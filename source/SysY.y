@@ -1,4 +1,27 @@
 %{
+/**
+文法分析编写过程
+
+1. 参考第一版文法，绝大多数非终结符与文法说明相同。由于bison需要BNF，而文法说明为EBNF
+因此有一些改动。具体为，由list结尾的一些非终结符是EBNF转BNF时添加的
+
+2. EBNF转BNF过程：
+    2.1. 首先根据一些基本规则进行转化，具体为：
+        + S->{A} 转化为 S->A`; A`->A`A | /null/;
+        + S->[A] 转化为 S->A`; A`->A | /null/;
+    2.2. 在之上的基础进行一些简化，主要的简化掉空规则
+
+3. 语义动作内生成对应的AST节点。分析结束时，将AST赋值给全局变量absyn_root，供之后使用。
+语义动作内包含三类函数：1)A_开头的AST构造函数 2)S_开头的将str转为symbol 3)特殊的U_reverseList
+
+4. U_reverseList使用目的
+    文法分析中一些规则我写成了最左推导(主要是以list结尾的文法规则)，这使得生成的AST顺序与真实情况相反，
+因此需要翻转一下链表。
+    改成最左推导的原因如下：
+        1) 冲突较少(感觉，没证明)
+        2) bison维护的解析栈相对较浅
+
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -340,6 +363,7 @@ Ident:
 %%
 
 static int calculate(int left, A_binOp op, int right){
+    /** 计算全为int的constInt，当前文法已不适用 */
     switch (op){
         case A_add:
             return left + right;
