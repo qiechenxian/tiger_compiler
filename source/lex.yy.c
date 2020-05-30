@@ -2154,6 +2154,7 @@ void yyfree (void * ptr )
 
 
 string striped(char* st){
+    /** 去掉左右括号，返回一个string*/
     int len = strlen(st);
     string striped_str = (string)malloc((len-1)*sizeof(char));
     for(int i = 1; i < len-1; i++){
@@ -2164,12 +2165,14 @@ string striped(char* st){
 }
 
 char* stripZero(char* st){
+    /** 去除8进制和16进制的前导0 */
     for(; *st == '0' && *(st+1); st++);
     assert(st);
     return st;
 }
 
 int otoi(char* text){
+    /** 8进制转10进制*/
     assert(text[0] == '0');
     char* str_num = stripZero(text);
     int res = *str_num - '0';
@@ -2177,9 +2180,11 @@ int otoi(char* text){
     return res;
 }
 
+ /// 16进制字符转对应的数值
 #define transHexP(p) (p-'0'<10?p-'0':(p-'A'<6?p-'7':p-'W'))
 
 int htoi(char* text){
+    /** 16进制转10进制*/
     assert(text[0] == '0' && (text[1] == 'x' | text[1] == 'X'));
     char* str_num = stripZero(text+2);
     int res = transHexP(*str_num);
