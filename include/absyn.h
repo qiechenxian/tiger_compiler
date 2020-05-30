@@ -1,6 +1,14 @@
 //
 // Created by loyx on 2020/4/29.
 //
+/**
+ * AST设计过程
+ * 参考了一些tiger语言的AST
+ * 虎书上说每一个终结符对应一个typedef， 这里做了一些简化
+ * 主要为：
+ *  1. 将(原本)多个typedef合成一个，例如A_dec中包含了变量、函数的声明
+ *  2. 一个typedef对应了多个文法非终结符，例如A_ArrayInitList对应了非终结符InitVal,InitValList
+ */
 
 #ifndef COMPILER_LOYX_ABSYN_H
 #define COMPILER_LOYX_ABSYN_H
@@ -39,7 +47,7 @@ typedef enum {
 A_decList A_conform(A_decList decs, S_symbol type);
 A_decList A_castDecList(A_decList list1, A_decList list2);
 
-/** program */
+/** AST */
 struct A_pos_ {
     int first_line;
     int first_column;
