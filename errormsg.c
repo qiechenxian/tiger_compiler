@@ -1,7 +1,7 @@
 //
 // Created by loyx on 2020/4/18.
 //
-#include "../include/errormsg.h"
+#include "errormsg.h"
 #include <stdarg.h>
 #include <stdio.h>
 

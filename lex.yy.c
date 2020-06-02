@@ -571,9 +571,9 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 ".\\lexer.l"
 #line 2 ".\\lexer.l"
-#include "../include/SysY.tab.h"
-#include "../include/util.h"
-#include "../include/errormsg.h"
+#include "SysY.tab.h"
+#include "util.h"
+#include "errormsg.h"
 
 extern int yywrap();
 extern void yyerror();

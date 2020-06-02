@@ -95,10 +95,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/util.h"
-#include "../include/errormsg.h"
-#include "../include/absyn.h"
-#include "../include/symbol.h"
+#include "util.h"
+#include "errormsg.h"
+#include "absyn.h"
+#include "symbol.h"
 
 extern int yylex();
 extern int yylineno;

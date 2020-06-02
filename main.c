@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "include/util.h"
-#include "include/absyn.h"
-#include "include/semant.h"
-#include "include/env.h"
+#include "util.h"
+#include "absyn.h"
+#include "semant.h"
+#include "env.h"
 
 extern FILE* yyin;
 extern FILE* yyout;

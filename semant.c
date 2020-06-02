@@ -2,8 +2,8 @@
 // Created by loyx on 2020/5/1.
 //
 
-#include "../include/semant.h"
-#include "../include/env.h"
+#include "semant.h"
+#include "env.h"
 #include <stdio.h>
 #include <string.h>
 
