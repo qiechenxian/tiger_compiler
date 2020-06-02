@@ -2,7 +2,7 @@
 // Created by loyx on 2020/4/25.
 //
 
-#include "../include/types.h"
+#include "types.h"
 
 
 static struct TY_ty_ ty_int = {TY_int};

@@ -3,8 +3,8 @@
 //
 
 #include <stdio.h>
-#include "../include/util.h"
-#include "../include/table.h"
+#include "util.h"
+#include "table.h"
 
 #define TAB_SIZE 127
 

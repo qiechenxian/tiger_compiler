@@ -2,7 +2,7 @@
 // Created by loyx on 2020/4/29.
 //
 
-#include "../include/absyn.h"
+#include "absyn.h"
 #include <string.h>
 
 

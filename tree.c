@@ -2,7 +2,7 @@
 // Created by loyx on 2020/5/8.
 //
 
-#include "../include/tree.h"
+#include "tree.h"
 T_expList T_ExpList(T_exp head, T_expList tail)
 {
     T_expList p = (T_expList)checked_malloc(sizeof *p);

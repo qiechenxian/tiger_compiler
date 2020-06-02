@@ -2,7 +2,7 @@
 // Created by loyx on 2020/3/24.
 //
 #include <string.h>
-#include "../include/util.h"
+#include "util.h"
 
 void* checked_malloc(unsigned len){
     void* p = malloc(len);

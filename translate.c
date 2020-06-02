@@ -2,8 +2,8 @@
 // Created by loyx on 2020/5/7.
 //
 
-#include "../include/translate.h"
-#include "../include/tree.h"
+#include "translate.h"
+#include "tree.h"
 
 
 /**

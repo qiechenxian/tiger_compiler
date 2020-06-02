@@ -2,7 +2,7 @@
 // Created by loyx on 2020/4/27.
 //
 
-#include "../include/env.h"
+#include "env.h"
 
 E_envEntry E_VarEntry(bool isConst, Tr_access access, TY_ty ty){
     E_envEntry e = checked_malloc(sizeof(*e));

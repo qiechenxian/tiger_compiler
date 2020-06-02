@@ -2,7 +2,7 @@
 // Created by loyx on 2020/5/7.
 //
 #include <stdio.h>
-#include "../include/temp.h"
+#include "temp.h"
 
 struct Temp_temp_ {int num;};
 

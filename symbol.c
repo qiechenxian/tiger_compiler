@@ -3,8 +3,8 @@
 //
 
 #include <string.h>
-#include "../include/symbol.h"
-#include "../include/table.h"
+#include "symbol.h"
+#include "table.h"
 
 struct S_symbol_{string name; S_symbol next;};
 static S_symbol newSymbol(string name, S_symbol next){
