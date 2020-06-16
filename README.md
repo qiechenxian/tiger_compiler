@@ -40,9 +40,11 @@
 直接运算了constExp的值。但现在constExp包含了常数变量
 可能得移动到语义阶段。
 
-##更新
-增加了栈帧结构的层次level封装，方便嵌套访问外层变量时通过静态链进行变量的level回溯访问
+## 更新—frame_level
++ 增加了栈帧结构的层次level封装，方便嵌套访问外层变量时通过静态链进行变量的level回溯访问
 添加frame的locals局部变量区域，formals视为参数区域且默认formals顶部指针指向静态链存储区
 暂时默认所有变量存储在frame中，寄存器分配待补充
 目前中间代码生成还在写，暂时只完成了simplevar的翻译
 我的ubuntu系统当时改python版本时的出了些问题，暂时是在windows下修改代码
+
+
