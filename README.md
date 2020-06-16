@@ -22,14 +22,16 @@
 + types.[ch]: 类型系统
 + env.[ch]: 类型检查使用的环境
 
-## C0的遗留产物
-这些是当时为C0写的
+## 中间代码生成
 + frame.h: 通用栈帧的抽象表示
 + arm_frame.c: arm结构栈帧
 + tree.[ch]: 树状IR定义
 + temp.[ch]: 临时变量和标号
-+ escape.[ch]: 逃逸变量查找
 + translate.[ch]: AST到IR的转化
+
+## C0的遗留产物
+这些是当时为C0写的
++ escape.[ch]: 逃逸变量查找
 
 ## 其他
 + main.c: 程序入口
