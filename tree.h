@@ -14,10 +14,10 @@ typedef struct T_stmList_ *T_stmList;
 typedef enum {
     T_add, T_sub, T_mul, T_div,
     T_and, T_or, T_lshift, T_rshift, T_arshift,
-    T_xor
+    T_xor, T_mod//添加取余
 } T_binOp;
 typedef enum {
-    T_lt, T_le, T_gt, T_ge, T_eq, T_ne
+    T_lt, T_le, T_gt, T_ge, T_eq, T_ne,T_not//添加not !
 } T_relOp;
 
 
@@ -58,7 +58,7 @@ T_expList T_ExpList(T_exp head, T_expList tail);
 T_stm T_Seq(T_stm left, T_stm right);
 T_stm T_Label(Temp_label label);
 T_stm T_Jump(T_exp exp, Temp_labelList labels);
-T_stm T_Cjump(T_relOp op, T_exp left, T_exp right, Temp_label, Temp_label);
+T_stm T_Cjump(T_relOp op, T_exp left, T_exp right, Temp_label trues, Temp_label falses);//
 T_stm T_Move(T_exp dst, T_exp src);
 T_stm T_Exp(T_exp exp);
 

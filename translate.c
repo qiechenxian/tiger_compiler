@@ -3,7 +3,7 @@
 //
 
 #include "translate.h"
-#include "tree.h"
+
 
 
 /**
@@ -33,7 +33,10 @@ struct Tr_exp_{
         struct Cx cx;
     }u;
 };
-
+struct Tr_access_{
+    Tr_level level;
+    F_access access;
+};//为静态链变量回溯 添加level封装
 struct Tr_expList_{ /// 特殊list, 记录头和尾
     Tr_node first;
     Tr_node last;
@@ -42,7 +45,10 @@ struct Tr_node_{
     Tr_exp exp;
     Tr_node next;
 };
-
+struct Tr_level_{
+    Tr_level_ parent_level;
+    F_frame frame;
+};//回溯用栈帧level封装
 
 /**
  * function prototype
@@ -62,6 +68,13 @@ static patchList joinPatch(patchList fList, patchList sList);
 /**
  * 构造函数
  * */
+ Tr_access Tr_Access(Tr_level level,F_access access)//接口改变
+ {
+    Tr_access acc=(Tr_access)checked_malloc(sizeof(*acc));
+    acc->level=level;
+    acc->access=access;
+    return acc;
+ }
 Tr_accessList Tr_AccessList(Tr_access head, Tr_accessList tail){
     Tr_accessList p = checked_malloc(sizeof(*p));
     p->head = head;
@@ -99,8 +112,9 @@ static patchList PatchList(Temp_label *head, patchList tail){
 
 
 /** delegate to frame.h */
-Tr_access Tr_allocLocal(F_frame frame, bool escape){
-    return F_allocLocal(frame, escape);
+Tr_access Tr_allocLocal(Tr_level level, bool escape){
+    F_access new_access=F_allocLocal(level->frame, escape);
+    return Tr_Access(level,new_access);
 }
 Tr_accessList Tr_getFormals(Tr_frame frame){
     return F_getFormals(frame);
@@ -129,6 +143,13 @@ static patchList joinPatch(patchList fList, patchList sList){
 
 
 /** expList functions */
+Tr_level Tr_newLevel(Tr_level parent,Temp_label name,U_boolList formals)//
+{
+    Tr_level level=(Tr_level)checked_malloc(sizeof(Tr_level_));
+    level->parent=parent;
+    level->frame=F_newFrame(name,U_boolList(true,formals));
+    return level;
+}//level封装后的newframe
 Tr_expList Tr_ExpList(){
     Tr_expList p = checked_malloc(sizeof(*p));
     p->last = NULL;
@@ -163,4 +184,14 @@ bool Tr_expList_isEmpty(Tr_expList list){
     if (!list || !list->first) return true;
     return false;
 }
-
+Tr_exp Tr_simpleVar(Tr_access acc,Tr_level level)//acc中包含目标access的offset和层数，level是指当前层数（静态连访问从当前层数逐层回溯访问）
+{
+    T_exp tmp=T_Temp(F_FP());
+    while(level!=NULL&&level!=acc->level->parent)
+    {
+        tmp=T_Mem(T_Binop(T_add,T_Const(level->frame->formals->head->u.offset),tmp));
+        level=level->parent;
+    }
+    return Tr_Ex(F_Exp(acc->access,tmp));
+}
+//todo array trans
