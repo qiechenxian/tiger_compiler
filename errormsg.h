@@ -6,7 +6,7 @@
 #define COMPILER_LOYX_ERRORMSG_H
 
 #include "util.h"
-#include "absyn.h"
+#include "ast.h"
 
 #define EM_LINE_CODE_BUF 510
 

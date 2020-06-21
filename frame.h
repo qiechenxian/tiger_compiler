@@ -8,6 +8,13 @@
 #include "util.h"
 #include "temp.h"
 #include "tree.h"
+
+/** 架构参数 */
+const int F_WORD_SIZE = 4; /// 32位机器
+static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
+static Temp_temp fp=NULL;
+
+
 typedef struct F_frame_* F_frame;
 typedef struct F_access_* F_access;
 

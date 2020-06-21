@@ -4,7 +4,7 @@
 
 #ifndef COMPILER_LOYX_TRANSLATE_H
 #define COMPILER_LOYX_TRANSLATE_H
-#include "tree.h"
+
 #include "frame.h"
 
 /**
@@ -14,10 +14,10 @@
  * 同时支持扩展静态链等
  *
  * */
-typedef Tr_access_* Tr_access;
+typedef F_access Tr_access;
 typedef F_accessList Tr_accessList;
 typedef F_frame Tr_frame;
-typedef Tr_level_* Tr_level;
+
 Tr_frame Tr_newFrame(Temp_label name, U_boolList formals);
 Tr_access Tr_allocLocal(Tr_frame frame, bool escape);
 Tr_accessList Tr_getFormals(Tr_frame frame);

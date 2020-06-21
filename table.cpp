@@ -16,7 +16,7 @@ struct binder_{
     void* prev_top;
 };
 static binder Binder(void* key, void* value, binder next, void *prev_top){
-    binder b = checked_malloc(sizeof(*b));
+    binder b = (binder)checked_malloc(sizeof(*b));
     b->key = key;
     b->value = value;
     b->next = next;
@@ -30,7 +30,7 @@ struct TAB_table_{
     void* top;
 };
 TAB_table TAB_empty(){
-    TAB_table t = checked_malloc(sizeof(*t));
+    TAB_table t = (TAB_table)checked_malloc(sizeof(*t));
     t->top = NULL;
     for(int i = 0; i < TAB_SIZE; i++)
         t->table[i] = NULL;
@@ -38,13 +38,13 @@ TAB_table TAB_empty(){
 }
 void TAB_enter(TAB_table t, void* key, void* value){
     assert(t && key);
-    unsigned index = ((unsigned)key) % TAB_SIZE;
+    long long index = ((long long)key) % TAB_SIZE;
     t->table[index] = Binder(key, value, t->table[index], t->top);
     t->top = key;
 }
 void* TAB_look(TAB_table t, void* key){
     assert(t && key);
-    unsigned index = ((unsigned)key) % TAB_SIZE;
+    long long index = ((long long)key) % TAB_SIZE;
     for(binder b = t->table[index]; b; b = b->next){
         if(b->key == key) return b->value;
     }
@@ -54,7 +54,7 @@ void* TAB_pop(TAB_table t){
     assert(t);
     void* pop_key = t->top;
     assert(pop_key);
-    unsigned index = ((unsigned)pop_key) % TAB_SIZE;
+    long long index = ((long long)pop_key) % TAB_SIZE;
     binder pop_binder = t->table[index];
     assert(pop_binder);
     t->table[index] = pop_binder->next;

@@ -18,7 +18,7 @@ string String(char *str){
 }
 
 U_boolList U_BoolList(bool head, U_boolList tail){
-    U_boolList p = checked_malloc(sizeof(*p));
+    U_boolList p = (U_boolList)checked_malloc(sizeof(*p));
     p->head = head;
     p->tail = tail;
     return p;

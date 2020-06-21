@@ -5,7 +5,7 @@
 #ifndef COMPILER_LOYX_SEMANT_H
 #define COMPILER_LOYX_SEMANT_H
 
-#include "absyn.h"
+#include "ast.h"
 #include "types.h"
 #include "errormsg.h"
 #include "translate.h"

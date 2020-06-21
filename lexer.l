@@ -1,7 +1,7 @@
 %{
-#include "../include/SysY.tab.h"
-#include "../include/util.h"
-#include "../include/errormsg.h"
+#include "SysY.tab.h"
+#include "util.h"
+#include "errormsg.h"
 
 extern int yywrap();
 extern void yyerror();
@@ -110,10 +110,12 @@ char* stripZero(char* st){
 int otoi(char* text){
     /** 8进制转10进制*/
     assert(text[0] == '0');
-    char* str_num = stripZero(text);
-    int res = *str_num - '0';
-    while(*(++str_num)){res = 8 * res + *str_num - '0';}
-    return res;
+    char *ptr;
+    int res=(int)strtol(text,&ptr,8);
+//    char* str_num = stripZero(text);
+//    int res = *str_num - '0';
+//    while(*(++str_num)){res = 8 * res + *str_num - '0';}
+//    return res;
 }
 
  /// 16进制字符转对应的数值
@@ -121,10 +123,12 @@ int otoi(char* text){
 
 int htoi(char* text){
     /** 16进制转10进制*/
-    assert(text[0] == '0' && (text[1] == 'x' | text[1] == 'X'));
-    char* str_num = stripZero(text+2);
-    int res = transHexP(*str_num);
-    while(*(++str_num)){res = 16 * res + transHexP(*str_num);}
-    return res;
+    char *ptr;
+    int res=(int)strtol(text,&ptr,16);
+//    assert(text[0] == '0' && (text[1] == 'x' | text[1] == 'X'));
+//    char* str_num = stripZero(text+2);
+//    int res = transHexP(*str_num);
+//    while(*(++str_num)){res = 16 * res + transHexP(*str_num);}
+//    return res;
 }
 

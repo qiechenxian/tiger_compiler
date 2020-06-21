@@ -8,7 +8,7 @@
 
 struct S_symbol_{string name; S_symbol next;};
 static S_symbol newSymbol(string name, S_symbol next){
-    S_symbol s = checked_malloc(sizeof(*s));
+    S_symbol s = (S_symbol)checked_malloc(sizeof(*s));
     s->name = name; s->next = next;
     return s;
 }
@@ -55,6 +55,6 @@ void S_beginScope(S_table t){
 void S_endScope(S_table t){
     S_symbol s;
     do {
-        s = TAB_pop((TAB_table) t);
+        s = (S_symbol)TAB_pop((TAB_table) t);
     }while (s != &mark_sym);
 }
