@@ -65,7 +65,7 @@ static char error_str_ty[][12] = {
         "array", "struct", "typedef"
 };
 
-string TY_toString(TY_ty ty){
+c_string TY_toString(TY_ty ty){
     if(ty->kind == TY_ty_::TY_typedef)
         return S_getName(ty->u.ty_typedef.sym);
     return error_str_ty[ty->kind];

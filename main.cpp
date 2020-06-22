@@ -14,8 +14,8 @@ extern int yyparse();
  * 跨文件全局变量
  */
 extern  A_decList absyn_root;
-string INPUT_FILE;
-string OUTPUT_FILE;
+c_string INPUT_FILE;
+c_string OUTPUT_FILE;
 
 
 

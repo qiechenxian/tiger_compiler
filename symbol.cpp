@@ -6,8 +6,8 @@
 #include "symbol.h"
 #include "table.h"
 
-struct S_symbol_{string name; S_symbol next;};
-static S_symbol newSymbol(string name, S_symbol next){
+struct S_symbol_{c_string name; S_symbol next;};
+static S_symbol newSymbol(c_string name, S_symbol next){
     S_symbol s = (S_symbol)checked_malloc(sizeof(*s));
     s->name = name; s->next = next;
     return s;
@@ -15,15 +15,15 @@ static S_symbol newSymbol(string name, S_symbol next){
 
 #define SIZE 125
 static S_symbol hashtable[SIZE];
-static unsigned hash(char* s0){
+static unsigned hash(const char* s0){
     unsigned h = 0;
-    for(char* s = s0; *s; s++){
+    for(char* s = const_cast<char *>(s0); *s; s++){
         h = h*65599 + *s;
     }
     return h;
 }
 
-S_symbol S_Symbol(string name){
+S_symbol S_Symbol(c_string name){
     unsigned index = hash(name) % SIZE;
     S_symbol symbols = hashtable[index];
     for(S_symbol sym = symbols; sym; sym = sym->next){
@@ -35,7 +35,7 @@ S_symbol S_Symbol(string name){
     hashtable[index] = new_sym;
     return new_sym;
 }
-string S_getName(S_symbol sym){
+c_string S_getName(S_symbol sym){
     return sym->name;
 }
 S_table S_empty(){

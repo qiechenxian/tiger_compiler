@@ -10,9 +10,9 @@ void* checked_malloc(unsigned len){
     return p;
 }
 
-string String(char *str){
+c_string String(char *str){
     unsigned len = strlen(str);
-    string p = (string)checked_malloc(len*sizeof(char));
+    c_string p = (c_string)checked_malloc(len * sizeof(char));
     strcpy(p, str);
     return p;
 }

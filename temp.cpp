@@ -19,10 +19,10 @@ Temp_label Temp_newLabel(){
     sprintf(buf, "L%d", label++);
     return Temp_namedLabel(String(buf));
 }
-Temp_label Temp_namedLabel(string name){
+Temp_label Temp_namedLabel(c_string name){
     return S_Symbol(name);
 }
-string Temp_labelString(Temp_label s){
+c_string Temp_labelString(Temp_label s){
     return S_getName(s);
 }
 Temp_tempList Temp_TempList(Temp_temp head, Temp_tempList tail){

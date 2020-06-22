@@ -13,8 +13,8 @@ Temp_temp Temp_newTemp();
 
 typedef  S_symbol Temp_label;
 Temp_label Temp_newLabel();
-Temp_label Temp_namedLabel(string name);
-string Temp_labelString(Temp_label s);
+Temp_label Temp_namedLabel(c_string name);
+c_string Temp_labelString(Temp_label s);
 
 typedef struct Temp_tempList_ *Temp_tempList;
 struct Temp_tempList_{Temp_temp head; Temp_tempList tail;};

@@ -579,7 +579,7 @@ char *yytext;
 extern int yywrap();
 extern void yyerror(char* msg);
 
-string striped(char*);
+c_string striped(char*);
 int otoi(char* text);
 int htoi(char* text);
 
@@ -2154,10 +2154,10 @@ void yyfree (void * ptr )
 
 
 
-string striped(char* st){
+c_string striped(char* st){
     /** 去掉左右括号，返回一个string*/
     int len = strlen(st);
-    string striped_str = (string)malloc((len-1)*sizeof(char));
+    c_string striped_str = (c_string)malloc((len - 1) * sizeof(char));
     for(int i = 1; i < len-1; i++){
         striped_str[i-1] = st[i];
     }
