@@ -22,9 +22,9 @@
         2) bison维护的解析栈相对较浅
 
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "util.h"
 #include "errormsg.h"
 #include "ast.h"
@@ -101,13 +101,13 @@ void yyerror(char*);
 %token <character> CHARACTER
 
 %type <var> LVal
-%type <integer> Number ConstExp
+%type <integer> Number
 %type <sym> Ident BType
 %type <binOp> addOp mulOp UnaryOp RelOp
 %type <stm> Block Stmt
 %type <comStmList> BlockItem
 %type <expList> ConstSubscripts ExpSubscripts FuncRParams
-%type <exp> Exp Cond
+%type <exp> Exp Cond ConstExp
 %type <decList> CompUnit Decl ConstDecl ConstDefList VarDecl VarDefList
 %type <dec> ConstDef VarDef FuncDef
 %type <arrayInitList> ConstInitValList ConstInitVal InitVal InitValList
@@ -160,18 +160,18 @@ BType:
 
 ConstDef:
     Ident ASSIGNMENT ConstExp {
-        $$ = A_VariableDec(A_POS(@$), NULL, $1, A_IntExp(A_POS(@3), $3), true);
+        $$ = A_VariableDec(A_POS(@$), NULL, $1, $3, true);
     }
     | Ident ConstSubscripts ASSIGNMENT ConstInitVal {
-        $$ = (A_dec)A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), (A_arrayInitList)U_reverseList($4), true);
+        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), (A_arrayInitList)U_reverseList($4), true);
     }
     ;
 
 ConstSubscripts:
     ConstSubscripts L_BRACKETS ConstExp R_BRACKETS {
-        $$ = A_ExpList(A_IntExp(A_POS(@3), $3), $1);
+        $$ = A_ExpList($3, $1);
     }
-    | L_BRACKETS ConstExp R_BRACKETS {$$ = A_ExpList(A_IntExp(A_POS(@2), $2), NULL);}
+    | L_BRACKETS ConstExp R_BRACKETS {$$ = A_ExpList($2, NULL);}
     ;
 
 ConstInitVal:
@@ -186,13 +186,13 @@ ConstInitValList:
         $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), (A_arrayInitList)U_reverseList($3)), $1);
     }
     | ConstInitValList COMMA ConstExp {
-        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), A_IntExp(A_POS(@3), $3)), $1);
+        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $3), $1);
     }
     | ConstInitVal {
         $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), (A_arrayInitList)U_reverseList($1)), NULL);
     }
     | ConstExp {
-        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), A_IntExp(A_POS(@1), $1)), NULL);
+        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $1), NULL);
     }
     ;
 
@@ -345,11 +345,7 @@ Exp:
     ;
 
 ConstExp:
-    ConstExp addOp ConstExp %prec UAddOp {$$ = calculate($1, $2, $3);}
-    | ConstExp mulOp ConstExp %prec UMulOp {$$ = calculate($1, $2, $3);}
-    | UnaryOp ConstExp %prec UUnary {$$ = calculate(0, $1, $2);}
-    | L_PARENTHESIS ConstExp L_PARENTHESIS {$$ = $2;}
-    | Number {$$ = $1;}
+    Exp {$$ = $1}
     ;
 
 Number:

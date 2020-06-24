@@ -4,12 +4,12 @@
 
 #include "semant.h"
 #include "env.h"
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 /** expty构造函数 */
 struct expty Expty(Tr_exp exp, TY_ty ty, bool isConst){
-    struct expty e;
+    struct expty e{};
     e.exp = exp;
     e.ty = ty;
     e.isConst = isConst;
@@ -44,8 +44,8 @@ static TY_ty anonymousArrayTyDec(S_symbol base, int size, S_table tenv) {
         arrayStr[i] = '$';
     }
     S_symbol arraySym = S_Symbol(arrayStr);
-    TY_ty ty = (TY_ty)S_look(tenv, arraySym);
-    if (ty == NULL){
+    auto ty = (TY_ty)S_look(tenv, arraySym);
+    if (ty == nullptr){
         ty = (TY_ty)S_look(tenv, base);
         for (int i = 0; i < size; ++i)
             ty = TY_Array(ty);
@@ -123,13 +123,13 @@ static TY_ty look_ty(S_table tenv, S_symbol sym){
 F_fragList SEM_transProgram(S_table venv, S_table tenv, A_decList program){
 
     for (A_decList iter = program; iter; iter = iter->tail)
-        transDec(NULL, venv, tenv, iter->head);
+        transDec(nullptr, venv, tenv, iter->head);
 
-    E_envEntry mainEntry = (E_envEntry)S_look(venv, S_Symbol("main"));
+    auto mainEntry = (E_envEntry)S_look(venv, S_Symbol("main"));
     if (!mainEntry || mainEntry->kind != E_envEntry_::E_funEntry)
         EM_error(A_Pos(0,0,0,0), "not find main function");
 
-    return NULL;
+    return nullptr;
 }
 
 static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
@@ -138,7 +138,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
 
             /** 检查数组基础类型 */
             assert(d->u.array.base);
-            TY_ty type = (TY_ty)look_ty(tenv, d->u.array.base);
+            auto type = (TY_ty)look_ty(tenv, d->u.array.base);
             if (!type){
                 EM_error(d->pos, "unknown type \'%s\'",
                          S_getName(d->u.array.base));
@@ -147,7 +147,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             if (frame)
                 var_access = Tr_allocLocal(frame, true);
             else
-                var_access = NULL; // todo global var const var
+                var_access = nullptr; // todo global var const var
 
             /** 根据数组纬度生成对应的类型， 相当于一个匿名typedef variableDec */
             int lens = 0;
@@ -155,7 +155,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             assert(lens);
             TY_ty array_ty = anonymousArrayTyDec(d->u.array.base, lens, tenv);
 
-            /** 填符号表 */
+            /** 填符号表
+             *
+             * varEntry保存每个varDec的isConst，用来区分const和非const
+             *
+             * */
             S_enter(venv, d->u.array.id, E_VarEntry(d->u.array.isConst, var_access, array_ty));
 
             /** 检查下标 */
@@ -173,11 +177,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             // todo translate
 
             /** 处理初值 */
-            if (d->u.array.init != NULL){
+            if (d->u.array.init != nullptr){
                 // todo check init value
-                return NULL; // todo translate
+                return nullptr; // todo translate
             }
-            return NULL;
+            return nullptr;
         }
         case A_dec_::A_variableDec:{
 
@@ -193,24 +197,24 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             if (frame)
                 var_access = Tr_allocLocal(frame, true);
             else
-                var_access = NULL; // todo global var const var
+                var_access = nullptr; // todo global var const var
             S_enter(venv, d->u.var.id, E_VarEntry(d->u.var.isConst, var_access, type));
 
             /** 处理初始值 */
-            if (d->u.var.init != NULL) {
+            if (d->u.var.init != nullptr) {
                 struct expty e = transExp(venv, tenv, d->u.var.init);
                 if (!is_equal_ty(type, e.ty)) {
                     EM_error(d->pos, "type error: %s given, expected %s for expression",
                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
-                return NULL; /// todo return assign op
+                return nullptr; /// todo return assign op
             }
-            return NULL; /// no init value and not array
+            return nullptr; /// no init value and not array
         }
         case A_dec_::A_functionDec:{
 
             /** 处理函数头 */
-            TY_ty resultTy = NULL;
+            TY_ty resultTy = nullptr;
             if (d->u.function.result){
                 resultTy = (TY_ty)S_look(tenv, d->u.function.result);
                 if (!resultTy)
@@ -228,7 +232,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             S_enter(venv, d->u.function.id, E_FunEntry(fun_label, formalTys, resultTy));
 
             /** 处理函数体 */
-            E_envEntry funEntry = (E_envEntry)S_look(venv, d->u.function.id);
+            auto funEntry = (E_envEntry)S_look(venv, d->u.function.id);
             S_beginScope(venv);
             S_beginScope(tenv);
                 /// 登记形参
@@ -253,7 +257,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             }
                 /// 检查main函数是否有参数，返回值是否为int
             if (d->u.function.id == S_Symbol("main")){
-                if (d->u.function.params != NULL)
+                if (d->u.function.params != nullptr)
                     EM_warning(d->pos, "main function should have no args");
                 if (!is_equal_ty(returnValue.ty, TY_Int()))
                     EM_warning(d->pos, "main function should return a integer");
@@ -262,7 +266,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             S_endScope(venv);
             S_endScope(tenv);
             /// todo return tr_noExp
-            return NULL;
+            return nullptr;
         }
         case A_dec_::A_typedef:
             assert(0); /// todo typedef
@@ -275,10 +279,10 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         case A_stm_::A_expStm:{
             transExp(venv, tenv, s->u.expStm);
             // todo translate
-            return Expty(NULL, TY_Void(), false);
+            return Expty(nullptr, TY_Void(), false);
         }
         case A_stm_::A_ifStm:{
-            struct expty test, body, elseBody;
+            struct expty test{}, body{}, elseBody{};
             test = transExp(venv, tenv, s->u.ifStm.test);
             if (test.ty->kind != TY_ty_::TY_int){
                 EM_error(s->u.ifStm.test->pos, "integer required");
@@ -287,10 +291,10 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody);
                 // todo translate
-                return Expty(NULL, TY_Void(), false);
+                return Expty(nullptr, TY_Void(), false);
             }
             // todo translate
-            return Expty(NULL, TY_Void(), false);
+            return Expty(nullptr, TY_Void(), false);
         }
         case A_stm_::A_whileStm:{
             struct expty test = transExp(venv, tenv, s->u.whileStm.test);
@@ -332,7 +336,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             struct expty var = transVar(venv, tenv, s->u.assignStm.var);
 
             /// 检查左值是否为const
-            if (var.isConst == true){
+            if (var.isConst){
                 EM_error(s->pos,
                         "assignment of read-only variable \'%s\'",
                         S_getName(s->u.assignStm.var->u.simple));
@@ -389,18 +393,18 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             return transVar(venv, tenv, a->u.varExp);
         }
         case A_exp_::A_intExp:{
-            return Expty(NULL, TY_Int(), false);
+            return Expty(nullptr, TY_Int(), false);
         }
         case A_exp_::A_charExp:{
-            return Expty(NULL, TY_Char(), false);
+            return Expty(nullptr, TY_Char(), false);
         }
         case A_exp_::A_callExp:{
-            E_envEntry funEntry = (E_envEntry)S_look(venv, a->u.callExp.id);
+            auto funEntry = (E_envEntry)S_look(venv, a->u.callExp.id);
             /// 检查是否定义函数
-            if (funEntry == NULL || funEntry->kind != E_envEntry_::E_funEntry){
+            if (funEntry == nullptr || funEntry->kind != E_envEntry_::E_funEntry){
                 EM_error(a->pos, "undefined function %s",
                          S_getName(a->u.callExp.id));
-                return Expty(NULL, TY_Void(), false);
+                return Expty(nullptr, TY_Void(), false);
             }
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
@@ -422,7 +426,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                 EM_error(a->pos, "too many arguments!");
             }
             // todo translate
-            return Expty(NULL, actual_ty(funEntry->u.fun.result), false);
+            return Expty(nullptr, actual_ty(funEntry->u.fun.result), false);
         }
         case A_exp_::A_opExp:{
             A_binOp op = a->u.opExp.op;
@@ -445,7 +449,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                                  "%s expression given for RHS, expected int",
                                  TY_toString(right.ty));
                     }
-                    return Expty(NULL, TY_Int(), false);
+                    return Expty(nullptr, TY_Int(), false);
                     /// todo return op
                 }
                 case A_eq:
@@ -517,14 +521,14 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
 static struct expty transVar(S_table venv, S_table tenv, A_var v){
     switch (v->kind) {
         case A_var_::A_simpleVar:{
-            E_envEntry varEntry = (E_envEntry)S_look(venv, v->u.simple);
-            if (varEntry == NULL || varEntry->kind != E_envEntry_::E_varEntry){
+            auto varEntry = (E_envEntry)S_look(venv, v->u.simple);
+            if (varEntry == nullptr || varEntry->kind != E_envEntry_::E_varEntry){
                 EM_error(v->pos, "undefined variable %s",
                         S_getName(v->u.simple));
-                return Expty(NULL, TY_Int(), varEntry->u.var.isConst);
+                return Expty(nullptr, TY_Int(), varEntry->u.var.isConst);
             } else{
                 // todo translate
-                return Expty(NULL, actual_ty(varEntry->u.var.ty), varEntry->u.var.isConst);
+                return Expty(nullptr, actual_ty(varEntry->u.var.ty), varEntry->u.var.isConst);
             }
         }
         case A_var_::A_arrayVar:{

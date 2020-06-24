@@ -15,6 +15,7 @@ struct E_envEntry_{
     enum {E_varEntry, E_funEntry}kind;
     union {
         struct {bool isConst; Tr_access access; TY_ty ty;}var;
+//        struct {bool isConst; E_constValues cValues; Tr_access access; TY_ty ty;}var; todo ConstExp
         struct {Temp_label label; TY_tyList formals; TY_ty result;}fun;
     }u;
 };
