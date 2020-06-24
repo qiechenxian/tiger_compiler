@@ -5,15 +5,16 @@
 #include "env.h"
 
 E_envEntry E_VarEntry(bool isConst, Tr_access access, TY_ty ty){
-    E_envEntry e = (E_envEntry)(sizeof(*e));
+    auto e = (E_envEntry)checked_malloc(sizeof(E_envEntry_));
     e->kind = E_envEntry_::E_varEntry;
     e->u.var.isConst = isConst;
+    e->u.var.cValues = nullptr;
     e->u.var.access = access;
     e->u.var.ty = ty;
     return e;
 }
 E_envEntry E_FunEntry(Temp_label label, TY_tyList formals, TY_ty result){
-    E_envEntry e = (E_envEntry)checked_malloc(sizeof(*e));
+    auto e = (E_envEntry)checked_malloc(sizeof(E_envEntry_));
     e->kind = E_envEntry_::E_funEntry;
     e->u.fun.label = label;
     e->u.fun.formals = formals;
@@ -21,8 +22,21 @@ E_envEntry E_FunEntry(Temp_label label, TY_tyList formals, TY_ty result){
     return e;
 }
 
+E_constValues E_SingleValue(int v){
+    auto e = (E_constValues)checked_malloc(sizeof(E_constValues_));
+    e->kind = E_constValues_::E_singleValue;
+    e->u.singleValue = v;
+    return e;
+}
+E_constValues E_ArrayValue(int* vs){
+    auto e = (E_constValues)checked_malloc(sizeof(E_constValues_));
+    e->kind = E_constValues_::E_arrayValue;
+    e->u.arrayValue = vs;
+    return e;
+}
+
 S_table E_base_typeEntry(){
-    S_table t = (S_table)S_empty();
+    auto t = (S_table)S_empty();
     S_enter(t, S_Symbol("int"), TY_Int());
     S_enter(t, S_Symbol("void"), TY_Void());
     return t;
