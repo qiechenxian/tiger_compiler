@@ -7,7 +7,11 @@
 #include <cstdio>
 #include <cstring>
 
-/** expty构造函数 */
+/**
+ * expty构造函数
+ *
+ * expty的作用是：在各transXX函数中传递信息。这个名字不太好
+ * */
 struct expty Expty(Tr_exp exp, TY_ty ty, bool isConst){
     struct expty e{};
     e.exp = exp;
@@ -104,8 +108,10 @@ static TY_ty actual_ty(TY_ty ty){
     /**
      * 在存在typedef的情况下，获取该类型的真实类型
      * */
-    if (ty->kind == TY_ty_::TY_typedef)
+    if (ty->kind == TY_ty_::TY_typedef) {
         return actual_ty(ty->u.ty_typedef.ty);
+        assert(0); // 我们没有typedef关键词， 不应该运行到此处。 --loyx 2020/6/25
+    }
     else
         return ty;
 }
@@ -125,7 +131,7 @@ F_fragList SEM_transProgram(S_table venv, S_table tenv, A_decList program){
     for (A_decList iter = program; iter; iter = iter->tail)
         transDec(nullptr, venv, tenv, iter->head);
 
-    auto mainEntry = (E_envEntry)S_look(venv, S_Symbol("main"));
+    auto mainEntry = (E_envEntry)S_look(venv, S_Symbol((char *)"main"));
     if (!mainEntry || mainEntry->kind != E_envEntry_::E_funEntry)
         EM_error(A_Pos(0,0,0,0), "not find main function");
 
@@ -155,17 +161,18 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
             assert(lens);
             TY_ty array_ty = anonymousArrayTyDec(d->u.array.base, lens, tenv);
 
-            /** 填符号表
-             *
-             * varEntry保存每个varDec的isConst，用来区分const和非const
-             *
-             * */
-            S_enter(venv, d->u.array.id, E_VarEntry(d->u.array.isConst, var_access, array_ty));
+            /// 数组声明，在符号表中的基本条目
+            E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
 
             /** 检查下标 */
             for (A_expList iter = d->u.array.size; iter; iter = iter->tail){
+                /**
+                 * 下标要求都是可求值非负的constExp
+                 * transExp函数保证将constExp表达式优化成单个intExp，并就地修改AST结构
+                 */
                 A_exp subscript = iter->head;
-                if (subscript->kind != A_exp_::A_intExp)
+                transExp(venv, tenv, subscript); /// 转化constExp表达式
+                if (subscript->kind != A_exp_::A_intExp) /// 如果下标合法，transExp保证AST被就地修改为intExp
                     EM_error(subscript->pos,
                             "size of array \'%s\' has non-integer type",
                             S_getName(d->u.array.id));
@@ -178,9 +185,37 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
 
             /** 处理初值 */
             if (d->u.array.init != nullptr){
-                // todo check init value
-                return nullptr; // todo translate
+                // todo 检查数组初值是否合法
+
+                // todo 将标准化数组初值
+
+                if (d->u.array.isConst){
+                    /**
+                     * 常量数组初值处理
+                     */
+                    int temp[2]; // todo fix temp
+                    arrayEntry->u.var.cValues = E_ArrayValue(temp);
+                    S_enter(venv, d->u.array.id, arrayEntry);
+                    return nullptr;
+                } else{
+                    /**
+                     * 非常量数组初值处理
+                     */
+                    S_enter(venv, d->u.array.id, arrayEntry);
+                    return nullptr; // todo translate
+                }
             }
+
+            // todo 全局数组无初值情况
+            /// 无初值情况
+            if (d->u.array.isConst){
+                /**
+                 * 常数数组无初始化，默认全0
+                 */
+                int temp[2] = {}; // todo fix temp
+                arrayEntry->u.var.cValues = E_ArrayValue(temp);
+            }
+            S_enter(venv, d->u.array.id, arrayEntry);
             return nullptr;
         }
         case A_dec_::A_variableDec:{
@@ -192,24 +227,54 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
                 EM_error(d->pos, "unknown type name \'%s\'",
                         S_getName(d->u.var.type));
             }
-//            Tr_access var_access = Tr_allocLocal(frame, d->u.var.escape); todo escape
+            //Tr_access var_access = Tr_allocLocal(frame, d->u.var.escape); todo escape
             Tr_access var_access;
             if (frame)
                 var_access = Tr_allocLocal(frame, true);
             else
                 var_access = nullptr; // todo global var const var
-            S_enter(venv, d->u.var.id, E_VarEntry(d->u.var.isConst, var_access, type));
+
+            /// 该变量声明的在符号表中的基本条目
+            E_envEntry varEntry = E_VarEntry(d->u.var.isConst, var_access, type);
 
             /** 处理初始值 */
             if (d->u.var.init != nullptr) {
+
+                /// 检查初值与声明类型是否相符
                 struct expty e = transExp(venv, tenv, d->u.var.init);
                 if (!is_equal_ty(type, e.ty)) {
                     EM_error(d->pos, "type error: %s given, expected %s for expression",
                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
-                return nullptr; /// todo return assign op
+
+
+                if (d->u.var.isConst){
+                    /**
+                     * 如果是常量声明，需要判断初值是否为constExp
+                     * transExp函数保证，所有constExp都被转换为intExp。
+                     * 并且修改AST结构(此处为d->u.var.init)
+                     */
+                    if (d->u.var.init->kind != A_exp_::A_intExp){
+                        EM_error(d->u.var.init->pos,
+                                 "The initial value of the constant should be ConstExp");
+                    }
+                    /// 在符号表中创建该const变量的条目，特别保存const的初始值，供之后使用。
+                    varEntry->u.var.cValues = E_SingleValue(d->u.var.init->u.intExp); // transExp保证正确
+                    S_enter(venv, d->u.var.id, varEntry);
+                    return nullptr; /// 常量声明应该到此为止 todo 验证正确性
+                } else{
+                    /**
+                     * 非常量声明的初值处理
+                     */
+                    S_enter(venv, d->u.var.id, varEntry);
+                    return nullptr; /// todo return assign op
+                }
             }
-            return nullptr; /// no init value and not array
+
+            /// 没有初值
+            if (d->u.var.isConst) varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
+            S_enter(venv, d->u.var.id, varEntry);
+            return nullptr; /// no init value
         }
         case A_dec_::A_functionDec:{
 
@@ -256,7 +321,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
                         );
             }
                 /// 检查main函数是否有参数，返回值是否为int
-            if (d->u.function.id == S_Symbol("main")){
+            if (d->u.function.id == S_Symbol((char *)"main")){
                 if (d->u.function.params != nullptr)
                     EM_warning(d->pos, "main function should have no args");
                 if (!is_equal_ty(returnValue.ty, TY_Int()))
@@ -341,7 +406,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         "assignment of read-only variable \'%s\'",
                         S_getName(s->u.assignStm.var->u.simple));
             }
-            /// 检查数组是否定位到了元素 todo bug: 未实现该功能
+            /// 检查数组是否定位到了元素
             if (var.ty->kind == TY_ty_::TY_array){
                 EM_error(s->pos,"assignment to expression with array type");
             }
@@ -384,13 +449,19 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     assert(0);
 }
 
+// todo transExp 的计算constExp表达式功能
 static struct expty transExp(S_table venv, S_table tenv, A_exp a){
     switch (a->kind) {
         case A_exp_::A_logicExp:{
             assert(0);
         }
         case A_exp_::A_varExp:{
-            return transVar(venv, tenv, a->u.varExp);
+//            return transVar(venv, tenv, a->u.varExp);
+            expty var = transVar(venv, tenv, a->u.varExp);
+//            if (var.ty->kind == TY_ty_::TY_array)
+//                EM_error(a->pos,"");
+            return var;
+            // todo if const 应将 A_varExp 转化为 A_intExp
         }
         case A_exp_::A_intExp:{
             return Expty(nullptr, TY_Int(), false);

@@ -7,8 +7,9 @@ int test(int a, int b[][a*10]){
 }
 
 int main(){
-    int d[4][4-];
-    int _a;
+    int d[4][4] = {1,2,3,{{}}};
+    int _a = 10;
+    d[1][1] = d[1][2];
     test(1, d);
     return 1;
 }
