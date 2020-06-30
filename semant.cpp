@@ -480,7 +480,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
             A_expList argIter = a->u.callExp.args;
-            for ( ; argIter; argIter = argIter->tail, formals = formals->tail){
+            for ( ; argIter && formals; argIter = argIter->tail, formals = formals->tail){
                 struct expty argType = transExp(venv, tenv, argIter->head);
                 if (!is_equal_ty(argType.ty, formals->head)){
                     EM_warning(argIter->head->pos,
@@ -491,9 +491,9 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                 }
             }
             /// 检查参数个数
-            if (argIter == NULL && formals != NULL){
+            if (argIter == nullptr && formals != nullptr){
                 EM_error(a->pos, "not enough arguments!");
-            } else if (argIter != NULL && formals == NULL){
+            }else if (argIter != nullptr){
                 EM_error(a->pos, "too many arguments!");
             }
             // todo translate

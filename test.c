@@ -10,7 +10,7 @@ int main(){
     int d[4][4] = {1,2,3,{{}}};
     int _a = 10;
     d[1][1] = d[1][2];
-    test(1, d);
+    test(1);
     return 1;
 }
 
