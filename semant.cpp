@@ -33,6 +33,69 @@ static TY_tyList makeFormalTys(S_table tenv, A_fieldList params);
 
 
 /** 辅助函数 */
+static int calculate(A_binOp op, int left, int right) {
+    /**
+     * 该函数服务于transExp中A_varOp情况。
+     * 作用：计算常量表达式结果
+     */
+    switch (op) {
+        case A_or:
+            return left || right;
+        case A_and:
+            return left && right;
+        case A_not:
+            return !left;
+        case A_lt:
+            return left < right;
+        case A_le:
+            return left <= right;
+        case A_gt:
+            return left > right;
+        case A_ge:
+            return left >= right;
+        case A_eq:
+            return left == right;
+        case A_ne:
+            return left != right;
+        case A_add:
+            return left + right;
+        case A_sub:
+            return left - right;
+        case A_mul:
+            return left * right;
+        case A_div:
+            return left / right;
+        case A_mod:
+            return left % right;
+    }
+}
+
+static int getConstValue(S_table venv, A_exp a){
+    /**
+     * 此函数是服务transExp中A_varExp情况的辅助函数
+     * @param venv: 值环境符号表
+     * @param a: 特指A_varExp
+     * @return: const变量转化为int
+     */
+    A_var const_var = a->u.varExp;
+    int access_index[256];
+    int index_len = 0;
+    while (const_var->kind == A_var_::A_arrayVar){
+        A_exp exp_index = const_var->u.arrayVar.index;
+        assert(exp_index->kind == A_exp_::A_intExp);
+        access_index[index_len++] = exp_index->u.intExp;
+        const_var = const_var->u.arrayVar.id;
+    }
+    auto const_var_entry = (E_envEntry)S_look(venv, const_var->u.simple);
+    if (index_len){
+        int trans_index = 0; // todo 数组cValues访问
+        int *temp_array_cValues = const_var_entry->u.var.cValues->u.arrayValue;
+        return *(temp_array_cValues + trans_index);
+    } else{
+        return const_var_entry->u.var.cValues->u.singleValue;
+    }
+}
+
 static U_boolList makeFormalEscapeList(A_fieldList params){
     if (!params)
         return nullptr;
@@ -449,6 +512,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     assert(0);
 }
 
+
 // todo transExp 的计算constExp表达式功能
 static struct expty transExp(S_table venv, S_table tenv, A_exp a){
     switch (a->kind) {
@@ -456,12 +520,14 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             assert(0);
         }
         case A_exp_::A_varExp:{
-//            return transVar(venv, tenv, a->u.varExp);
             expty var = transVar(venv, tenv, a->u.varExp);
-//            if (var.ty->kind == TY_ty_::TY_array)
-//                EM_error(a->pos,"");
+            if (var.isConst){
+                a->u.intExp = getConstValue(venv, a);
+                a->kind = A_exp_::A_intExp;
+                var.ty = TY_Int();
+                /// 此处会造成内存泄漏，泄漏对象：a->u.varExp所指的A_var对象
+            }
             return var;
-            // todo if const 应将 A_varExp 转化为 A_intExp
         }
         case A_exp_::A_intExp:{
             return Expty(nullptr, TY_Int());
@@ -503,6 +569,17 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             A_binOp op = a->u.opExp.op;
             struct expty left = transExp(venv, tenv, a->u.opExp.left);
             struct expty right = transExp(venv, tenv, a->u.opExp.right);
+
+            if (left.isConst && right.isConst){
+                A_exp temp_left = a->u.opExp.left;
+                A_exp temp_right = a->u.opExp.right;
+                a->u.intExp = calculate(op, temp_left->u.intExp, temp_right->u.intExp);
+                a->kind = A_exp_::A_intExp;
+                expty expty_msg = Expty(nullptr, TY_Int());
+                expty_msg.isConst = true;
+                return expty_msg;
+                /// 此处会造成内存泄漏，泄漏对象：temp_left, temp_right所指对象
+            }
 
             switch (op) {
                 case A_add:
@@ -597,7 +674,6 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v){
                 EM_error(v->pos, "undefined variable %s",
                         S_getName(v->u.simple));
                 struct expty expty_msg = Expty(nullptr, TY_Int());
-                expty_msg.isConst = varEntry->u.var.isConst;
                 return expty_msg;
             } else{
                 // todo translate
@@ -613,7 +689,6 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v){
                 EM_error(v->u.arrayVar.id->pos,
                         "subscripted value is neither array nor pointer nor vector");
                 struct expty expty_msg = Expty(nullptr, TY_Int());
-                expty_msg.isConst = id.isConst;
                 return expty_msg;
             } else{
                 struct expty index = transExp(venv, tenv, v->u.arrayVar.index);
@@ -622,7 +697,7 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v){
                 }
                 // todo translate
                 expty expty_msg = Expty(nullptr, actual_ty(id.ty->u.array));
-                expty_msg.isConst = id.isConst;
+                expty_msg.isConst = id.isConst && index.isConst;
                 return expty_msg;
             }
         }
