@@ -13,7 +13,7 @@
 typedef void* F_fragList ;
 
 struct expty {Tr_exp exp; TY_ty ty;bool isConst;};
-struct expty Expty(Tr_exp exp, TY_ty ty, bool isConst);
+struct expty Expty(Tr_exp exp, TY_ty ty);
 
 F_fragList SEM_transProgram(S_table venv, S_table tenv, A_decList program);
 

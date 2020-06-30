@@ -12,11 +12,11 @@
  *
  * expty的作用是：在各transXX函数中传递信息。这个名字不太好
  * */
-struct expty Expty(Tr_exp exp, TY_ty ty, bool isConst){
+struct expty Expty(Tr_exp exp, TY_ty ty){
     struct expty e{};
     e.exp = exp;
     e.ty = ty;
-    e.isConst = isConst;
+    e.isConst = false;
     return e;
 }
 
@@ -344,7 +344,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         case A_stm_::A_expStm:{
             transExp(venv, tenv, s->u.expStm);
             // todo translate
-            return Expty(nullptr, TY_Void(), false);
+            return Expty(nullptr, TY_Void());
         }
         case A_stm_::A_ifStm:{
             struct expty test{}, body{}, elseBody{};
@@ -356,10 +356,10 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody);
                 // todo translate
-                return Expty(nullptr, TY_Void(), false);
+                return Expty(nullptr, TY_Void());
             }
             // todo translate
-            return Expty(nullptr, TY_Void(), false);
+            return Expty(nullptr, TY_Void());
         }
         case A_stm_::A_whileStm:{
             struct expty test = transExp(venv, tenv, s->u.whileStm.test);
@@ -368,11 +368,11 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             }
             // todo translate
             struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body);
-            return Expty(nullptr, TY_Void(), false);
+            return Expty(nullptr, TY_Void());
         }
         case A_stm_::A_blockStm:{
             if (!s->u.blockStm)
-                return Expty(nullptr, TY_Void(), false);
+                return Expty(nullptr, TY_Void());
 
             struct expty returnTy{};
             S_beginScope(tenv);
@@ -395,7 +395,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             }
             S_endScope(tenv);
             S_endScope(venv);
-            return Expty(nullptr, returnTy.ty, false);
+            return Expty(nullptr, returnTy.ty);
         }
         case A_stm_::A_assignStm:{
             struct expty var = transVar(venv, tenv, s->u.assignStm.var);
@@ -418,15 +418,15 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         TY_toString(var.ty));
             }
             // todo translate
-            return Expty(nullptr, TY_Void(), false);
+            return Expty(nullptr, TY_Void());
         }
         case A_stm_::A_returnStm:{
             if (!s->u.returnStm){
-                return Expty(nullptr, TY_Void(), false);
+                return Expty(nullptr, TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm);
             // todo 自建 translate
-            return Expty(nullptr, returnTy.ty, false);
+            return Expty(nullptr, returnTy.ty);
         }
         case A_stm_::A_switchStm:{
             struct expty key = transExp(venv, tenv, s->u.switchStm.exp);
@@ -438,7 +438,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                 struct expty body = transStm(frame, venv, tenv, caseIter->head->body);
                 // todo translate
             }
-            return Expty(nullptr, TY_Void(), false);
+            return Expty(nullptr, TY_Void());
         }
         case A_stm_::A_breakStm:
         case A_stm_::A_continue:{
@@ -464,10 +464,10 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             // todo if const 应将 A_varExp 转化为 A_intExp
         }
         case A_exp_::A_intExp:{
-            return Expty(nullptr, TY_Int(), false);
+            return Expty(nullptr, TY_Int());
         }
         case A_exp_::A_charExp:{
-            return Expty(nullptr, TY_Char(), false);
+            return Expty(nullptr, TY_Char());
         }
         case A_exp_::A_callExp:{
             auto funEntry = (E_envEntry)S_look(venv, a->u.callExp.id);
@@ -475,7 +475,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             if (funEntry == nullptr || funEntry->kind != E_envEntry_::E_funEntry){
                 EM_error(a->pos, "undefined function %s",
                          S_getName(a->u.callExp.id));
-                return Expty(nullptr, TY_Void(), false);
+                return Expty(nullptr, TY_Void());
             }
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
@@ -497,7 +497,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                 EM_error(a->pos, "too many arguments!");
             }
             // todo translate
-            return Expty(nullptr, actual_ty(funEntry->u.fun.result), false);
+            return Expty(nullptr, actual_ty(funEntry->u.fun.result));
         }
         case A_exp_::A_opExp:{
             A_binOp op = a->u.opExp.op;
@@ -520,7 +520,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                                  "%s expression given for RHS, expected int",
                                  TY_toString(right.ty));
                     }
-                    return Expty(nullptr, TY_Int(), false);
+                    return Expty(nullptr, TY_Int());
                     /// todo return op
                 }
                 case A_eq:
@@ -553,7 +553,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                                 "unexpected %s expression in comparison",
                                 TY_toString(right.ty));
                     }
-                    return Expty(nullptr, TY_Int(),false);
+                    return Expty(nullptr, TY_Int());
                 }
                 case A_lt:
                 case A_le:
@@ -574,13 +574,13 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                                  "unexpected %s expression in comparison",
                                  TY_toString(right.ty));
                     }
-                    return Expty(nullptr, TY_Int(), false);
+                    return Expty(nullptr, TY_Int());
                 }
                 case A_and:
                 case A_not:
                 case A_or:
                     /// todo and or not
-                    return Expty(nullptr, TY_Int(), false);
+                    return Expty(nullptr, TY_Int());
                 default:
                     assert(0);
             }
@@ -596,10 +596,14 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v){
             if (varEntry == nullptr || varEntry->kind != E_envEntry_::E_varEntry){
                 EM_error(v->pos, "undefined variable %s",
                         S_getName(v->u.simple));
-                return Expty(nullptr, TY_Int(), varEntry->u.var.isConst);
+                struct expty expty_msg = Expty(nullptr, TY_Int());
+                expty_msg.isConst = varEntry->u.var.isConst;
+                return expty_msg;
             } else{
                 // todo translate
-                return Expty(nullptr, actual_ty(varEntry->u.var.ty), varEntry->u.var.isConst);
+                struct expty expty_msg = Expty(nullptr, actual_ty(varEntry->u.var.ty));
+                expty_msg.isConst = varEntry->u.var.isConst;
+                return expty_msg;
             }
         }
         case A_var_::A_arrayVar:{
@@ -608,14 +612,18 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v){
             if (id.ty->kind != TY_ty_::TY_array){
                 EM_error(v->u.arrayVar.id->pos,
                         "subscripted value is neither array nor pointer nor vector");
-                return Expty(nullptr, TY_Int(), id.isConst);
+                struct expty expty_msg = Expty(nullptr, TY_Int());
+                expty_msg.isConst = id.isConst;
+                return expty_msg;
             } else{
                 struct expty index = transExp(venv, tenv, v->u.arrayVar.index);
                 if (index.ty->kind != TY_ty_::TY_int){
                     EM_error(v->u.arrayVar.index->pos, "index must be a int");
                 }
                 // todo translate
-                return Expty(nullptr, actual_ty(id.ty->u.array), id.isConst);
+                expty expty_msg = Expty(nullptr, actual_ty(id.ty->u.array));
+                expty_msg.isConst = id.isConst;
+                return expty_msg;
             }
         }
         case A_var_::A_structVar:{
