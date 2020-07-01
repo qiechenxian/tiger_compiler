@@ -513,7 +513,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
 }
 
 
-// todo transExp 的计算constExp表达式功能
 static struct expty transExp(S_table venv, S_table tenv, A_exp a){
     switch (a->kind) {
         case A_exp_::A_varExp:{
@@ -571,6 +570,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                 right = transExp(venv, tenv, a->u.opExp.right);
 
                 if (left.isConst && right.isConst) {
+                    /// 也可使用left和right的kind是否为A_IntExp判断
                     A_exp temp_left = a->u.opExp.left;
                     A_exp temp_right = a->u.opExp.right;
                     a->u.intExp = calculate(op, temp_left->u.intExp, temp_right->u.intExp);

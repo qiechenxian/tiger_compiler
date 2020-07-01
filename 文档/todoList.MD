@@ -13,7 +13,7 @@
 |■| ConstDef，ConstInitVal,Block语法问题|郑泰岩| 
 |■| FuncFParam 第一维参数问题| zty|
 |√| 更改为cpp | zty|
-|■| 完善const变量问题| 骆艺轩| 
 | | makefile清理功能||
-|■|常量表达式优化| loyx|
+|√|常量表达式优化| loyx|
+| |数组初始值处理| |
 
