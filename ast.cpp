@@ -203,10 +203,10 @@ A_exp A_OpExp(A_pos pos, A_exp left, A_binOp op, A_exp right){
 }
 A_exp A_LogicExp(A_pos pos, A_binOp op, A_exp factor1, A_exp factor2){
     A_exp a = (A_exp)checked_malloc(sizeof(*a));
-    a->kind = A_exp_::A_logicExp;
-    a->u.logicExp.op = op;
-    a->u.logicExp.factor1 = factor1;
-    a->u.logicExp.factor2 = factor2;
+    a->kind = A_exp_::A_opExp;
+    a->u.opExp.op = op;
+    a->u.opExp.left = factor1;
+    a->u.opExp.right = factor2;
     return a;
 }
 A_field A_Field(A_pos pos, S_symbol id, S_symbol type, A_expList size){

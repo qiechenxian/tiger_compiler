@@ -183,7 +183,6 @@ struct A_exp_{
         A_charExp,
         A_callExp,
         A_opExp,
-        A_logicExp
     }kind;
     union {
         A_var varExp;
@@ -198,11 +197,6 @@ struct A_exp_{
             A_binOp op;
             A_exp right;
         }opExp;
-        struct {
-            A_binOp op;
-            A_exp factor1;
-            A_exp factor2; /// this is optional
-        }logicExp;
     }u;
 };
 A_exp A_VarExp(A_pos pos, A_var varExp);

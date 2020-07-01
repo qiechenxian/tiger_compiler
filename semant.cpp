@@ -516,9 +516,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
 // todo transExp 的计算constExp表达式功能
 static struct expty transExp(S_table venv, S_table tenv, A_exp a){
     switch (a->kind) {
-        case A_exp_::A_logicExp:{
-            assert(0);
-        }
         case A_exp_::A_varExp:{
             expty var = transVar(venv, tenv, a->u.varExp);
             if (var.isConst){
@@ -568,17 +565,29 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
         case A_exp_::A_opExp:{
             A_binOp op = a->u.opExp.op;
             struct expty left = transExp(venv, tenv, a->u.opExp.left);
-            struct expty right = transExp(venv, tenv, a->u.opExp.right);
+            struct expty right{};
 
-            if (left.isConst && right.isConst){
-                A_exp temp_left = a->u.opExp.left;
-                A_exp temp_right = a->u.opExp.right;
-                a->u.intExp = calculate(op, temp_left->u.intExp, temp_right->u.intExp);
-                a->kind = A_exp_::A_intExp;
-                expty expty_msg = Expty(nullptr, TY_Int());
-                expty_msg.isConst = true;
-                return expty_msg;
-                /// 此处会造成内存泄漏，泄漏对象：temp_left, temp_right所指对象
+            if (op != A_not) {
+                right = transExp(venv, tenv, a->u.opExp.right);
+
+                if (left.isConst && right.isConst) {
+                    A_exp temp_left = a->u.opExp.left;
+                    A_exp temp_right = a->u.opExp.right;
+                    a->u.intExp = calculate(op, temp_left->u.intExp, temp_right->u.intExp);
+                    a->kind = A_exp_::A_intExp;
+                    expty expty_msg = Expty(nullptr, TY_Int());
+                    expty_msg.isConst = true;
+                    return expty_msg;
+                    /// 此处会造成内存泄漏，泄漏对象：temp_left, temp_right所指对象
+                }
+            } else if (left.isConst){
+                    A_exp temp_left = a->u.opExp.left;
+                    a->u.intExp = calculate(op, temp_left->u.intExp, 0);
+                    a->kind = A_exp_::A_intExp;
+                    expty expty_msg = Expty(nullptr, TY_Int());
+                    expty_msg.isConst = true;
+                    return expty_msg;
+                    /// 此处会造成内存泄漏，泄漏对象：temp_left所指对象
             }
 
             switch (op) {
