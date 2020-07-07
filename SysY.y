@@ -262,11 +262,13 @@ FuncFParam:
 ExpSubscripts:
     ExpSubscripts L_BRACKETS Exp R_BRACKETS {$$ = A_ExpList($3, $1);}
     | L_BRACKETS R_BRACKETS {$$ = A_ExpList(A_IntExp(A_POS(@$), 0), NULL);}
-    | L_BRACKETS Exp R_BRACKETS {$$ = A_ExpList($2, NULL);}
+
+   | L_BRACKETS Exp R_BRACKETS {$$ = A_ExpList($2, NULL);}
     ;
 
 Block:
     L_BRACE BlockItem R_BRACE {$$ = A_BlockStm(A_POS(@$), (A_comStmList)U_reverseList($2));}
+	|L_BRACE R_BRACE {$$ = A_BlockStm(A_POS(@$),NULL);}
     ;
 
 BlockItem:
@@ -279,6 +281,7 @@ BlockItem:
 Stmt:
     LVal ASSIGNMENT Exp SEMICOLON {$$ = A_AssignStm(A_POS(@$), $1, $3);}
     | Exp SEMICOLON {$$ = A_ExpStm(A_POS(@$), $1);}
+	| SEMICOLON {$$ = A_ExpStm(A_POS(@$),NULL);}
     | Block {$$ = $1;}
     | IF L_PARENTHESIS Cond R_PARENTHESIS Stmt {$$ = A_IfStm(A_POS(@$), $3, $5, NULL);}
     | IF L_PARENTHESIS Cond R_PARENTHESIS Stmt ELSE Stmt {$$ = A_IfStm(A_POS(@$), $3, $5, $7);}
@@ -345,7 +348,7 @@ Exp:
     ;
 
 ConstExp:
-    Exp {$$ = $1}
+    Exp {$$ = $1;}
     ;
 
 Number:
