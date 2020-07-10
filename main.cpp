@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "semant.h"
 #include "env.h"
+#include "prast.h"
 
 extern FILE* yyin;
 extern FILE* yyout;
@@ -58,6 +59,7 @@ int main(int argc, char ** argv) {
     S_table tenv = E_base_typeEntry();
     S_table venv = E_base_valueEntry();
     yyparse();
+    pr_decList(stderr,absyn_root,0);
     SEM_transProgram(venv, tenv, absyn_root);
     printf("\nsemantic check finish !\n");
 

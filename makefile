@@ -1,10 +1,10 @@
 cc:=g++ --std=c++14
 
-complier:main.o util.o errormsg.o table.o symbol.o ast.o lex.yy.o SysY.tab.o types.h types.o env.o temp.o tree.o arm_frame.o translate.o semant.o
+complier:main.o util.o errormsg.o table.o symbol.o ast.o lex.yy.o SysY.tab.o types.h types.o env.o temp.o tree.o arm_frame.o translate.o semant.o prast.o
 
 
 
-	$(cc) -o complier main.o util.o errormsg.o table.o symbol.o ast.o  lex.yy.o  SysY.tab.o types.h types.o env.o temp.o tree.o arm_frame.o translate.o semant.o
+	$(cc) -o complier main.o util.o errormsg.o table.o symbol.o ast.o  lex.yy.o  SysY.tab.o types.h types.o env.o temp.o tree.o arm_frame.o translate.o semant.o prast.o
 
 
 
@@ -128,7 +128,8 @@ lex.yy.o:lex.yy.cpp SysY.tab.h errormsg.o util.o
 
 
 
-
+prast.o:prast.cpp prast.h
+	$(cc) -c prast.cpp prast.h
 
 
 
@@ -190,5 +191,5 @@ errormsg.o:errormsg.cpp errormsg.h
 
 clean:
 
-	rm complier main.o semant.o translate.o arm_frame.o tree.o temp.o env.o types.o SysY.tab.o lex.yy.o ast.o symbol.o table.o util.o errormsg.o
+	rm -f complier *.o *.gch
 
