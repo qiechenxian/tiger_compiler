@@ -5,7 +5,7 @@
 #ifndef COMPILER_LOYX__PRAST_H
 #define COMPILER_LOYX__PRAST_H
 
-#include <stdio.h>
+#include <cstdio>
 #include "util.h"
 #include "symbol.h"
 #include "ast.h"

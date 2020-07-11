@@ -163,7 +163,7 @@ ConstDef:
         $$ = A_VariableDec(A_POS(@$), NULL, $1, $3, true);
     }
     | Ident ConstSubscripts ASSIGNMENT ConstInitVal {
-        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), (A_arrayInitList)U_reverseList($4), true);
+        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), $4, true);
     }
     ;
 
@@ -175,7 +175,7 @@ ConstSubscripts:
     ;
 
 ConstInitVal:
-    L_BRACE ConstInitValList R_BRACE {$$ = $2;}
+    L_BRACE ConstInitValList R_BRACE {$$ = (A_arrayInitList)U_reverseList($2);}
     | L_BRACE R_BRACE {
         $$ = A_ArrayInitList(A_SingleInit(A_POS(@$), A_IntExp(A_POS(@$), 0)), NULL);
     }
@@ -183,13 +183,13 @@ ConstInitVal:
 
 ConstInitValList:
     ConstInitValList COMMA ConstInitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), (A_arrayInitList)U_reverseList($3)), $1);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), $3), $1);
     }
     | ConstInitValList COMMA ConstExp {
         $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $3), $1);
     }
     | ConstInitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), (A_arrayInitList)U_reverseList($1)), NULL);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), $1), NULL);
     }
     | ConstExp {
         $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $1), NULL);
@@ -212,25 +212,29 @@ VarDef:
         $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), NULL, false);
     }
     | Ident ConstSubscripts ASSIGNMENT InitVal {
-        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), (A_arrayInitList)U_reverseList($4), false);
+        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), $4, false);
     }
     ;
 
 InitVal:
-    L_BRACE InitValList R_BRACE {$$ = $2;}
+    L_BRACE InitValList R_BRACE {$$ = (A_arrayInitList)U_reverseList($2);}
     | L_BRACE R_BRACE {
         $$ = A_ArrayInitList(A_SingleInit(A_POS(@$), A_IntExp(A_POS(@$), 0)), NULL);
     }
     ;
 
 InitValList:
-    InitValList COMMA Exp {$$ = A_ArrayInitList(A_SingleInit(A_POS(@3), $3), $1);}
-    | InitValList COMMA InitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), (A_arrayInitList)U_reverseList($3)), $1);
+    InitValList COMMA Exp {
+        $$ = A_ArrayInitList(A_SingleInit(A_POS(@3), $3), $1);
     }
-    | Exp {$$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $1), NULL);}
+    | InitValList COMMA InitVal {
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), $3), $1);
+    }
+    | Exp {
+        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $1), NULL);
+    }
     | InitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), (A_arrayInitList)U_reverseList($1)), NULL);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), $1), NULL);
     }
     ;
 

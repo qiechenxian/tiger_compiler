@@ -70,7 +70,7 @@ A_dec A_ArrayDec(A_pos pos, S_symbol base, S_symbol id, A_expList size, A_arrayI
     a->u.array.size = size;
     a->u.array.init = init;
     a->u.array.isConst = isConst;
-    a->u.var.escape = false; /// 默认非逃逸变量
+    a->u.array.escape = false; /// 默认非逃逸变量
     return a;
 }
 A_dec A_FunctionDec(A_pos pos, S_symbol id, A_fieldList params, S_symbol result, A_stm body){
@@ -263,12 +263,14 @@ A_caseList A_CaseList(A_case head, A_caseList tail){
 }
 A_initNode A_SingleInit(A_pos pos, A_exp single){
     A_initNode a = (A_initNode)checked_malloc(sizeof(*a));
+    a->pos = pos;
     a->kind = A_initNode_::A_singleInit;
     a->u.single = single;
     return a;
 }
 A_initNode A_NestedInit(A_pos pos, A_arrayInitList nested){
     A_initNode a = (A_initNode)checked_malloc(sizeof(*a));
+    a->pos = pos;
     a->kind = A_initNode_::A_nestedInit;
     a->u.nested = nested;
     return a;

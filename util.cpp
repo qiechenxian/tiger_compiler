@@ -1,7 +1,7 @@
 //
 // Created by loyx on 2020/3/24.
 //
-#include <string.h>
+#include <cstring>
 #include "util.h"
 
 void* checked_malloc(unsigned len){
@@ -29,7 +29,7 @@ U_boolList U_BoolList(bool head, U_boolList tail){
  * */
 struct U_tempList{void* head; struct U_tempList* tail;};
 void* U_reverseList(void* list){
-    struct U_tempList *rev = NULL, *pre, *iter = (struct U_tempList*)list;
+    struct U_tempList *rev = nullptr, *pre, *iter = (struct U_tempList*)list;
     while (iter){pre = iter; iter = iter->tail; pre->tail = rev; rev = pre;}
     return (void*)rev;
 }

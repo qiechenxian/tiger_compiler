@@ -17,7 +17,7 @@ static void pr_comStmList(FILE *out, A_comStmList v, int d);
 static void pr_case(FILE *out, A_case v, int d);
 static void pr_caseList(FILE *out, A_caseList v, int d);
 static void pr_initNode(FILE *out, A_initNode v, int d);
-static void pr_arraryInitList(FILE *out, A_arrayInitList v, int d);
+static void pr_arrayInitList(FILE *out, A_arrayInitList v, int d);
 
 
 static void indent(FILE *out,int d){
@@ -79,8 +79,10 @@ static void pr_dec(FILE *out,A_dec v,int d)
             }
             pr_expList(out,v->u.array.size,d+1);
             fprintf(out,",\n");
-            pr_arraryInitList(out,v->u.array.init,d+1);
-            fprintf(out,",\n");
+            if (v->u.array.init){
+                pr_arrayInitList(out, v->u.array.init, d + 1);
+                fprintf(out,",\n");
+            }
             indent(out,d+1);
             fprintf(out,"%s",v->u.array.escape?"TRUE)":"FALSE)");
             break;
@@ -174,7 +176,7 @@ static void pr_exp(FILE *out ,A_exp v,int d){
             fprintf(out,"intExp(%d)",v->u.intExp);
             break;
         case A_exp_::A_charExp:
-            fprintf(out,"charExp(%s)",v->u.charExp);
+            fprintf(out,"charExp(%d)",v->u.charExp);
             break;
         case A_exp_::A_callExp:
             fprintf(out,"callExp(%s,\n",S_getName(v->u.callExp.id));
@@ -326,24 +328,25 @@ static void pr_initNode(FILE *out, A_initNode v, int d){
             break;
         case A_initNode_::A_nestedInit:
             fprintf(out,"nestedInit(\n");
-            pr_arraryInitList(out,v->u.nested,d+1);
+            pr_arrayInitList(out, v->u.nested, d + 1);
             fprintf(out,")");
+            break;
         default:
             assert(0);
     }
 }
-static void pr_arraryInitList(FILE *out, A_arrayInitList v, int d){
-    indent(out,d);
-    if(v){
-        fprintf(out,"arrayInitList(\n");
-        pr_initNode(out,v->head,d+1);
-        fprintf(out,",\n");
-        pr_arraryInitList(out,v->tail,d+1);
-        fprintf(out,")");
-    } else{
-        fprintf(out,"arrayInitList()");
+
+static void pr_arrayInitList(FILE *out, A_arrayInitList v, int d) {
+    indent(out, d);
+    fprintf(out, "arrayInitList(\n");
+    pr_initNode(out, v->head, d + 1);
+    if (v->tail){
+        fprintf(out, ",\n");
+        pr_arrayInitList(out, v->tail, d + 1);
     }
+    fprintf(out, ")");
 }
+
 
 
 
