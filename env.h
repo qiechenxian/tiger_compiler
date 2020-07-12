@@ -8,6 +8,7 @@
 #include "types.h"
 #include "translate.h"
 #include "temp.h"
+#include "array_init.h"
 
 typedef struct E_envEntry_ *E_envEntry;
 typedef struct E_constValues_ *E_constValues;
@@ -15,7 +16,6 @@ typedef struct E_constValues_ *E_constValues;
 struct E_envEntry_{
     enum {E_varEntry, E_funEntry}kind;
     union {
-//        struct {bool isConst; Tr_access access; TY_ty ty;}var;
         struct {bool isConst; E_constValues cValues; Tr_access access; TY_ty ty;}var;
         struct {Temp_label label; TY_tyList formals; TY_ty result;}fun;
     }u;
@@ -37,7 +37,7 @@ struct E_constValues_{
     enum {E_singleValue, E_arrayValue}kind;
     union {
         int singleValue;
-        int* arrayValue; // 未提供边界检查！
+        INIT_initList arrayValue;
     }u;
 };
 
@@ -45,7 +45,7 @@ E_envEntry E_VarEntry(bool isConst, Tr_access access, TY_ty ty);
 E_envEntry E_FunEntry(Temp_label label, TY_tyList formals, TY_ty result);
 
 E_constValues E_SingleValue(int v);
-E_constValues E_ArrayValue(int* vs);
+E_constValues E_ArrayValue(INIT_initList vs);
 
 S_table E_base_typeEntry();
 S_table E_base_valueEntry();

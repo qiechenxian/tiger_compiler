@@ -88,9 +88,8 @@ static int getConstValue(S_table venv, A_exp a){
     }
     auto const_var_entry = (E_envEntry)S_look(venv, const_var->u.simple);
     if (index_len){
-        int trans_index = 0; // todo 数组cValues访问
-        int *temp_array_cValues = const_var_entry->u.var.cValues->u.arrayValue;
-        return *(temp_array_cValues + trans_index);
+        access_index[index_len] = -1;
+        return INIT_getInt(const_var_entry->u.var.cValues->u.arrayValue, access_index);
     } else{
         return const_var_entry->u.var.cValues->u.singleValue;
     }
@@ -248,16 +247,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
 
             /** 处理初值 */
             if (d->u.array.init != nullptr){
-                // todo 检查数组初值是否合法
-
-                // todo 将标准化数组初值
+                INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);
 
                 if (d->u.array.isConst){
                     /**
                      * 常量数组初值处理
                      */
-                    int temp[2]; // todo fix temp
-                    arrayEntry->u.var.cValues = E_ArrayValue(temp);
+                    arrayEntry->u.var.cValues = E_ArrayValue(init_list);
                     S_enter(venv, d->u.array.id, arrayEntry);
                     return nullptr;
                 } else{
@@ -269,14 +265,15 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
                 }
             }
 
-            // todo 全局数组无初值情况
+            // todo 全局数组无初值情况  (需要区分全局变量)
+
             /// 无初值情况
             if (d->u.array.isConst){
                 /**
                  * 常数数组无初始化，默认全0
                  */
-                int temp[2] = {}; // todo fix temp
-                arrayEntry->u.var.cValues = E_ArrayValue(temp);
+                INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
+                arrayEntry->u.var.cValues = E_ArrayValue(null_init);
             }
             S_enter(venv, d->u.array.id, arrayEntry);
             return nullptr;

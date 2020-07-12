@@ -28,7 +28,7 @@ E_constValues E_SingleValue(int v){
     e->u.singleValue = v;
     return e;
 }
-E_constValues E_ArrayValue(int* vs){
+E_constValues E_ArrayValue(INIT_initList vs){
     auto e = (E_constValues)checked_malloc(sizeof(E_constValues_));
     e->kind = E_constValues_::E_arrayValue;
     e->u.arrayValue = vs;
@@ -37,8 +37,8 @@ E_constValues E_ArrayValue(int* vs){
 
 S_table E_base_typeEntry(){
     auto t = (S_table)S_empty();
-    S_enter(t, S_Symbol("int"), TY_Int());
-    S_enter(t, S_Symbol("void"), TY_Void());
+    S_enter(t, S_Symbol((char*)"int"), TY_Int());
+    S_enter(t, S_Symbol((char*)"void"), TY_Void());
     return t;
 }
 S_table E_base_valueEntry(){

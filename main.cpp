@@ -58,11 +58,18 @@ int main(int argc, char ** argv) {
 
     S_table tenv = E_base_typeEntry();
     S_table venv = E_base_valueEntry();
+
     yyparse();
+
+    printf("before semantic ast:\n");
     pr_decList(stderr,absyn_root,0);
+    printf("\n");
+
     SEM_transProgram(venv, tenv, absyn_root);
     printf("\nsemantic check finish !\n");
 
+    printf("after semantic ast:\n");
+    pr_decList(stderr, absyn_root, 0);
 
     return 0;
 }
