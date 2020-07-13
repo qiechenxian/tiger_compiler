@@ -33,6 +33,13 @@ struct E_constValues_{
      *      3. 未考虑free
      *
      * --loyx 2020/6/24
+     *
+     * 变更：
+     * 1. arrayValue的类型更改为INIT_initList(详情array_init.[h|cpp])
+     * 2. arrayValue的处理在INIT_initList的构造函数中完成
+     * 3. arrayValue的查值函数由array_init模块提供(INIT_getInt)
+     * --loyx 2020/7/13
+     *
      */
     enum {E_singleValue, E_arrayValue}kind;
     union {

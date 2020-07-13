@@ -7,6 +7,9 @@
 #include "errormsg.h"
 
 static A_exp getOneValue(A_arrayInitList init_list) {
+    /**
+     * paddingInit的辅助函数
+     */
     if (init_list->tail){
         EM_warning(init_list->tail->head->pos, "excess elements in array initializer");
     }
@@ -18,6 +21,12 @@ static A_exp getOneValue(A_arrayInitList init_list) {
 }
 
 static void paddingInit(A_exp* exp_array, int len, const int* suffix_size, A_arrayInitList init_list){
+    /**
+     * INIT_InitList的辅助函数.
+     * 用于填充数组声明时的初值
+     * 例如：将int a[4][2] = {{},{3},{5},{7,8}}的初值填充为{{0,0}, {3,0}, {5,0}, {7,8}}
+     * 填充行为与C语言保持一致
+     */
     int index = 0;
     while (index < len){
         if (init_list->head->kind == A_initNode_::A_singleInit){
