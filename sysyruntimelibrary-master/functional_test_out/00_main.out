@@ -1,0 +1,28 @@
+test_input = D:\CLionProjects\untitled\sysyruntimelibrary-master\functional_test\00_main.sy
+test_out = D:\CLionProjects\untitled\sysyruntimelibrary-master\functional_test_out\00_main.out
+before semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      returnStm(
+       intExp(0))),
+     comStmList()))),
+  decList())
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      returnStm(
+       intExp(0))),
+     comStmList()))),
+  decList())

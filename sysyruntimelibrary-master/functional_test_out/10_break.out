@@ -1,0 +1,52 @@
+test_input = D:\CLionProjects\untitled\sysyruntimelibrary-master\functional_test\10_break.sy
+test_out = D:\CLionProjects\untitled\sysyruntimelibrary-master\functional_test_out\10_break.out
+before semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        intExp(10),
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       whileStm(
+        opExp(
+         gt,
+         varExp(
+          simpleVar(a)),
+         intExp(0)),
+        blockStm(
+         comStmList(
+          comStm(
+           assignStm(
+            simpleVar(a),
+            opExp(
+             sub,
+             varExp(
+              simpleVar(a)),
+             intExp(1)))),
+          comStmList(
+           comStm(
+            ifStm(
+             opExp(
+              eq,
+              varExp(
+               simpleVar(a)),
+              intExp(5)),
+             breakStm()             )),
+           comStmList()))))
+),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList()))))),
+  decList())

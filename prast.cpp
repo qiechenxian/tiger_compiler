@@ -66,8 +66,10 @@ static void pr_dec(FILE *out,A_dec v,int d)
                 indent(out,d+1);
                 fprintf(out,"%s,\n",S_getName(v->u.var.type));
             }
-            pr_exp(out,v->u.var.init,d+1);
-            fprintf(out,",\n");
+            if(v->u.var.init) {
+                pr_exp(out, v->u.var.init, d + 1);
+                fprintf(out, ",\n");
+            }
             indent(out,d+1);
             fprintf(out,"%s",v->u.var.escape?"TRUE)":"FALSE)");
             break;
@@ -147,7 +149,9 @@ static void pr_stm(FILE *out, A_stm v, int d){
             break;
         case A_stm_::A_returnStm:
             fprintf(out,"returnStm(\n");
-            pr_exp(out,v->u.returnStm,d+1);
+            if(v->u.returnStm) {
+                pr_exp(out, v->u.returnStm, d + 1);
+            }
             fprintf(out,")");
             break;
         case A_stm_::A_breakStm:
