@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/25_if_test4.sy:17:22: error: syntax error, unexpected R_PARENTHESIS
+17|   return (if_ifElse_()
+  |                       ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/25_if_test4.sy:0:0: error: not find main function

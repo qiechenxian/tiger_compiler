@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/31_while_if_test2.sy:22:19: error: syntax error, unexpected R_PARENTHESIS
+22|   return (ifWhile()
+  |                    ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/31_while_if_test2.sy:0:0: error: not find main function

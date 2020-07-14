@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/34_func_test2.sy:42:15: error: syntax error, unexpected R_PARENTHESIS
+42| 	return func1()
+  |                ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/34_func_test2.sy:0:0: error: not find main function

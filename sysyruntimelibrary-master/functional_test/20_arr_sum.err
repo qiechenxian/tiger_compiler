@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/20_arr_sum.sy:3:16: error: syntax error, unexpected R_PARENTHESIS
+3| 	a[0] = getint()
+ |                 ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/20_arr_sum.sy:0:0: error: not find main function

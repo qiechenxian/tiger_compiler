@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/65_word_count.sy:31:22: error: syntax error, unexpected R_PARENTHESIS
+31|         temp = getch()
+  |                       ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/65_word_count.sy:0:0: error: not find main function

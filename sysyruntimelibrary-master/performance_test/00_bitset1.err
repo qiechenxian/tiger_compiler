@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/performance_test/00_bitset1.sy:54:20: error: syntax error, unexpected R_PARENTHESIS
+54|     int n = getint()
+  |                     ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/performance_test/00_bitset1.sy:0:0: error: not find main function

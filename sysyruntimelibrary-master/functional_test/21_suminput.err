@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/21_suminput.sy:6:13: error: syntax error, unexpected R_PARENTHESIS
+6| 	n = getint()
+ |              ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/21_suminput.sy:0:0: error: not find main function

@@ -1,4 +1,9 @@
-int a[10][10];
+int test()
+{
+    int c=10;
+    int d=10;
+    return c+d;
+}
 int main(){
-    return 0;
+    return test();
 }

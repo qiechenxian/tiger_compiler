@@ -1,0 +1,6 @@
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/63_simple_atoi.sy:38:22: error: syntax error, unexpected R_PARENTHESIS
+38|         temp = getch()
+  |                       ^
+before semantic ast:
+ decList()
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/63_simple_atoi.sy:0:0: error: not find main function
