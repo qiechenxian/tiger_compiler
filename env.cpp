@@ -52,29 +52,41 @@ S_table E_base_valueEntry(S_table tenv){
     E_envEntry funEntry;
     auto array1d = (TY_ty)S_look(tenv, S_Symbol((char*)"$int"));
 
-    /// int getint()
+    /// (1) int getint()
     funEntry = E_FunEntry(nullptr, nullptr, TY_Int());
     S_enter(t, S_Symbol((char*)"getint"), funEntry);
 
-    /// int getch()
+    /// (2) int getch()
     funEntry = E_FunEntry(nullptr, nullptr, TY_Int());
     S_enter(t, S_Symbol((char*)"getch"), funEntry);
 
-    /// int getarray(int [])
+    /// (3) int getarray(int [])
     funEntry = E_FunEntry(nullptr, TY_TyList(array1d, nullptr), TY_Int());
     S_enter(t, S_Symbol((char*)"getarray"), funEntry);
 
-    /// void putint(int)
+    /// (4) void putint(int)
     funEntry = E_FunEntry(nullptr, TY_TyList(TY_Int(), nullptr), TY_Void());
     S_enter(t, S_Symbol((char*)"putint"), funEntry);
 
-    /// void putarray(int, int[])
+    /// (5) void putch(int)
+    funEntry = E_FunEntry(nullptr, TY_TyList(TY_Int(), nullptr), TY_Void());
+    S_enter(t, S_Symbol((char*)"putch"), funEntry);
+
+    /// (6) void putarray(int, int[])
     TY_tyList formals = TY_TyList(TY_Int(), TY_TyList(array1d, nullptr));
     funEntry = E_FunEntry(nullptr, formals,TY_Void());
     S_enter(t, S_Symbol((char*)"putarray"), funEntry);
 
-    /// void putf()
+    /// (7) void putf()
     //todo putf
+
+    /// (8) void starttime()
+    funEntry = E_FunEntry(nullptr, nullptr, TY_Void());
+    S_enter(t, S_Symbol((char*)"starttime"), funEntry);
+
+    /// (9) void stoptime()
+    funEntry = E_FunEntry(nullptr, nullptr, TY_Void());
+    S_enter(t, S_Symbol((char*)"stoptime"), funEntry);
 
     return t;
 }
