@@ -65,14 +65,31 @@ struct A_dec_{
         struct {
             S_symbol type;
             S_symbol id;
+
+            /**
+             * 此处为constExp相关联的地方之一(1/3)
+             * A_exp init 有两种情况：
+             *      当为Const时，init实质为ConstExp(技术上看为Exp，语义阶段进一步处理)
+             *      当部位Const时，init为Exp
+             * --loyx 2020/6/23
+             */
             A_exp init; /// init is optional
+
             bool isConst;
             bool escape;
         }var;
         struct {
             S_symbol base;
             S_symbol id;
-            A_expList size; /// only intExp
+
+            /**
+             * constExp 相关联的地方之一(2/3)
+             * 此处为，const数组变量和数组变量 的 纬度大小定义
+             * 处理方式：将constExp看为Exp，在语义分析阶段进一步处理
+             * --loyx 2020/6/23
+             */
+            A_expList size;
+
             A_arrayInitList init; /// init is optional
             bool isConst;
             bool escape;
@@ -212,7 +229,14 @@ struct A_initNode_{
     A_pos pos;
     enum {A_singleInit, A_nestedInit}kind;
     union {
+
+        /**
+         * 此处为ConstExp相关联地方之一(3/3)
+         * A_exp single 本质是ConstExp，语义阶段进一步处理
+         * --loyx 2020/6/23
+         */
         A_exp single;
+
         A_arrayInitList nested;
     }u;
 };

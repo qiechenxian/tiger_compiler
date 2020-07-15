@@ -5,12 +5,12 @@
 #ifndef COMPILER_LOYX_SEMANT_H
 #define COMPILER_LOYX_SEMANT_H
 
-#include "absyn.h"
+#include "ast.h"
 #include "types.h"
 #include "errormsg.h"
 #include "translate.h"
 
-typedef void* F_fragList ;
+
 
 struct expty {Tr_exp exp; TY_ty ty;bool isConst;};
 struct expty Expty(Tr_exp exp, TY_ty ty, bool isConst);

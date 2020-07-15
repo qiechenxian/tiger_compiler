@@ -8,9 +8,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-typedef char *string;
-string String(char *);
+#include <stdio.h>
+typedef char *c_string;
+c_string String(char *);
 
 //typedef char bool;
 //#define TRUE 1

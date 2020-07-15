@@ -10,7 +10,7 @@
 unsigned EM_token_pos = 0;
 char EM_code_str[EM_LINE_CODE_BUF];
 char *msg[EM_MSG_NUM];
-string FILE_NAME;
+c_string FILE_NAME;
 
 void EM_add_token(const char* token, unsigned len){
     for(int i = 0; i<len; i++, EM_token_pos++){
@@ -33,7 +33,7 @@ char** EM_error_code(){
     EM_code_str[++EM_token_pos] = 0;
     return msg;
 }
-void EM_warning(A_pos pos, char* message, ...){
+void EM_warning(A_pos pos, const char* message, ...){
     fprintf(stderr, "%s:%d:%d: warning: ", FILE_NAME, pos->first_line, pos->first_column);
     va_list ap;
     va_start(ap, message);
@@ -42,7 +42,7 @@ void EM_warning(A_pos pos, char* message, ...){
     fprintf(stderr, "\n");
 }
 
-void EM_error(A_pos pos, char* message, ...){
+void EM_error(A_pos pos, const char* message, ...){
     fprintf(stderr, "%s:%d:%d: error: ", FILE_NAME, pos->first_line, pos->first_column);
     va_list ap;
     va_start(ap, message);

@@ -56,7 +56,7 @@ struct TY_fieldList_{
 };
 TY_fieldList TY_FieldList(TY_field head, TY_fieldList tail);
 
-string TY_toString(TY_ty ty);
+c_string TY_toString(TY_ty ty);
 
 
 #endif //COMPILER_LOYX_TYPES_H

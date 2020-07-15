@@ -2,11 +2,28 @@
 // Created by loyx on 2020/5/10.
 //
 #include "frame.h"
-
-/** 架构参数 */
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
-static Temp_temp fp=NUll;
+static Temp_temp fp=NULL;
+static Temp_temp rv=NULL;
+
+//栈帧结构
+Temp_temp F_FP()//取帧指针
+{
+    if(fp==NULL)
+    {
+        fp=Temp_newTemp();
+    }
+    return fp;
+}
+Temp_temp F_RV()//取帧指针
+{
+    if(rv==NULL)
+    {
+        rv=Temp_newTemp();
+    }
+    return rv;
+}
 /** class declare */
 struct F_access_{
     enum {inFrame, inReg}kind;
@@ -22,15 +39,9 @@ struct F_frame_{
     F_accessList locals;
     int local_count;
     /** instructions required view shift*/
-};//添加局部变量域，formals域栈顶默认为静态链
-Temp_temp F_Fp()//取帧指针
-{
-    if(fp==NULL)
-    {
-        fp=Temp_newTemp();
-    }
-    return fp;
-}
+};//添加局部变量域
+
+
 
 /** function prototype */
 static F_access InFrame(int offset);
@@ -41,19 +52,19 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals);
 
 /** 构造函数 */
 static F_access InFrame(int offset){
-    F_access fa = checked_malloc(sizeof(*fa));
-    fa->kind = inFrame;
+    F_access fa = (F_access)checked_malloc(sizeof(*fa));
+    fa->kind = F_access_::inFrame;
     fa->u.offset = offset;
     return fa;
 }
 static F_access InReg(Temp_temp reg){
-    F_access fa = checked_malloc(sizeof(*fa));
-    fa->kind = inReg;
+    F_access fa = (F_access)checked_malloc(sizeof(*fa));
+    fa->kind = F_access_::inReg;
     fa->u.reg = reg;
     return fa;
 }
 static F_accessList F_AccessList(F_access head, F_accessList tail){
-    F_accessList p = checked_malloc(sizeof(*p));
+    F_accessList p = (F_accessList)checked_malloc(sizeof(*p));
     p->head = head;
     p->tail = tail;
     return p;
@@ -88,7 +99,7 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
 
 /** frame 相关 */
 F_frame F_newFrame(Temp_label name, U_boolList formals){
-    F_frame f = checked_malloc(sizeof(*f));
+    F_frame f = (F_frame)checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
     f->local_count = 0;
@@ -113,13 +124,43 @@ F_access F_allocLocal(F_frame frame, bool escape){
         return InReg(Temp_newTemp());
     }
 }
+
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
 {
-    if (acc->kind ==inFrame )
+    if (acc->kind ==F_access_::inFrame )
     {
         return T_Mem(T_Binop(T_add, framePtr, T_Const(acc->u.offset)));
     }
     return  T_Temp(acc->u.reg);
 }
 
-
+int get_word_size()
+{
+    return F_WORD_SIZE;
+}
+F_accessList F_formals(F_frame f) {
+    return f->formals;
+}
+//片段相关F_frag
+F_fragList F_FragList(F_frag head,F_fragList tail)
+{
+    F_fragList new_frag_list=(F_fragList)checked_malloc(sizeof(*new_frag_list));
+    new_frag_list->head=head;
+    new_frag_list->tail=tail;
+    return new_frag_list;
+}
+F_frag F_StringFrag(Temp_label label,c_string str)
+{
+    F_frag new_frag=(F_frag)checked_malloc(sizeof(*new_frag));
+    new_frag->kind=F_frag_::F_stringFrag;
+    new_frag->u.stringg.str=str;
+    new_frag->u.stringg.label=label;
+    return new_frag;
+}
+F_frag F_ProcFrag(T_stm body,F_frame frame)
+{
+    F_frag new_frag=(F_frag)checked_malloc(sizeof(*new_frag));
+    new_frag->kind=F_frag_::F_procFrag;
+    new_frag->u.proc.body=body;
+    new_frag->u.proc.frame=frame;
+}

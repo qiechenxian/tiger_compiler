@@ -10,15 +10,15 @@ void* checked_malloc(unsigned len){
     return p;
 }
 
-string String(char *str){
+c_string String(char *str){
     unsigned len = strlen(str);
-    string p = (string)checked_malloc(len*sizeof(char));
+    c_string p = (c_string)checked_malloc(len * sizeof(char));
     strcpy(p, str);
     return p;
 }
 
 U_boolList U_BoolList(bool head, U_boolList tail){
-    U_boolList p = checked_malloc(sizeof(*p));
+    U_boolList p = (U_boolList)checked_malloc(sizeof(*p));
     p->head = head;
     p->tail = tail;
     return p;

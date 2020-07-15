@@ -85,13 +85,14 @@
 #endif
 
 
-#include "absyn.h"
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+#include "ast.h"
 typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 21 ".\\SysY.y"
+#line 44 ".\\SysY.y"
 
     int integer;
     char* string;
@@ -107,7 +108,7 @@ typedef union YYSTYPE
     S_symbol sym;
     A_binOp binOp;
     A_arrayInitList arrayInitList;
-    A_comStm comStm;
+    A_comStmList comStmList;
 
 
 

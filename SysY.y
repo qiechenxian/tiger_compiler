@@ -22,17 +22,17 @@
         2) bison维护的解析栈相对较浅
 
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../include/util.h"
-#include "../include/errormsg.h"
-#include "../include/absyn.h"
-#include "../include/symbol.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include "util.h"
+#include "errormsg.h"
+#include "ast.h"
+#include "symbol.h"
 
 extern int yylex();
 extern int yylineno;
-extern A_decList absyn_root;
+A_decList absyn_root;
 
 static int calculate(int left, A_binOp op, int right);
 void yyerror(char*);
@@ -101,13 +101,13 @@ void yyerror(char*);
 %token <character> CHARACTER
 
 %type <var> LVal
-%type <integer> Number ConstExp
+%type <integer> Number
 %type <sym> Ident BType
 %type <binOp> addOp mulOp UnaryOp RelOp
 %type <stm> Block Stmt
 %type <comStmList> BlockItem
 %type <expList> ConstSubscripts ExpSubscripts FuncRParams
-%type <exp> Exp Cond
+%type <exp> Exp Cond ConstExp
 %type <decList> CompUnit Decl ConstDecl ConstDefList VarDecl VarDefList
 %type <dec> ConstDef VarDef FuncDef
 %type <arrayInitList> ConstInitValList ConstInitVal InitVal InitValList
@@ -126,7 +126,7 @@ void yyerror(char*);
 %start program
 %%
 program:
-    CompUnit {absyn_root = U_reverseList($1);}
+    CompUnit {absyn_root = (A_decList)U_reverseList($1);}
     ;
 
 CompUnit:
@@ -160,18 +160,18 @@ BType:
 
 ConstDef:
     Ident ASSIGNMENT ConstExp {
-        $$ = A_VariableDec(A_POS(@$), NULL, $1, A_IntExp(A_POS(@3), $3), true);
+        $$ = A_VariableDec(A_POS(@$), NULL, $1, $3, true);
     }
     | Ident ConstSubscripts ASSIGNMENT ConstInitVal {
-        $$ = A_ArrayDec(A_POS(@$), NULL, $1, U_reverseList($2), U_reverseList($4), true);
+        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), (A_arrayInitList)U_reverseList($4), true);
     }
     ;
 
 ConstSubscripts:
     ConstSubscripts L_BRACKETS ConstExp R_BRACKETS {
-        $$ = A_ExpList(A_IntExp(A_POS(@3), $3), $1);
+        $$ = A_ExpList($3, $1);
     }
-    | L_BRACKETS ConstExp R_BRACKETS {$$ = A_ExpList(A_IntExp(A_POS(@2), $2), NULL);}
+    | L_BRACKETS ConstExp R_BRACKETS {$$ = A_ExpList($2, NULL);}
     ;
 
 ConstInitVal:
@@ -183,16 +183,16 @@ ConstInitVal:
 
 ConstInitValList:
     ConstInitValList COMMA ConstInitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), U_reverseList($3)), $1);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), (A_arrayInitList)U_reverseList($3)), $1);
     }
     | ConstInitValList COMMA ConstExp {
-        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), A_IntExp(A_POS(@3), $3)), $1);
+        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $3), $1);
     }
     | ConstInitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), U_reverseList($1)), NULL);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), (A_arrayInitList)U_reverseList($1)), NULL);
     }
     | ConstExp {
-        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), A_IntExp(A_POS(@1), $1)), NULL);
+        $$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $1), NULL);
     }
     ;
 
@@ -209,10 +209,10 @@ VarDef:
     Ident {$$ = A_VariableDec(A_POS(@$), NULL, $1, NULL, false);}
     | Ident ASSIGNMENT Exp {$$ = A_VariableDec(A_POS(@$), NULL, $1, $3, false);}
     | Ident ConstSubscripts {
-        $$ = A_ArrayDec(A_POS(@$), NULL, $1, U_reverseList($2), NULL, false);
+        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), NULL, false);
     }
     | Ident ConstSubscripts ASSIGNMENT InitVal {
-        $$ = A_ArrayDec(A_POS(@$), NULL, $1, U_reverseList($2), U_reverseList($4), false);
+        $$ = A_ArrayDec(A_POS(@$), NULL, $1, (A_expList)U_reverseList($2), (A_arrayInitList)U_reverseList($4), false);
     }
     ;
 
@@ -226,23 +226,23 @@ InitVal:
 InitValList:
     InitValList COMMA Exp {$$ = A_ArrayInitList(A_SingleInit(A_POS(@3), $3), $1);}
     | InitValList COMMA InitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), U_reverseList($3)), $1);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@3), (A_arrayInitList)U_reverseList($3)), $1);
     }
     | Exp {$$ = A_ArrayInitList(A_SingleInit(A_POS(@1), $1), NULL);}
     | InitVal {
-        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), U_reverseList($1)), NULL);
+        $$ = A_ArrayInitList(A_NestedInit(A_POS(@1), (A_arrayInitList)U_reverseList($1)), NULL);
     }
     ;
 
 FuncDef:
     VOID Ident L_PARENTHESIS FuncFParams R_PARENTHESIS Block {
-        $$ = A_FunctionDec(A_POS(@$), $2, U_reverseList($4), S_Symbol("void"), $6);
+        $$ = A_FunctionDec(A_POS(@$), $2, (A_fieldList)U_reverseList($4), S_Symbol("void"), $6);
     }
     | VOID Ident L_PARENTHESIS R_PARENTHESIS Block {
         $$ = A_FunctionDec(A_POS(@$), $2, NULL, S_Symbol("void"), $5);
     }
     | BType Ident L_PARENTHESIS FuncFParams R_PARENTHESIS Block {
-        $$ = A_FunctionDec(A_POS(@$), $2, U_reverseList($4), $1, $6);
+        $$ = A_FunctionDec(A_POS(@$), $2, (A_fieldList)U_reverseList($4), $1, $6);
     }
     | BType Ident L_PARENTHESIS R_PARENTHESIS Block {
         $$ = A_FunctionDec(A_POS(@$), $2, NULL, $1, $5);
@@ -256,7 +256,7 @@ FuncFParams:
 
 FuncFParam:
     BType Ident {$$ = A_Field(A_POS(@$), $2, $1, NULL);}
-    | BType Ident  ExpSubscripts {$$ = A_Field(A_POS(@$), $2, $1, U_reverseList($3));}
+    | BType Ident  ExpSubscripts {$$ = A_Field(A_POS(@$), $2, $1, (A_expList)U_reverseList($3));}
     ;
 
 ExpSubscripts:
@@ -266,7 +266,7 @@ ExpSubscripts:
     ;
 
 Block:
-    L_BRACE BlockItem R_BRACE {$$ = A_BlockStm(A_POS(@$), U_reverseList($2));}
+    L_BRACE BlockItem R_BRACE {$$ = A_BlockStm(A_POS(@$), (A_comStmList)U_reverseList($2));}
     ;
 
 BlockItem:
@@ -339,17 +339,13 @@ Exp:
     | L_PARENTHESIS Exp R_PARENTHESIS {$$ = $2;}
     | LVal {$$ = A_VarExp(A_POS(@$), $1);}
     | Ident L_PARENTHESIS FuncRParams R_PARENTHESIS {
-        $$ = A_CallExp(A_POS(@$), $1, U_reverseList($3));
+        $$ = A_CallExp(A_POS(@$), $1, (A_expList)U_reverseList($3));
     }
     | Number {$$ = A_IntExp(A_POS(@$), $1);}
     ;
 
 ConstExp:
-    ConstExp addOp ConstExp %prec UAddOp {$$ = calculate($1, $2, $3);}
-    | ConstExp mulOp ConstExp %prec UMulOp {$$ = calculate($1, $2, $3);}
-    | UnaryOp ConstExp %prec UUnary {$$ = calculate(0, $1, $2);}
-    | L_PARENTHESIS ConstExp L_PARENTHESIS {$$ = $2;}
-    | Number {$$ = $1;}
+    Exp {$$ = $1}
     ;
 
 Number:
@@ -385,7 +381,8 @@ void yyerror(char* msg){
     fprintf(stderr, "%d| %s\n", yylineno, code_msg[0]);
 
     char line_no[32];
-    itoa(yylineno, line_no, 10);
+    //itoa(yylineno, line_no, 10);
+    sprintf(line_no,"%d",yylineno);
     unsigned len = strlen(line_no);
     for(int i = 0; i<len; i++){
         fprintf(stderr, " ");

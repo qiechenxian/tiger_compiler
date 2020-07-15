@@ -7,8 +7,8 @@
 #include "util.h"
 
 typedef struct S_symbol_ *S_symbol;
-S_symbol S_Symbol(string);
-string S_getName(S_symbol);
+S_symbol S_Symbol(c_string);
+c_string S_getName(S_symbol);
 
 typedef struct TAB_tabel_* S_table;
 S_table S_empty();
