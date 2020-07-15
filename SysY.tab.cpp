@@ -2349,7 +2349,7 @@ yyreduce:
 
 /* Line 1464 of yacc.c  */
 #line 362 ".\\SysY.y"
-    {A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 94:
@@ -2363,7 +2363,7 @@ yyreduce:
 
 /* Line 1464 of yacc.c  */
 #line 367 ".\\SysY.y"
-    {A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 96:

@@ -121,8 +121,12 @@ before semantic ast:
                comStm(
                 assignStm(
                  simpleVar(a),
-                 varExp(
-                  simpleVar(a)))),
+                 opExp(
+                  add,
+                  varExp(
+                   simpleVar(a)),
+                  varExp(
+                   simpleVar(b))))),
                comStmList()))))),
           comStmList(
            comStm(
@@ -174,8 +178,32 @@ before semantic ast:
               comStmList(
                comStm(
                 returnStm(
-                 callExp(func1,
-                  expList()))),
+                 opExp(
+                  add,
+                  opExp(
+                   add,
+                   opExp(
+                    add,
+                    opExp(
+                     add,
+                     opExp(
+                      add,
+                      opExp(
+                       add,
+                       callExp(func1,
+                        expList()),
+                       callExp(func2,
+                        expList())),
+                      callExp(func3,
+                       expList())),
+                     callExp(func4,
+                      expList())),
+                    varExp(
+                     simpleVar(a))),
+                   varExp(
+                    simpleVar(b))),
+                  varExp(
+                   simpleVar(c))))),
                comStmList()))))))))),
       decList())))))
 
@@ -303,8 +331,12 @@ after semantic ast:
                comStm(
                 assignStm(
                  simpleVar(a),
-                 varExp(
-                  simpleVar(a)))),
+                 opExp(
+                  add,
+                  varExp(
+                   simpleVar(a)),
+                  varExp(
+                   simpleVar(b))))),
                comStmList()))))),
           comStmList(
            comStm(
@@ -356,7 +388,31 @@ after semantic ast:
               comStmList(
                comStm(
                 returnStm(
-                 callExp(func1,
-                  expList()))),
+                 opExp(
+                  add,
+                  opExp(
+                   add,
+                   opExp(
+                    add,
+                    opExp(
+                     add,
+                     opExp(
+                      add,
+                      opExp(
+                       add,
+                       callExp(func1,
+                        expList()),
+                       callExp(func2,
+                        expList())),
+                      callExp(func3,
+                       expList())),
+                     callExp(func4,
+                      expList())),
+                    varExp(
+                     simpleVar(a))),
+                   varExp(
+                    simpleVar(b))),
+                  varExp(
+                   simpleVar(c))))),
                comStmList()))))))))),
       decList())))))

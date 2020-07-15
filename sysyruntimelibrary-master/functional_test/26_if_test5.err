@@ -50,8 +50,11 @@ before semantic ast:
                 intExp(25))               )),
              comStmList())),/n           assignStm(
             simpleVar(a),
-            varExp(
-             simpleVar(a)))           )),
+            opExp(
+             add,
+             varExp(
+              simpleVar(a)),
+             intExp(15)))           )),
          comStmList(
           comStm(
            returnStm(
@@ -124,8 +127,11 @@ after semantic ast:
                 intExp(25))               )),
              comStmList())),/n           assignStm(
             simpleVar(a),
-            varExp(
-             simpleVar(a)))           )),
+            opExp(
+             add,
+             varExp(
+              simpleVar(a)),
+             intExp(15)))           )),
          comStmList(
           comStm(
            returnStm(

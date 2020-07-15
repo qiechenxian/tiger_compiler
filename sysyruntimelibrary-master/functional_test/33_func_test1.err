@@ -71,15 +71,22 @@ before semantic ast:
             comStm(
              assignStm(
               simpleVar(b),
-              varExp(
-               simpleVar(b)))),
+              opExp(
+               sub,
+               varExp(
+                simpleVar(b)),
+               intExp(1)))),
             comStmList())))
 ),
         comStmList(
          comStm(
           returnStm(
-           varExp(
-            simpleVar(a)))),
+           opExp(
+            add,
+            varExp(
+             simpleVar(a)),
+            varExp(
+             simpleVar(b))))),
          comStmList())))))),
    decList(
     functionDec(main,
@@ -113,8 +120,12 @@ before semantic ast:
          comStmList(
           comStm(
            returnStm(
-            varExp(
-             simpleVar(a)))),
+            opExp(
+             add,
+             varExp(
+              simpleVar(a)),
+             varExp(
+              simpleVar(b))))),
           comStmList())))))),
     decList())))
 
@@ -192,15 +203,22 @@ after semantic ast:
             comStm(
              assignStm(
               simpleVar(b),
-              varExp(
-               simpleVar(b)))),
+              opExp(
+               sub,
+               varExp(
+                simpleVar(b)),
+               intExp(1)))),
             comStmList())))
 ),
         comStmList(
          comStm(
           returnStm(
-           varExp(
-            simpleVar(a)))),
+           opExp(
+            add,
+            varExp(
+             simpleVar(a)),
+            varExp(
+             simpleVar(b))))),
          comStmList())))))),
    decList(
     functionDec(main,
@@ -234,7 +252,11 @@ after semantic ast:
          comStmList(
           comStm(
            returnStm(
-            varExp(
-             simpleVar(a)))),
+            opExp(
+             add,
+             varExp(
+              simpleVar(a)),
+             varExp(
+              simpleVar(b))))),
           comStmList())))))),
     decList())))int == int

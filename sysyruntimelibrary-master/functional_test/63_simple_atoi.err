@@ -63,8 +63,11 @@ before semantic ast:
                comStm(
                 assignStm(
                  simpleVar(i),
-                 varExp(
-                  simpleVar(i)))),
+                 opExp(
+                  add,
+                  varExp(
+                   simpleVar(i)),
+                  intExp(1)))),
                comStmList())))
 ),
            comStmList(
@@ -114,8 +117,11 @@ before semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(i),
-                   varExp(
-                    simpleVar(i)))),
+                   opExp(
+                    add,
+                    varExp(
+                     simpleVar(i)),
+                    intExp(1)))),
                  comStmList()))),/n              ifStm(
                opExp(
                 and,
@@ -183,21 +189,41 @@ before semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(s),
-                   varExp(
-                    simpleVar(s)))),
+                   opExp(
+                    sub,
+                    opExp(
+                     add,
+                     opExp(
+                      mul,
+                      varExp(
+                       simpleVar(s)),
+                      intExp(10)),
+                     varExp(
+                      arrayVar(
+                       simpleVar(src),
+                       varExp(
+                        simpleVar(i))))),
+                    intExp(48)))),
                  comStmList(
                   comStm(
                    assignStm(
                     simpleVar(i),
-                    varExp(
-                     simpleVar(i)))),
+                    opExp(
+                     add,
+                     varExp(
+                      simpleVar(i)),
+                     intExp(1)))),
                   comStmList()))))
 ),
              comStmList(
               comStm(
                returnStm(
-                varExp(
-                 simpleVar(s)))),
+                opExp(
+                 mul,
+                 varExp(
+                  simpleVar(s)),
+                 varExp(
+                  simpleVar(isMinus))))),
               comStmList())))))))))))),
   decList(
    functionDec(main,
@@ -266,8 +292,11 @@ before semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(i),
-                   varExp(
-                    simpleVar(i)))),
+                   opExp(
+                    add,
+                    varExp(
+                     simpleVar(i)),
+                    intExp(1)))),
                  comStmList())))))
 ),
            comStmList(
@@ -368,8 +397,11 @@ after semantic ast:
                comStm(
                 assignStm(
                  simpleVar(i),
-                 varExp(
-                  simpleVar(i)))),
+                 opExp(
+                  add,
+                  varExp(
+                   simpleVar(i)),
+                  intExp(1)))),
                comStmList())))
 ),
            comStmList(
@@ -419,8 +451,11 @@ after semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(i),
-                   varExp(
-                    simpleVar(i)))),
+                   opExp(
+                    add,
+                    varExp(
+                     simpleVar(i)),
+                    intExp(1)))),
                  comStmList()))),/n              ifStm(
                opExp(
                 and,
@@ -488,21 +523,41 @@ after semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(s),
-                   varExp(
-                    simpleVar(s)))),
+                   opExp(
+                    sub,
+                    opExp(
+                     add,
+                     opExp(
+                      mul,
+                      varExp(
+                       simpleVar(s)),
+                      intExp(10)),
+                     varExp(
+                      arrayVar(
+                       simpleVar(src),
+                       varExp(
+                        simpleVar(i))))),
+                    intExp(48)))),
                  comStmList(
                   comStm(
                    assignStm(
                     simpleVar(i),
-                    varExp(
-                     simpleVar(i)))),
+                    opExp(
+                     add,
+                     varExp(
+                      simpleVar(i)),
+                     intExp(1)))),
                   comStmList()))))
 ),
              comStmList(
               comStm(
                returnStm(
-                varExp(
-                 simpleVar(s)))),
+                opExp(
+                 mul,
+                 varExp(
+                  simpleVar(s)),
+                 varExp(
+                  simpleVar(isMinus))))),
               comStmList())))))))))))),
   decList(
    functionDec(main,
@@ -571,8 +626,11 @@ after semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(i),
-                   varExp(
-                    simpleVar(i)))),
+                   opExp(
+                    add,
+                    varExp(
+                     simpleVar(i)),
+                    intExp(1)))),
                  comStmList())))))
 ),
            comStmList(

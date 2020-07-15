@@ -1,4 +1,5 @@
 int main(){
-    int a = 1+1;
+    int a;
+    a = a*1+2*a;
     return a;
 }

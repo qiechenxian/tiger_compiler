@@ -38,8 +38,12 @@ before semantic ast:
             opExp(
              sub,
              intExp(0),
-             varExp(
-              simpleVar(a))))),
+             opExp(
+              add,
+              varExp(
+               simpleVar(a)),
+              varExp(
+               simpleVar(b)))))),
           comStmList(
            comStm(
             expStm(
@@ -96,8 +100,12 @@ after semantic ast:
             opExp(
              sub,
              intExp(0),
-             varExp(
-              simpleVar(a))))),
+             opExp(
+              add,
+              varExp(
+               simpleVar(a)),
+              varExp(
+               simpleVar(b)))))),
           comStmList(
            comStm(
             expStm(

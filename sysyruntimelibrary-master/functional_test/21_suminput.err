@@ -79,14 +79,24 @@ before semantic ast:
                   comStm(
                    assignStm(
                     simpleVar(s),
-                    varExp(
-                     simpleVar(s)))),
+                    opExp(
+                     add,
+                     varExp(
+                      simpleVar(s)),
+                     varExp(
+                      arrayVar(
+                       simpleVar(a),
+                       varExp(
+                        simpleVar(i))))))),
                   comStmList(
                    comStm(
                     assignStm(
                      simpleVar(i),
-                     varExp(
-                      simpleVar(i)))),
+                     opExp(
+                      add,
+                      varExp(
+                       simpleVar(i)),
+                      intExp(1)))),
                    comStmList())))))
 ),
              comStmList(

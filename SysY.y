@@ -359,12 +359,12 @@ Exp:
 
 AddExp:
     MulExp {$$ = $1}
-    | AddExp addOp MulExp {A_OpExp(A_POS(@$), $1, $2, $3)}
+    | AddExp addOp MulExp {$$ = A_OpExp(A_POS(@$), $1, $2, $3)}
     ;
 
 MulExp:
     UnaryExp {$$ = $1}
-    | MulExp mulOp UnaryExp {A_OpExp(A_POS(@$), $1, $2, $3)}
+    | MulExp mulOp UnaryExp {$$ = A_OpExp(A_POS(@$), $1, $2, $3)}
     ;
 
 UnaryExp:

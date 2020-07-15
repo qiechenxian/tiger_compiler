@@ -15,7 +15,7 @@ PATH_name = [
     "可执行文件路径"
 ]
 
-if_default = input("是否使用默认路径？(y/N):")
+if_default = input("是否使用默认路径？(Y/n):")
 if if_default:
     for index, name in enumerate(PATH_name):
         PATH[index] = input("{}:".format(name))

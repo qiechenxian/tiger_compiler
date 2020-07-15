@@ -40,8 +40,11 @@ before semantic ast:
         comStm(
          assignStm(
           simpleVar(p),
-          varExp(
-           simpleVar(n)))),
+          opExp(
+           sub,
+           varExp(
+            simpleVar(n)),
+           intExp(1)))),
         comStmList(
          comStm(
           decList(
@@ -53,16 +56,26 @@ before semantic ast:
           comStm(
            assignStm(
             simpleVar(q),
-            varExp(
-             simpleVar(n)))),
+            opExp(
+             sub,
+             varExp(
+              simpleVar(n)),
+             intExp(2)))),
           comStmList(
            comStm(
             returnStm(
-             callExp(fib,
-              expList(
-               varExp(
-                simpleVar(p)),
-               expList())))),
+             opExp(
+              add,
+              callExp(fib,
+               expList(
+                varExp(
+                 simpleVar(p)),
+                expList())),
+              callExp(fib,
+               expList(
+                varExp(
+                 simpleVar(q)),
+                expList()))))),
            comStmList()))))))))),
   decList(
    functionDec(main,
@@ -135,8 +148,11 @@ after semantic ast:
         comStm(
          assignStm(
           simpleVar(p),
-          varExp(
-           simpleVar(n)))),
+          opExp(
+           sub,
+           varExp(
+            simpleVar(n)),
+           intExp(1)))),
         comStmList(
          comStm(
           decList(
@@ -148,16 +164,26 @@ after semantic ast:
           comStm(
            assignStm(
             simpleVar(q),
-            varExp(
-             simpleVar(n)))),
+            opExp(
+             sub,
+             varExp(
+              simpleVar(n)),
+             intExp(2)))),
           comStmList(
            comStm(
             returnStm(
-             callExp(fib,
-              expList(
-               varExp(
-                simpleVar(p)),
-               expList())))),
+             opExp(
+              add,
+              callExp(fib,
+               expList(
+                varExp(
+                 simpleVar(p)),
+                expList())),
+              callExp(fib,
+               expList(
+                varExp(
+                 simpleVar(q)),
+                expList()))))),
            comStmList()))))))))),
   decList(
    functionDec(main,
