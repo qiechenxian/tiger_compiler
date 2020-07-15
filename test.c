@@ -1,9 +1,8 @@
-int test()
-{
-    int c=10;
-    int d=10;
-    return c+d;
+int defn(){
+    return 4;
 }
+
 int main(){
-    return test();
+    int a=defn();
+    return a;
 }

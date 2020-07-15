@@ -348,6 +348,9 @@ Exp:
     | Ident L_PARENTHESIS FuncRParams R_PARENTHESIS {
         $$ = A_CallExp(A_POS(@$), $1, (A_expList)U_reverseList($3));
     }
+    | Ident L_PARENTHESIS R_PARENTHESIS {
+        $$ = A_CallExp(A_POS(@$), $1, NULL);
+    }
     | Number {$$ = A_IntExp(A_POS(@$), $1);}
     ;
 
