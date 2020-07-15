@@ -316,4 +316,4 @@ before semantic ast:
                         intExp(0))),
                       comStmList())))))))))))))))))),
     decList())))
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/54_sort_test2.sy:33:9: error: undefined function putint
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/54_sort_test2.sy:35:9: error: undefined function putch

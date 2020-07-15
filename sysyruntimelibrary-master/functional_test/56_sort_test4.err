@@ -360,5 +360,5 @@ before semantic ast:
                          intExp(0))),
                        comStmList()))))))))))))))))))),
     decList())))
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/56_sort_test4.sy:43:9: error: undefined function putint
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/56_sort_test4.sy:45:9: error: undefined function putch
 int == int

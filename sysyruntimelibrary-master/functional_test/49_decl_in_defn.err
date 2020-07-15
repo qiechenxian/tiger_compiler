@@ -37,4 +37,44 @@ before semantic ast:
            intExp(0))),
          comStmList()))))))),
   decList())
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/49_decl_in_defn.sy:5:5: error: undefined function putint
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        intExp(12))),
+      comStmList(
+       comStm(
+        decList(
+         varibaleDec(t,
+          int,
+          FALSE),
+         decList()),),
+       comStmList(
+        comStm(
+         expStm(
+          callExp(putint,
+           expList(
+            varExp(
+             simpleVar(a)),
+            expList()))),
+        comStmList(
+         comStm(
+          returnStm(
+           intExp(0))),
+         comStmList()))))))),
+  decList())

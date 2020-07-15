@@ -1,6 +1,124 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/22_if_test1.sy:15:18: error: syntax error, unexpected R_PARENTHESIS
-15|   return (ifElse()
-  |                   ^
 before semantic ast:
- decList()
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/22_if_test1.sy:0:0: error: not find main function
+ decList(
+  functionDec(ifElse,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        intExp(5))),
+      comStmList(
+       comStm(
+        ifStm(
+         opExp(
+          eq,
+          varExp(
+           simpleVar(a)),
+          intExp(5)),
+         blockStm(
+          comStmList(
+           comStm(
+            assignStm(
+             simpleVar(a),
+             intExp(25))),
+           comStmList())),/n         blockStm(
+          comStmList(
+           comStm(
+            assignStm(
+             simpleVar(a),
+             opExp(
+              mul,
+              varExp(
+               simpleVar(a)),
+              intExp(2)))),
+           comStmList()))         )),
+       comStmList(
+        comStm(
+         returnStm(
+          varExp(
+           simpleVar(a)))),
+        comStmList())))))),
+  decList(
+   functionDec(main,
+    fieldList(),
+    int,
+    blockStm(
+     comStmList(
+      comStm(
+       returnStm(
+        callExp(ifElse,
+         expList()))),
+      comStmList()))),
+   decList()))
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(ifElse,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        intExp(5))),
+      comStmList(
+       comStm(
+        ifStm(
+         opExp(
+          eq,
+          varExp(
+           simpleVar(a)),
+          intExp(5)),
+         blockStm(
+          comStmList(
+           comStm(
+            assignStm(
+             simpleVar(a),
+             intExp(25))),
+           comStmList())),/n         blockStm(
+          comStmList(
+           comStm(
+            assignStm(
+             simpleVar(a),
+             opExp(
+              mul,
+              varExp(
+               simpleVar(a)),
+              intExp(2)))),
+           comStmList()))         )),
+       comStmList(
+        comStm(
+         returnStm(
+          varExp(
+           simpleVar(a)))),
+        comStmList())))))),
+  decList(
+   functionDec(main,
+    fieldList(),
+    int,
+    blockStm(
+     comStmList(
+      comStm(
+       returnStm(
+        callExp(ifElse,
+         expList()))),
+      comStmList()))),
+   decList()))int == int

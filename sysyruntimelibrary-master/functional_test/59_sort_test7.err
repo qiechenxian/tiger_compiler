@@ -713,5 +713,5 @@ before semantic ast:
                             intExp(0))),
                           comStmList()))))))))))))))))))))),
      decList()))))
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/59_sort_test7.sy:81:9: error: undefined function putint
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/59_sort_test7.sy:83:9: error: undefined function putch
 int == intint == int

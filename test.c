@@ -1,8 +1,5 @@
-int defn(){
-    return 4;
-}
-
 int main(){
-    int a=defn();
+    int a;
+    a = getint();
     return a;
 }

@@ -6,13 +6,14 @@
 
 
 static struct TY_ty_ ty_int = {TY_ty_::TY_int};
-TY_ty TY_Int(void) {return &ty_int;}
+TY_ty TY_Int() {return &ty_int;}
 
 static struct TY_ty_ ty_char = {TY_ty_::TY_char};
-TY_ty TY_Char(void) {return &ty_char;}
+TY_ty TY_Char() {return &ty_char;}
 
 static struct TY_ty_ ty_void = {TY_ty_::TY_void};
-TY_ty TY_Void(void) {return &ty_void;}
+TY_ty TY_Void() {return &ty_void;}
+
 
 TY_ty TY_Array(TY_ty ty){
     TY_ty p = (TY_ty)checked_malloc(sizeof(*p));

@@ -55,6 +55,6 @@ E_constValues E_SingleValue(int v);
 E_constValues E_ArrayValue(INIT_initList vs);
 
 S_table E_base_typeEntry();
-S_table E_base_valueEntry();
+S_table E_base_valueEntry(S_table tenv);
 
 #endif //COMPILER_LOYX_ENV_H

@@ -1,6 +1,54 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/12_getint.sy:3:13: error: syntax error, unexpected R_PARENTHESIS
-3| 	a = getint()
- |              ^
 before semantic ast:
- decList()
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/12_getint.sy:0:0: error: not find main function
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        callExp(getint,
+         expList()))),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList()))))),
+  decList())
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        callExp(getint,
+         expList()))),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList()))))),
+  decList())

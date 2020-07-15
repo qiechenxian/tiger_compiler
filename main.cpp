@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
 
     S_table tenv = E_base_typeEntry();
-    S_table venv = E_base_valueEntry();
+    S_table venv = E_base_valueEntry(tenv);
 
     yyparse();
 

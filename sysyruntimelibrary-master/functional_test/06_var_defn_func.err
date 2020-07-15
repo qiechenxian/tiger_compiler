@@ -1,6 +1,66 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_var_defn_func.sy:6:16: error: syntax error, unexpected R_PARENTHESIS
-6|     int a=defn()
- |                 ^
 before semantic ast:
- decList()
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_var_defn_func.sy:0:0: error: not find main function
+ decList(
+  functionDec(defn,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      returnStm(
+       intExp(4))),
+     comStmList()))),
+  decList(
+   functionDec(main,
+    fieldList(),
+    int,
+    blockStm(
+     comStmList(
+      comStm(
+       decList(
+        varibaleDec(a,
+         int,
+         callExp(defn,
+          expList()),
+         FALSE),
+        decList()),),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList())))),
+   decList()))
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(defn,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      returnStm(
+       intExp(4))),
+     comStmList()))),
+  decList(
+   functionDec(main,
+    fieldList(),
+    int,
+    blockStm(
+     comStmList(
+      comStm(
+       decList(
+        varibaleDec(a,
+         int,
+         callExp(defn,
+          expList()),
+         FALSE),
+        decList()),),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList())))),
+   decList()))

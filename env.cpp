@@ -39,10 +39,44 @@ S_table E_base_typeEntry(){
     auto t = (S_table)S_empty();
     S_enter(t, S_Symbol((char*)"int"), TY_Int());
     S_enter(t, S_Symbol((char*)"void"), TY_Void());
+
+    /// 这是为了内置函数的形参(int[])提供类型
+    S_enter(t, S_Symbol((char*)"$int"), TY_Array(TY_Int()));
     return t;
 }
-S_table E_base_valueEntry(){
+
+S_table E_base_valueEntry(S_table tenv){
     S_table t = S_empty();
-    /// build in functions
+
+    /** 内置函数 */
+    E_envEntry funEntry;
+    auto array1d = (TY_ty)S_look(tenv, S_Symbol((char*)"$int"));
+
+    /// int getint()
+    funEntry = E_FunEntry(nullptr, nullptr, TY_Int());
+    S_enter(t, S_Symbol((char*)"getint"), funEntry);
+
+    /// int getch()
+    funEntry = E_FunEntry(nullptr, nullptr, TY_Int());
+    S_enter(t, S_Symbol((char*)"getch"), funEntry);
+
+    /// int getarray(int [])
+    funEntry = E_FunEntry(nullptr, TY_TyList(array1d, nullptr), TY_Int());
+    S_enter(t, S_Symbol((char*)"getarray"), funEntry);
+
+    /// void putint(int)
+    funEntry = E_FunEntry(nullptr, TY_TyList(TY_Int(), nullptr), TY_Void());
+    S_enter(t, S_Symbol((char*)"putint"), funEntry);
+
+    /// void putarray(int, int[])
+    TY_tyList formals = TY_TyList(TY_Int(), TY_TyList(array1d, nullptr));
+    funEntry = E_FunEntry(nullptr, formals,TY_Void());
+    S_enter(t, S_Symbol((char*)"putarray"), funEntry);
+
+    /// void putf()
+    //todo putf
+
     return t;
 }
+
+
