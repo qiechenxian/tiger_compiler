@@ -53,7 +53,7 @@ T_stmList C_linearize(T_stm stm)
 {
     return linear(do_stm(stm),NULL);
 }
-static T_stmList linear(T_stm stm,T_stmList right)
+static T_stmList linear(T_stm stm,T_stmList right)//seq树节点线性化
 {
     if(stm->kind==T_stm_::T_SEQ)
     {
@@ -72,7 +72,7 @@ static expRefList get_call_reflist(T_exp callExp) {
     }
     return res;
 }
-static T_stm do_stm(T_stm stm) {
+static T_stm do_stm(T_stm stm) {//对stm的子节点调用recoder
     switch (stm->kind) {
         case T_stm_::T_SEQ:
             return seq(do_stm(stm->u.SEQ.left), do_stm(stm->u.SEQ.right));
@@ -103,7 +103,7 @@ static T_stm do_stm(T_stm stm) {
             return stm;
     }
 }
-static struct stmExp do_exp(T_exp exp){
+static struct stmExp do_exp(T_exp exp){//对exp的子节点调用recoder
     switch (exp->kind) {
         case T_exp_::T_BINOP:
             return StmExp(recoder(ExpRefList(&exp->u.BINOP.left,ExpRefList(&exp->u.BINOP.right, nullptr))),exp);
@@ -118,7 +118,7 @@ static struct stmExp do_exp(T_exp exp){
             return StmExp(recoder(nullptr),exp);
     }
 }
-static T_stm recoder(expRefList refList) {
+static T_stm recoder(expRefList refList) {//完成对ESEQ的消除，将ESEQ的stm提前，并将ESEQ用ESEQ的exp替换或者用保存有exp的temp替换
     if (!refList)
         return T_Exp(T_Const(0));
     if ((*refList->head)->kind == T_exp_::T_CALL) {
@@ -130,10 +130,10 @@ static T_stm recoder(expRefList refList) {
     struct stmExp head = do_exp(*refList->head);
     T_stm others = recoder(refList->tail);
 
-    if (commute(others, head.e)) {
+    if (commute(others, head.e)) {//如果others的stm可以放在head的exp前，顺序修改对head.exp无影响
         *refList->head = head.e;
         return seq(head.s, others);
-    } else
+    } else//顺序修改对head.exp有影响，将head.exp先保存到寄存器中
     {    Temp_temp temp = Temp_newTemp();
         *refList->head = T_Temp(temp);
         return seq(
@@ -144,26 +144,26 @@ static T_stm recoder(expRefList refList) {
 }
 C_stmListList cut_stm(T_stmList pre_stm,T_stmList now_stm,Temp_label temp_done)//裁剪stm并完成开始新的block
 {
-    if(now_stm == nullptr)
+    if(now_stm == nullptr)//函数结束跳转至出口处理
     {
         T_stmList done_blcok= T_StmList(T_Jump(T_Name(temp_done),Temp_LabelList(temp_done, nullptr)), nullptr);
         pre_stm->tail=done_blcok;
         return nullptr;
     }
-    else if(now_stm->head->kind==T_stm_::T_CJUMP||now_stm->head->kind==T_stm_::T_JUMP)
+    else if(now_stm->head->kind==T_stm_::T_CJUMP||now_stm->head->kind==T_stm_::T_JUMP)//基本块结束，切断后，开始新的基本块
     {
         T_stmList save_next;
         save_next=now_stm->tail;
         now_stm->tail= nullptr;
         return block_trans(save_next,temp_done);
     }
-    else if(now_stm->head->kind==T_stm_::T_LABEL)
+    else if(now_stm->head->kind==T_stm_::T_LABEL)//基本块结束，添加T_jumo，切断，开始新的基本块
     {
         pre_stm->tail= T_StmList(T_Jump(T_Name(now_stm->head->u.LABEL),Temp_LabelList(now_stm->head->u.LABEL, nullptr)), nullptr);
         return block_trans(now_stm,temp_done);
     } else
     {
-        return cut_stm(now_stm,now_stm->tail,temp_done);
+        return cut_stm(now_stm,now_stm->tail,temp_done);//空操作，往后继续
     }
 }
 C_stmListList block_trans(T_stmList stm,Temp_label temp_done)//负责完成block开头的label检查补充，并调用cut_stm将stm裁剪为block
@@ -184,12 +184,12 @@ struct C_block C_basicBlocks(T_stmList stmList)
 {
     struct C_block my_block;
     Temp_label temp=Temp_newLabel();
-    my_block.labels=temp;//函数出口处理程序所在label
+    my_block.labels=temp;//函数出口处理程序所在label，实现在后面，尚未完成
     my_block.stmLists=block_trans(stmList,temp);
     return my_block;
 
 }
-static T_stmList getLast(T_stmList list)
+static T_stmList getLast(T_stmList list)//得到基本块倒数第二个stm（T_jump前或T_Cjump前）
 {
     T_stmList last = list;
     while (last->tail->tail) last = last->tail;
@@ -201,7 +201,7 @@ static void trace(T_stmList list)
     T_stm lab = list->head;
     T_stm s = last->tail->head;
     S_enter(block_env, lab->u.LABEL, NULL);
-    if (s->kind == T_stm_::T_JUMP) {
+    if (s->kind == T_stm_::T_JUMP) {//将jump的目标块放置到jump后
         T_stmList target = (T_stmList) S_look(block_env, s->u.JUMP.jumps->head);
         if (!s->u.JUMP.jumps->tail && target) {
             last->tail = target;
@@ -209,21 +209,21 @@ static void trace(T_stmList list)
         }
         else {last->tail->tail = getNext();}
     }
-    else if (s->kind == T_stm_::T_CJUMP) {
+    else if (s->kind == T_stm_::T_CJUMP) {//将cjump的false目标块放置到cjump后
         T_stmList trues =  (T_stmList) S_look(block_env, s->u.CJUMP.trues);
         T_stmList falses =  (T_stmList) S_look(block_env, s->u.CJUMP.falses);
-        if (falses) {
+        if (falses) {//有false情况
             last->tail->tail = falses;
             trace(falses);
         }
-        else if (trues) {
+        else if (trues) {//只有true情况，反转条件，true与false label反转
             last->tail->head = T_Cjump(T_not_op(s->u.CJUMP.op), s->u.CJUMP.left,
                                        s->u.CJUMP.right, s->u.CJUMP.falses,
                     s->u.CJUMP.trues);
             last->tail->tail = trues;
             trace(trues);
         }
-        else {
+        else {//都没有
             Temp_label falses = Temp_newLabel();
             last->tail->head = T_Cjump(s->u.CJUMP.op, s->u.CJUMP.left,
                                        s->u.CJUMP.right, s->u.CJUMP.trues, falses);
@@ -234,12 +234,12 @@ static void trace(T_stmList list)
 }
 static T_stmList getNext()
 {
-    if (!global_block.stmLists)
+    if (!global_block.stmLists)//基本块为空
         return T_StmList(T_Label(global_block.labels), NULL);
     else {
             T_stmList s = global_block.stmLists->head;
-            if (S_look(block_env, s->head->u.LABEL)) {
-                trace(s);
+            if (S_look(block_env, s->head->u.LABEL)) {//stm在block中
+                trace(s);//轨迹处理
                 return s;
             }
             else {
@@ -248,13 +248,13 @@ static T_stmList getNext()
             }
     }
 }
-T_stmList C_traceSchedule(struct C_block b)
+T_stmList C_traceSchedule(struct C_block b)//轨迹
 { C_stmListList sList;
     block_env = S_empty();
     global_block = b;
 
     for (sList=global_block.stmLists; sList; sList=sList->tail) {
-        S_enter(block_env, sList->head->head->u.LABEL, sList->head);
+        S_enter(block_env, sList->head->head->u.LABEL, sList->head);//标记所有块中stm
     }
-    return getNext();
+    return getNext();//返回处理好的轨迹
 }
