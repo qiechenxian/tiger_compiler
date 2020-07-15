@@ -402,9 +402,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
 static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s){
     switch (s->kind) {
         case A_stm_::A_expStm:{
-            transExp(venv, tenv, s->u.expStm);
+            expty expty_msg = transExp(venv, tenv, s->u.expStm);
             // todo translate
-            return Expty(nullptr, TY_Void());
+            return Expty(nullptr, expty_msg.ty);
         }
         case A_stm_::A_ifStm:{
             struct expty test{}, body{}, elseBody{};
@@ -416,10 +416,13 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody);
                 // todo translate
-                return Expty(nullptr, TY_Void());
+                if (body.ty != elseBody.ty){
+                    EM_error(s->pos, "return different type in if statement");
+                }
+                return Expty(nullptr, body.ty);
             }
             // todo translate
-            return Expty(nullptr, TY_Void());
+            return Expty(nullptr, body.ty);
         }
         case A_stm_::A_whileStm:{
             struct expty test = transExp(venv, tenv, s->u.whileStm.test);
@@ -428,7 +431,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             }
             // todo translate
             struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body);
-            return Expty(nullptr, TY_Void());
+            return Expty(nullptr, body.ty);
         }
         case A_stm_::A_blockStm:{
             if (!s->u.blockStm)
@@ -502,8 +505,8 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         }
         case A_stm_::A_breakStm:
         case A_stm_::A_continue:{
-            // todo break and continue
-            assert(0);
+            // todo break and continue 需要涉及IR阶段
+            return Expty(nullptr, TY_Void());
         }
     }
     assert(0);

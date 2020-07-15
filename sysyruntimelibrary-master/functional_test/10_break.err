@@ -48,5 +48,5 @@ before semantic ast:
           simpleVar(a)))),
        comStmList()))))),
   decList())
-complier_2020: /mnt/e/workspace_clion/compiler_2020/semant.cpp:506: expty transStm(Tr_frame, S_table, S_table, A_stm): Assertion `0' failed.
+complier_2020: /mnt/e/workspace_clion/compiler_2020/semant.cpp:511: expty transStm(Tr_frame, S_table, S_table, A_stm): Assertion `0' failed.
 Aborted (core dumped)

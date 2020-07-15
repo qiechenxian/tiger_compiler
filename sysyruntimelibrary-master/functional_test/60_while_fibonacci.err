@@ -311,4 +311,4 @@ after semantic ast:
             varExp(
              simpleVar(res)))),
           comStmList())))))),
-    decList())))int == intint == int
+    decList())))int == int

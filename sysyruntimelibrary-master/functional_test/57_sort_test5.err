@@ -578,4 +578,4 @@ before semantic ast:
                            intExp(0))),
                          comStmList()))))))))))))))))))),
       decList())))))
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/57_sort_test5.sy:61:9: error: undefined function putch
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/57_sort_test5.sy:17:9: error: return different type in if statement

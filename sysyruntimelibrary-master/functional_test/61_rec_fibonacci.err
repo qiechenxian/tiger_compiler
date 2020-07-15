@@ -164,4 +164,4 @@ before semantic ast:
                comStmList()))))))))))),
     decList())))
 /mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/61_rec_fibonacci.sy:25:2: error: undefined function putch
-int == intint == int
+int == int
