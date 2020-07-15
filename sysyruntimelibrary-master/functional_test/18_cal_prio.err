@@ -45,16 +45,8 @@ before semantic ast:
             comStm(
              assignStm(
               simpleVar(d),
-              opExp(
-               add,
-               varExp(
-                simpleVar(a)),
-               opExp(
-                mul,
-                varExp(
-                 simpleVar(b)),
-                varExp(
-                 simpleVar(c)))))),
+              varExp(
+               simpleVar(a)))),
             comStmList(
              comStm(
               returnStm(
@@ -111,16 +103,8 @@ after semantic ast:
             comStm(
              assignStm(
               simpleVar(d),
-              opExp(
-               add,
-               varExp(
-                simpleVar(a)),
-               opExp(
-                mul,
-                varExp(
-                 simpleVar(b)),
-                varExp(
-                 simpleVar(c)))))),
+              varExp(
+               simpleVar(a)))),
             comStmList(
              comStm(
               returnStm(

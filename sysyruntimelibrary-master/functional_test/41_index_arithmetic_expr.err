@@ -73,22 +73,8 @@ before semantic ast:
                 varExp(
                  arrayVar(
                   simpleVar(result),
-                  opExp(
-                   sub,
-                   opExp(
-                    dev,
-                    opExp(
-                     add,
-                     opExp(
-                      mod,
-                      varExp(
-                       simpleVar(a)),
-                      varExp(
-                       simpleVar(b))),
-                     varExp(
-                      simpleVar(b))),
-                    intExp(5)),
-                   intExp(2)))))),
+                  varExp(
+                   simpleVar(a)))))),
               comStmList(
                comStm(
                 expStm(
@@ -180,22 +166,8 @@ after semantic ast:
                 varExp(
                  arrayVar(
                   simpleVar(result),
-                  opExp(
-                   sub,
-                   opExp(
-                    dev,
-                    opExp(
-                     add,
-                     opExp(
-                      mod,
-                      varExp(
-                       simpleVar(a)),
-                      varExp(
-                       simpleVar(b))),
-                     varExp(
-                      simpleVar(b))),
-                    intExp(5)),
-                   intExp(2)))))),
+                  varExp(
+                   simpleVar(a)))))),
               comStmList(
                comStm(
                 expStm(

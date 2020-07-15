@@ -50,22 +50,16 @@ before semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(b),
-                   opExp(
-                    add,
-                    varExp(
-                     simpleVar(b)),
-                    intExp(2)))),
+                   varExp(
+                    simpleVar(b)))),
                  comStmList())))
 ),
              comStmList(
               comStm(
                assignStm(
                 simpleVar(b),
-                opExp(
-                 add,
-                 varExp(
-                  simpleVar(b)),
-                 intExp(25)))),
+                varExp(
+                 simpleVar(b)))),
               comStmList()))),/n           whileStm(
             opExp(
              lt,
@@ -77,20 +71,14 @@ before semantic ast:
               comStm(
                assignStm(
                 simpleVar(b),
-                opExp(
-                 mul,
-                 varExp(
-                  simpleVar(b)),
-                 intExp(2)))),
+                varExp(
+                 simpleVar(b)))),
               comStmList(
                comStm(
                 assignStm(
                  simpleVar(a),
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(a)),
-                  intExp(1)))),
+                 varExp(
+                  simpleVar(a)))),
                comStmList()))))
            )),
          comStmList(
@@ -165,22 +153,16 @@ after semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(b),
-                   opExp(
-                    add,
-                    varExp(
-                     simpleVar(b)),
-                    intExp(2)))),
+                   varExp(
+                    simpleVar(b)))),
                  comStmList())))
 ),
              comStmList(
               comStm(
                assignStm(
                 simpleVar(b),
-                opExp(
-                 add,
-                 varExp(
-                  simpleVar(b)),
-                 intExp(25)))),
+                varExp(
+                 simpleVar(b)))),
               comStmList()))),/n           whileStm(
             opExp(
              lt,
@@ -192,20 +174,14 @@ after semantic ast:
               comStm(
                assignStm(
                 simpleVar(b),
-                opExp(
-                 mul,
-                 varExp(
-                  simpleVar(b)),
-                 intExp(2)))),
+                varExp(
+                 simpleVar(b)))),
               comStmList(
                comStm(
                 assignStm(
                  simpleVar(a),
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(a)),
-                  intExp(1)))),
+                 varExp(
+                  simpleVar(a)))),
                comStmList()))))
            )),
          comStmList(

@@ -27,18 +27,8 @@ before semantic ast:
           decList(
            varibaleDec(c,
             int,
-            opExp(
-             add,
-             opExp(
-              add,
-              opExp(
-               mul,
-               varExp(
-                simpleVar(a)),
-               intExp(2)),
-              varExp(
-               simpleVar(b))),
-             intExp(3)),
+            varExp(
+             simpleVar(a)),
             FALSE),
            decList()),),
          comStmList(
@@ -79,18 +69,8 @@ after semantic ast:
           decList(
            varibaleDec(c,
             int,
-            opExp(
-             add,
-             opExp(
-              add,
-              opExp(
-               mul,
-               varExp(
-                simpleVar(a)),
-               intExp(2)),
-              varExp(
-               simpleVar(b))),
-             intExp(3)),
+            varExp(
+             simpleVar(a)),
             FALSE),
            decList()),),
          comStmList(

@@ -53,11 +53,8 @@ before semantic ast:
              lt,
              varExp(
               simpleVar(i)),
-             opExp(
-              sub,
-              varExp(
-               simpleVar(n)),
-              intExp(1))),
+             varExp(
+              simpleVar(n))),
             blockStm(
              comStmList(
               comStm(
@@ -69,11 +66,8 @@ before semantic ast:
                comStm(
                 assignStm(
                  simpleVar(j),
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(i)),
-                  intExp(1)))),
+                 varExp(
+                  simpleVar(i)))),
                comStmList(
                 comStm(
                  whileStm(
@@ -111,11 +105,8 @@ before semantic ast:
                      comStm(
                       assignStm(
                        simpleVar(j),
-                       opExp(
-                        add,
-                        varExp(
-                         simpleVar(j)),
-                        intExp(1)))),
+                       varExp(
+                        simpleVar(j)))),
                      comStmList()))))
 ),
                 comStmList(
@@ -170,11 +161,8 @@ before semantic ast:
                   comStm(
                    assignStm(
                     simpleVar(i),
-                    opExp(
-                     add,
-                     varExp(
-                      simpleVar(i)),
-                     intExp(1)))),
+                    varExp(
+                     simpleVar(i)))),
                   comStmList())))))))
 ),
           comStmList(
@@ -347,11 +335,8 @@ before semantic ast:
                                comStm(
                                 assignStm(
                                  simpleVar(i),
-                                 opExp(
-                                  add,
-                                  varExp(
-                                   simpleVar(i)),
-                                  intExp(1)))),
+                                 varExp(
+                                  simpleVar(i)))),
                                comStmList()))))))))
 ),
                       comStmList(

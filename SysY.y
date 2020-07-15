@@ -103,23 +103,17 @@ void yyerror(char*);
 %type <var> LVal
 %type <integer> Number
 %type <sym> Ident BType
-%type <binOp> addOp mulOp UnaryOp RelOp
+%type <binOp> addOp mulOp UnaryOp RelOp EqOp
 %type <stm> Block Stmt
 %type <comStmList> BlockItem
 %type <expList> ConstSubscripts ExpSubscripts FuncRParams
-%type <exp> Exp Cond ConstExp
+%type <exp> Exp Cond ConstExp LOrExp LAndExp EqExp RelExp AddExp MulExp UnaryExp PrimaryExp
 %type <decList> CompUnit Decl ConstDecl ConstDefList VarDecl VarDefList
 %type <dec> ConstDef VarDef FuncDef
 %type <arrayInitList> ConstInitValList ConstInitVal InitVal InitValList
 %type <field> FuncFParam
 %type <fieldList> FuncFParams
 
-%left OR
-%left AND
-%left ADD SUB UAddOp
-%left MUL DIV MOD UMulOp
-%right NOT
-%left UUnary
 
 %locations
 %error-verbose
@@ -307,20 +301,39 @@ LVal:
     ;
 
 Cond:
-    Exp RelOp Exp {$$ = A_LogicExp(A_POS(@$), $2, $1, $3);}
-    | L_PARENTHESIS Cond R_PARENTHESIS {$$ = $2;}
-    | NOT Cond {$$ = A_LogicExp(A_POS(@$), A_not, $2, NULL);}
-    | Cond AND Cond {$$ = A_LogicExp(A_POS(@$), A_and, $1, $3);}
-    | Cond OR Cond {$$ = A_LogicExp(A_POS(@$), A_or, $1, $3);}
+    LOrExp {$$ = $1}
+    ;
+
+LOrExp:
+    LAndExp {$$ = $1}
+    | LOrExp OR LAndExp {$$ = A_OpExp(A_POS(@$), $1, A_and, $3)}
+    ;
+
+LAndExp:
+    EqExp {$$ = $1}
+    | LAndExp AND EqExp {$$ = A_OpExp(A_POS(@$), $1, A_or, $3)}
+    ;
+
+EqExp:
+    RelExp {$$ = $1}
+    | EqExp EqOp RelExp {$$ = A_OpExp(A_POS(@$), $1, $2, $3)}
+    ;
+
+RelExp:
+    AddExp {$$ = $1}
+    | RelExp RelOp AddExp {$$ = A_OpExp(A_POS(@$), $1, $2, $3)}
     ;
 
 RelOp:
-    EQ {$$ = A_eq;}
-    | NE {$$ = A_ne;}
-    | LT {$$ = A_lt;}
+    LT {$$ = A_lt;}
     | LE {$$ = A_le;}
     | GT {$$ = A_gt;}
     | GE {$$ = A_ge;}
+    ;
+
+EqOp:
+    EQ {$$ = A_eq;}
+    | NE {$$ = A_ne;}
     ;
 
 addOp:
@@ -337,25 +350,44 @@ mulOp:
 UnaryOp:
     ADD {$$ = A_add;}
     | SUB {$$ = A_sub;}
+    | NOT {$$ = A_not;}
     ;
 
 Exp:
-    Exp addOp Exp %prec UAddOp {$$ = A_OpExp(A_POS(@$), $1, $2, $3);}
-    | Exp mulOp Exp %prec UMulOp {$$ = A_OpExp(A_POS(@$),$1, $2, $3);}
-    | UnaryOp Exp %prec UUnary {$$ = A_OpExp(A_POS(@$), A_IntExp(A_POS(@$), 0), $1, $2);}
-    | L_PARENTHESIS Exp R_PARENTHESIS {$$ = $2;}
-    | LVal {$$ = A_VarExp(A_POS(@$), $1);}
+    AddExp {$$ = $1}
+    ;
+
+AddExp:
+    MulExp {$$ = $1}
+    | AddExp addOp MulExp {A_OpExp(A_POS(@$), $1, $2, $3)}
+    ;
+
+MulExp:
+    UnaryExp {$$ = $1}
+    | MulExp mulOp UnaryExp {A_OpExp(A_POS(@$), $1, $2, $3)}
+    ;
+
+UnaryExp:
+    PrimaryExp {$$ = $1}
     | Ident L_PARENTHESIS FuncRParams R_PARENTHESIS {
         $$ = A_CallExp(A_POS(@$), $1, (A_expList)U_reverseList($3));
     }
-    | Ident L_PARENTHESIS R_PARENTHESIS {
+    | Ident L_PARENTHESIS R_PARENTHESIS{
         $$ = A_CallExp(A_POS(@$), $1, NULL);
     }
+    | UnaryOp UnaryExp {
+        $$ = A_OpExp(A_POS(@$), A_IntExp(A_POS(@$),0), $1, $2)
+    }
+    ;
+
+PrimaryExp:
+    L_PARENTHESIS Exp R_PARENTHESIS {$$ = $2}
+    | LVal {$$ = A_VarExp(A_POS(@$), $1);}
     | Number {$$ = A_IntExp(A_POS(@$), $1);}
     ;
 
 ConstExp:
-    Exp {$$ = $1;}
+    AddExp {$$ = $1;}
     ;
 
 Number:
@@ -368,30 +400,12 @@ Ident:
 
 %%
 
-static int calculate(int left, A_binOp op, int right){
-    /** 计算全为int的constInt，当前文法已不适用 */
-    switch (op){
-        case A_add:
-            return left + right;
-        case A_sub:
-            return left - right;
-        case A_mul:
-            return left * right;
-        case A_div:
-            return left / right;
-        case A_mod:
-            return left % right;
-    }
-    assert(0);
-}
-
 void yyerror(char* msg){
     fprintf(stderr, "%s:%d:%d: error: %s\n", FILE_NAME, yylineno, EM_token_pos, msg);
     char** code_msg = EM_error_code();
     fprintf(stderr, "%d| %s\n", yylineno, code_msg[0]);
 
     char line_no[32];
-    //itoa(yylineno, line_no, 10);
     sprintf(line_no,"%d",yylineno);
     unsigned len = strlen(line_no);
     for(int i = 0; i<len; i++){

@@ -71,39 +71,23 @@ before semantic ast:
                comStm(
                 ifStm(
                  opExp(
-                  or,
+                  and,
                   opExp(
                    lt,
-                   opExp(
-                    dev,
-                    opExp(
-                     mul,
-                     varExp(
-                      simpleVar(d)),
-                     intExp(1)),
-                    intExp(2)),
+                   varExp(
+                    simpleVar(d)),
                    intExp(0)),
                   opExp(
-                   and,
+                   or,
                    opExp(
                     ne,
-                    opExp(
-                     sub,
-                     varExp(
-                      simpleVar(a)),
-                     varExp(
-                      simpleVar(b))),
+                    varExp(
+                     simpleVar(a)),
                     intExp(0)),
                    opExp(
                     ne,
-                    opExp(
-                     mod,
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(c)),
-                      intExp(3)),
-                     intExp(2)),
+                    varExp(
+                     simpleVar(c)),
                     intExp(0)))),
                  blockStm(
                   comStmList(
@@ -119,39 +103,23 @@ before semantic ast:
                 comStm(
                  ifStm(
                   opExp(
-                   or,
+                   and,
                    opExp(
                     lt,
-                    opExp(
-                     add,
-                     opExp(
-                      mod,
-                      varExp(
-                       simpleVar(d)),
-                      intExp(2)),
-                     intExp(67)),
+                    varExp(
+                     simpleVar(d)),
                     intExp(0)),
                    opExp(
-                    and,
+                    or,
                     opExp(
                      ne,
-                     opExp(
-                      sub,
-                      varExp(
-                       simpleVar(a)),
-                      varExp(
-                       simpleVar(b))),
+                     varExp(
+                      simpleVar(a)),
                      intExp(0)),
                     opExp(
                      ne,
-                     opExp(
-                      mod,
-                      opExp(
-                       add,
-                       varExp(
-                        simpleVar(c)),
-                       intExp(2)),
-                      intExp(2)),
+                     varExp(
+                      simpleVar(c)),
                      intExp(0)))),
                   blockStm(
                    comStmList(
@@ -249,39 +217,23 @@ after semantic ast:
                comStm(
                 ifStm(
                  opExp(
-                  or,
+                  and,
                   opExp(
                    lt,
-                   opExp(
-                    dev,
-                    opExp(
-                     mul,
-                     varExp(
-                      simpleVar(d)),
-                     intExp(1)),
-                    intExp(2)),
+                   varExp(
+                    simpleVar(d)),
                    intExp(0)),
                   opExp(
-                   and,
+                   or,
                    opExp(
                     ne,
-                    opExp(
-                     sub,
-                     varExp(
-                      simpleVar(a)),
-                     varExp(
-                      simpleVar(b))),
+                    varExp(
+                     simpleVar(a)),
                     intExp(0)),
                    opExp(
                     ne,
-                    opExp(
-                     mod,
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(c)),
-                      intExp(3)),
-                     intExp(2)),
+                    varExp(
+                     simpleVar(c)),
                     intExp(0)))),
                  blockStm(
                   comStmList(
@@ -297,39 +249,23 @@ after semantic ast:
                 comStm(
                  ifStm(
                   opExp(
-                   or,
+                   and,
                    opExp(
                     lt,
-                    opExp(
-                     add,
-                     opExp(
-                      mod,
-                      varExp(
-                       simpleVar(d)),
-                      intExp(2)),
-                     intExp(67)),
+                    varExp(
+                     simpleVar(d)),
                     intExp(0)),
                    opExp(
-                    and,
+                    or,
                     opExp(
                      ne,
-                     opExp(
-                      sub,
-                      varExp(
-                       simpleVar(a)),
-                      varExp(
-                       simpleVar(b))),
+                     varExp(
+                      simpleVar(a)),
                      intExp(0)),
                     opExp(
                      ne,
-                     opExp(
-                      mod,
-                      opExp(
-                       add,
-                       varExp(
-                        simpleVar(c)),
-                       intExp(2)),
-                      intExp(2)),
+                     varExp(
+                      simpleVar(c)),
                      intExp(0)))),
                   blockStm(
                    comStmList(

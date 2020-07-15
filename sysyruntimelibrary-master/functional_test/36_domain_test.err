@@ -31,13 +31,7 @@ before semantic ast:
          varExp(
           arrayVar(
            simpleVar(array),
-           opExp(
-            sub,
-            intExp(3),
-            varExp(
-             arrayVar(
-              simpleVar(a),
-              intExp(0)))))))),
+           intExp(3))))),
        comStmList())))),
    decList(
     functionDec(main,
@@ -97,14 +91,8 @@ before semantic ast:
             comStmList(
              comStm(
               returnStm(
-               opExp(
-                add,
-                varExp(
-                 simpleVar(a)),
-                varExp(
-                 arrayVar(
-                  simpleVar(array),
-                  intExp(1)))))),
+               varExp(
+                simpleVar(a)))),
              comStmList()))))))))),
     decList())))
 
@@ -142,13 +130,7 @@ after semantic ast:
          varExp(
           arrayVar(
            simpleVar(array),
-           opExp(
-            sub,
-            intExp(3),
-            varExp(
-             arrayVar(
-              simpleVar(a),
-              intExp(0)))))))),
+           intExp(3))))),
        comStmList())))),
    decList(
     functionDec(main,
@@ -208,13 +190,7 @@ after semantic ast:
             comStmList(
              comStm(
               returnStm(
-               opExp(
-                add,
-                varExp(
-                 simpleVar(a)),
-                varExp(
-                 arrayVar(
-                  simpleVar(array),
-                  intExp(1)))))),
+               varExp(
+                simpleVar(a)))),
              comStmList()))))))))),
     decList())))

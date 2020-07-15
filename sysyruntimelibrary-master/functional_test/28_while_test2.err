@@ -65,11 +65,8 @@ before semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(a),
-                   opExp(
-                    add,
-                    varExp(
-                     simpleVar(a)),
-                    intExp(3)))),
+                   varExp(
+                    simpleVar(a)))),
                  comStmList(
                   comStm(
                    whileStm(
@@ -83,11 +80,8 @@ before semantic ast:
                       comStm(
                        assignStm(
                         simpleVar(b),
-                        opExp(
-                         add,
-                         varExp(
-                          simpleVar(b)),
-                         intExp(1)))),
+                        varExp(
+                         simpleVar(b)))),
                       comStmList(
                        comStm(
                         whileStm(
@@ -101,11 +95,8 @@ before semantic ast:
                            comStm(
                             assignStm(
                              simpleVar(c),
-                             opExp(
-                              sub,
-                              varExp(
-                               simpleVar(c)),
-                              intExp(1)))),
+                             varExp(
+                              simpleVar(c)))),
                            comStmList(
                             comStm(
                              whileStm(
@@ -119,63 +110,39 @@ before semantic ast:
                                 comStm(
                                  assignStm(
                                   simpleVar(d),
-                                  opExp(
-                                   add,
-                                   varExp(
-                                    simpleVar(d)),
-                                   intExp(3)))),
+                                  varExp(
+                                   simpleVar(d)))),
                                 comStmList())))
 ),
                             comStmList(
                              comStm(
                               assignStm(
                                simpleVar(d),
-                               opExp(
-                                sub,
-                                varExp(
-                                 simpleVar(d)),
-                                intExp(1)))),
+                               varExp(
+                                simpleVar(d)))),
                              comStmList())))))
 ),
                        comStmList(
                         comStm(
                          assignStm(
                           simpleVar(c),
-                          opExp(
-                           add,
-                           varExp(
-                            simpleVar(c)),
-                           intExp(1)))),
+                          varExp(
+                           simpleVar(c)))),
                         comStmList())))))
 ),
                   comStmList(
                    comStm(
                     assignStm(
                      simpleVar(b),
-                     opExp(
-                      sub,
-                      varExp(
-                       simpleVar(b)),
-                      intExp(2)))),
+                     varExp(
+                      simpleVar(b)))),
                    comStmList())))))
 ),
              comStmList(
               comStm(
                returnStm(
-                opExp(
-                 add,
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(a)),
-                  opExp(
-                   add,
-                   varExp(
-                    simpleVar(b)),
-                   varExp(
-                    simpleVar(d)))),
-                 varExp(
-                  simpleVar(c))))),
+                varExp(
+                 simpleVar(a)))),
               comStmList())))))))))))),
   decList(
    functionDec(main,
@@ -258,11 +225,8 @@ after semantic ast:
                  comStm(
                   assignStm(
                    simpleVar(a),
-                   opExp(
-                    add,
-                    varExp(
-                     simpleVar(a)),
-                    intExp(3)))),
+                   varExp(
+                    simpleVar(a)))),
                  comStmList(
                   comStm(
                    whileStm(
@@ -276,11 +240,8 @@ after semantic ast:
                       comStm(
                        assignStm(
                         simpleVar(b),
-                        opExp(
-                         add,
-                         varExp(
-                          simpleVar(b)),
-                         intExp(1)))),
+                        varExp(
+                         simpleVar(b)))),
                       comStmList(
                        comStm(
                         whileStm(
@@ -294,11 +255,8 @@ after semantic ast:
                            comStm(
                             assignStm(
                              simpleVar(c),
-                             opExp(
-                              sub,
-                              varExp(
-                               simpleVar(c)),
-                              intExp(1)))),
+                             varExp(
+                              simpleVar(c)))),
                            comStmList(
                             comStm(
                              whileStm(
@@ -312,63 +270,39 @@ after semantic ast:
                                 comStm(
                                  assignStm(
                                   simpleVar(d),
-                                  opExp(
-                                   add,
-                                   varExp(
-                                    simpleVar(d)),
-                                   intExp(3)))),
+                                  varExp(
+                                   simpleVar(d)))),
                                 comStmList())))
 ),
                             comStmList(
                              comStm(
                               assignStm(
                                simpleVar(d),
-                               opExp(
-                                sub,
-                                varExp(
-                                 simpleVar(d)),
-                                intExp(1)))),
+                               varExp(
+                                simpleVar(d)))),
                              comStmList())))))
 ),
                        comStmList(
                         comStm(
                          assignStm(
                           simpleVar(c),
-                          opExp(
-                           add,
-                           varExp(
-                            simpleVar(c)),
-                           intExp(1)))),
+                          varExp(
+                           simpleVar(c)))),
                         comStmList())))))
 ),
                   comStmList(
                    comStm(
                     assignStm(
                      simpleVar(b),
-                     opExp(
-                      sub,
-                      varExp(
-                       simpleVar(b)),
-                      intExp(2)))),
+                     varExp(
+                      simpleVar(b)))),
                    comStmList())))))
 ),
              comStmList(
               comStm(
                returnStm(
-                opExp(
-                 add,
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(a)),
-                  opExp(
-                   add,
-                   varExp(
-                    simpleVar(b)),
-                   varExp(
-                    simpleVar(d)))),
-                 varExp(
-                  simpleVar(c))))),
+                varExp(
+                 simpleVar(a)))),
               comStmList())))))))))))),
   decList(
    functionDec(main,

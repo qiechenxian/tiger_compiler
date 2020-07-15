@@ -88,24 +88,14 @@ before semantic ast:
                    comStm(
                     assignStm(
                      simpleVar(sum),
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(sum)),
-                      varExp(
-                       arrayVar(
-                        simpleVar(a),
-                        varExp(
-                         simpleVar(cnt))))))),
+                     varExp(
+                      simpleVar(sum)))),
                    comStmList(
                     comStm(
                      assignStm(
                       simpleVar(cnt),
-                      opExp(
-                       sub,
-                       varExp(
-                        simpleVar(cnt)),
-                       intExp(1)))),
+                      varExp(
+                       simpleVar(cnt)))),
                     comStmList()))))
 ),
                comStmList(
@@ -207,24 +197,14 @@ after semantic ast:
                    comStm(
                     assignStm(
                      simpleVar(sum),
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(sum)),
-                      varExp(
-                       arrayVar(
-                        simpleVar(a),
-                        varExp(
-                         simpleVar(cnt))))))),
+                     varExp(
+                      simpleVar(sum)))),
                    comStmList(
                     comStm(
                      assignStm(
                       simpleVar(cnt),
-                      opExp(
-                       sub,
-                       varExp(
-                        simpleVar(cnt)),
-                       intExp(1)))),
+                      varExp(
+                       simpleVar(cnt)))),
                     comStmList()))))
 ),
                comStmList(

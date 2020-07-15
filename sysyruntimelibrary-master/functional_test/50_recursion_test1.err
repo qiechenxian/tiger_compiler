@@ -34,23 +34,13 @@ before semantic ast:
        comStm(
         assignStm(
          simpleVar(nn),
-         opExp(
-          sub,
-          varExp(
-           simpleVar(n)),
-          intExp(1)))),
+         varExp(
+          simpleVar(n)))),
        comStmList(
         comStm(
          returnStm(
-          opExp(
-           mul,
-           varExp(
-            simpleVar(n)),
-           callExp(fact,
-            expList(
-             varExp(
-              simpleVar(nn)),
-             expList()))))),
+          varExp(
+           simpleVar(n)))),
         comStmList())))))),
   decList(
    functionDec(main,
@@ -117,23 +107,13 @@ after semantic ast:
        comStm(
         assignStm(
          simpleVar(nn),
-         opExp(
-          sub,
-          varExp(
-           simpleVar(n)),
-          intExp(1)))),
+         varExp(
+          simpleVar(n)))),
        comStmList(
         comStm(
          returnStm(
-          opExp(
-           mul,
-           varExp(
-            simpleVar(n)),
-           callExp(fact,
-            expList(
-             varExp(
-              simpleVar(nn)),
-             expList()))))),
+          varExp(
+           simpleVar(n)))),
         comStmList())))))),
   decList(
    functionDec(main,

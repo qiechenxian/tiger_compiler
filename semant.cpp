@@ -44,7 +44,7 @@ static int calculate(A_binOp op, int left, int right) {
         case A_and:
             return left && right;
         case A_not:
-            return !left;
+            return !right; /// 文法中将！exp保存为 0 NOT EXP
         case A_lt:
             return left < right;
         case A_le:
@@ -578,8 +578,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                     /// 此处会造成内存泄漏，泄漏对象：temp_left, temp_right所指对象
                 }
             } else if (left.isConst){
-                    A_exp temp_left = a->u.opExp.left;
-                    a->u.intExp = calculate(op, temp_left->u.intExp, 0);
+                    A_exp temp_right = a->u.opExp.right;
+                    a->u.intExp = calculate(op, 0, temp_right->u.intExp);
                     a->kind = A_exp_::A_intExp;
                     expty expty_msg = Expty(nullptr, TY_Int());
                     expty_msg.isConst = true;
