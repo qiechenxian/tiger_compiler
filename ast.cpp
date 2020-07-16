@@ -30,7 +30,7 @@ A_decList A_castDecList(A_decList list1, A_decList list2){
      * 将两个A_decList 连接起来
      * */
     A_decList iter = list1;
-    while(iter->tail != NULL){
+    while(iter->tail != nullptr){
         iter = iter->tail;
     }
     iter->tail = list2;
@@ -201,12 +201,11 @@ A_exp A_OpExp(A_pos pos, A_exp left, A_binOp op, A_exp right){
     a->u.opExp.right = right;
     return a;
 }
-A_exp A_LogicExp(A_pos pos, A_binOp op, A_exp factor1, A_exp factor2){
-    A_exp a = (A_exp)checked_malloc(sizeof(*a));
-    a->kind = A_exp_::A_opExp;
-    a->u.opExp.op = op;
-    a->u.opExp.left = factor1;
-    a->u.opExp.right = factor2;
+A_exp A_StringExp(A_pos pos, c_string stringExp){
+    auto a = (A_exp)checked_malloc(sizeof(A_exp_));
+    a->pos = pos;
+    a->kind = A_exp_::A_stringExp;
+    a->u.stringExp = String(stringExp);
     return a;
 }
 A_field A_Field(A_pos pos, S_symbol id, S_symbol type, A_expList size){

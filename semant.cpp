@@ -539,6 +539,17 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                          S_getName(a->u.callExp.id));
                 return Expty(nullptr, TY_Void());
             }
+
+            /// 针对putf的特殊处理
+            if (strcmp(S_getName(a->u.callExp.id), "putf") == 0){
+                if (a->u.callExp.args->head->kind != A_exp_::A_stringExp){
+                    EM_error(a->pos, "The first argument of putf must be a String");
+                }
+                // todo translate
+                return Expty(nullptr, TY_Void());
+            }
+
+
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
             A_expList argIter = a->u.callExp.args;

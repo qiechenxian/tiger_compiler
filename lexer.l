@@ -4,7 +4,7 @@
 #include "errormsg.h"
 
 extern int yywrap();
-extern void yyerror();
+extern void yyerror(char* msg);
 
 c_string striped(char*);
 int otoi(char* text);
@@ -27,7 +27,7 @@ no_zero_num [1-9]
 num 0|{no_zero_num}
 unsign_int {no_zero_num}({num})*
 character \'{add_ops}?\'|\'{mul_ops}?\'|\'{letter}?\'|\'{num}?\' 
-string \"([\32\33\35-\126])*\"
+string \"[^"]*\"
 
 %option yylineno
 %Start COMMENT1 COMMENT2
@@ -80,17 +80,17 @@ string \"([\32\33\35-\126])*\"
 <INITIAL>{unsign_int}|0 { ADJ; yylval.integer = atoi(yytext); return INTEGER;  }
 <INITIAL>0[0-7]* { ADJ; yylval.integer = otoi(yytext); return INTEGER; }
 <INITIAL>(0x|0X)[0-9a-fA-F]+ { ADJ; yylval.integer = htoi(yytext); return INTEGER; }
-<INITIAL>{string} { ADJ; yylval.string = striped(yytext); return STRING; } 
+<INITIAL>{string} { ADJ; yylval.string = striped(yytext); return STRING; }
 <INITIAL>{character} { ADJ; yylval.character = *striped(yytext); return CHARACTER; } 
 
 <INITIAL>[ \t]+ { /* space */ ADJ; }
 <INITIAL>(\n|\r|\n\r)+ {yycolumn = 1;EM_clear_buf();}
-<INITIAL>. { /* error */ yyerror("invalid character"); }
+<INITIAL>. { /* error */ yyerror("lex: invalid character"); }
 
 %%
 
 c_string striped(char* st){
-    /** 去掉左右括号，返回一个string*/
+    /** 去掉左右引号，返回一个string*/
     int len = strlen(st);
     c_string striped_str = (c_string)malloc((len-1)*sizeof(char));
     for(int i = 1; i < len-1; i++){
@@ -112,23 +112,13 @@ int otoi(char* text){
     assert(text[0] == '0');
     char *ptr;
     int res=(int)strtol(text,&ptr,8);
-//    char* str_num = stripZero(text);
-//    int res = *str_num - '0';
-//    while(*(++str_num)){res = 8 * res + *str_num - '0';}
-//    return res;
+    return res;
 }
-
- /// 16进制字符转对应的数值
-#define transHexP(p) (p-'0'<10?p-'0':(p-'A'<6?p-'7':p-'W'))
 
 int htoi(char* text){
     /** 16进制转10进制*/
     char *ptr;
     int res=(int)strtol(text,&ptr,16);
-//    assert(text[0] == '0' && (text[1] == 'x' | text[1] == 'X'));
-//    char* str_num = stripZero(text+2);
-//    int res = transHexP(*str_num);
-//    while(*(++str_num)){res = 16 * res + transHexP(*str_num);}
-//    return res;
+    return res;
 }
 

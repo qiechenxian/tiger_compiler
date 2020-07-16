@@ -384,6 +384,7 @@ PrimaryExp:
     L_PARENTHESIS Exp R_PARENTHESIS {$$ = $2}
     | LVal {$$ = A_VarExp(A_POS(@$), $1);}
     | Number {$$ = A_IntExp(A_POS(@$), $1);}
+    | STRING {$$ = A_StringExp(A_POS(@$), $1);}
     ;
 
 ConstExp:

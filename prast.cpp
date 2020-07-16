@@ -197,6 +197,9 @@ static void pr_exp(FILE *out ,A_exp v,int d){
             pr_exp(out,v->u.opExp.right,d+1);
             fprintf(out,")");
             break;
+        case A_exp_::A_stringExp:
+            fprintf(out, "opExp(%s)", v->u.stringExp);
+            break;
         default:
             assert(0);
     }

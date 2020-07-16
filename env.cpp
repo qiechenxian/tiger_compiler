@@ -78,7 +78,8 @@ S_table E_base_valueEntry(S_table tenv){
     S_enter(t, S_Symbol((char*)"putarray"), funEntry);
 
     /// (7) void putf()
-    //todo putf
+    funEntry = E_FunEntry(nullptr, nullptr, TY_Void());
+    S_enter(t, S_Symbol((char*)"putf"), funEntry);
 
     /// (8) void starttime()
     funEntry = E_FunEntry(nullptr, nullptr, TY_Void());

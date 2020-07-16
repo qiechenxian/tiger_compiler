@@ -4,11 +4,10 @@ Terminals unused in grammar
    SWITCH
    CASE
    COLON
-   STRING
    CHARACTER
 
 
-State 173 conflicts: 1 shift/reduce
+State 174 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -154,12 +153,13 @@ Grammar
    99 PrimaryExp: L_PARENTHESIS Exp R_PARENTHESIS
   100           | LVal
   101           | Number
+  102           | STRING
 
-  102 ConstExp: AddExp
+  103 ConstExp: AddExp
 
-  103 Number: INTEGER
+  104 Number: INTEGER
 
-  104 Ident: ID
+  105 Ident: ID
 
 
 Terminals, with rules where they appear
@@ -202,9 +202,9 @@ L_BRACKETS (290) 14 15 43 44 45 66
 R_BRACKETS (291) 14 15 43 44 45 66
 L_BRACE (292) 16 17 29 30 46 47
 R_BRACE (293) 16 17 29 30 46 47
-ID (294) 104
-INTEGER (295) 103
-STRING (296)
+ID (294) 105
+INTEGER (295) 104
+STRING (296) 102
 CHARACTER (297)
 
 
@@ -284,19 +284,19 @@ UnaryOp (77)
 Exp (78)
     on left: 90, on right: 26 31 33 43 45 52 53 61 63 64 66 99
 AddExp (79)
-    on left: 91 92, on right: 74 75 90 92 102
+    on left: 91 92, on right: 74 75 90 92 103
 MulExp (80)
     on left: 93 94, on right: 91 92 94
 UnaryExp (81)
     on left: 95 96 97 98, on right: 93 94 98
 PrimaryExp (82)
-    on left: 99 100 101, on right: 95
+    on left: 99 100 101 102, on right: 95
 ConstExp (83)
-    on left: 102, on right: 12 14 15 19 21
+    on left: 103, on right: 12 14 15 19 21
 Number (84)
-    on left: 103, on right: 101
+    on left: 104, on right: 101
 Ident (85)
-    on left: 104, on right: 12 13 25 26 27 28 35 36 37 38 41 42 65
+    on left: 105, on right: 12 13 25 26 27 28 35 36 37 38 41 42 65
     96 97
 
 
@@ -423,9 +423,9 @@ state 11
 
 state 12
 
-  104 Ident: ID .
+  105 Ident: ID .
 
-    $default  reduce using rule 104 (Ident)
+    $default  reduce using rule 105 (Ident)
 
 
 state 13
@@ -558,16 +558,17 @@ state 26
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 47
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 48
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
 state 27
@@ -576,10 +577,10 @@ state 27
    38        | BType Ident L_PARENTHESIS . R_PARENTHESIS Block
 
     INT            shift, and go to state 2
-    R_PARENTHESIS  shift, and go to state 54
+    R_PARENTHESIS  shift, and go to state 55
 
     BType        go to state 35
-    FuncFParams  go to state 55
+    FuncFParams  go to state 56
     FuncFParam   go to state 37
 
 
@@ -593,16 +594,17 @@ state 28
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    AddExp      go to state 56
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    ConstExp    go to state 57
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    AddExp      go to state 57
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    ConstExp    go to state 58
+    Number      go to state 53
+    Ident       go to state 54
 
 
 state 29
@@ -611,8 +613,8 @@ state 29
    27 VarDef: Ident ConstSubscripts .
    28       | Ident ConstSubscripts . ASSIGNMENT InitVal
 
-    ASSIGNMENT  shift, and go to state 58
-    L_BRACKETS  shift, and go to state 59
+    ASSIGNMENT  shift, and go to state 59
+    L_BRACKETS  shift, and go to state 60
 
     $default  reduce using rule 27 (VarDef)
 
@@ -623,7 +625,7 @@ state 30
 
     ID  shift, and go to state 12
 
-    ConstDef  go to state 60
+    ConstDef  go to state 61
     Ident     go to state 22
 
 
@@ -644,16 +646,17 @@ state 32
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    AddExp      go to state 56
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    ConstExp    go to state 61
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    AddExp      go to state 57
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    ConstExp    go to state 62
+    Number      go to state 53
+    Ident       go to state 54
 
 
 state 33
@@ -661,17 +664,17 @@ state 33
    13 ConstDef: Ident ConstSubscripts . ASSIGNMENT ConstInitVal
    14 ConstSubscripts: ConstSubscripts . L_BRACKETS ConstExp R_BRACKETS
 
-    ASSIGNMENT  shift, and go to state 62
-    L_BRACKETS  shift, and go to state 59
+    ASSIGNMENT  shift, and go to state 63
+    L_BRACKETS  shift, and go to state 60
 
 
 state 34
 
    36 FuncDef: VOID Ident L_PARENTHESIS R_PARENTHESIS . Block
 
-    L_BRACE  shift, and go to state 63
+    L_BRACE  shift, and go to state 64
 
-    Block  go to state 64
+    Block  go to state 65
 
 
 state 35
@@ -681,7 +684,7 @@ state 35
 
     ID  shift, and go to state 12
 
-    Ident  go to state 65
+    Ident  go to state 66
 
 
 state 36
@@ -689,8 +692,8 @@ state 36
    35 FuncDef: VOID Ident L_PARENTHESIS FuncFParams . R_PARENTHESIS Block
    39 FuncFParams: FuncFParams . COMMA FuncFParam
 
-    COMMA          shift, and go to state 66
-    R_PARENTHESIS  shift, and go to state 67
+    COMMA          shift, and go to state 67
+    R_PARENTHESIS  shift, and go to state 68
 
 
 state 37
@@ -753,36 +756,44 @@ state 43
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 68
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 69
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
 state 44
 
-  103 Number: INTEGER .
+  104 Number: INTEGER .
 
-    $default  reduce using rule 103 (Number)
+    $default  reduce using rule 104 (Number)
 
 
 state 45
 
+  102 PrimaryExp: STRING .
+
+    $default  reduce using rule 102 (PrimaryExp)
+
+
+state 46
+
    66 LVal: LVal . L_BRACKETS Exp R_BRACKETS
   100 PrimaryExp: LVal .
 
-    L_BRACKETS  shift, and go to state 69
+    L_BRACKETS  shift, and go to state 70
 
     $default  reduce using rule 100 (PrimaryExp)
 
 
-state 46
+state 47
 
    98 UnaryExp: UnaryOp . UnaryExp
 
@@ -792,129 +803,130 @@ state 46
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    UnaryExp    go to state 70
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    UnaryExp    go to state 71
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 47
+state 48
 
    26 VarDef: Ident ASSIGNMENT Exp .
 
     $default  reduce using rule 26 (VarDef)
 
 
-state 48
+state 49
 
    90 Exp: AddExp .
    92 AddExp: AddExp . addOp MulExp
 
-    ADD  shift, and go to state 71
-    SUB  shift, and go to state 72
+    ADD  shift, and go to state 72
+    SUB  shift, and go to state 73
 
     $default  reduce using rule 90 (Exp)
 
-    addOp  go to state 73
+    addOp  go to state 74
 
 
-state 49
+state 50
 
    91 AddExp: MulExp .
    94 MulExp: MulExp . mulOp UnaryExp
 
-    MUL  shift, and go to state 74
-    DIV  shift, and go to state 75
-    MOD  shift, and go to state 76
+    MUL  shift, and go to state 75
+    DIV  shift, and go to state 76
+    MOD  shift, and go to state 77
 
     $default  reduce using rule 91 (AddExp)
 
-    mulOp  go to state 77
+    mulOp  go to state 78
 
 
-state 50
+state 51
 
    93 MulExp: UnaryExp .
 
     $default  reduce using rule 93 (MulExp)
 
 
-state 51
+state 52
 
    95 UnaryExp: PrimaryExp .
 
     $default  reduce using rule 95 (UnaryExp)
 
 
-state 52
+state 53
 
   101 PrimaryExp: Number .
 
     $default  reduce using rule 101 (PrimaryExp)
 
 
-state 53
+state 54
 
    65 LVal: Ident .
    96 UnaryExp: Ident . L_PARENTHESIS FuncRParams R_PARENTHESIS
    97         | Ident . L_PARENTHESIS R_PARENTHESIS
 
-    L_PARENTHESIS  shift, and go to state 78
+    L_PARENTHESIS  shift, and go to state 79
 
     $default  reduce using rule 65 (LVal)
 
 
-state 54
+state 55
 
    38 FuncDef: BType Ident L_PARENTHESIS R_PARENTHESIS . Block
 
-    L_BRACE  shift, and go to state 63
+    L_BRACE  shift, and go to state 64
 
-    Block  go to state 79
-
-
-state 55
-
-   37 FuncDef: BType Ident L_PARENTHESIS FuncFParams . R_PARENTHESIS Block
-   39 FuncFParams: FuncFParams . COMMA FuncFParam
-
-    COMMA          shift, and go to state 66
-    R_PARENTHESIS  shift, and go to state 80
+    Block  go to state 80
 
 
 state 56
 
-   92 AddExp: AddExp . addOp MulExp
-  102 ConstExp: AddExp .
+   37 FuncDef: BType Ident L_PARENTHESIS FuncFParams . R_PARENTHESIS Block
+   39 FuncFParams: FuncFParams . COMMA FuncFParam
 
-    ADD  shift, and go to state 71
-    SUB  shift, and go to state 72
-
-    $default  reduce using rule 102 (ConstExp)
-
-    addOp  go to state 73
+    COMMA          shift, and go to state 67
+    R_PARENTHESIS  shift, and go to state 81
 
 
 state 57
 
-   15 ConstSubscripts: L_BRACKETS ConstExp . R_BRACKETS
+   92 AddExp: AddExp . addOp MulExp
+  103 ConstExp: AddExp .
 
-    R_BRACKETS  shift, and go to state 81
+    ADD  shift, and go to state 72
+    SUB  shift, and go to state 73
+
+    $default  reduce using rule 103 (ConstExp)
+
+    addOp  go to state 74
 
 
 state 58
 
-   28 VarDef: Ident ConstSubscripts ASSIGNMENT . InitVal
+   15 ConstSubscripts: L_BRACKETS ConstExp . R_BRACKETS
 
-    L_BRACE  shift, and go to state 82
-
-    InitVal  go to state 83
+    R_BRACKETS  shift, and go to state 82
 
 
 state 59
+
+   28 VarDef: Ident ConstSubscripts ASSIGNMENT . InitVal
+
+    L_BRACE  shift, and go to state 83
+
+    InitVal  go to state 84
+
+
+state 60
 
    14 ConstSubscripts: ConstSubscripts L_BRACKETS . ConstExp R_BRACKETS
 
@@ -924,42 +936,43 @@ state 59
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    AddExp      go to state 56
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    ConstExp    go to state 84
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    AddExp      go to state 57
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    ConstExp    go to state 85
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 60
+state 61
 
     9 ConstDefList: ConstDefList COMMA ConstDef .
 
     $default  reduce using rule 9 (ConstDefList)
 
 
-state 61
+state 62
 
    12 ConstDef: Ident ASSIGNMENT ConstExp .
 
     $default  reduce using rule 12 (ConstDef)
 
 
-state 62
+state 63
 
    13 ConstDef: Ident ConstSubscripts ASSIGNMENT . ConstInitVal
 
-    L_BRACE  shift, and go to state 85
+    L_BRACE  shift, and go to state 86
 
-    ConstInitVal  go to state 86
+    ConstInitVal  go to state 87
 
 
-state 63
+state 64
 
    46 Block: L_BRACE . BlockItem R_BRACE
    47      | L_BRACE . R_BRACE
@@ -969,82 +982,83 @@ state 63
     NOT            shift, and go to state 42
     CONST          shift, and go to state 1
     INT            shift, and go to state 2
-    IF             shift, and go to state 87
-    WHILE          shift, and go to state 88
-    RETURN         shift, and go to state 89
-    BREAK          shift, and go to state 90
-    CONTINUE       shift, and go to state 91
-    SEMICOLON      shift, and go to state 92
+    IF             shift, and go to state 88
+    WHILE          shift, and go to state 89
+    RETURN         shift, and go to state 90
+    BREAK          shift, and go to state 91
+    CONTINUE       shift, and go to state 92
+    SEMICOLON      shift, and go to state 93
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 63
-    R_BRACE        shift, and go to state 93
+    L_BRACE        shift, and go to state 64
+    R_BRACE        shift, and go to state 94
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    Decl        go to state 94
+    Decl        go to state 95
     ConstDecl   go to state 7
-    BType       go to state 95
+    BType       go to state 96
     VarDecl     go to state 9
-    Block       go to state 96
-    BlockItem   go to state 97
-    Stmt        go to state 98
-    LVal        go to state 99
-    UnaryOp     go to state 46
-    Exp         go to state 100
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    Block       go to state 97
+    BlockItem   go to state 98
+    Stmt        go to state 99
+    LVal        go to state 100
+    UnaryOp     go to state 47
+    Exp         go to state 101
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 64
+state 65
 
    36 FuncDef: VOID Ident L_PARENTHESIS R_PARENTHESIS Block .
 
     $default  reduce using rule 36 (FuncDef)
 
 
-state 65
+state 66
 
    41 FuncFParam: BType Ident .
    42           | BType Ident . ExpSubscripts
 
-    L_BRACKETS  shift, and go to state 101
+    L_BRACKETS  shift, and go to state 102
 
     $default  reduce using rule 41 (FuncFParam)
 
-    ExpSubscripts  go to state 102
+    ExpSubscripts  go to state 103
 
 
-state 66
+state 67
 
    39 FuncFParams: FuncFParams COMMA . FuncFParam
 
     INT  shift, and go to state 2
 
     BType       go to state 35
-    FuncFParam  go to state 103
-
-
-state 67
-
-   35 FuncDef: VOID Ident L_PARENTHESIS FuncFParams R_PARENTHESIS . Block
-
-    L_BRACE  shift, and go to state 63
-
-    Block  go to state 104
+    FuncFParam  go to state 104
 
 
 state 68
 
-   99 PrimaryExp: L_PARENTHESIS Exp . R_PARENTHESIS
+   35 FuncDef: VOID Ident L_PARENTHESIS FuncFParams R_PARENTHESIS . Block
 
-    R_PARENTHESIS  shift, and go to state 105
+    L_BRACE  shift, and go to state 64
+
+    Block  go to state 105
 
 
 state 69
+
+   99 PrimaryExp: L_PARENTHESIS Exp . R_PARENTHESIS
+
+    R_PARENTHESIS  shift, and go to state 106
+
+
+state 70
 
    66 LVal: LVal L_BRACKETS . Exp R_BRACKETS
 
@@ -1054,40 +1068,41 @@ state 69
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 106
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 107
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 70
+state 71
 
    98 UnaryExp: UnaryOp UnaryExp .
 
     $default  reduce using rule 98 (UnaryExp)
 
 
-state 71
+state 72
 
    82 addOp: ADD .
 
     $default  reduce using rule 82 (addOp)
 
 
-state 72
+state 73
 
    83 addOp: SUB .
 
     $default  reduce using rule 83 (addOp)
 
 
-state 73
+state 74
 
    92 AddExp: AddExp addOp . MulExp
 
@@ -1097,38 +1112,39 @@ state 73
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    MulExp      go to state 107
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    MulExp      go to state 108
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 74
+state 75
 
    84 mulOp: MUL .
 
     $default  reduce using rule 84 (mulOp)
 
 
-state 75
+state 76
 
    85 mulOp: DIV .
 
     $default  reduce using rule 85 (mulOp)
 
 
-state 76
+state 77
 
    86 mulOp: MOD .
 
     $default  reduce using rule 86 (mulOp)
 
 
-state 77
+state 78
 
    94 MulExp: MulExp mulOp . UnaryExp
 
@@ -1138,16 +1154,17 @@ state 77
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    UnaryExp    go to state 108
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    UnaryExp    go to state 109
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 78
+state 79
 
    96 UnaryExp: Ident L_PARENTHESIS . FuncRParams R_PARENTHESIS
    97         | Ident L_PARENTHESIS . R_PARENTHESIS
@@ -1156,46 +1173,47 @@ state 78
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
     L_PARENTHESIS  shift, and go to state 43
-    R_PARENTHESIS  shift, and go to state 109
+    R_PARENTHESIS  shift, and go to state 110
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    FuncRParams  go to state 110
-    LVal         go to state 45
-    UnaryOp      go to state 46
-    Exp          go to state 111
-    AddExp       go to state 48
-    MulExp       go to state 49
-    UnaryExp     go to state 50
-    PrimaryExp   go to state 51
-    Number       go to state 52
-    Ident        go to state 53
+    FuncRParams  go to state 111
+    LVal         go to state 46
+    UnaryOp      go to state 47
+    Exp          go to state 112
+    AddExp       go to state 49
+    MulExp       go to state 50
+    UnaryExp     go to state 51
+    PrimaryExp   go to state 52
+    Number       go to state 53
+    Ident        go to state 54
 
 
-state 79
+state 80
 
    38 FuncDef: BType Ident L_PARENTHESIS R_PARENTHESIS Block .
 
     $default  reduce using rule 38 (FuncDef)
 
 
-state 80
+state 81
 
    37 FuncDef: BType Ident L_PARENTHESIS FuncFParams R_PARENTHESIS . Block
 
-    L_BRACE  shift, and go to state 63
+    L_BRACE  shift, and go to state 64
 
-    Block  go to state 112
+    Block  go to state 113
 
 
-state 81
+state 82
 
    15 ConstSubscripts: L_BRACKETS ConstExp R_BRACKETS .
 
     $default  reduce using rule 15 (ConstSubscripts)
 
 
-state 82
+state 83
 
    29 InitVal: L_BRACE . InitValList R_BRACE
    30        | L_BRACE . R_BRACE
@@ -1204,39 +1222,40 @@ state 82
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 82
-    R_BRACE        shift, and go to state 113
+    L_BRACE        shift, and go to state 83
+    R_BRACE        shift, and go to state 114
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    InitVal      go to state 114
-    InitValList  go to state 115
-    LVal         go to state 45
-    UnaryOp      go to state 46
-    Exp          go to state 116
-    AddExp       go to state 48
-    MulExp       go to state 49
-    UnaryExp     go to state 50
-    PrimaryExp   go to state 51
-    Number       go to state 52
-    Ident        go to state 53
+    InitVal      go to state 115
+    InitValList  go to state 116
+    LVal         go to state 46
+    UnaryOp      go to state 47
+    Exp          go to state 117
+    AddExp       go to state 49
+    MulExp       go to state 50
+    UnaryExp     go to state 51
+    PrimaryExp   go to state 52
+    Number       go to state 53
+    Ident        go to state 54
 
 
-state 83
+state 84
 
    28 VarDef: Ident ConstSubscripts ASSIGNMENT InitVal .
 
     $default  reduce using rule 28 (VarDef)
 
 
-state 84
+state 85
 
    14 ConstSubscripts: ConstSubscripts L_BRACKETS ConstExp . R_BRACKETS
 
-    R_BRACKETS  shift, and go to state 117
+    R_BRACKETS  shift, and go to state 118
 
 
-state 85
+state 86
 
    16 ConstInitVal: L_BRACE . ConstInitValList R_BRACE
    17             | L_BRACE . R_BRACE
@@ -1245,47 +1264,48 @@ state 85
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 85
-    R_BRACE        shift, and go to state 118
+    L_BRACE        shift, and go to state 86
+    R_BRACE        shift, and go to state 119
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    ConstInitVal      go to state 119
-    ConstInitValList  go to state 120
-    LVal              go to state 45
-    UnaryOp           go to state 46
-    AddExp            go to state 56
-    MulExp            go to state 49
-    UnaryExp          go to state 50
-    PrimaryExp        go to state 51
-    ConstExp          go to state 121
-    Number            go to state 52
-    Ident             go to state 53
+    ConstInitVal      go to state 120
+    ConstInitValList  go to state 121
+    LVal              go to state 46
+    UnaryOp           go to state 47
+    AddExp            go to state 57
+    MulExp            go to state 50
+    UnaryExp          go to state 51
+    PrimaryExp        go to state 52
+    ConstExp          go to state 122
+    Number            go to state 53
+    Ident             go to state 54
 
 
-state 86
+state 87
 
    13 ConstDef: Ident ConstSubscripts ASSIGNMENT ConstInitVal .
 
     $default  reduce using rule 13 (ConstDef)
 
 
-state 87
+state 88
 
    56 Stmt: IF . L_PARENTHESIS Cond R_PARENTHESIS Stmt
    57     | IF . L_PARENTHESIS Cond R_PARENTHESIS Stmt ELSE Stmt
-
-    L_PARENTHESIS  shift, and go to state 122
-
-
-state 88
-
-   58 Stmt: WHILE . L_PARENTHESIS Cond R_PARENTHESIS Stmt
 
     L_PARENTHESIS  shift, and go to state 123
 
 
 state 89
+
+   58 Stmt: WHILE . L_PARENTHESIS Cond R_PARENTHESIS Stmt
+
+    L_PARENTHESIS  shift, and go to state 124
+
+
+state 90
 
    61 Stmt: RETURN . Exp SEMICOLON
    62     | RETURN . SEMICOLON
@@ -1293,58 +1313,59 @@ state 89
     ADD            shift, and go to state 40
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
-    SEMICOLON      shift, and go to state 124
+    SEMICOLON      shift, and go to state 125
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 125
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
-
-
-state 90
-
-   59 Stmt: BREAK . SEMICOLON
-
-    SEMICOLON  shift, and go to state 126
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 126
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
 state 91
 
-   60 Stmt: CONTINUE . SEMICOLON
+   59 Stmt: BREAK . SEMICOLON
 
     SEMICOLON  shift, and go to state 127
 
 
 state 92
 
+   60 Stmt: CONTINUE . SEMICOLON
+
+    SEMICOLON  shift, and go to state 128
+
+
+state 93
+
    54 Stmt: SEMICOLON .
 
     $default  reduce using rule 54 (Stmt)
 
 
-state 93
+state 94
 
    47 Block: L_BRACE R_BRACE .
 
     $default  reduce using rule 47 (Block)
 
 
-state 94
+state 95
 
    50 BlockItem: Decl .
 
     $default  reduce using rule 50 (BlockItem)
 
 
-state 95
+state 96
 
    22 VarDecl: BType . VarDefList SEMICOLON
 
@@ -1355,14 +1376,14 @@ state 95
     Ident       go to state 39
 
 
-state 96
+state 97
 
    55 Stmt: Block .
 
     $default  reduce using rule 55 (Stmt)
 
 
-state 97
+state 98
 
    46 Block: L_BRACE BlockItem . R_BRACE
    48 BlockItem: BlockItem . Decl
@@ -1373,62 +1394,63 @@ state 97
     NOT            shift, and go to state 42
     CONST          shift, and go to state 1
     INT            shift, and go to state 2
-    IF             shift, and go to state 87
-    WHILE          shift, and go to state 88
-    RETURN         shift, and go to state 89
-    BREAK          shift, and go to state 90
-    CONTINUE       shift, and go to state 91
-    SEMICOLON      shift, and go to state 92
+    IF             shift, and go to state 88
+    WHILE          shift, and go to state 89
+    RETURN         shift, and go to state 90
+    BREAK          shift, and go to state 91
+    CONTINUE       shift, and go to state 92
+    SEMICOLON      shift, and go to state 93
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 63
-    R_BRACE        shift, and go to state 128
+    L_BRACE        shift, and go to state 64
+    R_BRACE        shift, and go to state 129
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    Decl        go to state 129
+    Decl        go to state 130
     ConstDecl   go to state 7
-    BType       go to state 95
+    BType       go to state 96
     VarDecl     go to state 9
-    Block       go to state 96
-    Stmt        go to state 130
-    LVal        go to state 99
-    UnaryOp     go to state 46
-    Exp         go to state 100
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    Block       go to state 97
+    Stmt        go to state 131
+    LVal        go to state 100
+    UnaryOp     go to state 47
+    Exp         go to state 101
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 98
+state 99
 
    51 BlockItem: Stmt .
 
     $default  reduce using rule 51 (BlockItem)
 
 
-state 99
+state 100
 
    52 Stmt: LVal . ASSIGNMENT Exp SEMICOLON
    66 LVal: LVal . L_BRACKETS Exp R_BRACKETS
   100 PrimaryExp: LVal .
 
-    ASSIGNMENT  shift, and go to state 131
-    L_BRACKETS  shift, and go to state 69
+    ASSIGNMENT  shift, and go to state 132
+    L_BRACKETS  shift, and go to state 70
 
     $default  reduce using rule 100 (PrimaryExp)
 
 
-state 100
+state 101
 
    53 Stmt: Exp . SEMICOLON
 
-    SEMICOLON  shift, and go to state 132
+    SEMICOLON  shift, and go to state 133
 
 
-state 101
+state 102
 
    44 ExpSubscripts: L_BRACKETS . R_BRACKETS
    45              | L_BRACKETS . Exp R_BRACKETS
@@ -1437,180 +1459,181 @@ state 101
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
     L_PARENTHESIS  shift, and go to state 43
-    R_BRACKETS     shift, and go to state 133
+    R_BRACKETS     shift, and go to state 134
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 134
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 135
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 102
+state 103
 
    42 FuncFParam: BType Ident ExpSubscripts .
    43 ExpSubscripts: ExpSubscripts . L_BRACKETS Exp R_BRACKETS
 
-    L_BRACKETS  shift, and go to state 135
+    L_BRACKETS  shift, and go to state 136
 
     $default  reduce using rule 42 (FuncFParam)
 
 
-state 103
+state 104
 
    39 FuncFParams: FuncFParams COMMA FuncFParam .
 
     $default  reduce using rule 39 (FuncFParams)
 
 
-state 104
+state 105
 
    35 FuncDef: VOID Ident L_PARENTHESIS FuncFParams R_PARENTHESIS Block .
 
     $default  reduce using rule 35 (FuncDef)
 
 
-state 105
+state 106
 
    99 PrimaryExp: L_PARENTHESIS Exp R_PARENTHESIS .
 
     $default  reduce using rule 99 (PrimaryExp)
 
 
-state 106
+state 107
 
    66 LVal: LVal L_BRACKETS Exp . R_BRACKETS
 
-    R_BRACKETS  shift, and go to state 136
+    R_BRACKETS  shift, and go to state 137
 
 
-state 107
+state 108
 
    92 AddExp: AddExp addOp MulExp .
    94 MulExp: MulExp . mulOp UnaryExp
 
-    MUL  shift, and go to state 74
-    DIV  shift, and go to state 75
-    MOD  shift, and go to state 76
+    MUL  shift, and go to state 75
+    DIV  shift, and go to state 76
+    MOD  shift, and go to state 77
 
     $default  reduce using rule 92 (AddExp)
 
-    mulOp  go to state 77
+    mulOp  go to state 78
 
 
-state 108
+state 109
 
    94 MulExp: MulExp mulOp UnaryExp .
 
     $default  reduce using rule 94 (MulExp)
 
 
-state 109
+state 110
 
    97 UnaryExp: Ident L_PARENTHESIS R_PARENTHESIS .
 
     $default  reduce using rule 97 (UnaryExp)
 
 
-state 110
+state 111
 
    63 FuncRParams: FuncRParams . COMMA Exp
    96 UnaryExp: Ident L_PARENTHESIS FuncRParams . R_PARENTHESIS
 
-    COMMA          shift, and go to state 137
-    R_PARENTHESIS  shift, and go to state 138
+    COMMA          shift, and go to state 138
+    R_PARENTHESIS  shift, and go to state 139
 
 
-state 111
+state 112
 
    64 FuncRParams: Exp .
 
     $default  reduce using rule 64 (FuncRParams)
 
 
-state 112
+state 113
 
    37 FuncDef: BType Ident L_PARENTHESIS FuncFParams R_PARENTHESIS Block .
 
     $default  reduce using rule 37 (FuncDef)
 
 
-state 113
+state 114
 
    30 InitVal: L_BRACE R_BRACE .
 
     $default  reduce using rule 30 (InitVal)
 
 
-state 114
+state 115
 
    34 InitValList: InitVal .
 
     $default  reduce using rule 34 (InitValList)
 
 
-state 115
+state 116
 
    29 InitVal: L_BRACE InitValList . R_BRACE
    31 InitValList: InitValList . COMMA Exp
    32            | InitValList . COMMA InitVal
 
-    COMMA    shift, and go to state 139
-    R_BRACE  shift, and go to state 140
+    COMMA    shift, and go to state 140
+    R_BRACE  shift, and go to state 141
 
 
-state 116
+state 117
 
    33 InitValList: Exp .
 
     $default  reduce using rule 33 (InitValList)
 
 
-state 117
+state 118
 
    14 ConstSubscripts: ConstSubscripts L_BRACKETS ConstExp R_BRACKETS .
 
     $default  reduce using rule 14 (ConstSubscripts)
 
 
-state 118
+state 119
 
    17 ConstInitVal: L_BRACE R_BRACE .
 
     $default  reduce using rule 17 (ConstInitVal)
 
 
-state 119
+state 120
 
    20 ConstInitValList: ConstInitVal .
 
     $default  reduce using rule 20 (ConstInitValList)
 
 
-state 120
+state 121
 
    16 ConstInitVal: L_BRACE ConstInitValList . R_BRACE
    18 ConstInitValList: ConstInitValList . COMMA ConstInitVal
    19                 | ConstInitValList . COMMA ConstExp
 
-    COMMA    shift, and go to state 141
-    R_BRACE  shift, and go to state 142
+    COMMA    shift, and go to state 142
+    R_BRACE  shift, and go to state 143
 
 
-state 121
+state 122
 
    21 ConstInitValList: ConstExp .
 
     $default  reduce using rule 21 (ConstInitValList)
 
 
-state 122
+state 123
 
    56 Stmt: IF L_PARENTHESIS . Cond R_PARENTHESIS Stmt
    57     | IF L_PARENTHESIS . Cond R_PARENTHESIS Stmt ELSE Stmt
@@ -1621,23 +1644,24 @@ state 122
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    Cond        go to state 143
-    LOrExp      go to state 144
-    LAndExp     go to state 145
-    EqExp       go to state 146
-    RelExp      go to state 147
-    UnaryOp     go to state 46
-    AddExp      go to state 148
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    Cond        go to state 144
+    LOrExp      go to state 145
+    LAndExp     go to state 146
+    EqExp       go to state 147
+    RelExp      go to state 148
+    UnaryOp     go to state 47
+    AddExp      go to state 149
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 123
+state 124
 
    58 Stmt: WHILE L_PARENTHESIS . Cond R_PARENTHESIS Stmt
 
@@ -1647,72 +1671,73 @@ state 123
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    Cond        go to state 149
-    LOrExp      go to state 144
-    LAndExp     go to state 145
-    EqExp       go to state 146
-    RelExp      go to state 147
-    UnaryOp     go to state 46
-    AddExp      go to state 148
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    Cond        go to state 150
+    LOrExp      go to state 145
+    LAndExp     go to state 146
+    EqExp       go to state 147
+    RelExp      go to state 148
+    UnaryOp     go to state 47
+    AddExp      go to state 149
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 124
+state 125
 
    62 Stmt: RETURN SEMICOLON .
 
     $default  reduce using rule 62 (Stmt)
 
 
-state 125
+state 126
 
    61 Stmt: RETURN Exp . SEMICOLON
 
-    SEMICOLON  shift, and go to state 150
+    SEMICOLON  shift, and go to state 151
 
 
-state 126
+state 127
 
    59 Stmt: BREAK SEMICOLON .
 
     $default  reduce using rule 59 (Stmt)
 
 
-state 127
+state 128
 
    60 Stmt: CONTINUE SEMICOLON .
 
     $default  reduce using rule 60 (Stmt)
 
 
-state 128
+state 129
 
    46 Block: L_BRACE BlockItem R_BRACE .
 
     $default  reduce using rule 46 (Block)
 
 
-state 129
+state 130
 
    48 BlockItem: BlockItem Decl .
 
     $default  reduce using rule 48 (BlockItem)
 
 
-state 130
+state 131
 
    49 BlockItem: BlockItem Stmt .
 
     $default  reduce using rule 49 (BlockItem)
 
 
-state 131
+state 132
 
    52 Stmt: LVal ASSIGNMENT . Exp SEMICOLON
 
@@ -1722,40 +1747,41 @@ state 131
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 151
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 152
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 132
+state 133
 
    53 Stmt: Exp SEMICOLON .
 
     $default  reduce using rule 53 (Stmt)
 
 
-state 133
+state 134
 
    44 ExpSubscripts: L_BRACKETS R_BRACKETS .
 
     $default  reduce using rule 44 (ExpSubscripts)
 
 
-state 134
+state 135
 
    45 ExpSubscripts: L_BRACKETS Exp . R_BRACKETS
 
-    R_BRACKETS  shift, and go to state 152
+    R_BRACKETS  shift, and go to state 153
 
 
-state 135
+state 136
 
    43 ExpSubscripts: ExpSubscripts L_BRACKETS . Exp R_BRACKETS
 
@@ -1765,26 +1791,27 @@ state 135
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 153
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 154
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 136
+state 137
 
    66 LVal: LVal L_BRACKETS Exp R_BRACKETS .
 
     $default  reduce using rule 66 (LVal)
 
 
-state 137
+state 138
 
    63 FuncRParams: FuncRParams COMMA . Exp
 
@@ -1794,26 +1821,27 @@ state 137
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 154
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 155
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 138
+state 139
 
    96 UnaryExp: Ident L_PARENTHESIS FuncRParams R_PARENTHESIS .
 
     $default  reduce using rule 96 (UnaryExp)
 
 
-state 139
+state 140
 
    31 InitValList: InitValList COMMA . Exp
    32            | InitValList COMMA . InitVal
@@ -1822,30 +1850,31 @@ state 139
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 82
+    L_BRACE        shift, and go to state 83
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    InitVal     go to state 155
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    Exp         go to state 156
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    InitVal     go to state 156
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    Exp         go to state 157
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 140
+state 141
 
    29 InitVal: L_BRACE InitValList R_BRACE .
 
     $default  reduce using rule 29 (InitVal)
 
 
-state 141
+state 142
 
    18 ConstInitValList: ConstInitValList COMMA . ConstInitVal
    19                 | ConstInitValList COMMA . ConstExp
@@ -1854,169 +1883,170 @@ state 141
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 85
+    L_BRACE        shift, and go to state 86
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    ConstInitVal  go to state 157
-    LVal          go to state 45
-    UnaryOp       go to state 46
-    AddExp        go to state 56
-    MulExp        go to state 49
-    UnaryExp      go to state 50
-    PrimaryExp    go to state 51
-    ConstExp      go to state 158
-    Number        go to state 52
-    Ident         go to state 53
+    ConstInitVal  go to state 158
+    LVal          go to state 46
+    UnaryOp       go to state 47
+    AddExp        go to state 57
+    MulExp        go to state 50
+    UnaryExp      go to state 51
+    PrimaryExp    go to state 52
+    ConstExp      go to state 159
+    Number        go to state 53
+    Ident         go to state 54
 
 
-state 142
+state 143
 
    16 ConstInitVal: L_BRACE ConstInitValList R_BRACE .
 
     $default  reduce using rule 16 (ConstInitVal)
 
 
-state 143
+state 144
 
    56 Stmt: IF L_PARENTHESIS Cond . R_PARENTHESIS Stmt
    57     | IF L_PARENTHESIS Cond . R_PARENTHESIS Stmt ELSE Stmt
 
-    R_PARENTHESIS  shift, and go to state 159
-
-
-state 144
-
-   67 Cond: LOrExp .
-   69 LOrExp: LOrExp . OR LAndExp
-
-    OR  shift, and go to state 160
-
-    $default  reduce using rule 67 (Cond)
+    R_PARENTHESIS  shift, and go to state 160
 
 
 state 145
 
-   68 LOrExp: LAndExp .
-   71 LAndExp: LAndExp . AND EqExp
+   67 Cond: LOrExp .
+   69 LOrExp: LOrExp . OR LAndExp
 
-    AND  shift, and go to state 161
+    OR  shift, and go to state 161
 
-    $default  reduce using rule 68 (LOrExp)
+    $default  reduce using rule 67 (Cond)
 
 
 state 146
 
-   70 LAndExp: EqExp .
-   73 EqExp: EqExp . EqOp RelExp
+   68 LOrExp: LAndExp .
+   71 LAndExp: LAndExp . AND EqExp
 
-    EQ  shift, and go to state 162
-    NE  shift, and go to state 163
+    AND  shift, and go to state 162
 
-    $default  reduce using rule 70 (LAndExp)
-
-    EqOp  go to state 164
+    $default  reduce using rule 68 (LOrExp)
 
 
 state 147
 
-   72 EqExp: RelExp .
-   75 RelExp: RelExp . RelOp AddExp
+   70 LAndExp: EqExp .
+   73 EqExp: EqExp . EqOp RelExp
 
-    LT  shift, and go to state 165
-    LE  shift, and go to state 166
-    GT  shift, and go to state 167
-    GE  shift, and go to state 168
+    EQ  shift, and go to state 163
+    NE  shift, and go to state 164
 
-    $default  reduce using rule 72 (EqExp)
+    $default  reduce using rule 70 (LAndExp)
 
-    RelOp  go to state 169
+    EqOp  go to state 165
 
 
 state 148
 
-   74 RelExp: AddExp .
-   92 AddExp: AddExp . addOp MulExp
+   72 EqExp: RelExp .
+   75 RelExp: RelExp . RelOp AddExp
 
-    ADD  shift, and go to state 71
-    SUB  shift, and go to state 72
+    LT  shift, and go to state 166
+    LE  shift, and go to state 167
+    GT  shift, and go to state 168
+    GE  shift, and go to state 169
 
-    $default  reduce using rule 74 (RelExp)
+    $default  reduce using rule 72 (EqExp)
 
-    addOp  go to state 73
+    RelOp  go to state 170
 
 
 state 149
 
-   58 Stmt: WHILE L_PARENTHESIS Cond . R_PARENTHESIS Stmt
+   74 RelExp: AddExp .
+   92 AddExp: AddExp . addOp MulExp
 
-    R_PARENTHESIS  shift, and go to state 170
+    ADD  shift, and go to state 72
+    SUB  shift, and go to state 73
+
+    $default  reduce using rule 74 (RelExp)
+
+    addOp  go to state 74
 
 
 state 150
+
+   58 Stmt: WHILE L_PARENTHESIS Cond . R_PARENTHESIS Stmt
+
+    R_PARENTHESIS  shift, and go to state 171
+
+
+state 151
 
    61 Stmt: RETURN Exp SEMICOLON .
 
     $default  reduce using rule 61 (Stmt)
 
 
-state 151
+state 152
 
    52 Stmt: LVal ASSIGNMENT Exp . SEMICOLON
 
-    SEMICOLON  shift, and go to state 171
+    SEMICOLON  shift, and go to state 172
 
 
-state 152
+state 153
 
    45 ExpSubscripts: L_BRACKETS Exp R_BRACKETS .
 
     $default  reduce using rule 45 (ExpSubscripts)
 
 
-state 153
+state 154
 
    43 ExpSubscripts: ExpSubscripts L_BRACKETS Exp . R_BRACKETS
 
-    R_BRACKETS  shift, and go to state 172
+    R_BRACKETS  shift, and go to state 173
 
 
-state 154
+state 155
 
    63 FuncRParams: FuncRParams COMMA Exp .
 
     $default  reduce using rule 63 (FuncRParams)
 
 
-state 155
+state 156
 
    32 InitValList: InitValList COMMA InitVal .
 
     $default  reduce using rule 32 (InitValList)
 
 
-state 156
+state 157
 
    31 InitValList: InitValList COMMA Exp .
 
     $default  reduce using rule 31 (InitValList)
 
 
-state 157
+state 158
 
    18 ConstInitValList: ConstInitValList COMMA ConstInitVal .
 
     $default  reduce using rule 18 (ConstInitValList)
 
 
-state 158
+state 159
 
    19 ConstInitValList: ConstInitValList COMMA ConstExp .
 
     $default  reduce using rule 19 (ConstInitValList)
 
 
-state 159
+state 160
 
    56 Stmt: IF L_PARENTHESIS Cond R_PARENTHESIS . Stmt
    57     | IF L_PARENTHESIS Cond R_PARENTHESIS . Stmt ELSE Stmt
@@ -2024,31 +2054,32 @@ state 159
     ADD            shift, and go to state 40
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
-    IF             shift, and go to state 87
-    WHILE          shift, and go to state 88
-    RETURN         shift, and go to state 89
-    BREAK          shift, and go to state 90
-    CONTINUE       shift, and go to state 91
-    SEMICOLON      shift, and go to state 92
+    IF             shift, and go to state 88
+    WHILE          shift, and go to state 89
+    RETURN         shift, and go to state 90
+    BREAK          shift, and go to state 91
+    CONTINUE       shift, and go to state 92
+    SEMICOLON      shift, and go to state 93
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 63
+    L_BRACE        shift, and go to state 64
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    Block       go to state 96
-    Stmt        go to state 173
-    LVal        go to state 99
-    UnaryOp     go to state 46
-    Exp         go to state 100
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    Block       go to state 97
+    Stmt        go to state 174
+    LVal        go to state 100
+    UnaryOp     go to state 47
+    Exp         go to state 101
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 160
+state 161
 
    69 LOrExp: LOrExp OR . LAndExp
 
@@ -2058,21 +2089,22 @@ state 160
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    LAndExp     go to state 174
-    EqExp       go to state 146
-    RelExp      go to state 147
-    UnaryOp     go to state 46
-    AddExp      go to state 148
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    LAndExp     go to state 175
+    EqExp       go to state 147
+    RelExp      go to state 148
+    UnaryOp     go to state 47
+    AddExp      go to state 149
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 161
+state 162
 
    71 LAndExp: LAndExp AND . EqExp
 
@@ -2082,34 +2114,35 @@ state 161
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    EqExp       go to state 175
-    RelExp      go to state 147
-    UnaryOp     go to state 46
-    AddExp      go to state 148
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    EqExp       go to state 176
+    RelExp      go to state 148
+    UnaryOp     go to state 47
+    AddExp      go to state 149
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 162
+state 163
 
    80 EqOp: EQ .
 
     $default  reduce using rule 80 (EqOp)
 
 
-state 163
+state 164
 
    81 EqOp: NE .
 
     $default  reduce using rule 81 (EqOp)
 
 
-state 164
+state 165
 
    73 EqExp: EqExp EqOp . RelExp
 
@@ -2119,47 +2152,48 @@ state 164
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    RelExp      go to state 176
-    UnaryOp     go to state 46
-    AddExp      go to state 148
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    RelExp      go to state 177
+    UnaryOp     go to state 47
+    AddExp      go to state 149
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 165
+state 166
 
    76 RelOp: LT .
 
     $default  reduce using rule 76 (RelOp)
 
 
-state 166
+state 167
 
    77 RelOp: LE .
 
     $default  reduce using rule 77 (RelOp)
 
 
-state 167
+state 168
 
    78 RelOp: GT .
 
     $default  reduce using rule 78 (RelOp)
 
 
-state 168
+state 169
 
    79 RelOp: GE .
 
     $default  reduce using rule 79 (RelOp)
 
 
-state 169
+state 170
 
    75 RelExp: RelExp RelOp . AddExp
 
@@ -2169,163 +2203,166 @@ state 169
     L_PARENTHESIS  shift, and go to state 43
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    LVal        go to state 45
-    UnaryOp     go to state 46
-    AddExp      go to state 177
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    LVal        go to state 46
+    UnaryOp     go to state 47
+    AddExp      go to state 178
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 170
+state 171
 
    58 Stmt: WHILE L_PARENTHESIS Cond R_PARENTHESIS . Stmt
 
     ADD            shift, and go to state 40
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
-    IF             shift, and go to state 87
-    WHILE          shift, and go to state 88
-    RETURN         shift, and go to state 89
-    BREAK          shift, and go to state 90
-    CONTINUE       shift, and go to state 91
-    SEMICOLON      shift, and go to state 92
+    IF             shift, and go to state 88
+    WHILE          shift, and go to state 89
+    RETURN         shift, and go to state 90
+    BREAK          shift, and go to state 91
+    CONTINUE       shift, and go to state 92
+    SEMICOLON      shift, and go to state 93
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 63
+    L_BRACE        shift, and go to state 64
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    Block       go to state 96
-    Stmt        go to state 178
-    LVal        go to state 99
-    UnaryOp     go to state 46
-    Exp         go to state 100
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    Block       go to state 97
+    Stmt        go to state 179
+    LVal        go to state 100
+    UnaryOp     go to state 47
+    Exp         go to state 101
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 171
+state 172
 
    52 Stmt: LVal ASSIGNMENT Exp SEMICOLON .
 
     $default  reduce using rule 52 (Stmt)
 
 
-state 172
+state 173
 
    43 ExpSubscripts: ExpSubscripts L_BRACKETS Exp R_BRACKETS .
 
     $default  reduce using rule 43 (ExpSubscripts)
 
 
-state 173
+state 174
 
    56 Stmt: IF L_PARENTHESIS Cond R_PARENTHESIS Stmt .
    57     | IF L_PARENTHESIS Cond R_PARENTHESIS Stmt . ELSE Stmt
 
-    ELSE  shift, and go to state 179
+    ELSE  shift, and go to state 180
 
     ELSE      [reduce using rule 56 (Stmt)]
     $default  reduce using rule 56 (Stmt)
 
 
-state 174
+state 175
 
    69 LOrExp: LOrExp OR LAndExp .
    71 LAndExp: LAndExp . AND EqExp
 
-    AND  shift, and go to state 161
+    AND  shift, and go to state 162
 
     $default  reduce using rule 69 (LOrExp)
 
 
-state 175
+state 176
 
    71 LAndExp: LAndExp AND EqExp .
    73 EqExp: EqExp . EqOp RelExp
 
-    EQ  shift, and go to state 162
-    NE  shift, and go to state 163
+    EQ  shift, and go to state 163
+    NE  shift, and go to state 164
 
     $default  reduce using rule 71 (LAndExp)
 
-    EqOp  go to state 164
-
-
-state 176
-
-   73 EqExp: EqExp EqOp RelExp .
-   75 RelExp: RelExp . RelOp AddExp
-
-    LT  shift, and go to state 165
-    LE  shift, and go to state 166
-    GT  shift, and go to state 167
-    GE  shift, and go to state 168
-
-    $default  reduce using rule 73 (EqExp)
-
-    RelOp  go to state 169
+    EqOp  go to state 165
 
 
 state 177
 
-   75 RelExp: RelExp RelOp AddExp .
-   92 AddExp: AddExp . addOp MulExp
+   73 EqExp: EqExp EqOp RelExp .
+   75 RelExp: RelExp . RelOp AddExp
 
-    ADD  shift, and go to state 71
-    SUB  shift, and go to state 72
+    LT  shift, and go to state 166
+    LE  shift, and go to state 167
+    GT  shift, and go to state 168
+    GE  shift, and go to state 169
 
-    $default  reduce using rule 75 (RelExp)
+    $default  reduce using rule 73 (EqExp)
 
-    addOp  go to state 73
+    RelOp  go to state 170
 
 
 state 178
+
+   75 RelExp: RelExp RelOp AddExp .
+   92 AddExp: AddExp . addOp MulExp
+
+    ADD  shift, and go to state 72
+    SUB  shift, and go to state 73
+
+    $default  reduce using rule 75 (RelExp)
+
+    addOp  go to state 74
+
+
+state 179
 
    58 Stmt: WHILE L_PARENTHESIS Cond R_PARENTHESIS Stmt .
 
     $default  reduce using rule 58 (Stmt)
 
 
-state 179
+state 180
 
    57 Stmt: IF L_PARENTHESIS Cond R_PARENTHESIS Stmt ELSE . Stmt
 
     ADD            shift, and go to state 40
     SUB            shift, and go to state 41
     NOT            shift, and go to state 42
-    IF             shift, and go to state 87
-    WHILE          shift, and go to state 88
-    RETURN         shift, and go to state 89
-    BREAK          shift, and go to state 90
-    CONTINUE       shift, and go to state 91
-    SEMICOLON      shift, and go to state 92
+    IF             shift, and go to state 88
+    WHILE          shift, and go to state 89
+    RETURN         shift, and go to state 90
+    BREAK          shift, and go to state 91
+    CONTINUE       shift, and go to state 92
+    SEMICOLON      shift, and go to state 93
     L_PARENTHESIS  shift, and go to state 43
-    L_BRACE        shift, and go to state 63
+    L_BRACE        shift, and go to state 64
     ID             shift, and go to state 12
     INTEGER        shift, and go to state 44
+    STRING         shift, and go to state 45
 
-    Block       go to state 96
-    Stmt        go to state 180
-    LVal        go to state 99
-    UnaryOp     go to state 46
-    Exp         go to state 100
-    AddExp      go to state 48
-    MulExp      go to state 49
-    UnaryExp    go to state 50
-    PrimaryExp  go to state 51
-    Number      go to state 52
-    Ident       go to state 53
+    Block       go to state 97
+    Stmt        go to state 181
+    LVal        go to state 100
+    UnaryOp     go to state 47
+    Exp         go to state 101
+    AddExp      go to state 49
+    MulExp      go to state 50
+    UnaryExp    go to state 51
+    PrimaryExp  go to state 52
+    Number      go to state 53
+    Ident       go to state 54
 
 
-state 180
+state 181
 
    57 Stmt: IF L_PARENTHESIS Cond R_PARENTHESIS Stmt ELSE Stmt .
 

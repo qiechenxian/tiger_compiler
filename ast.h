@@ -183,6 +183,7 @@ struct A_exp_{
         A_charExp,
         A_callExp,
         A_opExp,
+        A_stringExp,
     }kind;
     union {
         A_var varExp;
@@ -197,6 +198,7 @@ struct A_exp_{
             A_binOp op;
             A_exp right;
         }opExp;
+        c_string stringExp;
     }u;
 };
 A_exp A_VarExp(A_pos pos, A_var varExp);
@@ -204,7 +206,7 @@ A_exp A_IntExp(A_pos pos, int intExp);
 A_exp A_CharExp(A_pos pos, char charExp);
 A_exp A_CallExp(A_pos pos, S_symbol id, A_expList args);
 A_exp A_OpExp(A_pos pos, A_exp left, A_binOp op, A_exp right);
-A_exp A_LogicExp(A_pos pos, A_binOp op, A_exp factor1, A_exp factor2);
+A_exp A_StringExp(A_pos pos, c_string stringExp);
 
 /** 支持扩展 typedef */
 struct A_ty_{
