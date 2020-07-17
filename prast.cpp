@@ -46,6 +46,7 @@ static void pr_var(FILE *out,A_var v,int d)
             fprintf(out,"%s)",S_getName(v->u.structVar.attr));
             break;
         default:
+            fprintf(out,"pr_var failed\n");
             assert(0);
     }
 }
@@ -102,6 +103,7 @@ static void pr_dec(FILE *out,A_dec v,int d)
             fprintf(out,")");
             break;
         default:
+            fprintf(out,"pr_dec failed\n");
             assert(0);
     }
 }
@@ -165,6 +167,7 @@ static void pr_stm(FILE *out, A_stm v, int d){
             pr_exp(out,v->u.expStm,d+1);
             break;
         default:
+            fprintf(out,"pr_stm failed\n");
             assert(0);
     }
 }
@@ -201,6 +204,7 @@ static void pr_exp(FILE *out ,A_exp v,int d){
             fprintf(out, "opExp(%s)", v->u.stringExp);
             break;
         default:
+            fprintf(out,"pr_exp failed\n");
             assert(0);
     }
 }
@@ -221,6 +225,7 @@ static void pr_ty(FILE *out, A_ty v, int d)
             fprintf(out,")");
             break;
         default:
+            fprintf(out,"pr_ty failed\n");
             assert(0);
     }
 }
@@ -339,6 +344,7 @@ static void pr_initNode(FILE *out, A_initNode v, int d){
             fprintf(out,")");
             break;
         default:
+            fprintf(out,"pr_initNode failed\n");
             assert(0);
     }
 }
