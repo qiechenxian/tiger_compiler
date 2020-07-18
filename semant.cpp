@@ -378,10 +378,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
                 /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body);
                 /// 检查返回值
-            if (returnValue.ty == nullptr){
-                EM_error(d->u.function.body->pos, "no return statement");
-            }
-            else if (!is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
+            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
                 EM_error(d->u.function.body->pos,
                         "incorrect return type %s, expected %s",
                         TY_toString(returnValue.ty),
@@ -459,8 +456,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                 }
                 if (comStmIter->head->stmSeq){
                     returnTy = transStm(frame, venv, tenv, comStmIter->head->stmSeq);
-                    if (returnTy.ty != TY_Void())
-                        break; /// 当出现return语句后立即停止检查 todo translate优化
+                    /// 一个blockStm中可以有多处return
                     // todo translate
                 }
             }
