@@ -529,10 +529,14 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             return var;
         }
         case A_exp_::A_intExp:{
-            return Expty(nullptr, TY_Int());
+            expty expty_msg = Expty(nullptr, TY_Int());
+            expty_msg.isConst = true;
+            return expty_msg;
         }
         case A_exp_::A_charExp:{
-            return Expty(nullptr, TY_Char());
+            expty expty_msg = Expty(nullptr, TY_Int());
+            expty_msg.isConst = true;
+            return expty_msg;
         }
         case A_exp_::A_callExp:{
             auto funEntry = (E_envEntry)S_look(venv, a->u.callExp.id);
@@ -586,7 +590,6 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                 if (a->u.opExp.left->kind == A_exp_::A_intExp
                 && a->u.opExp.right->kind == A_exp_::A_intExp){
                     /// 也可使用left和right的kind是否为A_IntExp判断
-                    /// 必须使用left和right的kind进行判断，否则无法优化int常数
                     A_exp temp_left = a->u.opExp.left;
                     A_exp temp_right = a->u.opExp.right;
                     a->u.intExp = calculate(op, temp_left->u.intExp, temp_right->u.intExp);

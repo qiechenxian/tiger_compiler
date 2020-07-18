@@ -257,10 +257,7 @@ after semantic ast:
                        comStmList(
                         comStm(
                          ifStm(
-                          opExp(
-                           eq,
-                           intExp(1),
-                           intExp(1)),
+                          intExp(1),
                           blockStm(
                            comStmList(
                             comStm(
@@ -311,4 +308,4 @@ after semantic ast:
               simpleVar(p)),
              expList()))))),
         comStmList()))))),
-   decList()))int == int
+   decList()))

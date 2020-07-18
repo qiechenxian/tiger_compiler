@@ -178,10 +178,7 @@ after semantic ast:
            arrayVar(
             simpleVar(array),
             intExp(0)),
-           opExp(
-            sub,
-            intExp(0),
-            intExp(1)))),
+           intExp(-1))),
          comStmList(
           comStm(
            assignStm(

@@ -200,10 +200,7 @@ after semantic ast:
       comStm(
        assignStm(
         simpleVar(maxNum),
-        opExp(
-         sub,
-         intExp(0),
-         intExp(999999)))),
+        intExp(-999999))),
       comStmList(
        comStm(
         assignStm(
@@ -220,10 +217,7 @@ after semantic ast:
            gt,
            varExp(
             simpleVar(size)),
-           opExp(
-            sub,
-            intExp(0),
-            intExp(1))),
+           intExp(-1)),
           blockStm(
            comStmList(
             comStm(
@@ -286,10 +280,7 @@ after semantic ast:
          arrayVar(
           simpleVar(result),
           intExp(0)),
-         opExp(
-          sub,
-          intExp(0),
-          intExp(2)))),
+         intExp(-2))),
        comStmList(
         comStm(
          assignStm(
@@ -303,10 +294,7 @@ after semantic ast:
            arrayVar(
             simpleVar(result),
             intExp(2)),
-           opExp(
-            sub,
-            intExp(0),
-            intExp(7)))),
+           intExp(-7))),
          comStmList(
           comStm(
            decList(

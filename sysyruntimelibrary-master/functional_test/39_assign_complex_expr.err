@@ -224,10 +224,7 @@ after semantic ast:
              comStm(
               assignStm(
                simpleVar(d),
-               opExp(
-                sub,
-                intExp(0),
-                intExp(2)))),
+               intExp(-2))),
              comStmList(
               comStm(
                assignStm(
