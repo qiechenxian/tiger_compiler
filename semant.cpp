@@ -373,7 +373,10 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d){
                 /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body);
                 /// 检查返回值
-            if (!is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
+            if (returnValue.ty == nullptr){
+                EM_error(d->u.function.body->pos, "no return statement");
+            }
+            else if (!is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
                 EM_error(d->u.function.body->pos,
                         "incorrect return type %s, expected %s",
                         TY_toString(returnValue.ty),
@@ -682,6 +685,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                     assert(0);
             }
         }
+        case A_exp_::A_stringExp:
+            break;
     }
     assert(0);
 }
