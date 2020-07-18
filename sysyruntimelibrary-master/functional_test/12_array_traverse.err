@@ -172,13 +172,7 @@ after semantic ast:
            le,
            varExp(
             simpleVar(i)),
-           opExp(
-            sub,
-            opExp(
-             add,
-             intExp(3),
-             intExp(4)),
-            intExp(2))),
+           intExp(5)),
           blockStm(
            comStmList(
             comStm(

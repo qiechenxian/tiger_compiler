@@ -62,7 +62,7 @@ static void pr_dec(FILE *out,A_dec v,int d)
     indent(out,d);
     switch (v->kind) {
         case A_dec_::A_variableDec:
-            fprintf(out,"varibaleDec(%s,\n",S_getName(v->u.var.id));
+            fprintf(out,"variableDec(%s,\n",S_getName(v->u.var.id));
             if(v->u.var.type){
                 indent(out,d+1);
                 fprintf(out,"%s,\n",S_getName(v->u.var.type));
@@ -220,7 +220,7 @@ static void pr_ty(FILE *out, A_ty v, int d)
             fprintf(out,"arrayTy(%s)",S_getName(v->u.name));
             break;
         case A_ty_::A_structTy:
-            fprintf(out,"struncTy(\n");
+            fprintf(out,"structTy(\n");
             pr_fieldList(out,v->u.structTy,d+1);
             fprintf(out,")");
             break;
@@ -334,7 +334,7 @@ static void pr_initNode(FILE *out, A_initNode v, int d){
     indent(out,d);
     switch (v->kind) {
         case A_initNode_::A_singleInit:
-            fprintf(out,"signleInit(\n");
+            fprintf(out,"singleInit(\n");
             pr_exp(out,v->u.single,d+1);
             fprintf(out,")");
             break;

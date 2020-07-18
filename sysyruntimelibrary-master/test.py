@@ -15,17 +15,19 @@ PATH_name = [
     "可执行文件路径"
 ]
 
+print("\n"+"="*90)
+print("当前环境：")
+for index, name in enumerate(PATH_name):
+    PATH[index] = os.path.abspath(PATH[index])
+    print("{}:{}".format(name, PATH[index]))
+print("="*90+"\n")
+
+
 if_default = input("是否使用默认路径？(Y/n):")
 if if_default:
     for index, name in enumerate(PATH_name):
         PATH[index] = input("{}:".format(name))
 
-print("\n"+"="*30)
-print("测试环境：")
-for index, name in enumerate(PATH_name):
-    PATH[index] = os.path.abspath(PATH[index])
-    print("{}:{}".format(name, PATH[index]))
-print("="*30+"\n")
 
 command = "{} -S -o {} {} -O2 >{} 2>&1"
 executable = os.path.abspath(PATH[2])

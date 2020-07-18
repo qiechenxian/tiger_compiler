@@ -583,8 +583,10 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
             if (op != A_not) {
                 right = transExp(venv, tenv, a->u.opExp.right);
 
-                if (left.isConst && right.isConst) {
+                if (a->u.opExp.left->kind == A_exp_::A_intExp
+                && a->u.opExp.right->kind == A_exp_::A_intExp){
                     /// 也可使用left和right的kind是否为A_IntExp判断
+                    /// 必须使用left和right的kind进行判断，否则无法优化int常数
                     A_exp temp_left = a->u.opExp.left;
                     A_exp temp_right = a->u.opExp.right;
                     a->u.intExp = calculate(op, temp_left->u.intExp, temp_right->u.intExp);
@@ -594,7 +596,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a){
                     return expty_msg;
                     /// 此处会造成内存泄漏，泄漏对象：temp_left, temp_right所指对象
                 }
-            } else if (left.isConst){
+            } else if (a->u.opExp.left->kind == A_exp_::A_intExp){
                     A_exp temp_right = a->u.opExp.right;
                     a->u.intExp = calculate(op, 0, temp_right->u.intExp);
                     a->kind = A_exp_::A_intExp;

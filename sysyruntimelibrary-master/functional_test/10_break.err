@@ -48,5 +48,55 @@ before semantic ast:
           simpleVar(a)))),
        comStmList()))))),
   decList())
-complier_2020: /mnt/e/workspace_clion/compiler_2020/semant.cpp:511: expty transStm(Tr_frame, S_table, S_table, A_stm): Assertion `0' failed.
-Aborted (core dumped)
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        intExp(10),
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       whileStm(
+        opExp(
+         gt,
+         varExp(
+          simpleVar(a)),
+         intExp(0)),
+        blockStm(
+         comStmList(
+          comStm(
+           assignStm(
+            simpleVar(a),
+            opExp(
+             sub,
+             varExp(
+              simpleVar(a)),
+             intExp(1)))),
+          comStmList(
+           comStm(
+            ifStm(
+             opExp(
+              eq,
+              varExp(
+               simpleVar(a)),
+              intExp(5)),
+             breakStm()             )),
+           comStmList()))))
+),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList()))))),
+  decList())int == int
