@@ -86,6 +86,11 @@ static int getConstValue(S_table venv, A_exp a){
         access_index[index_len++] = exp_index->u.intExp;
         const_var = const_var->u.arrayVar.id;
     }
+    for (int i = 0; i < index_len/2; i++){
+        int temp = access_index[i];
+        access_index[i] = access_index[index_len-i-1];
+        access_index[index_len-i-1] = temp;
+    }
     auto const_var_entry = (E_envEntry)S_look(venv, const_var->u.simple);
     if (index_len){
         access_index[index_len] = -1;
