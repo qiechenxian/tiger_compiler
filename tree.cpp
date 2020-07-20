@@ -52,8 +52,8 @@ T_stm T_Cjump(T_relOp op, T_exp left, T_exp right, Temp_label trueLabel, Temp_la
     p->u.CJUMP.op = op;
     p->u.CJUMP.left = left;
     p->u.CJUMP.right = right;
-    p->u.CJUMP.trueLabel = trueLabel;
-    p->u.CJUMP.falseLabel = falseLabel;
+    p->u.CJUMP.trues = trueLabel;
+    p->u.CJUMP.falses = falseLabel;
     return p;
 }
 
@@ -132,4 +132,14 @@ T_exp T_Call(T_exp fun, T_expList args)
     p->u.CALL.fun = fun;
     p->u.CALL.args = args;
     return p;
+}
+T_relOp T_not_op(T_relOp op)//T_lt, T_le, T_gt, T_ge, T_eq, T_ne,T_not,T_and, T_or,
+{
+    switch (op) {
+        case T_lt:return T_ge;
+        case T_le:return T_gt;
+        case T_ge:return T_lt;
+        case T_gt:return T_le;
+        case T_eq:return T_ne;
+    }
 }

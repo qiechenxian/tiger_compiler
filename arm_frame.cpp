@@ -2,7 +2,28 @@
 // Created by loyx on 2020/5/10.
 //
 #include "frame.h"
+const int F_WORD_SIZE = 4; /// 32位机器
+static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
+static Temp_temp fp=NULL;
+static Temp_temp rv=NULL;
 
+//栈帧结构
+Temp_temp F_FP()//取帧指针
+{
+    if(fp==NULL)
+    {
+        fp=Temp_newTemp();
+    }
+    return fp;
+}
+Temp_temp F_RV()//取帧指针
+{
+    if(rv==NULL)
+    {
+        rv=Temp_newTemp();
+    }
+    return rv;
+}
 /** class declare */
 struct F_access_{
     enum {inFrame, inReg}kind;
@@ -20,15 +41,7 @@ struct F_frame_{
     /** instructions required view shift*/
 };//添加局部变量域
 
-//栈帧结构
-Temp_temp F_Fp()//取帧指针
-{
-    if(fp==NULL)
-    {
-        fp=Temp_newTemp();
-    }
-    return fp;
-}
+
 
 /** function prototype */
 static F_access InFrame(int offset);
@@ -121,4 +134,33 @@ T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
     return  T_Temp(acc->u.reg);
 }
 
-
+int get_word_size()
+{
+    return F_WORD_SIZE;
+}
+F_accessList F_formals(F_frame f) {
+    return f->formals;
+}
+//片段相关F_frag
+F_fragList F_FragList(F_frag head,F_fragList tail)
+{
+    F_fragList new_frag_list=(F_fragList)checked_malloc(sizeof(*new_frag_list));
+    new_frag_list->head=head;
+    new_frag_list->tail=tail;
+    return new_frag_list;
+}
+F_frag F_StringFrag(Temp_label label,c_string str)
+{
+    F_frag new_frag=(F_frag)checked_malloc(sizeof(*new_frag));
+    new_frag->kind=F_frag_::F_stringFrag;
+    new_frag->u.stringg.str=str;
+    new_frag->u.stringg.label=label;
+    return new_frag;
+}
+F_frag F_ProcFrag(T_stm body,F_frame frame)
+{
+    F_frag new_frag=(F_frag)checked_malloc(sizeof(*new_frag));
+    new_frag->kind=F_frag_::F_procFrag;
+    new_frag->u.proc.body=body;
+    new_frag->u.proc.frame=frame;
+}

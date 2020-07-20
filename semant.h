@@ -10,7 +10,6 @@
 #include "errormsg.h"
 #include "translate.h"
 
-typedef void* F_fragList ;
 
 struct expty {Tr_exp exp; TY_ty ty;bool isConst;};
 struct expty Expty(Tr_exp exp, TY_ty ty);
