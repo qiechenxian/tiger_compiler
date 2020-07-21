@@ -164,3 +164,7 @@ F_frag F_ProcFrag(T_stm body,F_frame frame)
     new_frag->u.proc.body=body;
     new_frag->u.proc.frame=frame;
 }
+T_stm F_procEntryExitl(F_frame frame,T_stm stm)
+{
+    return stm;//中间代码阶段的虚实现
+}

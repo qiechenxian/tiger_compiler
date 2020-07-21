@@ -10,7 +10,7 @@
  * typedefs
  * */
 typedef struct Tr_node_* Tr_node;
-
+static F_fragList fragList = nullptr;
 
 
 /**
@@ -46,7 +46,7 @@ struct Tr_node_{
     Tr_exp exp;
     Tr_node next;
 };
-
+static Tr_frame root_frame = nullptr;
 
 /**
  * function prototype
@@ -62,7 +62,12 @@ static patchList PatchList(Temp_label *head, patchList tail);
 static void doPatch(patchList list, Temp_label label);
 static patchList joinPatch(patchList fList, patchList sList);
 
-
+Tr_frame Tr_root_frame(void)
+{
+    if (!root_frame)
+        root_frame = Tr_newFrame(Temp_newLabel(), nullptr);
+    return root_frame;
+}
 /**
  * 构造函数
  * */
@@ -374,24 +379,29 @@ Tr_exp Tr_dec_Var(Tr_expList exps,int size)//变量或数组声明无初值
     return Tr_Ex(T_Eseq(dec_var,T_Temp(dec_var_r)));
 }
 
-Tr_exp Tr_init_Var(Tr_expList exps,Tr_expList sizes)//变量或数组声明带有初值sizes为数组长度信息 exps为
+Tr_exp Tr_init_Var(Tr_INIT_initList int_info)//变量或数组声明带有初值sizes为数组长度信息 exps为
 {
-    T_expList call_size=T_ExpList(Tr_unEx(sizes->first), nullptr);
-    sizes=sizes->last;
-    T_expList v_temp=call_size;
+    int array_length=int_info->array_length;
+    T_stm init_var;
     Temp_temp dec_var_r=Temp_newTemp();
-    for(;sizes;sizes=sizes->last)
+    T_exp pointer=T_Call(T_Name(Temp_namedLabel("init_var")),T_ExpList(T_Const(array_length),nullptr));//调用外部函数，汇编实现数组空间分配
+    T_stm arr_base_address=T_Move(T_Temp(dec_var_r),pointer);//返回基址地址
+    init_var=arr_base_address;
+    if(int_info->array== nullptr)
     {
-        v_temp->tail=T_ExpList(Tr_unEx(sizes->first), nullptr);
-        v_temp=v_temp->tail;
-    }
-    T_exp pointer=T_Call(T_Name(Temp_namedLabel((char*)"init_var")),call_size);//调用外部函数，应该是汇编实现
-    T_stm init_var=T_Move(T_Temp(dec_var_r),pointer);
-    for(int i=0;exps;exps=exps->last,i++)
+        for(int i=0;i<array_length;i++)
+        {
+            init_var=T_Seq(init_var,T_Move(T_Mem(T_Binop(T_add,T_Const(i*get_word_size()),T_Temp(dec_var_r))),T_Const(0)));
+        }
+        return Tr_Nx(init_var);
+    } else
     {
-        init_var=T_Seq(init_var,T_Move(T_Mem(T_Binop(T_add,T_Const(i*get_word_size()),T_Temp(dec_var_r))),Tr_unEx(exps->first)));
+        for(int i=0;i<array_length;i++)
+        {
+            init_var=T_Seq(init_var,T_Move(T_Mem(T_Binop(T_add,T_Const(i*get_word_size()),T_Temp(dec_var_r))),Tr_unEx(int_info->array[i])));
+        }
+        return Tr_Nx(init_var);
     }
-    return Tr_Nx(init_var);
 }
 Tr_exp Tr_doneExp() {
     return Tr_Ex(T_Name(Temp_newLabel()));
@@ -469,4 +479,20 @@ Tr_exp Tr_seq(Tr_exp left,Tr_exp right)
 {
     return Tr_Nx(T_Seq(Tr_unNx(left),Tr_unNx(right)));
 }
-//todo return translate
+void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals)//todo
+{
+    F_frag pfrag = F_ProcFrag(Tr_unNx(body),frame);
+    fragList = F_FragList(pfrag, fragList);
+}
+Tr_exp Tr_return(Tr_exp ret_num)
+{
+    Temp_temp get_rv=F_RV();
+    T_exp tmp=T_Temp(get_rv);
+    return Tr_Nx(T_Move(tmp,Tr_unEx(ret_num)));
+}
+//todo return jump label in chapter 12
+
+F_fragList Tr_getResult(void)
+{
+    return fragList;
+}

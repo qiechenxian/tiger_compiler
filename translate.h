@@ -7,6 +7,7 @@
 
 #include "frame.h"
 #include "ast.h"
+#include "array_init.h"
 #include <cstdio>
 /**
  *
@@ -18,6 +19,7 @@
 typedef F_access Tr_access;
 typedef F_accessList Tr_accessList;
 typedef F_frame Tr_frame;
+
 
 Tr_frame Tr_newFrame(Temp_label name, U_boolList formals);
 Tr_access Tr_allocLocal(Tr_frame frame, bool escape);
@@ -33,7 +35,11 @@ Tr_accessList Tr_AccessList(Tr_access head, Tr_accessList tail);// 构造函数
 typedef struct Tr_exp_ *Tr_exp ;
 typedef struct Tr_expList_ *Tr_expList;
 typedef struct patchList_ *patchList;
-
+typedef struct Tr_INIT_initList_ *Tr_INIT_initList;
+struct Tr_INIT_initList_{
+    Tr_exp* array;
+    int array_length;
+};
 /** expList 相关操作 */
 Tr_expList Tr_ExpList(); /// return an empty expList
 void Tr_expList_append(Tr_expList list, Tr_exp exp);
@@ -49,7 +55,7 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right);
 Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right);
 Tr_exp Tr_if_else(Tr_exp condition_part,Tr_exp then_part,Tr_exp else_part);
 Tr_exp Tr_dec_Var(Tr_expList exps,int size);
-Tr_exp Tr_init_Var(Tr_expList exps,Tr_expList sizes);
+Tr_exp Tr_init_Var(Tr_INIT_initList int_info);
 Tr_exp Tr_doneExp();
 Tr_exp Tr_initialExp();
 Tr_exp Tr_break(Tr_exp done);
@@ -58,4 +64,8 @@ Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue);
 Tr_exp Tr_func_call(Temp_label name,Tr_expList params);
 Tr_exp Tr_assign(Tr_exp left,Tr_exp right);
 Tr_exp Tr_seq(Tr_exp left,Tr_exp right);
+Tr_exp Tr_return(Tr_exp ret_num);
+Tr_frame Tr_root_frame();
+F_fragList Tr_getResult();
+void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals);
 #endif //COMPILER_LOYX_TRANSLATE_H

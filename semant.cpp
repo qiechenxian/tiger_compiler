@@ -197,13 +197,13 @@ static TY_ty look_ty(S_table tenv, S_symbol sym){
 F_fragList SEM_transProgram(S_table venv, S_table tenv, A_decList program){
 
     for (A_decList iter = program; iter; iter = iter->tail)
-        transDec(nullptr, venv, tenv, iter->head, nullptr, nullptr);
+        transDec(Tr_root_frame(), venv, tenv, iter->head, nullptr, nullptr);
 
     auto mainEntry = (E_envEntry)S_look(venv, S_Symbol((char *)"main"));
     if (!mainEntry || mainEntry->kind != E_envEntry_::E_funEntry)
         EM_error(A_Pos(0,0,0,0), "not find main function");
 
-    return nullptr;
+    return Tr_getResult();
 }
 
 static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_exp l_break,Tr_exp l_continue){
@@ -250,24 +250,32 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                             S_getName(d->u.array.id));
             }
             // todo translate
-
             /** 处理初值 */
             if (d->u.array.init != nullptr){
-                INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);
-
+                INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);//这下弄中间代码舒服了
+                //将init_list中的A_EXP转换为中间代码形式并保存
+                int i;
+                Tr_INIT_initList init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
+                init_list_tr->array_length=init_list->suffix_size[0];
+                init_list_tr->array=(Tr_exp*)checked_malloc(init_list->suffix_size[0]*sizeof(Tr_exp));
+                for(i=0;i<init_list->suffix_size[0];i++)
+                {
+                    struct expty temp=transExp(venv,tenv,init_list->array[i],l_break,l_continue);;
+                    init_list_tr->array[i]=temp.exp;
+                }
                 if (d->u.array.isConst){
                     /**
                      * 常量数组初值处理
                      */
                     arrayEntry->u.var.cValues = E_ArrayValue(init_list);
                     S_enter(venv, d->u.array.id, arrayEntry);
-                    return nullptr;
+                    return Tr_init_Var(init_list_tr);
                 } else{
                     /**
                      * 非常量数组初值处理
                      */
                     S_enter(venv, d->u.array.id, arrayEntry);
-                    return nullptr; // todo translate
+                    return Tr_init_Var(init_list_tr); // todo translate
                 }
             }
 
@@ -281,8 +289,12 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
                 arrayEntry->u.var.cValues = E_ArrayValue(null_init);
             }
+            INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);
+            Tr_INIT_initList init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
+            init_list_tr->array_length=init_list->suffix_size[0];
+            init_list_tr->array= nullptr;
             S_enter(venv, d->u.array.id, arrayEntry);
-            return nullptr;
+            return Tr_init_Var(init_list_tr);//todo address delivery in codeselect
         }
         case A_dec_::A_variableDec:{
 
@@ -327,20 +339,20 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     /// 在符号表中创建该const变量的条目，特别保存const的初始值，供之后使用。
                     varEntry->u.var.cValues = E_SingleValue(d->u.var.init->u.intExp); // transExp保证正确
                     S_enter(venv, d->u.var.id, varEntry);
-                    return nullptr; /// 常量声明应该到此为止 todo 验证正确性
+                    return Tr_nopExp(); /// 常量声明应该到此为止 todo 验证正确性 是否需要assign
                 } else{
                     /**
                      * 非常量声明的初值处理
                      */
                     S_enter(venv, d->u.var.id, varEntry);
-                    return nullptr; /// todo return assign op
+                    return Tr_assign(Tr_simpleVar(var_access),e.exp); /// todo return assign op
                 }
             }
 
             /// 没有初值
             if (d->u.var.isConst) varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
             S_enter(venv, d->u.var.id, varEntry);
-            return nullptr; /// no init value
+            return Tr_nopExp(); // no init value just allocl momery
         }
         case A_dec_::A_functionDec:{
 
@@ -393,11 +405,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 if (!is_equal_ty(returnValue.ty, TY_Int()))
                     EM_warning(d->pos, "main function should return a integer");
             }
-
+            Tr_procEntryExit(fun_frame, returnValue.exp, argsCL);//将函数栈帧与函数体记录，构建中间代码阶段反回的片段列表
             S_endScope(venv);
             S_endScope(tenv);
-            /// todo return tr_noExp
             return Tr_nopExp();
+            //todo funcdec which have todo after reg alloc
         }
         case A_dec_::A_typedef:
             assert(0); /// todo typedef
@@ -499,13 +511,13 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             // todo translate
             return Expty(Tr_assign(var.exp,exp.exp), TY_Void());
         }
-        case A_stm_::A_returnStm:{//to do translate
+        case A_stm_::A_returnStm:{//to do translate  now translate it as put result in rv reg
             if (!s->u.returnStm){
-                return Expty(nullptr, TY_Void());
+                return Expty(Tr_nopExp(), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
             // todo 自建 translate
-            return Expty(nullptr, returnTy.ty);
+            return Expty(Tr_return(returnTy.exp), returnTy.ty);
         }
         case A_stm_::A_switchStm:{//not required in grammer
             struct expty key = transExp(venv, tenv, s->u.switchStm.exp,l_break,l_continue);
@@ -559,7 +571,6 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                          S_getName(a->u.callExp.id));
                 return Expty(nullptr, TY_Void());
             }
-
             /// 针对putf的特殊处理
             if (strcmp(S_getName(a->u.callExp.id), "putf") == 0){
                 if (a->u.callExp.args->head->kind != A_exp_::A_stringExp){
@@ -568,8 +579,6 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 // todo translate
                 return Expty(nullptr, TY_Void());
             }
-
-
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
             A_expList argIter = a->u.callExp.args;
@@ -727,7 +736,7 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                 return expty_msg;
             }
         }
-        case A_var_::A_arrayVar:{
+        case A_var_::A_arrayVar:{//todo 确认array base index
             struct expty id = transVar(venv, tenv, v->u.arrayVar.id,l_break,l_continue);
             // todo translate
             if (id.ty->kind != TY_ty_::TY_array){
