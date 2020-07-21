@@ -139,11 +139,11 @@ static struct Cx Tr_unCx(Tr_exp e)
             return e->u.cx;
         case Tr_exp_::Tr_ex:
         {
-            T_stm stm = T_Cjump(T_ne, e->u.ex, T_Const(0), NULL ,  NULL);
-            struct Cx cx;
+            T_stm stm = T_Cjump(T_ne, e->u.ex, T_Const(0), nullptr ,  nullptr);
+            struct Cx cx{};
             cx.stm = stm;
-            cx.falses = PatchList(&stm->u.CJUMP.falses, NULL);
-            cx.trues = PatchList(&stm->u.CJUMP.trues, NULL);
+            cx.falses = PatchList(&stm->u.CJUMP.falses, nullptr);
+            cx.trues = PatchList(&stm->u.CJUMP.trues, nullptr);
             return cx;
         }
         case Tr_exp_::Tr_nx:
@@ -194,8 +194,8 @@ static patchList joinPatch(patchList fList, patchList sList){
 /** expList functions */
 Tr_expList Tr_ExpList(){
     Tr_expList p = (Tr_expList)checked_malloc(sizeof(*p));
-    p->last = NULL;
-    p->first = NULL;
+    p->last = nullptr;
+    p->first = nullptr;
     return p;
 }
 //void Tr_expList_append(Tr_expList list, Tr_exp exp){
@@ -223,23 +223,22 @@ Tr_expList Tr_ExpList(){
 //    }
 //}
 void Tr_expList_append(Tr_expList list, Tr_exp exp) {
-    if(list->first==NULL)
+    if(list->first==nullptr)
     {
         list->first=exp;
         return;
     }
-    while(list->last!=NULL)
+    while(list->last!=nullptr)
     {
         list=list->last;
     }
     Tr_expList p = (Tr_expList)checked_malloc(sizeof(*p));
     p->first=exp;
-    p->last=NULL;
+    p->last=nullptr;
     list->last=p;
 }
 bool Tr_expList_isEmpty(Tr_expList list){
-    if (!list || !list->first) return true;
-    return false;
+    return !list || !list->first;
 }
 Tr_exp Tr_nopExp()
 {
@@ -258,7 +257,6 @@ Tr_exp Tr_simpleVar(Tr_access acc)
     Temp_temp get_fp=F_FP();
     T_exp tmp=T_Temp(get_fp);
     return Tr_Ex(F_Exp(acc,tmp));
-    printf("error:wrong with Tr_simpleVar from translate.c");
 }
 
 Tr_exp Tr_subsriptVar(Tr_exp base, Tr_exp offset) {
@@ -274,13 +272,15 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
         case A_mul: op=T_mul;break;
         case A_div: op=T_div;break;
         case A_mod: op=T_mod;break;
-        default:printf("error from Tr_binop translate.c maybe something wrong wirh binop");break;
+        default:
+            printf("error from Tr_binop translate.c maybe something wrong wirh binop");
+            break;
     }
-    if(op==T_add&& left==NULL)
+    if(op==T_add&& left==nullptr)
     {
         op=T_s_add;
     }
-    if(op==T_sub&& left==NULL)
+    if(op==T_sub&& left==nullptr)
     {
         op=T_s_sub;
     }
@@ -295,7 +295,7 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
     else
     {
         printf("error:wrong with Tr_binop from translate.c");
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -309,7 +309,9 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
         case A_ge: op=T_ge;break;
         case A_eq: op=T_eq;break;
         case A_ne: op=T_ne;break;
-        default:printf("error from Tr_binop translate.c maybe something wrong wirh relop");break;
+        default:
+            printf("error from Tr_binop translate.c maybe something wrong wirh relop");
+            break;
     }
     T_exp left_exp=Tr_unEx(left);
     T_exp right_exp=Tr_unEx(right);
@@ -323,37 +325,51 @@ Tr_exp Tr_if_else(Tr_exp condition_part,Tr_exp then_part,Tr_exp else_part)//if_e
     Temp_temp if_r=Temp_newTemp();
     doPatch(cx_condi.trues,if_t);
     doPatch(cx_condi.falses,if_f);
-    T_stm then_stm=NULL;
-    T_stm else_stm=NULL;
+    T_stm then_stm=nullptr;
+    T_stm else_stm=nullptr;
 
     switch (then_part->kind)
     {
-        case Tr_exp_::Tr_cx:{printf("error:grammer may not allowed,  wrong with Tr_if_else from translate.c");break;}
+        case Tr_exp_::Tr_cx:{
+            printf("error:grammer may not allowed,"
+                   "  wrong with Tr_if_else from translate.c");
+            break;
+        }
         case Tr_exp_::Tr_nx:
-        case Tr_exp_::Tr_ex:{then_stm= T_Seq(cx_condi.stm,T_Seq(T_Label(if_t),Tr_unNx(then_part))); break;}
+        case Tr_exp_::Tr_ex:{
+            then_stm= T_Seq(cx_condi.stm,T_Seq(T_Label(if_t),Tr_unNx(then_part)));
+            break;
+        }
     }
-    if(else_part==NULL)
+    if(else_part==nullptr)
     {
         return(Tr_Nx(T_Seq(then_stm,T_Label(if_f))));
     }
-    else if(else_part!=NULL)
-    {
-        Temp_label if_e=Temp_newLabel();
-        then_stm=T_Seq(then_stm,T_Jump(T_Name(if_e),Temp_LabelList(if_e,NULL)));
-        switch (else_part->kind)
-        {
-            case Tr_exp_::Tr_cx:{printf("error:grammer may not allowed,  wrong with Tr_if_else from translate.c");break;}
+    else {
+        Temp_label if_e = Temp_newLabel();
+        then_stm = T_Seq(then_stm,
+                         T_Jump(T_Name(if_e),
+                                Temp_LabelList(if_e, nullptr)));
+        switch (else_part->kind) {
+            case Tr_exp_::Tr_cx: {
+                printf("error:grammer may not allowed,  wrong with Tr_if_else from translate.c");
+                break;
+            }
             case Tr_exp_::Tr_nx:
-            case Tr_exp_::Tr_ex:{else_stm= T_Seq(then_stm,T_Seq(T_Label(if_f),Tr_unNx(else_part)));break;}
+            case Tr_exp_::Tr_ex: {
+                else_stm = T_Seq(then_stm, T_Seq(T_Label(if_f), Tr_unNx(else_part)));
+                break;
+            }
         }
-        return(Tr_Nx(T_Seq(else_stm,T_Label(if_e))));
+        return (Tr_Nx(T_Seq(else_stm, T_Label(if_e))));
     }
 }
 
 Tr_exp Tr_dec_Var(Tr_expList exps,int size)//变量或数组声明无初值
 {
     Temp_temp dec_var_r=Temp_newTemp();
-    T_exp pointer=T_Call(T_Name(Temp_namedLabel("init_var")),T_ExpList(T_Const(size*get_word_size()),NULL));//调用外部函数，应该是汇编实现
+    T_exp pointer=T_Call(T_Name(Temp_namedLabel((char*)"init_var")),
+            T_ExpList(T_Const(size*get_word_size()),nullptr));//调用外部函数，应该是汇编实现
     T_stm dec_var=T_Move(T_Temp(dec_var_r),pointer);
     return Tr_Ex(T_Eseq(dec_var,T_Temp(dec_var_r)));
 }
@@ -369,7 +385,7 @@ Tr_exp Tr_init_Var(Tr_expList exps,Tr_expList sizes)//变量或数组声明带�
         v_temp->tail=T_ExpList(Tr_unEx(sizes->first), nullptr);
         v_temp=v_temp->tail;
     }
-    T_exp pointer=T_Call(T_Name(Temp_namedLabel("init_var")),call_size);//调用外部函数，应该是汇编实现
+    T_exp pointer=T_Call(T_Name(Temp_namedLabel((char*)"init_var")),call_size);//调用外部函数，应该是汇编实现
     T_stm init_var=T_Move(T_Temp(dec_var_r),pointer);
     for(int i=0;exps;exps=exps->last,i++)
     {
@@ -386,25 +402,25 @@ Tr_exp Tr_initialExp() {
 Tr_exp Tr_break(Tr_exp done)
 {
     Temp_label done_l=Tr_unEx(done)->u.NAME;
-    return Tr_Nx(T_Jump(T_Name(done_l),Temp_LabelList(done_l,NULL)));
+    return Tr_Nx(T_Jump(T_Name(done_l),Temp_LabelList(done_l,nullptr)));
 }
 Tr_exp Tr_continue(Tr_exp initial)
 {
     Temp_label initial_l=Tr_unEx(initial)->u.NAME;
-    return Tr_Nx(T_Jump(T_Name(initial_l),Temp_LabelList(initial_l,NULL)));
+    return Tr_Nx(T_Jump(T_Name(initial_l),Temp_LabelList(initial_l,nullptr)));
 }
 Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue)
 {
-    Temp_label while_f=NULL;
-    Temp_label while_i=NULL;
-    if(w_break==NULL)
+    Temp_label while_f=nullptr;
+    Temp_label while_i=nullptr;
+    if(w_break==nullptr)
     {
         while_f=Temp_newLabel();
     } else
     {
         while_f=Tr_unEx(w_break)->u.NAME;
     }
-    if(w_continue==NULL)
+    if(w_continue==nullptr)
     {
         while_i=Temp_newLabel();
     } else
@@ -412,23 +428,35 @@ Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue)
         while_i=Tr_unEx(w_continue)->u.NAME;
     }
     struct Cx cx_condi=Tr_unCx(w_cond);
-    T_stm body_stm=NULL;
+    T_stm body_stm=nullptr;
     switch (w_stmt->kind)
     {
-        case Tr_exp_::Tr_cx:{printf("error:grammer may not allowed,  wrong with Tr_if_else from translate.c");break;}
+        case Tr_exp_::Tr_cx:{
+            printf("error:grammer may not allowed,  wrong with Tr_if_else from translate.c");
+            break;
+        }
         case Tr_exp_::Tr_nx:
-        case Tr_exp_::Tr_ex:{body_stm=Tr_unNx(w_stmt);body_stm=T_Seq(T_Label(while_i),T_Seq(cx_condi.stm,T_Seq(body_stm,T_Seq(T_Jump(T_Name(while_i),Temp_LabelList(while_i,NULL)),T_Label(while_f))))); break;}
+        case Tr_exp_::Tr_ex:{
+            body_stm=Tr_unNx(w_stmt);
+            body_stm=T_Seq(T_Label(while_i),
+                    T_Seq(cx_condi.stm,
+                            T_Seq(body_stm,
+                                    T_Seq(T_Jump(T_Name(while_i),
+                                            Temp_LabelList(while_i,nullptr)),
+                                                    T_Label(while_f)))));
+            break;
+        }
     }
     return Tr_Nx(body_stm);
 }
 Tr_exp Tr_func_call(Temp_label name,Tr_expList params)
 {
     T_exp tmp=T_Temp(F_FP());
-    T_expList call_param_h=T_ExpList(tmp,NULL);
+    T_expList call_param_h=T_ExpList(tmp,nullptr);
     T_expList c_temp=call_param_h;
     for(;params;params=params->last)
     {
-        c_temp->tail=T_ExpList(Tr_unEx(params->first),NULL);
+        c_temp->tail=T_ExpList(Tr_unEx(params->first),nullptr);
         c_temp=c_temp->tail;
     }
     return Tr_Ex(T_Call(T_Name(name),call_param_h));

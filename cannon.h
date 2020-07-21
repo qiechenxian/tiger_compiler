@@ -3,7 +3,7 @@
 //
 #include "temp.h"
 #include "tree.h"
-#include "stdio.h"
+#include <cstdio>
 #ifndef COMPILER_BUG_CONSTEXP_CANNON_H
 #define COMPILER_BUG_CONSTEXP_CANNON_H
 typedef struct C_stmListList_ *C_stmListList;

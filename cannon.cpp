@@ -5,7 +5,7 @@
 typedef struct expRefList_* expRefList;
 struct expRefList_ {T_exp *head;expRefList tail;};
 struct stmExp{T_stm s;T_exp e;};
-static T_stm recoder(expRefList rlist);
+static T_stm recoder(expRefList refList);
 static T_stm do_stm(T_stm stm);
 static struct stmExp do_exp(T_exp exp);
 static expRefList get_call_reflist(T_exp callExp);
@@ -15,7 +15,7 @@ S_table block_env;
 static T_stmList getLast(T_stmList list);
 static void trace(T_stmList list);
 static T_stmList getNext();
-T_stmList C_traceSchedule(struct C_block b);
+
 C_stmListList C_StmListList(T_stmList head,C_stmListList tail)
 {
     C_stmListList block_list=(C_stmListList)checked_malloc(sizeof(*block_list));
@@ -37,7 +37,7 @@ static T_stm seq(T_stm x,T_stm y){
 }
 struct stmExp StmExp(T_stm s,T_exp e)
 {
-    struct stmExp new_stmExp;
+    struct stmExp new_stmExp{};
     new_stmExp.e=e;
     new_stmExp.s=s;
     return new_stmExp;
@@ -51,7 +51,7 @@ expRefList ExpRefList(T_exp *exp,expRefList tail)
 }
 T_stmList C_linearize(T_stm stm)
 {
-    return linear(do_stm(stm),NULL);
+    return linear(do_stm(stm),nullptr);
 }
 static T_stmList linear(T_stm stm,T_stmList right)
 {
@@ -62,11 +62,11 @@ static T_stmList linear(T_stm stm,T_stmList right)
     {return T_StmList(stm,right);}
 }
 static expRefList get_call_reflist(T_exp callExp) {
-    expRefList res = ExpRefList(&callExp->u.CALL.fun, NULL);
+    expRefList res = ExpRefList(&callExp->u.CALL.fun, nullptr);
     expRefList p = res;
     T_expList p_args = callExp->u.CALL.args;
     while (p_args) {
-        p->tail = ExpRefList(&p_args->head, NULL);
+        p->tail = ExpRefList(&p_args->head, nullptr);
         p_args = p_args->tail;
         p = p->tail;
     }
@@ -77,23 +77,28 @@ static T_stm do_stm(T_stm stm) {
         case T_stm_::T_SEQ:
             return seq(do_stm(stm->u.SEQ.left), do_stm(stm->u.SEQ.right));
         case T_stm_::T_JUMP:
-            return seq(recoder(ExpRefList(&stm->u.JUMP.exp, NULL)),stm);
+            return seq(recoder(ExpRefList(&stm->u.JUMP.exp, nullptr)),stm);
         case T_stm_::T_CJUMP:
             return seq(
-                    recoder(ExpRefList(&stm->u.CJUMP.left,ExpRefList(&stm->u.CJUMP.right, NULL))),stm);
+                    recoder(
+                            ExpRefList(&stm->u.CJUMP.left,
+                                    ExpRefList(&stm->u.CJUMP.right, nullptr))),stm);
         case T_stm_::T_EXP:
             if (stm->u.EXP->kind == T_exp_::T_CALL)//call的处理
                 return seq(recoder(get_call_reflist(stm->u.EXP)),stm);
             else
-                return seq(recoder(ExpRefList(&stm->u.EXP, NULL)),stm);
+                return seq(recoder(ExpRefList(&stm->u.EXP, nullptr)),stm);
         case T_stm_::T_MOVE:
             if (stm->u.MOVE.dst->kind == T_exp_::T_TEMP) {
                 if (stm->u.MOVE.src->kind == T_exp_::T_CALL)
                     return seq(recoder(get_call_reflist(stm->u.MOVE.src)),stm);
                 else
-                    return seq(recoder(ExpRefList(&stm->u.MOVE.src, NULL)),stm);
+                    return seq(recoder(
+                            ExpRefList(&stm->u.MOVE.src, nullptr)),stm);
             } else if (stm->u.MOVE.dst->kind == T_exp_::T_MEM) {
-                return seq(recoder(ExpRefList(&stm->u.MOVE.dst->u.MEM,ExpRefList(&stm->u.MOVE.src, NULL))),stm);
+                return seq(recoder(
+                        ExpRefList(&stm->u.MOVE.dst->u.MEM,
+                                ExpRefList(&stm->u.MOVE.src, nullptr))),stm);
             } else if (stm->u.MOVE.dst->kind == T_exp_::T_ESEQ) {
                 T_stm s = stm->u.MOVE.dst->u.ESEQ.stm;
                 stm->u.MOVE.dst = s->u.MOVE.dst->u.ESEQ.exp;
@@ -106,7 +111,9 @@ static T_stm do_stm(T_stm stm) {
 static struct stmExp do_exp(T_exp exp){
     switch (exp->kind) {
         case T_exp_::T_BINOP:
-            return StmExp(recoder(ExpRefList(&exp->u.BINOP.left,ExpRefList(&exp->u.BINOP.right, nullptr))),exp);
+            return StmExp(recoder(
+                    ExpRefList(&exp->u.BINOP.left,
+                            ExpRefList(&exp->u.BINOP.right, nullptr))),exp);
         case T_exp_::T_MEM:
             return StmExp(recoder(ExpRefList(&exp->u.MEM, nullptr)),exp);
         case T_exp_::T_ESEQ:{struct  stmExp x=do_exp(exp->u.ESEQ.exp);
@@ -146,7 +153,10 @@ C_stmListList cut_stm(T_stmList pre_stm,T_stmList now_stm,Temp_label temp_done)/
 {
     if(now_stm == nullptr)
     {
-        T_stmList done_blcok= T_StmList(T_Jump(T_Name(temp_done),Temp_LabelList(temp_done, nullptr)), nullptr);
+        T_stmList done_blcok= T_StmList(
+                T_Jump(T_Name(temp_done),
+                        Temp_LabelList(temp_done, nullptr)),
+                        nullptr);
         pre_stm->tail=done_blcok;
         return nullptr;
     }
@@ -159,7 +169,10 @@ C_stmListList cut_stm(T_stmList pre_stm,T_stmList now_stm,Temp_label temp_done)/
     }
     else if(now_stm->head->kind==T_stm_::T_LABEL)
     {
-        pre_stm->tail= T_StmList(T_Jump(T_Name(now_stm->head->u.LABEL),Temp_LabelList(now_stm->head->u.LABEL, nullptr)), nullptr);
+        pre_stm->tail= T_StmList(
+                T_Jump(T_Name(now_stm->head->u.LABEL),
+                       Temp_LabelList(now_stm->head->u.LABEL, nullptr)),
+                       nullptr);
         return block_trans(now_stm,temp_done);
     } else
     {
@@ -182,7 +195,7 @@ C_stmListList block_trans(T_stmList stm,Temp_label temp_done)//负责完成block
 }
 struct C_block C_basicBlocks(T_stmList stmList)
 {
-    struct C_block my_block;
+    struct C_block my_block{};
     Temp_label temp=Temp_newLabel();
     my_block.labels=temp;//函数出口处理程序所在label
     my_block.stmLists=block_trans(stmList,temp);
@@ -200,9 +213,9 @@ static void trace(T_stmList list)
     T_stmList last = getLast(list);
     T_stm lab = list->head;
     T_stm s = last->tail->head;
-    S_enter(block_env, lab->u.LABEL, NULL);
+    S_enter(block_env, lab->u.LABEL, nullptr);
     if (s->kind == T_stm_::T_JUMP) {
-        T_stmList target = (T_stmList) S_look(block_env, s->u.JUMP.jumps->head);
+        auto target = (T_stmList) S_look(block_env, s->u.JUMP.jumps->head);
         if (!s->u.JUMP.jumps->tail && target) {
             last->tail = target;
             trace(target);
@@ -210,8 +223,8 @@ static void trace(T_stmList list)
         else {last->tail->tail = getNext();}
     }
     else if (s->kind == T_stm_::T_CJUMP) {
-        T_stmList trues =  (T_stmList) S_look(block_env, s->u.CJUMP.trues);
-        T_stmList falses =  (T_stmList) S_look(block_env, s->u.CJUMP.falses);
+        auto trues =  (T_stmList) S_look(block_env, s->u.CJUMP.trues);
+        auto falses =  (T_stmList) S_look(block_env, s->u.CJUMP.falses);
         if (falses) {
             last->tail->tail = falses;
             trace(falses);
@@ -235,7 +248,7 @@ static void trace(T_stmList list)
 static T_stmList getNext()
 {
     if (!global_block.stmLists)
-        return T_StmList(T_Label(global_block.labels), NULL);
+        return T_StmList(T_Label(global_block.labels), nullptr);
     else {
             T_stmList s = global_block.stmLists->head;
             if (S_look(block_env, s->head->u.LABEL)) {

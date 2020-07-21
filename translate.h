@@ -7,7 +7,7 @@
 
 #include "frame.h"
 #include "ast.h"
-#include "stdio.h"
+#include <cstdio>
 /**
  *
  * 管理栈帧结构与局部变量
