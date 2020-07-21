@@ -1,0 +1,54 @@
+before semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        callExp(getint,
+         expList()))),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList()))))),
+  decList())
+
+semantic check finish !
+after semantic ast:
+ decList(
+  functionDec(main,
+   fieldList(),
+   int,
+   blockStm(
+    comStmList(
+     comStm(
+      decList(
+       varibaleDec(a,
+        int,
+        FALSE),
+       decList()),),
+     comStmList(
+      comStm(
+       assignStm(
+        simpleVar(a),
+        callExp(getint,
+         expList()))),
+      comStmList(
+       comStm(
+        returnStm(
+         varExp(
+          simpleVar(a)))),
+       comStmList()))))),
+  decList())
