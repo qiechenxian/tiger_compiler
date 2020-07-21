@@ -62,3 +62,18 @@ void* TAB_pop(TAB_table t){
     //todo free?
     return pop_binder->key;
 }
+
+void TAB_dump(TAB_table t, void (*show)(void *key, void *value))
+{
+    void *k=t->top;
+    int index=((long long) k)%TAB_SIZE;
+    binder b=t->table[index];
+    if(b==NULL) return;
+    t->table[index]=b->next;
+    t->top=b->prev_top;
+    show(b->key,b->value);
+    TAB_dump(t,show);
+    assert(t->top==b->prev_top&&t->table[index]==b->next);
+    t->top=k;
+    t->table[index]=b;
+}
