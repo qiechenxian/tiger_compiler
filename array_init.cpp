@@ -90,6 +90,7 @@ INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_lis
 
     init_list->array = exp_array;
     init_list->suffix_size = suffix_size;
+    init_list->total_size = suffix_size[0] * temp[0];
     return init_list;
 }
 
@@ -105,4 +106,27 @@ int INIT_getInt(INIT_initList init_list, int* index){
     A_exp el = INIT_get(init_list, index);
     assert(el->kind == A_exp_::A_intExp);
     return el->u.intExp;
+}
+int INIT_getTotalSize(INIT_initList init_list){
+    return init_list->total_size;
+}
+int *INIT_transformGlobal(INIT_initList init_list){
+    assert(init_list->total_size > 1);
+    int shrink_size = 1;
+    for (int i = 1; i < init_list->total_size; i++){
+        if (init_list->array[i]->u.intExp == 0 && init_list->array[i-1]->u.intExp == 0){
+            continue;
+        }
+        shrink_size++;
+    }
+    int *shrink_array = (int*)checked_malloc(shrink_size*sizeof(int));
+    int index = 1;
+    shrink_array[0] = init_list->array[0]->u.intExp;
+    for (int i = 1; i < init_list->total_size; i++){
+        if (init_list->array[i]->u.intExp == 0 && init_list->array[i-1]->u.intExp == 0){
+            continue;
+        }
+        shrink_array[index++] = init_list->array[i]->u.intExp;
+    }
+    return shrink_array;
 }

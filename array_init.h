@@ -29,11 +29,13 @@ typedef struct INIT_initList_ *INIT_initList;
 struct INIT_initList_{
     A_exp* array;
     int* suffix_size;
+    int total_size;
 };
 INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_list);
 
 A_exp INIT_get(INIT_initList init_list, const int* index);
 int INIT_getInt(INIT_initList init_list, int* index);
+int *INIT_transformGlobal(INIT_initList init_list);
 
 
 #endif //COMPILER_2020_ARRAY_INIT_H
