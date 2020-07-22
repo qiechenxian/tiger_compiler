@@ -1,6 +1,6 @@
 before semantic ast:
  decList(
-  varibaleDec(n,
+  variableDec(n,
    int,
    FALSE),
   decList(
@@ -28,7 +28,7 @@ before semantic ast:
      comStmList(
       comStm(
        decList(
-        varibaleDec(temp,
+        variableDec(temp,
          int,
          FALSE),
         decList()),),
@@ -92,7 +92,7 @@ before semantic ast:
       comStmList(
        comStm(
         decList(
-         varibaleDec(dad,
+         variableDec(dad,
           int,
           FALSE),
          decList()),),
@@ -105,7 +105,7 @@ before semantic ast:
         comStmList(
          comStm(
           decList(
-           varibaleDec(son,
+           variableDec(son,
             int,
             FALSE),
            decList()),),
@@ -245,14 +245,14 @@ before semantic ast:
        comStmList(
         comStm(
          decList(
-          varibaleDec(i,
+          variableDec(i,
            int,
            FALSE),
           decList()),),
         comStmList(
          comStm(
           decList(
-           varibaleDec(tmp,
+           variableDec(tmp,
             int,
             FALSE),
            decList()),),
@@ -336,7 +336,7 @@ before semantic ast:
                 comStmList(
                  comStm(
                   decList(
-                   varibaleDec(tmp0,
+                   variableDec(tmp0,
                     int,
                     FALSE),
                    decList()),),
@@ -493,7 +493,7 @@ before semantic ast:
                     comStmList(
                      comStm(
                       decList(
-                       varibaleDec(i,
+                       variableDec(i,
                         int,
                         FALSE),
                        decList()),),
@@ -527,7 +527,7 @@ before semantic ast:
                            comStmList(
                             comStm(
                              decList(
-                              varibaleDec(tmp,
+                              variableDec(tmp,
                                int,
                                FALSE),
                               decList()),),

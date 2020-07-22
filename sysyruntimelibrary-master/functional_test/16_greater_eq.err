@@ -1,6 +1,6 @@
 before semantic ast:
  decList(
-  varibaleDec(a,
+  variableDec(a,
    int,
    intExp(5),
    FALSE),
@@ -11,31 +11,31 @@ before semantic ast:
      intExp(10),
      expList()),
     arrayInitList(
-     signleInit(
+     singleInit(
       intExp(9)),
      arrayInitList(
-      signleInit(
+      singleInit(
        intExp(8)),
       arrayInitList(
-       signleInit(
+       singleInit(
         intExp(7)),
        arrayInitList(
-        signleInit(
+        singleInit(
          intExp(6)),
         arrayInitList(
-         signleInit(
+         singleInit(
           intExp(5)),
          arrayInitList(
-          signleInit(
+          singleInit(
            intExp(4)),
           arrayInitList(
-           signleInit(
+           singleInit(
             intExp(3)),
            arrayInitList(
-            signleInit(
+            singleInit(
              intExp(2)),
             arrayInitList(
-             signleInit(
+             singleInit(
               intExp(1))))))))))),
     FALSE),
    decList(
@@ -46,7 +46,7 @@ before semantic ast:
       comStmList(
        comStm(
         decList(
-         varibaleDec(i,
+         variableDec(i,
           int,
           intExp(0),
           FALSE),
@@ -86,7 +86,7 @@ before semantic ast:
 semantic check finish !
 after semantic ast:
  decList(
-  varibaleDec(a,
+  variableDec(a,
    int,
    intExp(5),
    FALSE),
@@ -97,31 +97,31 @@ after semantic ast:
      intExp(10),
      expList()),
     arrayInitList(
-     signleInit(
+     singleInit(
       intExp(9)),
      arrayInitList(
-      signleInit(
+      singleInit(
        intExp(8)),
       arrayInitList(
-       signleInit(
+       singleInit(
         intExp(7)),
        arrayInitList(
-        signleInit(
+        singleInit(
          intExp(6)),
         arrayInitList(
-         signleInit(
+         singleInit(
           intExp(5)),
          arrayInitList(
-          signleInit(
+          singleInit(
            intExp(4)),
           arrayInitList(
-           signleInit(
+           singleInit(
             intExp(3)),
            arrayInitList(
-            signleInit(
+            singleInit(
              intExp(2)),
             arrayInitList(
-             signleInit(
+             singleInit(
               intExp(1))))))))))),
     FALSE),
    decList(
@@ -132,7 +132,7 @@ after semantic ast:
       comStmList(
        comStm(
         decList(
-         varibaleDec(i,
+         variableDec(i,
           int,
           intExp(0),
           FALSE),

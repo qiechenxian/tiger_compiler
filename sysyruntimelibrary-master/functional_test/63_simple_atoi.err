@@ -14,7 +14,7 @@ before semantic ast:
     comStmList(
      comStm(
       decList(
-       varibaleDec(s,
+       variableDec(s,
         int,
         FALSE),
        decList()),),
@@ -26,7 +26,7 @@ before semantic ast:
       comStmList(
        comStm(
         decList(
-         varibaleDec(isMinus,
+         variableDec(isMinus,
           int,
           FALSE),
          decList()),),
@@ -38,7 +38,7 @@ before semantic ast:
         comStmList(
          comStm(
           decList(
-           varibaleDec(i,
+           variableDec(i,
             int,
             FALSE),
            decList()),),
@@ -243,7 +243,7 @@ before semantic ast:
       comStmList(
        comStm(
         decList(
-         varibaleDec(temp,
+         variableDec(temp,
           int,
           FALSE),
          decList()),),
@@ -255,7 +255,7 @@ before semantic ast:
         comStmList(
          comStm(
           decList(
-           varibaleDec(i,
+           variableDec(i,
             int,
             FALSE),
            decList()),),

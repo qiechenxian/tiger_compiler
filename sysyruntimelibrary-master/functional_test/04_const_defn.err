@@ -1,6 +1,6 @@
 before semantic ast:
  decList(
-  varibaleDec(x,
+  variableDec(x,
    int,
    intExp(4),
    FALSE),
@@ -20,7 +20,7 @@ before semantic ast:
 semantic check finish !
 after semantic ast:
  decList(
-  varibaleDec(x,
+  variableDec(x,
    int,
    intExp(4),
    FALSE),

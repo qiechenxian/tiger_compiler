@@ -26,10 +26,11 @@ Temp_temp F_RV()//取帧指针
 }
 /** class declare */
 struct F_access_{
-    enum {inFrame, inReg}kind;
+    enum {inFrame, inReg, inGlobal}kind;
     struct {
         int offset;
         Temp_temp reg;
+        Temp_label global;
     }u;
 };
 
@@ -61,6 +62,12 @@ static F_access InReg(Temp_temp reg){
     F_access fa = (F_access)checked_malloc(sizeof(*fa));
     fa->kind = F_access_::inReg;
     fa->u.reg = reg;
+    return fa;
+}
+static F_access InGlobal(Temp_label global){
+    auto fa = (F_access)checked_malloc(sizeof(F_access_));
+    fa->kind = F_access_::inGlobal;
+    fa->u.global = global;
     return fa;
 }
 static F_accessList F_AccessList(F_access head, F_accessList tail){
@@ -118,11 +125,15 @@ F_access F_allocLocal(F_frame frame, bool escape){
     if (escape) {
         access=InFrame(F_WORD_SIZE  * (- frame->local_count));
         frame->locals=F_AccessList(access,frame->locals);
+        return access;
     }
     else
     {
         return InReg(Temp_newTemp());
     }
+}
+F_access F_allocGlobal(){
+    return InGlobal(Temp_newLabel());
 }
 
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式

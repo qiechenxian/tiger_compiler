@@ -23,6 +23,7 @@ typedef F_frame Tr_frame;
 
 Tr_frame Tr_newFrame(Temp_label name, U_boolList formals);
 Tr_access Tr_allocLocal(Tr_frame frame, bool escape);
+Tr_access Tr_allocGlobal();
 Tr_accessList Tr_getFormals(Tr_frame frame);
 Tr_accessList Tr_AccessList(Tr_access head, Tr_accessList tail);// 构造函数
 

@@ -15,28 +15,28 @@ before semantic ast:
           intExp(2),
           expList())),
         arrayInitList(
-         signleInit(
+         singleInit(
           intExp(1)),
          arrayInitList(
-          signleInit(
+          singleInit(
            intExp(2)),
           arrayInitList(
-           signleInit(
+           singleInit(
             intExp(3)),
            arrayInitList(
-            signleInit(
+            singleInit(
              intExp(4)),
             arrayInitList(
-             signleInit(
+             singleInit(
               intExp(5)),
              arrayInitList(
-              signleInit(
+              singleInit(
                intExp(6)),
               arrayInitList(
-               signleInit(
+               singleInit(
                 intExp(7)),
                arrayInitList(
-                signleInit(
+                singleInit(
                  intExp(8)))))))))),
         FALSE),
        decList()),),
@@ -53,7 +53,7 @@ before semantic ast:
          arrayInitList(
           nestedInit(
            arrayInitList(
-            signleInit(
+            singleInit(
              varExp(
               arrayVar(
                arrayVar(
@@ -61,7 +61,7 @@ before semantic ast:
                 intExp(0)),
                intExp(0)))),
             arrayInitList(
-             signleInit(
+             singleInit(
               varExp(
                arrayVar(
                 arrayVar(
@@ -71,26 +71,26 @@ before semantic ast:
           arrayInitList(
            nestedInit(
             arrayInitList(
-             signleInit(
+             singleInit(
               intExp(3)),
              arrayInitList(
-              signleInit(
+              singleInit(
                intExp(4))))),
            arrayInitList(
             nestedInit(
              arrayInitList(
-              signleInit(
+              singleInit(
                intExp(5)),
               arrayInitList(
-               signleInit(
+               singleInit(
                 intExp(6))))),
             arrayInitList(
              nestedInit(
               arrayInitList(
-               signleInit(
+               singleInit(
                 intExp(7)),
                arrayInitList(
-                signleInit(
+                singleInit(
                  intExp(8))))))))),
          FALSE),
         decList()),),
@@ -119,28 +119,28 @@ after semantic ast:
           intExp(2),
           expList())),
         arrayInitList(
-         signleInit(
+         singleInit(
           intExp(1)),
          arrayInitList(
-          signleInit(
+          singleInit(
            intExp(2)),
           arrayInitList(
-           signleInit(
+           singleInit(
             intExp(3)),
            arrayInitList(
-            signleInit(
+            singleInit(
              intExp(4)),
             arrayInitList(
-             signleInit(
+             singleInit(
               intExp(5)),
              arrayInitList(
-              signleInit(
+              singleInit(
                intExp(6)),
               arrayInitList(
-               signleInit(
+               singleInit(
                 intExp(7)),
                arrayInitList(
-                signleInit(
+                singleInit(
                  intExp(8)))))))))),
         FALSE),
        decList()),),
@@ -157,7 +157,7 @@ after semantic ast:
          arrayInitList(
           nestedInit(
            arrayInitList(
-            signleInit(
+            singleInit(
              varExp(
               arrayVar(
                arrayVar(
@@ -165,7 +165,7 @@ after semantic ast:
                 intExp(0)),
                intExp(0)))),
             arrayInitList(
-             signleInit(
+             singleInit(
               varExp(
                arrayVar(
                 arrayVar(
@@ -175,26 +175,26 @@ after semantic ast:
           arrayInitList(
            nestedInit(
             arrayInitList(
-             signleInit(
+             singleInit(
               intExp(3)),
              arrayInitList(
-              signleInit(
+              singleInit(
                intExp(4))))),
            arrayInitList(
             nestedInit(
              arrayInitList(
-              signleInit(
+              singleInit(
                intExp(5)),
               arrayInitList(
-               signleInit(
+               singleInit(
                 intExp(6))))),
             arrayInitList(
              nestedInit(
               arrayInitList(
-               signleInit(
+               singleInit(
                 intExp(7)),
                arrayInitList(
-                signleInit(
+                singleInit(
                  intExp(8))))))))),
          FALSE),
         decList()),),
