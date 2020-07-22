@@ -16,5 +16,5 @@ void S_enter(S_table t, S_symbol sym, void* value);
 void* S_look(S_table t, S_symbol sym);
 void S_beginScope(S_table t);
 void S_endScope(S_table t);
-
+c_string S_name(S_symbol sym);
 #endif //COMPILER_LOYX_SYMBOL_H

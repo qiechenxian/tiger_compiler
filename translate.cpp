@@ -162,7 +162,14 @@ static patchList PatchList(Temp_label *head, patchList tail){
     p->tail = tail;
     return p;
 }
-
+static patchList connect_PatchList(patchList left, patchList right){
+    while(left->tail!= nullptr)
+    {
+        left=left->tail;
+    }
+    left->tail=right;
+    return left;
+}
 
 /** delegate to frame.h */
 Tr_access Tr_allocLocal(F_frame frame, bool escape){
@@ -285,21 +292,9 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
             printf("error from Tr_binop translate.c maybe something wrong wirh binop");
             break;
     }
-    if(op==T_add&& left==nullptr)
-    {
-        op=T_s_add;
-    }
-    if(op==T_sub&& left==nullptr)
-    {
-        op=T_s_sub;
-    }
     if(op==T_add||op==T_sub||op==T_mul||op==T_div||op==T_mod||op==T_and||op==T_or)
     {
         return Tr_Ex(T_Binop(op,Tr_unEx(left),Tr_unEx(right)));
-    }
-    else if(op==T_s_add||op==T_s_sub||op==T_not)
-    {
-        return Tr_Ex(T_Binop(op, nullptr,Tr_unEx(right)));
     }
     else
     {
@@ -318,6 +313,99 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
         case A_ge: op=T_ge;break;
         case A_eq: op=T_eq;break;
         case A_ne: op=T_ne;break;
+        case A_and:{
+            op=T_and;
+                if(left->kind==Tr_exp_::Tr_ex)
+                {
+                    T_relOp temp_op=T_gt;
+                    T_exp left_exp=Tr_unEx(left);
+                    T_exp right_exp=T_Const(0);
+                    T_stm cond = T_Cjump(temp_op, left_exp, right_exp, nullptr, nullptr);
+                    patchList trues = PatchList(&cond->u.CJUMP.trues, nullptr);
+                    patchList falses = PatchList(&cond->u.CJUMP.falses, nullptr);
+                    left->kind=Tr_exp_::Tr_cx;
+                    left->u.cx.trues=trues;
+                    left->u.cx.falses=falses;
+                    left->u.cx.stm=cond;
+                }
+                if(right->kind==Tr_exp_::Tr_ex)
+                {
+                    T_relOp temp_op=T_gt;
+                    T_exp left_exp=Tr_unEx(right);
+                    T_exp right_exp=T_Const(0);
+                    T_stm cond = T_Cjump(temp_op, left_exp, right_exp, nullptr, nullptr);
+                    patchList trues = PatchList(&cond->u.CJUMP.trues, nullptr);
+                    patchList falses = PatchList(&cond->u.CJUMP.falses, nullptr);
+                    right->kind=Tr_exp_::Tr_cx;
+                    right->u.cx.trues=trues;
+                    right->u.cx.falses=falses;
+                    right->u.cx.stm=cond;
+                }
+                Temp_label trues_and= Temp_newLabel();
+                T_stm temp_stm=T_Seq(left->u.cx.stm,T_Seq(T_Label(trues_and),right->u.cx.stm));
+                if(left->kind==Tr_exp_::Tr_cx&&right->kind==Tr_exp_::Tr_cx)
+                {
+                    doPatch(left->u.cx.trues,trues_and);
+                    patchList and_trues= right->u.cx.trues;
+                    patchList and_falses= connect_PatchList(left->u.cx.falses,right->u.cx.falses);
+                    return Tr_Cx(and_trues,and_falses,temp_stm);
+                }
+
+            break;}
+        case A_or:{
+            op=T_or;
+            if(left->kind==Tr_exp_::Tr_ex)//将A_exp装换为 A_exp>0   例如： （3||4）-->(3>0||4>0)
+            {
+                T_relOp temp_op=T_gt;
+                T_exp left_exp=Tr_unEx(left);
+                T_exp right_exp=T_Const(0);
+                T_stm cond = T_Cjump(temp_op, left_exp, right_exp, nullptr, nullptr);
+                patchList trues = PatchList(&cond->u.CJUMP.trues, nullptr);
+                patchList falses = PatchList(&cond->u.CJUMP.falses, nullptr);
+                left->kind=Tr_exp_::Tr_cx;
+                left->u.cx.trues=trues;
+                left->u.cx.falses=falses;
+                left->u.cx.stm=cond;
+            }
+            if(right->kind==Tr_exp_::Tr_ex)//
+            {
+                T_relOp temp_op=T_gt;
+                T_exp left_exp=Tr_unEx(right);
+                T_exp right_exp=T_Const(0);
+                T_stm cond = T_Cjump(temp_op, left_exp, right_exp, nullptr, nullptr);
+                patchList trues = PatchList(&cond->u.CJUMP.trues, nullptr);
+                patchList falses = PatchList(&cond->u.CJUMP.falses, nullptr);
+                right->kind=Tr_exp_::Tr_cx;
+                right->u.cx.trues=trues;
+                right->u.cx.falses=falses;
+                right->u.cx.stm=cond;
+            }
+            Temp_label falses_or= Temp_newLabel();
+            T_stm temp_stm=T_Seq(left->u.cx.stm,T_Seq(T_Label(falses_or),right->u.cx.stm));
+            if(left->kind==Tr_exp_::Tr_cx&&right->kind==Tr_exp_::Tr_cx)
+            {
+                doPatch(left->u.cx.falses,falses_or);
+                patchList or_trues= connect_PatchList(left->u.cx.trues,right->u.cx.trues);
+                patchList or_falses= right->u.cx.falses;
+                return Tr_Cx(or_trues,or_falses,temp_stm);
+            }
+            break;}
+        case A_not:
+                {op=T_not;
+                if(right->kind==Tr_exp_::Tr_cx)
+                {
+
+                } else if(right->kind==Tr_exp_::Tr_ex)
+                {
+                    T_relOp temp_op=T_le;
+                    T_exp left_exp=Tr_unEx(right);
+                    T_exp right_exp=T_Const(0);
+                    T_stm cond = T_Cjump(temp_op, left_exp, right_exp, nullptr, nullptr);
+                    patchList trues = PatchList(&cond->u.CJUMP.trues, nullptr);
+                    patchList falses = PatchList(&cond->u.CJUMP.falses, nullptr);
+                    return Tr_Cx(trues,falses,cond);
+                }
+                break;}
         default:
             printf("error from Tr_binop translate.c maybe something wrong wirh relop");
             break;

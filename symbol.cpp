@@ -58,3 +58,7 @@ void S_endScope(S_table t){
         s = (S_symbol)TAB_pop((TAB_table) t);
     }while (s != &mark_sym);
 }
+c_string S_name(S_symbol sym)
+{
+    return sym->name;
+}

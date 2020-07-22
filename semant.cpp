@@ -702,11 +702,10 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     }
                     return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
                 }
+
+                case A_not:return Expty(Tr_relop(op, nullptr,right.exp), TY_Int());
                 case A_and:
-                case A_not:
-                case A_or:
-                    /// todo and or not
-                    return Expty(Tr_binop(op,left.exp,right.exp), TY_Int());
+                case A_or:return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
                 default:
                     assert(0);
             }

@@ -14,10 +14,10 @@ typedef struct T_stmList_ *T_stmList;
 typedef enum {
     T_add, T_sub, T_mul, T_div,
      T_lshift, T_rshift, T_arshift,
-    T_xor,T_mod,T_s_add,T_s_sub,T_not,T_and, T_or
+    T_xor,T_mod,
 } T_binOp;
 typedef enum {
-    T_lt, T_le, T_gt, T_ge, T_eq, T_ne
+    T_lt, T_le, T_gt, T_ge, T_eq, T_ne,T_not,T_and, T_or
 } T_relOp;
 
 

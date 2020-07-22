@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "\n");
 
     frags=SEM_transProgram(venv, tenv, absyn_root);
+
     fprintf(stderr, "\nsemantic check finish !\n");
         for (;frags;frags=frags->tail){
             if (frags->head->kind == F_frag_::F_procFrag)
