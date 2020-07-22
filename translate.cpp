@@ -392,10 +392,12 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
             break;}
         case A_not:
                 {op=T_not;
-                if(right->kind==Tr_exp_::Tr_cx)
+                if(right->kind==Tr_exp_::Tr_cx)//条件语句交换true false label
                 {
-
-                } else if(right->kind==Tr_exp_::Tr_ex)
+                    patchList temp=right->u.cx.falses;
+                    right->u.cx.falses=right->u.cx.trues;
+                    right->u.cx.trues=temp;
+                } else if(right->kind==Tr_exp_::Tr_ex)//!3=!(3>0)=3<=0
                 {
                     T_relOp temp_op=T_le;
                     T_exp left_exp=Tr_unEx(right);
