@@ -176,7 +176,7 @@ F_frag F_ProcFrag(T_stm body,F_frame frame)
     new_frag->u.proc.frame=frame;
     return new_frag;
 }
-F_frag F_GlobalFrag(Temp_temp label){
+F_frag F_GlobalFrag(Temp_label label){
     auto new_frag = (F_frag)checked_malloc(sizeof(F_frag_));
     new_frag->kind = F_frag_::F_globalFrag;
     new_frag->u.global.label = label;

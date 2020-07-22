@@ -47,6 +47,6 @@ struct F_fragList_{F_frag head;F_fragList tail;};
 F_fragList F_FragList(F_frag head,F_fragList tail);
 F_frag F_StringFrag(Temp_label label,c_string str);
 F_frag F_ProcFrag(T_stm body,F_frame frame);
-F_frag F_GlobalFrag(Temp_temp label);
+F_frag F_GlobalFrag(Temp_label label);
 
 #endif //COMPILER_LOYX_FRAME_H
