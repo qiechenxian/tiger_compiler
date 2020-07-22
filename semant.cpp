@@ -294,7 +294,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             init_list_tr->array_length=init_list->suffix_size[0];
             init_list_tr->array= nullptr;
             S_enter(venv, d->u.array.id, arrayEntry);
-            return Tr_init_Var(init_list_tr);//todo address delivery in codeselect
+            return Tr_init_Var(init_list_tr);
         }
         case A_dec_::A_variableDec:{
 
@@ -695,9 +695,9 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     }
 
                     if (left.ty->kind == TY_ty_::TY_int){
-                        /// todo translate
+
                     } else if (left.ty->kind == TY_ty_::TY_char){
-                        /// todo translate
+
                     } else{
                         EM_error(a->u.opExp.right->pos,
                                  "unexpected %s expression in comparison",
@@ -708,7 +708,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 case A_and:
                 case A_not:
                 case A_or:
-                    /// todo and or not
+
                     return Expty(Tr_binop(op,left.exp,right.exp), TY_Int());
                 default:
                     assert(0);
@@ -738,7 +738,6 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
         }
         case A_var_::A_arrayVar:{//todo 确认array base index
             struct expty id = transVar(venv, tenv, v->u.arrayVar.id,l_break,l_continue);
-            // todo translate
             if (id.ty->kind != TY_ty_::TY_array){
                 EM_error(v->u.arrayVar.id->pos,
                         "subscripted value is neither array nor pointer nor vector");
@@ -749,7 +748,6 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                 if (index.ty->kind != TY_ty_::TY_int){
                     EM_error(v->u.arrayVar.index->pos, "index must be a int");
                 }
-                // todo translate
                 expty expty_msg = Expty(Tr_subsriptVar(id.exp,index.exp), actual_ty(id.ty->u.array));
                 expty_msg.isConst = id.isConst && index.isConst;
                 return expty_msg;
