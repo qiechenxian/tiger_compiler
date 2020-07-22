@@ -24,7 +24,7 @@ before semantic ast:
     comStmList(
      comStm(
       decList(
-       varibaleDec(bitcount,
+       variableDec(bitcount,
         int,
         intExp(30),
         FALSE),
@@ -42,7 +42,7 @@ before semantic ast:
            intExp(1)),
           expList()),
          arrayInitList(
-          signleInit(
+          singleInit(
            intExp(0))),
          FALSE),
         decList()),),
@@ -186,7 +186,7 @@ before semantic ast:
                  comStmList(
                   comStm(
                    decList(
-                    varibaleDec(i,
+                    variableDec(i,
                      int,
                      intExp(10),
                      FALSE),
@@ -233,7 +233,7 @@ before semantic ast:
                    comStmList(
                     comStm(
                      decList(
-                      varibaleDec(v,
+                      variableDec(v,
                        int,
                        intExp(0),
                        FALSE),
@@ -416,20 +416,20 @@ before semantic ast:
      intExp(3),
      expList()),
     arrayInitList(
-     signleInit(
+     singleInit(
       intExp(19971231)),
      arrayInitList(
-      signleInit(
+      singleInit(
        intExp(19981013)),
       arrayInitList(
-       signleInit(
+       singleInit(
         opExp(
          add,
          intExp(1000000000),
          intExp(7)))))),
     FALSE),
    decList(
-    varibaleDec(staticvalue,
+    variableDec(staticvalue,
      int,
      intExp(0),
      FALSE),
@@ -499,7 +499,7 @@ before semantic ast:
         intExp(10000),
         expList()),
        arrayInitList(
-        signleInit(
+        singleInit(
          intExp(0))),
        FALSE),
       decList(
@@ -510,7 +510,7 @@ before semantic ast:
          comStmList(
           comStm(
            decList(
-            varibaleDec(n,
+            variableDec(n,
              int,
              callExp(getint,
               expList()),
@@ -530,11 +530,11 @@ before semantic ast:
             comStmList(
              comStm(
               decList(
-               varibaleDec(y,
+               variableDec(y,
                 int,
                 FALSE),
                decList(
-                varibaleDec(x,
+                variableDec(x,
                  int,
                  FALSE),
                 decList())),),
@@ -639,7 +639,7 @@ after semantic ast:
     comStmList(
      comStm(
       decList(
-       varibaleDec(bitcount,
+       variableDec(bitcount,
         int,
         intExp(30),
         FALSE),
@@ -653,7 +653,7 @@ after semantic ast:
           intExp(31),
           expList()),
          arrayInitList(
-          signleInit(
+          singleInit(
            intExp(0))),
          FALSE),
         decList()),),
@@ -797,7 +797,7 @@ after semantic ast:
                  comStmList(
                   comStm(
                    decList(
-                    varibaleDec(i,
+                    variableDec(i,
                      int,
                      intExp(10),
                      FALSE),
@@ -843,7 +843,7 @@ after semantic ast:
                    comStmList(
                     comStm(
                      decList(
-                      varibaleDec(v,
+                      variableDec(v,
                        int,
                        intExp(0),
                        FALSE),
@@ -877,8 +877,7 @@ after semantic ast:
                               dev,
                               varExp(
                                simpleVar(pos)),
-                              varExp(
-                               simpleVar(bitcount))))),
+                              intExp(30)))),
                            varExp(
                             arrayVar(
                              simpleVar(x),
@@ -886,8 +885,7 @@ after semantic ast:
                               mod,
                               varExp(
                                simpleVar(pos)),
-                              varExp(
-                               simpleVar(bitcount)))))),
+                              intExp(30))))),
                           intExp(2)),
                          varExp(
                           simpleVar(d))),
@@ -908,8 +906,7 @@ after semantic ast:
                                   dev,
                                   varExp(
                                    simpleVar(pos)),
-                                  varExp(
-                                   simpleVar(bitcount))))),
+                                  intExp(30)))),
                                varExp(
                                 arrayVar(
                                  simpleVar(x),
@@ -917,8 +914,7 @@ after semantic ast:
                                   mod,
                                   varExp(
                                    simpleVar(pos)),
-                                  varExp(
-                                   simpleVar(bitcount)))))),
+                                  intExp(30))))),
                               intExp(2)),
                              intExp(0)),
                             ifStm(
@@ -936,8 +932,7 @@ after semantic ast:
                                  mod,
                                  varExp(
                                   simpleVar(pos)),
-                                 varExp(
-                                  simpleVar(bitcount))))))                             )                            )),
+                                 intExp(30)))))                             )                            )),
                           comStmList(
                            comStm(
                             ifStm(
@@ -954,8 +949,7 @@ after semantic ast:
                                    dev,
                                    varExp(
                                     simpleVar(pos)),
-                                   varExp(
-                                    simpleVar(bitcount))))),
+                                   intExp(30)))),
                                 varExp(
                                  arrayVar(
                                   simpleVar(x),
@@ -963,8 +957,7 @@ after semantic ast:
                                    mod,
                                    varExp(
                                     simpleVar(pos)),
-                                   varExp(
-                                    simpleVar(bitcount)))))),
+                                   intExp(30))))),
                                intExp(2)),
                               intExp(1)),
                              ifStm(
@@ -986,8 +979,7 @@ after semantic ast:
                                    mod,
                                    varExp(
                                     simpleVar(pos)),
-                                   varExp(
-                                    simpleVar(bitcount)))))))                              )                             )),
+                                   intExp(30))))))                              )                             )),
                            comStmList())))                        )),
                       comStmList(
                        comStm(
@@ -998,8 +990,7 @@ after semantic ast:
                            dev,
                            varExp(
                             simpleVar(pos)),
-                           varExp(
-                            simpleVar(bitcount)))),
+                           intExp(30))),
                          opExp(
                           add,
                           varExp(
@@ -1009,8 +1000,7 @@ after semantic ast:
                              dev,
                              varExp(
                               simpleVar(pos)),
-                             varExp(
-                              simpleVar(bitcount))))),
+                             intExp(30)))),
                           varExp(
                            simpleVar(v))))),
                        comStmList(
@@ -1025,20 +1015,20 @@ after semantic ast:
      intExp(3),
      expList()),
     arrayInitList(
-     signleInit(
+     singleInit(
       intExp(19971231)),
      arrayInitList(
-      signleInit(
+      singleInit(
        intExp(19981013)),
       arrayInitList(
-       signleInit(
+       singleInit(
         opExp(
          add,
          intExp(1000000000),
          intExp(7)))))),
     FALSE),
    decList(
-    varibaleDec(staticvalue,
+    variableDec(staticvalue,
      int,
      intExp(0),
      FALSE),
@@ -1108,7 +1098,7 @@ after semantic ast:
         intExp(10000),
         expList()),
        arrayInitList(
-        signleInit(
+        singleInit(
          intExp(0))),
        FALSE),
       decList(
@@ -1119,7 +1109,7 @@ after semantic ast:
          comStmList(
           comStm(
            decList(
-            varibaleDec(n,
+            variableDec(n,
              int,
              callExp(getint,
               expList()),
@@ -1139,11 +1129,11 @@ after semantic ast:
             comStmList(
              comStm(
               decList(
-               varibaleDec(y,
+               variableDec(y,
                 int,
                 FALSE),
                decList(
-                varibaleDec(x,
+                variableDec(x,
                  int,
                  FALSE),
                 decList())),),
@@ -1219,4 +1209,4 @@ after semantic ast:
                   returnStm(
                    intExp(0))),
                  comStmList())))))))))),
-       decList()))))))
+       decList()))))))int == intint == intint == intint == intint == int

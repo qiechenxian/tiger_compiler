@@ -170,6 +170,9 @@ static patchList PatchList(Temp_label *head, patchList tail){
 Tr_access Tr_allocLocal(F_frame frame, bool escape){
     return F_allocLocal(frame, escape);
 }
+Tr_access Tr_allocGlobal(){
+    return F_allocGlobal();
+}
 Tr_accessList Tr_getFormals(Tr_frame frame){
     return F_getFormals(frame);
 }
@@ -265,7 +268,10 @@ Tr_exp Tr_simpleVar(Tr_access acc)
 }
 
 Tr_exp Tr_subsriptVar(Tr_exp base, Tr_exp offset) {
-    return Tr_Ex(T_Mem(T_Binop(T_add,Tr_unEx(base),T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size())))));
+    return Tr_Ex(T_Mem(
+            T_Binop(T_add,Tr_unEx(base),
+                    T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size()))
+                    )));
 }
 
 Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算

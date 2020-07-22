@@ -7,7 +7,7 @@ before semantic ast:
     comStmList(
      comStm(
       decList(
-       varibaleDec(a,
+       variableDec(a,
         int,
         intExp(10),
         FALSE),
@@ -68,7 +68,7 @@ after semantic ast:
     comStmList(
      comStm(
       decList(
-       varibaleDec(a,
+       variableDec(a,
         int,
         intExp(10),
         FALSE),

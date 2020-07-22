@@ -6,19 +6,19 @@ before semantic ast:
     intExp(5),
     expList()),
    arrayInitList(
-    signleInit(
+    singleInit(
      intExp(0)),
     arrayInitList(
-     signleInit(
+     singleInit(
       intExp(1)),
      arrayInitList(
-      signleInit(
+      singleInit(
        intExp(2)),
       arrayInitList(
-       signleInit(
+       singleInit(
         intExp(3)),
        arrayInitList(
-        signleInit(
+        singleInit(
          intExp(4))))))),
    FALSE),
   decList(
@@ -45,19 +45,19 @@ after semantic ast:
     intExp(5),
     expList()),
    arrayInitList(
-    signleInit(
+    singleInit(
      intExp(0)),
     arrayInitList(
-     signleInit(
+     singleInit(
       intExp(1)),
      arrayInitList(
-      signleInit(
+      singleInit(
        intExp(2)),
       arrayInitList(
-       signleInit(
+       singleInit(
         intExp(3)),
        arrayInitList(
-        signleInit(
+        singleInit(
          intExp(4))))))),
    FALSE),
   decList(
@@ -68,9 +68,6 @@ after semantic ast:
      comStmList(
       comStm(
        returnStm(
-        varExp(
-         arrayVar(
-          simpleVar(a),
-          intExp(4))))),
+        intExp(4))),
       comStmList()))),
    decList()))
