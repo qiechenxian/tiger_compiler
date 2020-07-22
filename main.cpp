@@ -5,9 +5,26 @@
 #include "semant.h"
 #include "env.h"
 #include "prast.h"
-
+#include "cannon.h"
 using namespace std;
+static void doProc(FILE *out, F_frame frame, T_stm body)
+{
+    //AS_proc proc;
+    //struct RA_result allocation;
+    T_stmList stmList;
+    //AS_instrList iList;
 
+    stmList = C_linearize(body);
+    stmList = C_traceSchedule(C_basicBlocks(stmList));
+
+    /* printStmList(stdout, stmList);*/
+    //iList  = F_codegen(frame, stmList); /* 9 */
+
+    //fprintf(out, "BEGIN %s\n", Temp_labelstring(F_name(frame)));
+    //AS_printInstrList (out, iList,
+    //                   Temp_layerMap(F_tempMap,Temp_name()));
+    //fprintf(out, "END %s\n\n", Temp_labelstring(F_name(frame)));
+}
 
 extern FILE *yyin;
 extern FILE *yyout;

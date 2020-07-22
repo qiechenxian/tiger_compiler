@@ -345,7 +345,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                      * 非常量声明的初值处理
                      */
                     S_enter(venv, d->u.var.id, varEntry);
-                    return Tr_assign(Tr_simpleVar(var_access),e.exp); /// todo return assign op
+                    return Tr_assign(Tr_simpleVar(var_access),e.exp);
                 }
             }
 
@@ -421,7 +421,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     switch (s->kind) {
         case A_stm_::A_expStm:{
             expty expty_msg = transExp(venv, tenv, s->u.expStm,l_break,l_continue);
-            // todo translate
+
             return Expty(expty_msg.exp, expty_msg.ty);
         }
         case A_stm_::A_ifStm:{
@@ -433,13 +433,13 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             body = transStm(frame, venv, tenv, s->u.ifStm.body,l_break,l_continue);
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody,l_break,l_continue);
-                // todo translate
+
                 if (body.ty != elseBody.ty){
                     EM_error(s->pos, "return different type in if statement");
                 }
                 return Expty(Tr_if_else(test.exp,body.exp,elseBody.exp), body.ty);
             }
-            // todo translate
+
             return Expty(Tr_if_else(test.exp,body.exp, nullptr), body.ty);
         }
         case A_stm_::A_whileStm:{
@@ -449,7 +449,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             }
             Tr_exp w_done=Tr_doneExp();
             Tr_exp w_init=Tr_initialExp();
-            // todo translate
             struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,l_break,l_continue);
             return Expty(Tr_while(test.exp,body.exp,w_done,w_init), body.ty);
         }
@@ -481,7 +480,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                     returnTy = transStm(frame, venv, tenv, comStmIter->head->stmSeq,l_break,l_continue);
                     save_temp.exp=Tr_seq(save_temp.exp,returnTy.exp);
                     /// 一个blockStm中可以有多处return
-                    // todo translate
                 }
             }
             S_endScope(tenv);
@@ -508,7 +506,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         "expression not of expected type %s",
                         TY_toString(var.ty));
             }
-            // todo translate
             return Expty(Tr_assign(var.exp,exp.exp), TY_Void());
         }
         case A_stm_::A_returnStm:{//to do translate  now translate it as put result in rv reg
@@ -516,7 +513,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                 return Expty(Tr_nopExp(), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
-            // todo 自建 translate
             return Expty(Tr_return(returnTy.exp), returnTy.ty);
         }
         case A_stm_::A_switchStm:{//not required in grammer
@@ -527,7 +523,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             A_caseList caseIter;
             for (caseIter = s->u.switchStm.body; caseIter; caseIter = caseIter->tail){
                 struct expty body = transStm(frame, venv, tenv, caseIter->head->body,l_break,l_continue);
-                // todo translate
             }
             return Expty(nullptr, TY_Void());
         }
@@ -576,7 +571,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 if (a->u.callExp.args->head->kind != A_exp_::A_stringExp){
                     EM_error(a->pos, "The first argument of putf must be a String");
                 }
-                // todo translate
+                // todo translate putf
                 return Expty(nullptr, TY_Void());
             }
             /// 检查参数类型
@@ -591,7 +586,6 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                             "incorrect type %s, expected %s",
                             TY_toString(argType.ty),
                             TY_toString(formals->head));
-                    /// todo translate
                 }
             }
             /// 检查参数个数
@@ -600,7 +594,6 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             }else if (argIter != nullptr){
                 EM_error(a->pos, "too many arguments!");
             }
-            // todo translate
             return Expty(Tr_func_call(funEntry->u.fun.label,params), actual_ty(funEntry->u.fun.result));
         }
         case A_exp_::A_opExp:{
@@ -650,7 +643,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                                  TY_toString(right.ty));
                     }
                     return Expty(Tr_binop(op,left.exp,right.exp), TY_Int());
-                    /// todo return op
+
                 }
                 case A_eq:
                 case A_ne:{
