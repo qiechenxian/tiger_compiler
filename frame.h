@@ -28,8 +28,11 @@ F_access F_allocGlobal();
 
 
 //Temp_temp /** Frame pointer */
-Temp_temp F_FP();
-Temp_temp F_RV();
+Temp_temp F_FP(void);
+Temp_temp F_SP(void);
+Temp_temp F_ZERO(void);
+Temp_temp F_RA(void);
+Temp_temp F_RV(void);
 int get_word_size();
 T_exp F_Exp(F_access acc, T_exp framePtr);
 F_accessList F_formals(F_frame f);

@@ -4,8 +4,11 @@
 #include "frame.h"
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
-static Temp_temp fp=NULL;
-static Temp_temp rv=NULL;
+static Temp_temp fp = NULL;
+static Temp_temp sp = NULL;
+static Temp_temp zero = NULL;
+static Temp_temp ra = NULL;
+static Temp_temp rv = NULL;
 
 //栈帧结构
 Temp_temp F_FP()//取帧指针
@@ -23,6 +26,26 @@ Temp_temp F_RV()//取帧指针
         rv=Temp_newTemp();
     }
     return rv;
+}
+Temp_temp F_SP(void) {
+    if (sp == NULL) {
+        sp = Temp_newTemp();
+    }
+    return sp;
+}
+
+Temp_temp F_ZERO(void) {
+    if (zero == NULL) {
+        zero = Temp_newTemp();
+    }
+    return zero;
+}
+
+Temp_temp F_RA(void) {
+    if (ra == NULL) {
+        ra = Temp_newTemp();
+    }
+    return ra;
 }
 /** class declare */
 struct F_access_{
