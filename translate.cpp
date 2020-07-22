@@ -64,9 +64,7 @@ static patchList joinPatch(patchList fList, patchList sList);
 
 Tr_frame Tr_root_frame(void)
 {
-    if (!root_frame)
-        root_frame = Tr_newFrame(Temp_newLabel(), nullptr);
-    return root_frame;
+    return nullptr;
 }
 /**
  * 构造函数

@@ -174,6 +174,13 @@ F_frag F_ProcFrag(T_stm body,F_frame frame)
     new_frag->kind=F_frag_::F_procFrag;
     new_frag->u.proc.body=body;
     new_frag->u.proc.frame=frame;
+    return new_frag;
+}
+F_frag F_GlobalFrag(Temp_temp label){
+    auto new_frag = (F_frag)checked_malloc(sizeof(F_frag_));
+    new_frag->kind = F_frag_::F_globalFrag;
+    new_frag->u.global.label = label;
+    return new_frag;
 }
 T_stm F_procEntryExitl(F_frame frame,T_stm stm)
 {
