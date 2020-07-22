@@ -7,7 +7,7 @@
 #include "prast.h"
 #include "cannon.h"
 using namespace std;
-static void doProc(FILE *out, F_frame frame, T_stm body)
+static void doProc(F_frame frame, T_stm body)
 {
     //AS_proc proc;
     //struct RA_result allocation;
@@ -42,7 +42,7 @@ c_string OUTPUT_FILE;
 
 int main(int argc, char **argv) {
 
-
+    F_fragList frags;
     /**
      * 参数处理 --loyx 2020/6/15
      */
@@ -84,12 +84,19 @@ int main(int argc, char **argv) {
     pr_decList(stderr, absyn_root, 0);
     fprintf(stderr, "\n");
 
-    SEM_transProgram(venv, tenv, absyn_root);
+    frags=SEM_transProgram(venv, tenv, absyn_root);
     fprintf(stderr, "\nsemantic check finish !\n");
-
+        for (;frags;frags=frags->tail){
+            if (frags->head->kind == F_frag_::F_procFrag)
+            {
+                doProc(frags->head->u.proc.frame, frags->head->u.proc.body);
+            }
+            //doProc(out, frags->head->u.proc.frame, frags->head->u.proc.body);
+            //else if (frags->head->kind == F_frag_::F_stringFrag)
+            //fprintf(out, "%s\n", frags->head->u.stringg.str);
+    }
     fprintf(stderr, "after semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
-
     return 0;
 }
 

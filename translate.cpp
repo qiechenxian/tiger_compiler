@@ -320,6 +320,10 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
     }
     T_exp left_exp=Tr_unEx(left);
     T_exp right_exp=Tr_unEx(right);
+    T_stm cond = T_Cjump(op, left_exp, right_exp, nullptr, nullptr);
+    patchList trues = PatchList(&cond->u.CJUMP.trues, nullptr);
+    patchList falses = PatchList(&cond->u.CJUMP.falses, nullptr);
+    return Tr_Cx(trues,falses,cond);
 }
 
 Tr_exp Tr_if_else(Tr_exp condition_part,Tr_exp then_part,Tr_exp else_part)//if_else语句

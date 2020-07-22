@@ -6,7 +6,7 @@
 #define COMPILER_LOYX_TEMP_H
 
 #include "symbol.h"
-
+#include "stdio.h"
 
 typedef struct Temp_temp_* Temp_temp;
 Temp_temp Temp_newTemp();

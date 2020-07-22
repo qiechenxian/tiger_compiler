@@ -35,7 +35,7 @@ struct T_stm_{
 };
 
 struct T_exp_{
-    enum {T_BINOP, T_MEM, T_TEMP, T_ESEQ, T_NAME, T_CONST, T_CALL}kind;
+    enum {T_BINOP, T_MEM, T_TEMP, T_ESEQ, T_NAME, T_CONST, T_CALL,T_RELOP}kind;
     union {
         struct {T_binOp op; T_exp left, right;}BINOP;
         T_exp MEM;
