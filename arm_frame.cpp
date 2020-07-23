@@ -171,23 +171,26 @@ F_access F_allocGlobal(S_symbol global){
 
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
 {
-    if (acc->kind==F_access_::inFrame)
-    {
-        return F_expWithIndex(acc, framePtr, 1);
+    switch (acc->kind) {
+        case F_access_::inFrame:
+            return F_expWithIndex(acc, framePtr, 0);
+        case F_access_::inReg:
+            return T_Temp(acc->u.reg);
+        case F_access_::inGlobal:
+            return T_Name(acc->u.global); /// 对于全局变量非数组返回T_Name
     }
-    return T_Temp(acc->u.reg);
 }
 
 T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
 /**
- * 该函数是为了访问栈中数组的index处的地址
- * @param acc
- * @param framePtr
- * @param index
+ * 该函数是为了访问栈中数组的index处的地址，注意此函数只在初始化时使用，index是数组拉平后的索引
+ * @param acc 数组的基址
+ * @param framePtr 栈基址
+ * @param index 数组拉平后的索引
  * @return T_Mem() 栈中 基址+offset+index 的位置
  */
 {
-    return T_Mem(T_Binop(T_add, framePtr, T_Const(acc->u.offset + index)));
+    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size()*(acc->u.offset + index))));
 }
 
 int get_word_size()
