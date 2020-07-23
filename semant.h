@@ -11,7 +11,18 @@
 #include "translate.h"
 
 
-struct expty {Tr_exp exp; TY_ty ty;bool isConst;};
+struct expty {
+    Tr_exp exp;
+    TY_ty ty;
+    bool isConst;
+
+    /**
+     * suffix_size是翻译数组访问时使用的
+     * 来源于INIT_initList->suffix_size
+     * suffix_size中的-1标志结尾
+     */
+    int* suffix_size;
+};
 struct expty Expty(Tr_exp exp, TY_ty ty);
 
 F_fragList SEM_transProgram(S_table venv, S_table tenv, A_decList program);

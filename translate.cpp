@@ -3,7 +3,6 @@
 //
 
 #include "translate.h"
-#include "tree.h"
 
 
 /**
@@ -226,30 +225,6 @@ Tr_expList Tr_ExpList(){
     p->first = nullptr;
     return p;
 }
-//void Tr_expList_append(Tr_expList list, Tr_exp exp){
-//    if (list->first){
-//        Tr_node node = (Tr_node)checked_malloc(sizeof(*node));
-//        node->exp = exp;
-//        node->next = NULL;
-//        list->last->next = node;
-//        list->last = list->last->next;
-//   } else{
-//        Tr_expList_prepend(list, exp);
-//    }
-//}
-//void Tr_expList_prepend(Tr_expList list, Tr_exp exp){
-//    if (list->first){
-//        Tr_node node = (Tr_node)checked_malloc(sizeof(*node));
-//        node->exp = exp;
-//        node->next = list->first;
-//        list->first = node;
-//    } else{
-//        list->first = (Tr_node)checked_malloc(sizeof(*list->first));
-//        list->first->exp = exp;
-//        list->first->next = NULL;
-//        list->last = list->first;
-//    }
-//}
 void Tr_expList_append(Tr_expList list, Tr_exp exp) {
     if(list->first==nullptr)
     {
@@ -287,11 +262,21 @@ Tr_exp Tr_simpleVar(Tr_access acc)
     return Tr_Ex(F_Exp(acc,tmp));
 }
 
-Tr_exp Tr_subsriptVar(Tr_exp base, Tr_exp offset) {
+Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
+{
     return Tr_Ex(T_Mem(
             T_Binop(T_add,Tr_unEx(base),
-                    T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size()))
+                    T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size()*dimension))
                     )));
+}
+
+Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
+{
+    return Tr_Ex(T_Binop(
+            T_add,
+            Tr_unEx(base),
+            T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size()*dimension))
+            ));
 }
 
 Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
@@ -303,20 +288,18 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
         case A_mul: op=T_mul;break;
         case A_div: op=T_div;break;
         case A_mod: op=T_mod;break;
-        default:
-        {printf("error from Tr_binop translate.c maybe something wrong wirh binop");
-            break;}
+        default: {
+            printf("error from Tr_binop translate.c maybe something wrong wirh binop");
+            assert(0);
+        }
     }
     if(op==T_add||op==T_sub||op==T_mul||op==T_div||op==T_mod)
     {
         return Tr_Ex(T_Binop(op,Tr_unEx(left),Tr_unEx(right)));
     }
-    else
-    {
-        printf("error:wrong with Tr_binop from translate.c");
-        return nullptr;
-    }
+    return Tr_Ex(T_Binop(op, Tr_unEx(left), Tr_unEx(right))); /// 简化了逻辑
 }
+
 
 Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
 {
@@ -483,7 +466,13 @@ Tr_exp Tr_if_else(Tr_exp condition_part,Tr_exp then_part,Tr_exp else_part)//if_e
     }
 }
 
-Tr_exp Tr_init_array(Tr_access base, Tr_INIT_initList init_info)//变量或数组声明带有初值sizes为数组长度信息 exps为
+Tr_exp Tr_init_array(Tr_access base, Tr_INIT_initList init_info)
+/**
+ * 栈内数组初始化翻译
+ * @param base 栈内数组的基地址(access)
+ * @param init_info 已翻译的初值
+ * @return T_Seq
+ */
 {
     T_exp frame_ptr = T_Temp(F_FP());
     int array_length=init_info->array_length;

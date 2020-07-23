@@ -17,6 +17,7 @@ struct expty Expty(Tr_exp exp, TY_ty ty){
     e.exp = exp;
     e.ty = ty;
     e.isConst = false;
+    e.suffix_size = nullptr;
     return e;
 }
 
@@ -810,15 +811,17 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                 struct expty expty_msg = Expty(nullptr, TY_Int());
                 return expty_msg;
             } else{
-
                 struct expty expty_msg = Expty(Tr_simpleVar(varEntry->u.var.access), actual_ty(varEntry->u.var.ty));
                 expty_msg.isConst = varEntry->u.var.isConst;
+                if (varEntry->u.var.cValues){
+                    /// 如果访问的变量是数组，则额外返回后缀和信息，供访问数组翻译时使用
+                    expty_msg.suffix_size = varEntry->u.var.cValues->u.arrayValue->suffix_size;
+                }
                 return expty_msg;
             }
         }
-        case A_var_::A_arrayVar:{//todo 确认array base index
+        case A_var_::A_arrayVar:{
             struct expty id = transVar(venv, tenv, v->u.arrayVar.id,l_break,l_continue);
-            // todo translate
             if (id.ty->kind != TY_ty_::TY_array){
                 EM_error(v->u.arrayVar.id->pos,
                         "subscripted value is neither array nor pointer nor vector");
@@ -829,8 +832,27 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                 if (index.ty->kind != TY_ty_::TY_int){
                     EM_error(v->u.arrayVar.index->pos, "index must be a int");
                 }
-                // todo translate
-                expty expty_msg = Expty(Tr_subsriptVar(id.exp,index.exp), actual_ty(id.ty->u.array));
+                expty expty_msg{};
+                if (id.suffix_size[1] != -1){
+                    /**
+                     * 通过suffix_size的后一位是否为-1，来判断数组是否访问到值
+                     * 例如对于 int a[2][4][3];
+                     * a[1][1][1] 最终翻译为T_MEM(...)
+                     * 而 a[1][1] 最终只翻译成地址的计算T_BinOp(...)
+                     */
+                    expty_msg = Expty(
+                            Tr_subscriptVarNoMem(id.exp,index.exp, id.suffix_size[0]),
+                            actual_ty(id.ty->u.array)
+                            );
+                } else{
+                    expty_msg = Expty(
+                            Tr_subscriptVar(id.exp, index.exp, id.suffix_size[0]),
+                            actual_ty(id.ty->u.array)
+                            );
+                }
+
+                /// suffix_size向后进一位，例如由[12, 3, 1, -1] -> [3, 1, -1]
+                expty_msg.suffix_size = id.suffix_size+1;
                 expty_msg.isConst = id.isConst && index.isConst;
                 return expty_msg;
             }
