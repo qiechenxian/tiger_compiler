@@ -185,6 +185,12 @@ Tr_accessList Tr_getFormals(Tr_frame frame){
 Tr_frame Tr_newFrame(Temp_label name, U_boolList formals){
     return F_newFrame(name, formals);
 }
+Temp_label Tr_getGlobalLabel(Tr_access access){
+    /**
+     * 从Tr_access中获取全局变量的label，该函数解耦了semant和frame
+     */
+    return F_getGlobalLabel(access);
+}
 
 
 /** 全局变量的frag */

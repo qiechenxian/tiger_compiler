@@ -100,6 +100,13 @@ static F_accessList F_AccessList(F_access head, F_accessList tail){
     return p;
 }
 
+Temp_label F_getGlobalLabel(F_access fa){
+    /**
+     * 为translate中的Tr_getGlobalLabel提供底层实现
+     */
+    assert(fa->kind == F_access_::inGlobal);
+    return fa->u.global;
+}
 
 /** 辅助函数 */
 static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
@@ -178,7 +185,8 @@ int get_word_size()
 F_accessList F_formals(F_frame f) {
     return f->formals;
 }
-//片段相关F_frag
+
+/// 片段相关F_frag
 F_fragList F_FragList(F_frag head,F_fragList tail)
 {
     F_fragList new_frag_list=(F_fragList)checked_malloc(sizeof(*new_frag_list));

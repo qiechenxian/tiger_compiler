@@ -25,6 +25,7 @@ Temp_label F_getName(F_frame frame);
 F_accessList F_getFormals(F_frame frame);
 F_access F_allocLocal(F_frame frame, bool escape);
 F_access F_allocGlobal(S_symbol global);
+Temp_label F_getGlobalLabel(F_access fa);
 
 
 //Temp_temp /** Frame pointer */

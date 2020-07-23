@@ -26,6 +26,7 @@ Tr_access Tr_allocLocal(Tr_frame frame, bool escape);
 Tr_access Tr_allocGlobal(S_symbol global);
 Tr_accessList Tr_getFormals(Tr_frame frame);
 Tr_accessList Tr_AccessList(Tr_access head, Tr_accessList tail);// 构造函数
+Temp_label Tr_getGlobalLabel(Tr_access access);
 
 
 /** 全局变量的frag */
