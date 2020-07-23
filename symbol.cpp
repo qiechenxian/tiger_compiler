@@ -5,7 +5,7 @@
 #include <string.h>
 #include "symbol.h"
 #include "table.h"
-
+#include "stdio.h"
 struct S_symbol_{c_string name; S_symbol next;};
 static S_symbol newSymbol(c_string name, S_symbol next){
     S_symbol s = (S_symbol)checked_malloc(sizeof(*s));
@@ -60,5 +60,7 @@ void S_endScope(S_table t){
 }
 c_string S_name(S_symbol sym)
 {
+    if(sym== nullptr)
+    {printf("error_______________null");}
     return sym->name;
 }

@@ -519,6 +519,7 @@ Tr_exp Tr_continue(Tr_exp initial)
 }
 Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue)
 {
+    Temp_label while_t=nullptr;
     Temp_label while_f=nullptr;
     Temp_label while_i=nullptr;
     if(w_break==nullptr)
@@ -535,7 +536,11 @@ Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue)
     {
         while_i=Tr_unEx(w_continue)->u.NAME;
     }
+    while_t=Temp_newLabel();
+
     struct Cx cx_condi=Tr_unCx(w_cond);
+    doPatch(cx_condi.trues,while_t);
+    doPatch(cx_condi.falses,while_f);
     T_stm body_stm=nullptr;
     switch (w_stmt->kind)
     {
@@ -548,10 +553,10 @@ Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue)
             body_stm=Tr_unNx(w_stmt);
             body_stm=T_Seq(T_Label(while_i),
                     T_Seq(cx_condi.stm,
-                            T_Seq(body_stm,
-                                    T_Seq(T_Jump(T_Name(while_i),
-                                            Temp_LabelList(while_i,nullptr)),
-                                                    T_Label(while_f)))));
+                            T_Seq(T_Label(while_t),T_Seq(body_stm,
+                                         T_Seq(T_Jump(T_Name(while_i),
+                                                      Temp_LabelList(while_i,nullptr)),
+                                               T_Label(while_f)))) ));
             break;
         }
     }
@@ -589,7 +594,11 @@ Tr_exp Tr_return(Tr_exp ret_num)
     return Tr_Nx(T_Move(tmp,Tr_unEx(ret_num)));
 }
 //todo return jump label in chapter 12
-
+Tr_exp Tr_newlabel()
+{
+    Temp_label new_l=Temp_newLabel();
+    return Tr_Ex(T_Name(new_l));
+}
 F_fragList Tr_getResult(void)
 {
     return fragList;

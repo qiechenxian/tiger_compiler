@@ -450,13 +450,15 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             Tr_exp w_done=Tr_doneExp();
             Tr_exp w_init=Tr_initialExp();
             // todo translate
-            struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,l_break,l_continue);
+            Tr_exp save_break=Tr_newlabel();
+            Tr_exp save_conti=Tr_newlabel();
+            struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,save_break,save_conti);//trans之前应生成while的break与continue  label
             return Expty(Tr_while(test.exp,body.exp,w_done,w_init), body.ty);
         }
         case A_stm_::A_blockStm:{
             if (!s->u.blockStm)
                 return Expty(nullptr, TY_Void());
-
+            bool initial_tag= true;
             struct expty returnTy{};
             struct expty save_temp;
             S_beginScope(tenv);
@@ -468,9 +470,10 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                     A_decList decIter = comStmIter->head->const_var_decStm;
                     for ( ; decIter; decIter = decIter->tail){
                         temp=transDec(frame, venv, tenv, decIter->head,l_break,l_continue);
-                        if(save_temp.exp == nullptr)
+                        if(initial_tag == true)
                         {
                             save_temp.exp=temp;
+                            initial_tag=false;
                         } else
                         {
                             save_temp.exp=Tr_seq(save_temp.exp,temp);

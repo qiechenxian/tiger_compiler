@@ -66,6 +66,7 @@ Tr_exp Tr_func_call(Temp_label name,Tr_expList params);
 Tr_exp Tr_assign(Tr_exp left,Tr_exp right);
 Tr_exp Tr_seq(Tr_exp left,Tr_exp right);
 Tr_exp Tr_return(Tr_exp ret_num);
+Tr_exp Tr_newlabel();
 Tr_frame Tr_root_frame();
 F_fragList Tr_getResult();
 void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals);

@@ -6,6 +6,8 @@
 #include "env.h"
 #include "prast.h"
 #include "cannon.h"
+#include "print_ir_tree.h"
+
 using namespace std;
 static void doProc(F_frame frame, T_stm body)
 {
@@ -77,15 +79,13 @@ int main(int argc, char **argv) {
 
     S_table tenv = E_base_typeEntry();
     S_table venv = E_base_valueEntry(tenv);
-
     yyparse();
-
     fprintf(stderr, "before semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
     fprintf(stderr, "\n");
 
     frags=SEM_transProgram(venv, tenv, absyn_root);
-
+    printStmList(frags);
     fprintf(stderr, "\nsemantic check finish !\n");
         for (;frags;frags=frags->tail){
             if (frags->head->kind == F_frag_::F_procFrag)

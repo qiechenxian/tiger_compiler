@@ -6,5 +6,6 @@
 #define COMPILER_DEV_CPP_PRINT_IR_TREE_H
 #include "tree.h"
 #include "temp.h"
-void printStmList (T_stmList stmList) ;
+#include "frame.h"
+void printStmList ( F_fragList stmList);
 #endif //COMPILER_DEV_CPP_PRINT_IR_TREE_H

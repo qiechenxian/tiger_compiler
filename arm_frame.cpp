@@ -138,7 +138,7 @@ F_access F_allocGlobal(){
 
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
 {
-    if (acc->kind ==F_access_::inFrame )
+    if (acc->kind==F_access_::inFrame)
     {
         return T_Mem(T_Binop(T_add, framePtr, T_Const(acc->u.offset)));
     }
