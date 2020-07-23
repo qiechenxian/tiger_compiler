@@ -218,10 +218,12 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                          S_getName(d->u.array.base));
             }
             Tr_access var_access;
-            if (frame)
+            if (frame) {
                 var_access = Tr_allocLocal(frame, true);
-            else
-                var_access = Tr_allocGlobal();
+            }
+            else {
+                var_access = Tr_allocGlobal(d->u.array.id);
+            }
 
             /** 根据数组纬度生成对应的类型， 相当于一个匿名typedef variableDec */
             int lens = 0;
@@ -305,12 +307,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 EM_error(d->pos, "unknown type name \'%s\'",
                         S_getName(d->u.var.type));
             }
-            //Tr_access var_access = Tr_allocLocal(frame, d->u.var.escape); todo escape
             Tr_access var_access;
-            if (frame)
+            if (frame){
                 var_access = Tr_allocLocal(frame, true);
-            else
-                var_access = nullptr; // todo global var const var
+            }
+            else{
+                var_access = Tr_allocGlobal(d->u.var.id);
+            }
 
             /// 该变量声明的在符号表中的基本条目
             E_envEntry varEntry = E_VarEntry(d->u.var.isConst, var_access, type);
@@ -325,6 +328,16 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
 
+                if (not frame){
+                    /// 无frame表示此变量为全局变量
+
+                    // 全局变量的初值必须为常数表达式，此处前端保证优化为常数
+                    assert(d->u.var.init->kind == A_exp_::A_intExp);
+                    Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp);
+
+                    /// 对于全局变量的翻译已归frag管理，无需翻译为ir
+                    return Tr_nopExp();
+                }
 
                 if (d->u.var.isConst){
                     /**
@@ -349,9 +362,18 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 }
             }
 
-            /// 没有初值
+            /** 无初值情况 */
+
+            /// 无初值的全局变量
+            if (not frame){
+                Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0);
+                return Tr_nopExp();
+            }
+
+            /// 无初值的const变量
             if (d->u.var.isConst) varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
             S_enter(venv, d->u.var.id, varEntry);
+
             return Tr_nopExp(); // no init value just allocl momery
         }
         case A_dec_::A_functionDec:{
