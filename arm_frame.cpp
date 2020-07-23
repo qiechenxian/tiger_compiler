@@ -149,8 +149,8 @@ Temp_label F_getName(F_frame frame){
 F_accessList F_getFormals(F_frame frame){
     return frame->formals;
 }
-F_access F_allocLocal(F_frame frame, bool escape){
-    frame->local_count++;
+F_access F_allocLocal(F_frame frame, bool escape, int size){
+    frame->local_count += size;
     F_access access;
     if (escape) {
         access=InFrame(F_WORD_SIZE  * (- frame->local_count));
@@ -221,4 +221,28 @@ F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values){
 T_stm F_procEntryExit1(F_frame frame,T_stm stm)
 {
     return stm;//中间代码阶段的虚实现
+}
+
+static Temp_tempList returnSink = NULL;
+
+/*
+ * 告诉寄存器分分配时过程的出口那些寄存器是活跃的，例如临时变量0，返回地址，栈指针，调用者保护的寄存器
+ */
+AS_instrList F_procEntryExit2(AS_instrList body) {
+    Temp_tempList calleeSaves = NULL;
+    if (!returnSink)
+        returnSink = Temp_TempList(F_ZERO(),
+                                   Temp_TempList(F_RA(),
+                                                 Temp_TempList(F_SP(), calleeSaves)));
+    return AS_splice(body, AS_InstrList(
+            AS_Oper("", NULL, returnSink, NULL), NULL));
+}
+
+/*
+ *
+ */
+AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
+    char buf[100];
+    sprintf(buf, "PROCEDURE %s\n", S_name(frame->name));
+    return AS_Proc(String(buf), body, "END\n");
 }

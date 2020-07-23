@@ -54,4 +54,8 @@ F_frag F_StringFrag(Temp_label label,c_string str);
 F_frag F_ProcFrag(T_stm body,F_frame frame);
 F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values);
 
+
+T_stm F_procEntryExit1(F_frame frame, T_stm stm);
+AS_instrList F_procEntryExit2(AS_instrList body);
+AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
 #endif //COMPILER_LOYX_FRAME_H
