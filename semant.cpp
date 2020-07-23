@@ -261,12 +261,12 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             if (d->u.array.init != nullptr){
 
                 INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);//这下弄中间代码舒服了
+
                 //将init_list中的A_EXP转换为中间代码形式并保存
-                int i;
                 auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-                init_list_tr->array_length=init_list->suffix_size[0];
-                init_list_tr->array=(Tr_exp*)checked_malloc(init_list->suffix_size[0]*sizeof(Tr_exp));
-                for(i=0;i<init_list->suffix_size[0];i++)
+                init_list_tr->array_length=init_list->total_size;
+                init_list_tr->array=(Tr_exp*)checked_malloc(init_list->total_size*sizeof(Tr_exp));
+                for(int i=0;i < init_list->total_size;i++)
                 {
                     struct expty temp=transExp(venv,tenv,init_list->array[i],l_break,l_continue);;
                     init_list_tr->array[i]=temp.exp;
@@ -286,6 +286,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                             array_total_size,
                             INIT_shrinkInitList(init_list)
                             );
+                    S_enter(venv, d->u.array.id, arrayEntry);
                     return Tr_nopExp();
                 }
 
@@ -295,16 +296,15 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                      */
                     arrayEntry->u.var.cValues = E_ArrayValue(init_list);
                     S_enter(venv, d->u.array.id, arrayEntry);
-                    return Tr_init_Var(init_list_tr);
+                    return Tr_init_array(var_access, init_list_tr); // todo 优化项：当常数数组只有常量访问时，无需初始化
                 } else{
                     /**
                      * 非常量数组初值处理
                      */
                     S_enter(venv, d->u.array.id, arrayEntry);
-                    return Tr_init_Var(init_list_tr); // todo translate
+                    return Tr_init_array(var_access, init_list_tr);
                 }
             }
-
 
             /** 无初值情况*/
 
@@ -319,6 +319,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                         array_total_size,
                         shrink_zeros
                         );
+                S_enter(venv, d->u.array.id, arrayEntry);
                 return Tr_nopExp();
             }
 
@@ -328,13 +329,21 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                  */
                 INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
                 arrayEntry->u.var.cValues = E_ArrayValue(null_init);
+
+                auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
+                init_list_tr->array_length=null_init->total_size;
+                init_list_tr->array=(Tr_exp*)checked_malloc(null_init->total_size*sizeof(Tr_exp));
+                for(int i=0;i < null_init->total_size;i++)
+                {
+                    struct expty temp=transExp(venv,tenv,null_init->array[i],l_break,l_continue);;
+                    init_list_tr->array[i]=temp.exp;
+                }
+
+                return Tr_init_array(var_access, init_list_tr);
             }
-            INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);
-            auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-            init_list_tr->array_length=init_list->suffix_size[0];
-            init_list_tr->array= nullptr;
+
             S_enter(venv, d->u.array.id, arrayEntry);
-            return Tr_init_Var(init_list_tr);//todo address delivery in codeselect
+            return Tr_nopExp(); /// 如果是普通数组则只需要在栈内分配空间即可
         }
         case A_dec_::A_variableDec:{
 
@@ -374,6 +383,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp);
 
                     /// 对于全局变量的翻译已归frag管理，无需翻译为ir
+                    S_enter(venv, d->u.var.id, varEntry);
                     return Tr_nopExp();
                 }
 
@@ -405,13 +415,14 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             /// 无初值的全局变量
             if (not frame){
                 Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0);
+                S_enter(venv, d->u.var.id, varEntry);
                 return Tr_nopExp();
             }
 
             /// 无初值的const变量
             if (d->u.var.isConst) varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
-            S_enter(venv, d->u.var.id, varEntry);
 
+            S_enter(venv, d->u.var.id, varEntry);
             return Tr_nopExp(); // no init value just allocl momery
         }
         case A_dec_::A_functionDec:{

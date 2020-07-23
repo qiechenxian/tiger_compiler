@@ -37,6 +37,7 @@ Temp_temp F_RA(void);
 Temp_temp F_RV(void);
 int get_word_size();
 T_exp F_Exp(F_access acc, T_exp framePtr);
+T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index);
 F_accessList F_formals(F_frame f);
 
 //F_frag片段信息相关
