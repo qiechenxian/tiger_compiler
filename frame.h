@@ -8,6 +8,7 @@
 #include "util.h"
 #include "temp.h"
 #include "tree.h"
+#include "assem.h"
 
 /** 架构参数 */
 
@@ -58,4 +59,7 @@ F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values);
 T_stm F_procEntryExit1(F_frame frame, T_stm stm);
 AS_instrList F_procEntryExit2(AS_instrList body);
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
+
+
+extern Temp_map F_tempMap;
 #endif //COMPILER_LOYX_FRAME_H

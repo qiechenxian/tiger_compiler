@@ -2,6 +2,7 @@
 // Created by loyx on 2020/5/10.
 //
 #include "frame.h"
+
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
 static Temp_temp fp = NULL;
@@ -246,3 +247,6 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     sprintf(buf, "PROCEDURE %s\n", S_name(frame->name));
     return AS_Proc(String(buf), body, "END\n");
 }
+
+
+Temp_map F_tempMap = NULL;
