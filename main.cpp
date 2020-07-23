@@ -24,6 +24,8 @@ static void doProc(F_frame frame, T_stm body)
 
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList));
+    printcannoList (stmList);
+
 
     //fprintf(out,"111");
     /* printStmList(stdout, stmList);*/

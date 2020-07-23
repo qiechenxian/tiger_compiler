@@ -128,7 +128,7 @@ static void pr_tree_exp(FILE *out, T_exp exp, int d)
 
 void printStmList ( F_fragList stmList)
 {
-    printf("---------------IR TREE PRINTF START---------------\n");
+    printf("↓---------------IR TREE PRINTF START---------------↓\n");
     if(out==nullptr)
     {
         printf("File open false");
@@ -136,5 +136,18 @@ void printStmList ( F_fragList stmList)
     for (; stmList; stmList=stmList->tail) {
         pr_stm(out, stmList->head->u.proc.body,0);
     }
-    printf("\n---------------IR TREE PRINTF OVER---------------\n");
+    printf("\n↑---------------IR TREE PRINTF OVER---------------↑\n");
+}
+void printcannoList ( T_stmList stmList)
+{
+    printf("↓---------------IR TREE AFTER CANNO PRINTF START---------------↓\n");
+    if(out==nullptr)
+    {
+        printf("File open false");
+    }
+    for (; stmList; stmList=stmList->tail) {
+        pr_stm(out, stmList->head,0);
+        printf("\n----dived line----\n");
+    }
+    printf("\n↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑\n");
 }

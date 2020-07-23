@@ -2,14 +2,14 @@
 // Created by loyx on 2020/5/10.
 //
 #include "frame.h"
-
+#include "assem.h"
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
 static Temp_temp fp = nullptr;
-static Temp_temp sp = NULL;
-static Temp_temp zero = NULL;
-static Temp_temp ra = NULL;
-static Temp_temp rv = NULL;
+static Temp_temp sp = nullptr;
+static Temp_temp zero = nullptr;
+static Temp_temp ra = nullptr;
+static Temp_temp rv = nullptr;
 
 //栈帧结构
 Temp_temp F_FP()//取帧指针
@@ -22,28 +22,28 @@ Temp_temp F_FP()//取帧指针
 }
 Temp_temp F_RV()//取帧指针
 {
-    if(rv==NULL)
+    if(rv==nullptr)
     {
         rv=Temp_newTemp();
     }
     return rv;
 }
 Temp_temp F_SP(void) {
-    if (sp == NULL) {
+    if (sp == nullptr) {
         sp = Temp_newTemp();
     }
     return sp;
 }
 
 Temp_temp F_ZERO(void) {
-    if (zero == NULL) {
+    if (zero == nullptr) {
         zero = Temp_newTemp();
     }
     return zero;
 }
 
 Temp_temp F_RA(void) {
-    if (ra == NULL) {
+    if (ra == nullptr) {
         ra = Temp_newTemp();
     }
     return ra;
@@ -111,11 +111,11 @@ Temp_label F_getGlobalLabel(F_access fa){
 
 /** 辅助函数 */
 static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
-    F_accessList access_list = NULL, list_tail = NULL;
+    F_accessList access_list = nullptr, list_tail = nullptr;
     int args_inReg_cnt = 0;
     for (U_boolList iter = formals; iter; iter = iter->tail){
 //        assert(iter->head); // todo escape
-        F_access access = NULL;
+        F_access access = nullptr;
         if (args_inReg_cnt <= F_K&&(iter->head==false)&&false){//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
             access = InReg(Temp_newTemp());
             args_inReg_cnt++;
@@ -124,10 +124,10 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
             access = InFrame((1 + args_inReg_cnt) * F_WORD_SIZE);//
         }
         if (access_list){
-            list_tail->tail = F_AccessList(access, NULL);
+            list_tail->tail = F_AccessList(access, nullptr);
             list_tail = list_tail->tail;
         } else{
-            access_list = F_AccessList(access, NULL);
+            access_list = F_AccessList(access, nullptr);
             list_tail = access_list;
         }
     }
@@ -141,7 +141,7 @@ F_frame F_newFrame(Temp_label name, U_boolList formals){
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
     f->local_count = 0;
-    f->locals=NULL;
+    f->locals=nullptr;
     return f;
 }
 Temp_label F_getName(F_frame frame){
@@ -224,19 +224,19 @@ T_stm F_procEntryExit1(F_frame frame,T_stm stm)
     return stm;//中间代码阶段的虚实现
 }
 
-static Temp_tempList returnSink = NULL;
+static Temp_tempList returnSink = nullptr;
 
 /*
  * 告诉寄存器分分配时过程的出口那些寄存器是活跃的，例如临时变量0，返回地址，栈指针，调用者保护的寄存器
  */
 AS_instrList F_procEntryExit2(AS_instrList body) {
-    Temp_tempList calleeSaves = NULL;
+    Temp_tempList calleeSaves = nullptr;
     if (!returnSink)
         returnSink = Temp_TempList(F_ZERO(),
                                    Temp_TempList(F_RA(),
                                                  Temp_TempList(F_SP(), calleeSaves)));
     return AS_splice(body, AS_InstrList(
-            AS_Oper("", NULL, returnSink, NULL), NULL));
+            AS_Oper("", nullptr, returnSink, nullptr), nullptr));
 }
 
 /*
@@ -249,4 +249,4 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 }
 
 
-Temp_map F_tempMap = NULL;
+Temp_map F_tempMap = nullptr;
