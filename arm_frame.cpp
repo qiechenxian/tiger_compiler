@@ -152,9 +152,8 @@ F_accessList F_getFormals(F_frame frame){
 }
 F_access F_allocLocal(F_frame frame, bool escape, int size){
     frame->local_count += size;
-    F_access access;
     if (escape) {
-        access=InFrame(F_WORD_SIZE  * (- frame->local_count));
+        F_access access=InFrame(F_WORD_SIZE  * (- frame->local_count));
         frame->locals=F_AccessList(access,frame->locals);
         return access;
     }
@@ -174,9 +173,21 @@ T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
 {
     if (acc->kind==F_access_::inFrame)
     {
-        return T_Mem(T_Binop(T_add, framePtr, T_Const(acc->u.offset)));
+        return F_expWithIndex(acc, framePtr, 1);
     }
-    return  T_Temp(acc->u.reg);
+    return T_Temp(acc->u.reg);
+}
+
+T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
+/**
+ * 该函数是为了访问栈中数组的index处的地址
+ * @param acc
+ * @param framePtr
+ * @param index
+ * @return T_Mem() 栈中 基址+offset+index 的位置
+ */
+{
+    return T_Mem(T_Binop(T_add, framePtr, T_Const(acc->u.offset + index)));
 }
 
 int get_word_size()

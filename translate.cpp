@@ -426,7 +426,6 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
         default:
             printf("error from Tr_binop translate.c maybe something wrong wirh relop");
             assert(0);
-            break;
     }
     T_exp left_exp=Tr_unEx(left);
     T_exp right_exp=Tr_unEx(right);
@@ -484,38 +483,20 @@ Tr_exp Tr_if_else(Tr_exp condition_part,Tr_exp then_part,Tr_exp else_part)//if_e
     }
 }
 
-Tr_exp Tr_dec_Var(Tr_expList exps,int size)//变量或数组声明无初值
+Tr_exp Tr_init_array(Tr_access base, Tr_INIT_initList init_info)//变量或数组声明带有初值sizes为数组长度信息 exps为
 {
-    Temp_temp dec_var_r=Temp_newTemp();
-    T_exp pointer=T_Call(T_Name(Temp_namedLabel((char*)"init_var")),
-            T_ExpList(T_Const(size*get_word_size()),nullptr));//调用外部函数，应该是汇编实现
-    T_stm dec_var=T_Move(T_Temp(dec_var_r),pointer);
-    return Tr_Ex(T_Eseq(dec_var,T_Temp(dec_var_r)));
-}
+    T_exp frame_ptr = T_Temp(F_FP());
+    int array_length=init_info->array_length;
+    T_stm init_var = T_Move(F_expWithIndex(base, frame_ptr, 0), Tr_unEx(init_info->array[0]));
 
-Tr_exp Tr_init_Var(Tr_INIT_initList int_info)//变量或数组声明带有初值sizes为数组长度信息 exps为
-{
-    int array_length=int_info->array_length;
-    T_stm init_var;
-    Temp_temp dec_var_r=Temp_newTemp();
-    T_exp pointer=T_Call(T_Name(Temp_namedLabel((char*)"init_var")),T_ExpList(T_Const(array_length),nullptr));//调用外部函数，汇编实现数组空间分配
-    T_stm arr_base_address=T_Move(T_Temp(dec_var_r),pointer);//返回基址地址
-    init_var=arr_base_address;
-    if(int_info->array== nullptr)
+    for(int i=1;i<array_length;i++)
     {
-        for(int i=0;i<array_length;i++)
-        {
-            init_var=T_Seq(init_var,T_Move(T_Mem(T_Binop(T_add,T_Const(i*get_word_size()),T_Temp(dec_var_r))),T_Const(0)));
-        }
-        return Tr_Nx(init_var);
-    } else
-    {
-        for(int i=0;i<array_length;i++)
-        {
-            init_var=T_Seq(init_var,T_Move(T_Mem(T_Binop(T_add,T_Const(i*get_word_size()),T_Temp(dec_var_r))),Tr_unEx(int_info->array[i])));
-        }
-        return Tr_Nx(init_var);
+        init_var = T_Seq(
+                init_var,
+                T_Move(F_expWithIndex(base, frame_ptr, i), Tr_unEx(init_info->array[i]))
+                );
     }
+    return Tr_Nx(init_var);
 }
 Tr_exp Tr_doneExp() {
     return Tr_Ex(T_Name(Temp_newLabel()));
