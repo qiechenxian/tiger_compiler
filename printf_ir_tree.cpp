@@ -24,11 +24,10 @@ static void indent(FILE *out, int d) {
 }
 
 static char bin_oper[][12] = {
-        "PLUS", "MINUS", "TIMES", "DIVIDE",
-        "AND", "OR", "LSHIFT", "RSHIFT", "ARSHIFT", "XOR"};
+        "T_BINOP", "T_MEM", "T_TEMP", "T_ESEQ", "T_NAME", "T_CONST", "T_CALL","T_RELOP"};
 
 static char rel_oper[][12] = {
-        "EQ", "NE", "LT", "GT", "LE", "GE", "ULT", "ULE", "UGT", "UGE"};
+        "T_lt", "T_le", "T_gt", "T_ge", "T_eq", "T_ne","T_not","T_and", "T_or"};
 
 static void pr_stm(FILE *out, T_stm stm, int d)
 {
