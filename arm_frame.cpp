@@ -155,8 +155,11 @@ F_access F_allocLocal(F_frame frame, bool escape){
         return InReg(Temp_newTemp());
     }
 }
-F_access F_allocGlobal(){
-    return InGlobal(Temp_newLabel());
+F_access F_allocGlobal(S_symbol global){
+    /**
+     * 仅返回一个全局变量的label
+     */
+    return InGlobal((Temp_label)global);
 }
 
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
@@ -199,13 +202,15 @@ F_frag F_ProcFrag(T_stm body,F_frame frame)
     new_frag->u.proc.frame=frame;
     return new_frag;
 }
-F_frag F_GlobalFrag(Temp_label label){
+F_frag F_GlobalFrag(Temp_label label, int size, int *init_values){
     auto new_frag = (F_frag)checked_malloc(sizeof(F_frag_));
     new_frag->kind = F_frag_::F_globalFrag;
     new_frag->u.global.label = label;
+    new_frag->u.global.size = size;
+    new_frag->u.global.init_values = init_values;
     return new_frag;
 }
-T_stm F_procEntryExitl(F_frame frame,T_stm stm)
+T_stm F_procEntryExit1(F_frame frame,T_stm stm)
 {
     return stm;//中间代码阶段的虚实现
 }

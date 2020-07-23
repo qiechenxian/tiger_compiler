@@ -24,7 +24,7 @@ F_frame F_newFrame(Temp_label name, U_boolList formals);
 Temp_label F_getName(F_frame frame);
 F_accessList F_getFormals(F_frame frame);
 F_access F_allocLocal(F_frame frame, bool escape);
-F_access F_allocGlobal();
+F_access F_allocGlobal(S_symbol global);
 
 
 //Temp_temp /** Frame pointer */
@@ -43,13 +43,14 @@ struct F_frag_{
     union {
         struct{Temp_label label; c_string str;}stringg;
         struct{T_stm body;F_frame frame;}proc;
-        struct {Temp_label label; /**todo 缺少初值*/}global;
+        struct {Temp_label label; int size; int* init_values;}global;
+        /// 假设没有int a[1]这种东西 --loyx 2020/7/22
     }u;
 };
 struct F_fragList_{F_frag head;F_fragList tail;};
 F_fragList F_FragList(F_frag head,F_fragList tail);
 F_frag F_StringFrag(Temp_label label,c_string str);
 F_frag F_ProcFrag(T_stm body,F_frame frame);
-F_frag F_GlobalFrag(Temp_label label);
+F_frag F_GlobalFrag(Temp_label label, int size, int* init_values);
 
 #endif //COMPILER_LOYX_FRAME_H
