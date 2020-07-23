@@ -14,6 +14,10 @@ static int temps = 100;
 Temp_temp Temp_newTemp() {
     Temp_temp p = (Temp_temp) checked_malloc(sizeof(*p));
     p->num = temps++;
+    {char temp_inform[16];
+        sprintf(temp_inform, "%d", p->num);
+        Temp_enter(Temp_name(), p, String(temp_inform));
+    }
     return p;
 }
 
@@ -54,7 +58,7 @@ struct Temp_map_ {
 };
 
 Temp_map Temp_name(void) {
-    static Temp_map m = NULL;
+    static Temp_map m = nullptr;
     if (!m) m = Temp_empty();
     return m;
 }
