@@ -1,10 +1,10 @@
-int a;
+
+int func(int p){
+    p = p - 1;
+    return p;
+}
 int main(){
-    int a;
-    int b = a;
-    while (a){
-        int b = 2;
-        a = a + b;
-    }
-    return 0;
+    int b=5;
+    b = func(b);
+    return b;
 }

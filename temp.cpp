@@ -20,6 +20,16 @@ Temp_temp Temp_newTemp() {
     }
     return p;
 }
+Temp_temp Temp_new_special(c_string s)
+{
+    Temp_temp p = (Temp_temp) checked_malloc(sizeof(*p));
+
+    {char temp_inform[16];
+        sprintf(temp_inform, "%s", s);
+        Temp_enter(Temp_name(), p, String(temp_inform));
+    }
+    return p;
+}
 
 static int label = 0;
 

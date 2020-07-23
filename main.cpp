@@ -104,6 +104,7 @@ int main(int argc, char **argv) {
             //else if (frags->head->kind == F_frag_::F_stringFrag)
             //fprintf(out, "%s\n", frags->head->u.stringg.str);
     }
+
     fprintf(stderr, "after semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
     return 0;

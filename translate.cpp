@@ -304,10 +304,10 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
         case A_div: op=T_div;break;
         case A_mod: op=T_mod;break;
         default:
-            printf("error from Tr_binop translate.c maybe something wrong wirh binop");
-            break;
+        {printf("error from Tr_binop translate.c maybe something wrong wirh binop");
+            break;}
     }
-    if(op==T_add||op==T_sub||op==T_mul||op==T_div||op==T_mod||op==T_and||op==T_or)
+    if(op==T_add||op==T_sub||op==T_mul||op==T_div||op==T_mod)
     {
         return Tr_Ex(T_Binop(op,Tr_unEx(left),Tr_unEx(right)));
     }
@@ -599,4 +599,10 @@ Tr_exp Tr_newlabel()
 F_fragList Tr_getResult(void)
 {
     return fragList;
+}
+Tr_exp  Tr_add_fuc_head_label(Tr_exp returnValue,Temp_label fun_label)
+{
+     T_stm temp= Tr_unNx(returnValue);
+     temp=T_Seq(T_Label(fun_label),temp);
+     return Tr_Nx(temp);
 }

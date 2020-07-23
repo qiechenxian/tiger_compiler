@@ -32,4 +32,5 @@ void Temp_enter(Temp_map m, Temp_temp t, c_string s);
 c_string Temp_look(Temp_map m, Temp_temp t);
 void Temp_dumpMap(FILE *out, Temp_map m);
 Temp_map Temp_name(void);
+Temp_temp Temp_new_special(c_string s);
 #endif //COMPILER_LOYX_TEMP_H

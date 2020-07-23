@@ -73,6 +73,7 @@ Tr_exp Tr_return(Tr_exp ret_num);
 Tr_exp Tr_newlabel();
 Tr_frame Tr_root_frame();
 F_fragList Tr_getResult();
+Tr_exp  Tr_add_fuc_head_label(Tr_exp returnValue,Temp_label fun_label);
 void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals);
 
 #endif //COMPILER_LOYX_TRANSLATE_H

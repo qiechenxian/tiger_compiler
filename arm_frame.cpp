@@ -16,7 +16,9 @@ Temp_temp F_FP()//取帧指针
 {
     if(fp==nullptr)
     {
-        fp=Temp_newTemp();
+        char save[5];
+        sprintf(save, "%s", "FP");
+        fp=Temp_new_special(save);
     }
     return fp;
 }
@@ -24,7 +26,9 @@ Temp_temp F_RV()//取帧指针
 {
     if(rv==nullptr)
     {
-        rv=Temp_newTemp();
+        char save[5];
+        sprintf(save, "%s", "RV");
+        rv=Temp_new_special(save);
     }
     return rv;
 }
@@ -190,7 +194,7 @@ T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
  * @return T_Mem() 栈中 基址+offset+index 的位置
  */
 {
-    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size()*index + acc->u.offset))));
+    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size()*index + acc->u.offset)));
 }
 
 int get_word_size()

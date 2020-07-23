@@ -98,8 +98,7 @@ static void pr_tree_exp(FILE *out, T_exp exp, int d)
             break;
         case T_exp_::T_TEMP:
             indent(out,d);
-            printf( "TEMP t%s",
-                                   Temp_look(Temp_name(), exp->u.TEMP));
+            printf( "TEMP t%s",Temp_look(Temp_name(), exp->u.TEMP));
             break;
         case T_exp_::T_ESEQ:
             indent(out,d);

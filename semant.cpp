@@ -461,6 +461,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             }
                 /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body,l_break,l_continue);
+            returnValue.exp =Tr_add_fuc_head_label(returnValue.exp,fun_label);
                 /// 检查返回值
             if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
                 EM_error(d->u.function.body->pos,
@@ -541,7 +542,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                     A_decList decIter = comStmIter->head->const_var_decStm;
                     for ( ; decIter; decIter = decIter->tail){
                         temp=transDec(frame, venv, tenv, decIter->head,l_break,l_continue);
-                        if(initial_tag == true)
+                        if(true==initial_tag)
                         {
                             save_temp.exp=temp;
                             initial_tag=false;
@@ -553,7 +554,14 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                 }
                 if (comStmIter->head->stmSeq){
                     returnTy = transStm(frame, venv, tenv, comStmIter->head->stmSeq,l_break,l_continue);
-                    save_temp.exp=Tr_seq(save_temp.exp,returnTy.exp);
+                    if(true==initial_tag)
+                    {
+                        save_temp.exp=returnTy.exp;
+                        initial_tag=false;
+                    } else
+                    {
+                        save_temp.exp=Tr_seq(save_temp.exp,returnTy.exp);
+                    }
                     /// 一个blockStm中可以有多处return
                     // todo translate
                 }
