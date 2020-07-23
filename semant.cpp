@@ -309,8 +309,8 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             if (not frame){
                 /// 全局数组无初始化，默认全0
 
-                int* shrink_zeros = (int*)checked_malloc(sizeof(int));
-                *shrink_zeros = 0;
+                U_intPair pair = U_IntPair(array_total_size, 0);
+                U_pairList shrink_zeros = U_PairList(pair, nullptr);
 
                 Tr_newArrayFrag(
                         Tr_getGlobalLabel(var_access),

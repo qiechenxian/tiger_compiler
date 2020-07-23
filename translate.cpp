@@ -195,12 +195,11 @@ Temp_label Tr_getGlobalLabel(Tr_access access){
 
 /** 全局变量的frag */
 void Tr_newIntFrag(Temp_label label, int value){
-    int* int2p = (int*)checked_malloc(sizeof(int));/// 在堆中分配内存，避免悬挂引用
-    *int2p = value;
-    F_frag int_frag = F_GlobalFrag(label, 1, int2p);
+    U_pairList pair_list = U_PairList(U_IntPair(1, value), nullptr);
+    F_frag int_frag = F_GlobalFrag(label, 1, pair_list);
     fragList = F_FragList(int_frag, fragList);
 }
-void Tr_newArrayFrag(Temp_label label, int size, int* values){
+void Tr_newArrayFrag(Temp_label label, int size, U_pairList values){
     F_frag array_frag = F_GlobalFrag(label, size, values);
     fragList = F_FragList(array_frag, fragList);
 }

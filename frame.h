@@ -44,7 +44,7 @@ struct F_frag_{
     union {
         struct{Temp_label label; c_string str;}stringg;
         struct{T_stm body;F_frame frame;}proc;
-        struct {Temp_label label; int size; int* init_values;}global;
+        struct {Temp_label label; int size; U_pairList init_values;}global;
         /// 假设没有int a[1]这种东西 --loyx 2020/7/22
     }u;
 };
@@ -52,6 +52,6 @@ struct F_fragList_{F_frag head;F_fragList tail;};
 F_fragList F_FragList(F_frag head,F_fragList tail);
 F_frag F_StringFrag(Temp_label label,c_string str);
 F_frag F_ProcFrag(T_stm body,F_frame frame);
-F_frag F_GlobalFrag(Temp_label label, int size, int* init_values);
+F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values);
 
 #endif //COMPILER_LOYX_FRAME_H

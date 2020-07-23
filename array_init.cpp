@@ -107,29 +107,26 @@ int INIT_getInt(INIT_initList init_list, int* index){
     assert(el->kind == A_exp_::A_intExp);
     return el->u.intExp;
 }
-int INIT_getTotalSize(INIT_initList init_list){
-    return init_list->total_size;
-}
-int *INIT_shrinkInitList(INIT_initList init_list){
+U_pairList INIT_shrinkInitList(INIT_initList init_list){
     /**
-     * 服务于全局数组的初值形式
+     * 服务于全局数组的初值形式，initList中的exp都应为intExp
      */
     assert(init_list->total_size > 1);
-    int shrink_size = 1;
+    assert(init_list->array[0]->kind == A_exp_::A_intExp);
+    U_intPair pair = U_IntPair(1, init_list->array[0]->u.intExp);
+    U_pairList shrink_array = U_PairList(pair, nullptr);
+    U_pairList tail_ptr = shrink_array;
+
     for (int i = 1; i < init_list->total_size; i++){
+        assert(init_list->array[i]->kind == A_exp_::A_intExp);
         if (init_list->array[i]->u.intExp == 0 && init_list->array[i-1]->u.intExp == 0){
+            tail_ptr->head->x += 1;
             continue;
         }
-        shrink_size++;
+        pair = U_IntPair(1, init_list->array[i]->u.intExp);
+        tail_ptr->tail = U_PairList(pair, nullptr);
+        tail_ptr = tail_ptr->tail;
     }
-    int *shrink_array = (int*)checked_malloc(shrink_size*sizeof(int));
-    int index = 1;
-    shrink_array[0] = init_list->array[0]->u.intExp;
-    for (int i = 1; i < init_list->total_size; i++){
-        if (init_list->array[i]->u.intExp == 0 && init_list->array[i-1]->u.intExp == 0){
-            continue;
-        }
-        shrink_array[index++] = init_list->array[i]->u.intExp;
-    }
+
     return shrink_array;
 }

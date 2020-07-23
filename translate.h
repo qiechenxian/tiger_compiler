@@ -31,7 +31,7 @@ Temp_label Tr_getGlobalLabel(Tr_access access);
 
 /** 全局变量的frag */
 void Tr_newIntFrag(Temp_label label, int value);
-void Tr_newArrayFrag(Temp_label label, int size, int* values);
+void Tr_newArrayFrag(Temp_label label, int size, U_pairList values);
 
 /**
  *
