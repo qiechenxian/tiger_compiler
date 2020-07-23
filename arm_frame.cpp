@@ -190,7 +190,7 @@ T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
  * @return T_Mem() 栈中 基址+offset+index 的位置
  */
 {
-    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size()*(acc->u.offset + index))));
+    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size()*index + acc->u.offset))));
 }
 
 int get_word_size()
