@@ -152,6 +152,7 @@ static struct Cx Tr_unCx(Tr_exp e)
         case Tr_exp_::Tr_nx:
         {
             printf("error:transform nx to cx");
+            assert(0);
         }
     }
 }
@@ -175,8 +176,8 @@ static patchList connect_PatchList(patchList left, patchList right){
 Tr_access Tr_allocLocal(F_frame frame, bool escape){
     return F_allocLocal(frame, escape);
 }
-Tr_access Tr_allocGlobal(){
-    return F_allocGlobal();
+Tr_access Tr_allocGlobal(S_symbol global){
+    return F_allocGlobal(global);
 }
 Tr_accessList Tr_getFormals(Tr_frame frame){
     return F_getFormals(frame);
@@ -184,10 +185,24 @@ Tr_accessList Tr_getFormals(Tr_frame frame){
 Tr_frame Tr_newFrame(Temp_label name, U_boolList formals){
     return F_newFrame(name, formals);
 }
+Temp_label Tr_getGlobalLabel(Tr_access access){
+    /**
+     * 从Tr_access中获取全局变量的label，该函数解耦了semant和frame
+     */
+    return F_getGlobalLabel(access);
+}
 
 
-/** Tr_exp */
-
+/** 全局变量的frag */
+void Tr_newIntFrag(Temp_label label, int value){
+    U_pairList pair_list = U_PairList(U_IntPair(1, value), nullptr);
+    F_frag int_frag = F_GlobalFrag(label, 1, pair_list);
+    fragList = F_FragList(int_frag, fragList);
+}
+void Tr_newArrayFrag(Temp_label label, int size, U_pairList values){
+    F_frag array_frag = F_GlobalFrag(label, size, values);
+    fragList = F_FragList(array_frag, fragList);
+}
 
 /** patchList 相关*/
 static void doPatch(patchList list, Temp_label label){

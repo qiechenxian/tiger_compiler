@@ -218,10 +218,12 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                          S_getName(d->u.array.base));
             }
             Tr_access var_access;
-            if (frame)
+            if (frame) {
                 var_access = Tr_allocLocal(frame, true);
-            else
-                var_access = Tr_allocGlobal();
+            }
+            else {
+                var_access = Tr_allocGlobal(d->u.array.id);
+            }
 
             /** 根据数组纬度生成对应的类型， 相当于一个匿名typedef variableDec */
             int lens = 0;
@@ -233,6 +235,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
 
             /** 检查下标 */
+            int array_total_size = 1; // 数组全长，供之后使用
             for (A_expList iter = d->u.array.size; iter; iter = iter->tail){
                 /**
                  * 下标要求都是可求值非负的constExp
@@ -248,10 +251,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     EM_error(subscript->pos,
                             "size of array \'%s\' is negative",
                             S_getName(d->u.array.id));
+
+                array_total_size *= subscript->u.intExp;
             }
-            // todo translate
+
             /** 处理初值 */
             if (d->u.array.init != nullptr){
+
                 INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);//这下弄中间代码舒服了
                 //将init_list中的A_EXP转换为中间代码形式并保存
                 int i;
@@ -263,6 +269,24 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     struct expty temp=transExp(venv,tenv,init_list->array[i],l_break,l_continue);;
                     init_list_tr->array[i]=temp.exp;
                 }
+
+                if (not frame){
+                    /// 全局数组的frag处理
+
+                    /**
+                     * 全局数组的初始值中必须都为常数。
+                     * 在上边的下标检查中可以保证如果是常数都会被优化为int
+                     * 但没有检查是否有非常数表达式。官方保证没有
+                     * -- loyx 2020/7/23
+                     */
+                    Tr_newArrayFrag(
+                            Tr_getGlobalLabel(var_access),
+                            array_total_size,
+                            INIT_shrinkInitList(init_list)
+                            );
+                    return Tr_nopExp();
+                }
+
                 if (d->u.array.isConst){
                     /**
                      * 常量数组初值处理
@@ -279,9 +303,23 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 }
             }
 
-            // todo 全局数组无初值情况  (需要区分全局变量)
 
-            /// 无初值情况
+            /** 无初值情况*/
+
+            if (not frame){
+                /// 全局数组无初始化，默认全0
+
+                U_intPair pair = U_IntPair(array_total_size, 0);
+                U_pairList shrink_zeros = U_PairList(pair, nullptr);
+
+                Tr_newArrayFrag(
+                        Tr_getGlobalLabel(var_access),
+                        array_total_size,
+                        shrink_zeros
+                        );
+                return Tr_nopExp();
+            }
+
             if (d->u.array.isConst){
                 /**
                  * 常数数组无初始化，默认全0
@@ -305,12 +343,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 EM_error(d->pos, "unknown type name \'%s\'",
                         S_getName(d->u.var.type));
             }
-            //Tr_access var_access = Tr_allocLocal(frame, d->u.var.escape); todo escape
             Tr_access var_access;
-            if (frame)
+            if (frame){
                 var_access = Tr_allocLocal(frame, true);
-            else
-                var_access = nullptr; // todo global var const var
+            }
+            else{
+                var_access = Tr_allocGlobal(d->u.var.id);
+            }
 
             /// 该变量声明的在符号表中的基本条目
             E_envEntry varEntry = E_VarEntry(d->u.var.isConst, var_access, type);
@@ -325,6 +364,16 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
 
+                if (not frame){
+                    /// 无frame表示此变量为全局变量
+
+                    // 全局变量的初值必须为常数表达式，此处前端保证优化为常数
+                    assert(d->u.var.init->kind == A_exp_::A_intExp);
+                    Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp);
+
+                    /// 对于全局变量的翻译已归frag管理，无需翻译为ir
+                    return Tr_nopExp();
+                }
 
                 if (d->u.var.isConst){
                     /**
@@ -349,9 +398,18 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 }
             }
 
-            /// 没有初值
+            /** 无初值情况 */
+
+            /// 无初值的全局变量
+            if (not frame){
+                Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0);
+                return Tr_nopExp();
+            }
+
+            /// 无初值的const变量
             if (d->u.var.isConst) varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
             S_enter(venv, d->u.var.id, varEntry);
+
             return Tr_nopExp(); // no init value just allocl momery
         }
         case A_dec_::A_functionDec:{

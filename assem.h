@@ -10,9 +10,10 @@
 #include "errormsg.h"
 #include "temp.h"
 
-typedef struct {
+typedef struct AS_targets_ *AS_targets;
+typedef struct AS_targets_ {
     Temp_labelList labels;
-} *AS_targets;
+} ;
 
 AS_targets AS_Targets(Temp_labelList labels);
 
@@ -45,22 +46,29 @@ struct AS_instr_ {
     } u;
 };
 
-AS_instr AS_Oper(c_string a,Temp_tempList d,Temp_tempList s, AS_targets j);
-AS_instr AS_Label(c_string a,Temp_label label);
+AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j);
+
+AS_instr AS_Label(c_string a, Temp_label label);
+
 AS_instr AS_Move(c_string a, Temp_tempList d, Temp_tempList s);
 
 // 调用AS_print可以将一条汇编指令表示为字符串的形式并输出
 // 需要在temp.h中描述对临时变量映射操作的函数
-void AS_print(FILE *out,AS_instr i,Temp_map m);
+void AS_print(FILE *out, AS_instr i, Temp_map m);
 
 typedef struct AS_instrList_ *AS_instrList;
-struct AS_instrList_ { AS_instr head; AS_instrList tail;};
+struct AS_instrList_ {
+    AS_instr head;
+    AS_instrList tail;
+};
+
 AS_instrList AS_InstrList(AS_instr head, AS_instrList tail);
 
 //把list b 拼接到 list a后边
 AS_instrList AS_splice(AS_instrList a, AS_instrList b);
+
 //
-void AS_printInstrList (FILE *out, AS_instrList iList, Temp_map m);
+void AS_printInstrList(FILE *out, AS_instrList iList, Temp_map m);
 
 typedef struct AS_proc_ *AS_proc;
 struct AS_proc_ {
@@ -70,4 +78,5 @@ struct AS_proc_ {
 };
 
 AS_proc AS_Proc(c_string p, AS_instrList b, c_string e);
+
 #endif //UNTITLED_ASSEM_H

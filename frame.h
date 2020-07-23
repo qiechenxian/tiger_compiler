@@ -24,12 +24,16 @@ F_frame F_newFrame(Temp_label name, U_boolList formals);
 Temp_label F_getName(F_frame frame);
 F_accessList F_getFormals(F_frame frame);
 F_access F_allocLocal(F_frame frame, bool escape);
-F_access F_allocGlobal();
+F_access F_allocGlobal(S_symbol global);
+Temp_label F_getGlobalLabel(F_access fa);
 
 
 //Temp_temp /** Frame pointer */
-Temp_temp F_FP();
-Temp_temp F_RV();
+Temp_temp F_FP(void);
+Temp_temp F_SP(void);
+Temp_temp F_ZERO(void);
+Temp_temp F_RA(void);
+Temp_temp F_RV(void);
 int get_word_size();
 T_exp F_Exp(F_access acc, T_exp framePtr);
 F_accessList F_formals(F_frame f);
@@ -40,13 +44,14 @@ struct F_frag_{
     union {
         struct{Temp_label label; c_string str;}stringg;
         struct{T_stm body;F_frame frame;}proc;
-        struct {Temp_label label; /**todo 缺少初值*/}global;
+        struct {Temp_label label; int size; U_pairList init_values;}global;
+        /// 假设没有int a[1]这种东西 --loyx 2020/7/22
     }u;
 };
 struct F_fragList_{F_frag head;F_fragList tail;};
 F_fragList F_FragList(F_frag head,F_fragList tail);
 F_frag F_StringFrag(Temp_label label,c_string str);
 F_frag F_ProcFrag(T_stm body,F_frame frame);
-F_frag F_GlobalFrag(Temp_label label);
+F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values);
 
 #endif //COMPILER_LOYX_FRAME_H

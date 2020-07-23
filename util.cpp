@@ -33,3 +33,16 @@ void* U_reverseList(void* list){
     while (iter){pre = iter; iter = iter->tail; pre->tail = rev; rev = pre;}
     return (void*)rev;
 }
+
+U_intPair U_IntPair(int x, int y){
+    auto pair = (U_intPair)checked_malloc(sizeof(U_intPair_));
+    pair->x = x;
+    pair->y = y;
+    return pair;
+}
+U_pairList U_PairList(U_intPair head, U_pairList tail){
+    auto list = (U_pairList)checked_malloc(sizeof(U_pairList_));
+    list->head = head;
+    list->tail = tail;
+    return list;
+}

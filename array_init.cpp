@@ -90,6 +90,7 @@ INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_lis
 
     init_list->array = exp_array;
     init_list->suffix_size = suffix_size;
+    init_list->total_size = suffix_size[0] * temp[0];
     return init_list;
 }
 
@@ -105,4 +106,27 @@ int INIT_getInt(INIT_initList init_list, int* index){
     A_exp el = INIT_get(init_list, index);
     assert(el->kind == A_exp_::A_intExp);
     return el->u.intExp;
+}
+U_pairList INIT_shrinkInitList(INIT_initList init_list){
+    /**
+     * 服务于全局数组的初值形式，initList中的exp都应为intExp
+     */
+    assert(init_list->total_size > 1);
+    assert(init_list->array[0]->kind == A_exp_::A_intExp);
+    U_intPair pair = U_IntPair(1, init_list->array[0]->u.intExp);
+    U_pairList shrink_array = U_PairList(pair, nullptr);
+    U_pairList tail_ptr = shrink_array;
+
+    for (int i = 1; i < init_list->total_size; i++){
+        assert(init_list->array[i]->kind == A_exp_::A_intExp);
+        if (init_list->array[i]->u.intExp == 0 && init_list->array[i-1]->u.intExp == 0){
+            tail_ptr->head->x += 1;
+            continue;
+        }
+        pair = U_IntPair(1, init_list->array[i]->u.intExp);
+        tail_ptr->tail = U_PairList(pair, nullptr);
+        tail_ptr = tail_ptr->tail;
+    }
+
+    return shrink_array;
 }

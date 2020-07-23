@@ -4,8 +4,11 @@
 #include "frame.h"
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
-static Temp_temp fp=NULL;
-static Temp_temp rv=NULL;
+static Temp_temp fp = NULL;
+static Temp_temp sp = NULL;
+static Temp_temp zero = NULL;
+static Temp_temp ra = NULL;
+static Temp_temp rv = NULL;
 
 //栈帧结构
 Temp_temp F_FP()//取帧指针
@@ -23,6 +26,26 @@ Temp_temp F_RV()//取帧指针
         rv=Temp_newTemp();
     }
     return rv;
+}
+Temp_temp F_SP(void) {
+    if (sp == NULL) {
+        sp = Temp_newTemp();
+    }
+    return sp;
+}
+
+Temp_temp F_ZERO(void) {
+    if (zero == NULL) {
+        zero = Temp_newTemp();
+    }
+    return zero;
+}
+
+Temp_temp F_RA(void) {
+    if (ra == NULL) {
+        ra = Temp_newTemp();
+    }
+    return ra;
 }
 /** class declare */
 struct F_access_{
@@ -77,6 +100,13 @@ static F_accessList F_AccessList(F_access head, F_accessList tail){
     return p;
 }
 
+Temp_label F_getGlobalLabel(F_access fa){
+    /**
+     * 为translate中的Tr_getGlobalLabel提供底层实现
+     */
+    assert(fa->kind == F_access_::inGlobal);
+    return fa->u.global;
+}
 
 /** 辅助函数 */
 static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
@@ -132,8 +162,11 @@ F_access F_allocLocal(F_frame frame, bool escape){
         return InReg(Temp_newTemp());
     }
 }
-F_access F_allocGlobal(){
-    return InGlobal(Temp_newLabel());
+F_access F_allocGlobal(S_symbol global){
+    /**
+     * 仅返回一个全局变量的label
+     */
+    return InGlobal((Temp_label)global);
 }
 
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
@@ -152,7 +185,8 @@ int get_word_size()
 F_accessList F_formals(F_frame f) {
     return f->formals;
 }
-//片段相关F_frag
+
+/// 片段相关F_frag
 F_fragList F_FragList(F_frag head,F_fragList tail)
 {
     F_fragList new_frag_list=(F_fragList)checked_malloc(sizeof(*new_frag_list));
@@ -176,13 +210,15 @@ F_frag F_ProcFrag(T_stm body,F_frame frame)
     new_frag->u.proc.frame=frame;
     return new_frag;
 }
-F_frag F_GlobalFrag(Temp_label label){
+F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values){
     auto new_frag = (F_frag)checked_malloc(sizeof(F_frag_));
     new_frag->kind = F_frag_::F_globalFrag;
     new_frag->u.global.label = label;
+    new_frag->u.global.size = size;
+    new_frag->u.global.init_values = init_values;
     return new_frag;
 }
-T_stm F_procEntryExitl(F_frame frame,T_stm stm)
+T_stm F_procEntryExit1(F_frame frame,T_stm stm)
 {
     return stm;//中间代码阶段的虚实现
 }
