@@ -217,22 +217,12 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 EM_error(d->pos, "unknown type \'%s\'",
                          S_getName(d->u.array.base));
             }
-            Tr_access var_access;
-            if (frame) {
-                var_access = Tr_allocLocal(frame, true);
-            }
-            else {
-                var_access = Tr_allocGlobal(d->u.array.id);
-            }
 
             /** 根据数组纬度生成对应的类型， 相当于一个匿名typedef variableDec */
             int lens = 0;
             for (A_expList sIter = d->u.array.size; sIter; sIter = sIter->tail, lens++);
             assert(lens);
             TY_ty array_ty = anonymousArrayTyDec(d->u.array.base, lens, tenv);
-
-            /// 数组声明，在符号表中的基本条目
-            E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
 
             /** 检查下标 */
             int array_total_size = 1; // 数组全长，供之后使用
@@ -254,6 +244,18 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                 array_total_size *= subscript->u.intExp;
             }
+
+            Tr_access var_access;
+            if (frame) {
+                var_access = Tr_allocLocal(frame, true, array_total_size);
+                /// 这里没有考虑数组特别大以至于栈放不下的情况
+            }
+            else {
+                var_access = Tr_allocGlobal(d->u.array.id);
+            }
+
+            /// 数组声明，在符号表中的基本条目
+            E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
 
             /** 处理初值 */
             if (d->u.array.init != nullptr){
@@ -345,7 +347,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             }
             Tr_access var_access;
             if (frame){
-                var_access = Tr_allocLocal(frame, true);
+                var_access = Tr_allocLocal(frame, true, 1);
             }
             else{
                 var_access = Tr_allocGlobal(d->u.var.id);
@@ -592,7 +594,9 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             }
             return Expty(nullptr, TY_Void());
         }
-        case A_stm_::A_breakStm:{return Expty(Tr_break(l_break), TY_Void()); }
+        case A_stm_::A_breakStm:{
+            return Expty(Tr_break(l_break), TY_Void());
+        }
         case A_stm_::A_continue:{
             return Expty(Tr_continue(l_continue), TY_Void());
         }

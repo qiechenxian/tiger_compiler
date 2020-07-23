@@ -149,8 +149,8 @@ Temp_label F_getName(F_frame frame){
 F_accessList F_getFormals(F_frame frame){
     return frame->formals;
 }
-F_access F_allocLocal(F_frame frame, bool escape){
-    frame->local_count++;
+F_access F_allocLocal(F_frame frame, bool escape, int size){
+    frame->local_count += size;
     F_access access;
     if (escape) {
         access=InFrame(F_WORD_SIZE  * (- frame->local_count));
