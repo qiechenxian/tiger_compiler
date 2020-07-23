@@ -235,6 +235,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
 
             /** 检查下标 */
+            int array_total_size = 1; // 数组全长，供之后使用
             for (A_expList iter = d->u.array.size; iter; iter = iter->tail){
                 /**
                  * 下标要求都是可求值非负的constExp
@@ -250,10 +251,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     EM_error(subscript->pos,
                             "size of array \'%s\' is negative",
                             S_getName(d->u.array.id));
+
+                array_total_size *= subscript->u.intExp;
             }
-            // todo translate
+
             /** 处理初值 */
             if (d->u.array.init != nullptr){
+
                 INIT_initList init_list = INIT_InitList(d->u.array.size, d->u.array.init);//这下弄中间代码舒服了
                 //将init_list中的A_EXP转换为中间代码形式并保存
                 int i;
@@ -265,6 +269,24 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     struct expty temp=transExp(venv,tenv,init_list->array[i],l_break,l_continue);;
                     init_list_tr->array[i]=temp.exp;
                 }
+
+                if (not frame){
+                    /// 全局数组的frag处理
+
+                    /**
+                     * 全局数组的初始值中必须都为常数。
+                     * 在上边的下标检查中可以保证如果是常数都会被优化为int
+                     * 但没有检查是否有非常数表达式。官方保证没有
+                     * -- loyx 2020/7/23
+                     */
+                    Tr_newArrayFrag(
+                            Tr_getGlobalLabel(var_access),
+                            array_total_size,
+                            INIT_shrinkInitList(init_list)
+                            );
+                    return Tr_nopExp();
+                }
+
                 if (d->u.array.isConst){
                     /**
                      * 常量数组初值处理
@@ -281,9 +303,23 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 }
             }
 
-            // todo 全局数组无初值情况  (需要区分全局变量)
 
-            /// 无初值情况
+            /** 无初值情况*/
+
+            if (not frame){
+                /// 全局数组无初始化，默认全0
+
+                int* shrink_zeros = (int*)checked_malloc(sizeof(int));
+                *shrink_zeros = 0;
+
+                Tr_newArrayFrag(
+                        Tr_getGlobalLabel(var_access),
+                        array_total_size,
+                        shrink_zeros
+                        );
+                return Tr_nopExp();
+            }
+
             if (d->u.array.isConst){
                 /**
                  * 常数数组无初始化，默认全0
