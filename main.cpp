@@ -7,25 +7,31 @@
 #include "prast.h"
 #include "cannon.h"
 #include "print_ir_tree.h"
+#include "codegen.h"
 
 using namespace std;
 static void doProc(F_frame frame, T_stm body)
 {
-    //AS_proc proc;
+
+    FILE *out=stderr;
+
+    AS_proc proc;
     //struct RA_result allocation;
     T_stmList stmList;
-    //AS_instrList iList;
+    AS_instrList iList;
+
+    F_tempMap=Temp_empty();
 
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList));
 
+    //fprintf(out,"111");
     /* printStmList(stdout, stmList);*/
-    //iList  = F_codegen(frame, stmList); /* 9 */
-
-    //fprintf(out, "BEGIN %s\n", Temp_labelstring(F_name(frame)));
-    //AS_printInstrList (out, iList,
-    //                   Temp_layerMap(F_tempMap,Temp_name()));
-    //fprintf(out, "END %s\n\n", Temp_labelstring(F_name(frame)));
+//    iList  = F_codegen(frame, stmList); /* 9 */
+//
+//    fprintf(out, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
+//    AS_printInstrList (out, iList,Temp_layerMap(F_tempMap,Temp_name()));
+//    fprintf(out, "END %s\n\n", Temp_labelString(F_getName(frame)));
 }
 
 extern FILE *yyin;

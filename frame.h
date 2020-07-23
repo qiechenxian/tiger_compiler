@@ -8,6 +8,7 @@
 #include "util.h"
 #include "temp.h"
 #include "tree.h"
+#include "assem.h"
 
 /** 架构参数 */
 
@@ -23,7 +24,7 @@ struct F_accessList_{F_access head; F_accessList tail;};
 F_frame F_newFrame(Temp_label name, U_boolList formals);
 Temp_label F_getName(F_frame frame);
 F_accessList F_getFormals(F_frame frame);
-F_access F_allocLocal(F_frame frame, bool escape);
+F_access F_allocLocal(F_frame frame, bool escape, int size);
 F_access F_allocGlobal(S_symbol global);
 Temp_label F_getGlobalLabel(F_access fa);
 
@@ -54,4 +55,11 @@ F_frag F_StringFrag(Temp_label label,c_string str);
 F_frag F_ProcFrag(T_stm body,F_frame frame);
 F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values);
 
+
+T_stm F_procEntryExit1(F_frame frame, T_stm stm);
+AS_instrList F_procEntryExit2(AS_instrList body);
+AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
+
+
+extern Temp_map F_tempMap;
 #endif //COMPILER_LOYX_FRAME_H

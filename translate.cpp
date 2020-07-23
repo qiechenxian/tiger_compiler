@@ -173,8 +173,8 @@ static patchList connect_PatchList(patchList left, patchList right){
 }
 
 /** delegate to frame.h */
-Tr_access Tr_allocLocal(F_frame frame, bool escape){
-    return F_allocLocal(frame, escape);
+Tr_access Tr_allocLocal(F_frame frame, bool escape, int size){
+    return F_allocLocal(frame, escape, size);
 }
 Tr_access Tr_allocGlobal(S_symbol global){
     return F_allocGlobal(global);
@@ -425,6 +425,7 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
                 break;}
         default:
             printf("error from Tr_binop translate.c maybe something wrong wirh relop");
+            assert(0);
             break;
     }
     T_exp left_exp=Tr_unEx(left);
@@ -497,7 +498,7 @@ Tr_exp Tr_init_Var(Tr_INIT_initList int_info)//变量或数组声明带有初值
     int array_length=int_info->array_length;
     T_stm init_var;
     Temp_temp dec_var_r=Temp_newTemp();
-    T_exp pointer=T_Call(T_Name(Temp_namedLabel("init_var")),T_ExpList(T_Const(array_length),nullptr));//调用外部函数，汇编实现数组空间分配
+    T_exp pointer=T_Call(T_Name(Temp_namedLabel((char*)"init_var")),T_ExpList(T_Const(array_length),nullptr));//调用外部函数，汇编实现数组空间分配
     T_stm arr_base_address=T_Move(T_Temp(dec_var_r),pointer);//返回基址地址
     init_var=arr_base_address;
     if(int_info->array== nullptr)
