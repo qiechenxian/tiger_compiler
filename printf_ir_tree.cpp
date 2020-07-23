@@ -128,7 +128,7 @@ static void pr_tree_exp(FILE *out, T_exp exp, int d)
 
 void printStmList ( F_fragList stmList)
 {
-    printf("---------------IR TREE PRINTF---------------\n");
+    printf("---------------IR TREE PRINTF START---------------\n");
     if(out==nullptr)
     {
         printf("File open false");
