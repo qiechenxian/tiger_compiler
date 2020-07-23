@@ -4,7 +4,7 @@
 #include "frame.h"
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
-static Temp_temp fp = NULL;
+static Temp_temp fp = nullptr;
 static Temp_temp sp = NULL;
 static Temp_temp zero = NULL;
 static Temp_temp ra = NULL;
@@ -13,7 +13,7 @@ static Temp_temp rv = NULL;
 //栈帧结构
 Temp_temp F_FP()//取帧指针
 {
-    if(fp==NULL)
+    if(fp==nullptr)
     {
         fp=Temp_newTemp();
     }
