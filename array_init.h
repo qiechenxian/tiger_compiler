@@ -35,7 +35,7 @@ INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_lis
 
 A_exp INIT_get(INIT_initList init_list, const int* index);
 int INIT_getInt(INIT_initList init_list, int* index);
-int *INIT_transformGlobal(INIT_initList init_list);
+int *INIT_shrinkInitList(INIT_initList init_list);
 
 
 #endif //COMPILER_2020_ARRAY_INIT_H

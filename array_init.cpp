@@ -110,7 +110,10 @@ int INIT_getInt(INIT_initList init_list, int* index){
 int INIT_getTotalSize(INIT_initList init_list){
     return init_list->total_size;
 }
-int *INIT_transformGlobal(INIT_initList init_list){
+int *INIT_shrinkInitList(INIT_initList init_list){
+    /**
+     * 服务于全局数组的初值形式
+     */
     assert(init_list->total_size > 1);
     int shrink_size = 1;
     for (int i = 1; i < init_list->total_size; i++){
