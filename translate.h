@@ -23,10 +23,14 @@ typedef F_frame Tr_frame;
 
 Tr_frame Tr_newFrame(Temp_label name, U_boolList formals);
 Tr_access Tr_allocLocal(Tr_frame frame, bool escape);
-Tr_access Tr_allocGlobal();
+Tr_access Tr_allocGlobal(S_symbol global);
 Tr_accessList Tr_getFormals(Tr_frame frame);
 Tr_accessList Tr_AccessList(Tr_access head, Tr_accessList tail);// 构造函数
 
+
+/** 全局变量的frag */
+void Tr_newIntFrag(Temp_label label, int value);
+void Tr_newArrayFrag(Temp_label label, int size, int* values);
 
 /**
  *
