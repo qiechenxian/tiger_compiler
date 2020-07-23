@@ -564,6 +564,8 @@ Tr_exp Tr_func_call(Temp_label name,Tr_expList params)
     T_exp tmp=T_Temp(F_FP());
     T_expList call_param_h=T_ExpList(tmp,nullptr);
     T_expList c_temp=call_param_h;
+    if(params->first== nullptr)
+    {return Tr_Ex(T_Call(T_Name(name),call_param_h));}
     for(;params;params=params->last)
     {
         c_temp->tail=T_ExpList(Tr_unEx(params->first),nullptr);
