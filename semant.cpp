@@ -246,6 +246,16 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 array_total_size *= subscript->u.intExp;
             }
 
+            /** 获取数组后缀和，供翻译数组访问时使用*/
+            int* suffix_size = (int*)checked_malloc((array_total_size+1)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
+            int suffix_index = 0;
+            for (A_expList iter = d->u.array.size; iter; iter = iter->tail)
+            {
+                assert(iter->head->kind == A_exp_::A_intExp);
+                suffix_size[suffix_index++] = iter->head->u.intExp;
+            }
+            suffix_size[suffix_index] = -1; // 放置结束标志
+
             Tr_access var_access;
             if (frame) {
                 var_access = Tr_allocLocal(frame, true, array_total_size);
@@ -257,6 +267,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
             /// 数组声明，在符号表中的基本条目
             E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
+            arrayEntry->u.var.suffix_size = suffix_size; // 登记数组的后缀和
 
             /** 处理初值 */
             if (d->u.array.init != nullptr){
@@ -805,10 +816,9 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
             } else{
                 struct expty expty_msg = Expty(Tr_simpleVar(varEntry->u.var.access), actual_ty(varEntry->u.var.ty));
                 expty_msg.isConst = varEntry->u.var.isConst;
-                if (varEntry->u.var.cValues){
-                    /// 如果访问的变量是数组，则额外返回后缀和信息，供访问数组翻译时使用
-                    expty_msg.suffix_size = varEntry->u.var.cValues->u.arrayValue->suffix_size;
-                }
+
+                /// 如果访问的变量是数组，则额外返回后缀和信息，供访问数组翻译时使用
+                expty_msg.suffix_size = varEntry->u.var.suffix_size;
                 return expty_msg;
             }
         }
@@ -825,6 +835,7 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                     EM_error(v->u.arrayVar.index->pos, "index must be a int");
                 }
                 expty expty_msg{};
+                assert(id.suffix_size);
                 if (id.suffix_size[1] != -1){
                     /**
                      * 通过suffix_size的后一位是否为-1，来判断数组是否访问到值

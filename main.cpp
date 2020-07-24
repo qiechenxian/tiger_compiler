@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
     S_table tenv = E_base_typeEntry();
     S_table venv = E_base_valueEntry(tenv);
     yyparse();
-    fprintf(stderr, "before semantic ast:\n");
+    fprintf(stderr, "\nbefore semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
     fprintf(stderr, "\n");
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
             //fprintf(out, "%s\n", frags->head->u.stringg.str);
     }
 
-    fprintf(stderr, "after semantic ast:\n");
+    fprintf(stderr, "\nafter semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
     return 0;
 }
