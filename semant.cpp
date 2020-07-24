@@ -446,7 +446,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 return Tr_nopExp();
             }
 
-            assert(0);
+            S_enter(venv, d->u.var.id, varEntry);
             return Tr_nopExp(); // no init value just allocl momery
         }
         case A_dec_::A_functionDec:{
