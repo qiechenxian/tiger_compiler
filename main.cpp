@@ -11,7 +11,7 @@
 
 using namespace std;
 
-static void doProc(F_frame frame, T_stm body) {
+static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
     FILE *out = stderr;
 
@@ -26,11 +26,11 @@ static void doProc(F_frame frame, T_stm body) {
     stmList = C_traceSchedule(C_basicBlocks(stmList));
     printcannoList(stderr, stmList);
 
-    iList = F_codegen(frame, stmList); /* 9 */
+    iList = F_codegen(frame, stmList);
 
-    fprintf(out, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
-    AS_printInstrList(out, iList, Temp_layerMap(F_tempMap, Temp_name()));
-    fprintf(out, "END %s\n\n", Temp_labelString(F_getName(frame)));
+    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
+    AS_printInstrList(outfile, iList, Temp_layerMap(F_tempMap, Temp_name()));
+    fprintf(outfile, "END %s\n\n", Temp_labelString(F_getName(frame)));
 }
 
 extern FILE *yyin;
@@ -97,13 +97,16 @@ int main(int argc, char **argv) {
     fprintf(stderr, "\nsemantic check finish !\n");
 
     printStmList(stderr, frags);
+
+    //输出汇编指令的路径,应更改为文件名
+    FILE *outfile=stdout;
     for (; frags; frags = frags->tail) {
         if (frags->head->kind == F_frag_::F_procFrag) {
-            doProc(frags->head->u.proc.frame, frags->head->u.proc.body);
-        } else if (frags->head->kind == F_frag_::F_stringFrag)
+            doProc(outfile,frags->head->u.proc.frame, frags->head->u.proc.body);
+        } else if (frags->head->kind == F_frag_::F_stringFrag) {
             fprintf(stderr, "%s\n", frags->head->u.stringg.str);
+        }
     }
-
     return 0;
 }
 

@@ -76,7 +76,7 @@ static void format(char *result, c_string assem, Temp_tempList dst, Temp_tempLis
     char *p;
     int i = 0;
     for (p = assem; p && *p != '\0'; p++) {
-        if (*p == '`') {
+        if (*p == '\'') {
             switch (*(++p)) {
                 case 's': {
                     int n = atoi(++p);
@@ -148,7 +148,7 @@ void AS_printInstrList(FILE *out, AS_instrList iList, Temp_map m) {
 }
 
 AS_proc AS_Proc(c_string p, AS_instrList b, c_string e) {
-    AS_proc proc = (AS_proc)checked_malloc(sizeof(*proc));
+    AS_proc proc = (AS_proc) checked_malloc(sizeof(*proc));
     proc->prolog = p;
     proc->body = b;
     proc->epilog = e;
