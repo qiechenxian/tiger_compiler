@@ -29,11 +29,11 @@ static void doProc(F_frame frame, T_stm body)
 
     //fprintf(out,"111");
     /* printStmList(stdout, stmList);*/
-//    iList  = F_codegen(frame, stmList); /* 9 */
-//
-//    fprintf(out, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
-//    AS_printInstrList (out, iList,Temp_layerMap(F_tempMap,Temp_name()));
-//    fprintf(out, "END %s\n\n", Temp_labelString(F_getName(frame)));
+    iList  = F_codegen(frame, stmList); /* 9 */
+
+    fprintf(out, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
+    AS_printInstrList (out, iList,Temp_layerMap(F_tempMap,Temp_name()));
+    fprintf(out, "END %s\n\n", Temp_labelString(F_getName(frame)));
 }
 
 extern FILE *yyin;

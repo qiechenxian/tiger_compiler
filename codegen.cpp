@@ -328,7 +328,7 @@ static void munchStm(T_stm s) {
             }
             break;
         }
-        case T_stm_::T_JUMP:
+        case T_stm_::T_JUMP:{
             if (s->u.JUMP.exp->kind == T_exp_::T_NAME) {
                 /* JUMP(NAME(lab)) */
                 Temp_label lab = s->u.JUMP.exp->u.NAME;
@@ -341,6 +341,7 @@ static void munchStm(T_stm s) {
                 Temp_labelList jumps = s->u.JUMP.jumps;
                 // 此处未写，jump(e)
             }
+            break;}
         case T_stm_::T_CJUMP: {
             /* CJUMP(op,e1,e2,jt,jf) */
             T_relOp op = s->u.CJUMP.op;
