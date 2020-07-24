@@ -1,0 +1,3 @@
+/mnt/e/compiler/compiler-dev-cpp-new/cmake-build-wsl_profile/CMakeFiles/rebuild_cache.dir
+/mnt/e/compiler/compiler-dev-cpp-new/cmake-build-wsl_profile/CMakeFiles/compiler_dev_cpp.dir
+/mnt/e/compiler/compiler-dev-cpp-new/cmake-build-wsl_profile/CMakeFiles/edit_cache.dir
