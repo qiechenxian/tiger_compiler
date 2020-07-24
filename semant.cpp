@@ -298,6 +298,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                             array_total_size,
                             INIT_shrinkInitList(init_list)
                             );
+                    if (d->u.array.isConst){
+                        arrayEntry->u.var.cValues = E_ArrayValue(init_list);
+                    }
                     S_enter(venv, d->u.array.id, arrayEntry);
                     return Tr_nopExp();
                 }
@@ -331,6 +334,10 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                         array_total_size,
                         shrink_zeros
                         );
+                if (d->u.array.isConst){
+                    INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
+                    arrayEntry->u.var.cValues = E_ArrayValue(null_init);
+                }
                 S_enter(venv, d->u.array.id, arrayEntry);
                 return Tr_nopExp();
             }
@@ -351,6 +358,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     init_list_tr->array[i]=temp.exp;
                 }
 
+                S_enter(venv, d->u.array.id, arrayEntry);
                 return Tr_init_array(var_access, init_list_tr);
             }
 
@@ -387,18 +395,6 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
 
-                if (not frame){
-                    /// 无frame表示此变量为全局变量
-
-                    // 全局变量的初值必须为常数表达式，此处前端保证优化为常数
-                    assert(d->u.var.init->kind == A_exp_::A_intExp);
-                    Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp);
-
-                    /// 对于全局变量的翻译已归frag管理，无需翻译为ir
-                    S_enter(venv, d->u.var.id, varEntry);
-                    return Tr_nopExp();
-                }
-
                 if (d->u.var.isConst){
                     /**
                      * 如果是常量声明，需要判断初值是否为constExp
@@ -412,7 +408,20 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     /// 在符号表中创建该const变量的条目，特别保存const的初始值，供之后使用。
                     varEntry->u.var.cValues = E_SingleValue(d->u.var.init->u.intExp); // transExp保证正确
                     S_enter(venv, d->u.var.id, varEntry);
-                } else{
+                    return Tr_nopExp(); // 对于const int，可直接看为一个宏定义不需要翻译，
+                                        // semant会保证每个对其的访问都会优化为一个int值
+                } else if (not frame){
+                    /// 无frame表示此变量为全局变量
+
+                    // 全局变量的初值必须为常数表达式，此处前端保证优化为常数
+                    assert(d->u.var.init->kind == A_exp_::A_intExp);
+                    Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp);
+
+                    /// 对于全局变量的翻译已归frag管理，无需翻译为ir
+                    S_enter(venv, d->u.var.id, varEntry);
+                    return Tr_nopExp();
+                }
+                else {
                     /**
                      * 非常量声明的初值处理
                      */
@@ -423,6 +432,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
             /** 无初值情况 */
 
+            /// 无初值的const变量
+            if (d->u.var.isConst) {
+                varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
+                S_enter(venv, d->u.var.id, varEntry);
+                return Tr_nopExp();
+            }
+
             /// 无初值的全局变量
             if (not frame){
                 Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0);
@@ -430,10 +446,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 return Tr_nopExp();
             }
 
-            /// 无初值的const变量
-            if (d->u.var.isConst) varEntry->u.var.cValues = E_SingleValue(0); /// 无初值常量默认0
-
-            S_enter(venv, d->u.var.id, varEntry);
+            assert(0);
             return Tr_nopExp(); // no init value just allocl momery
         }
         case A_dec_::A_functionDec:{
