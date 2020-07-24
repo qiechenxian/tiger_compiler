@@ -564,7 +564,8 @@ Tr_exp Tr_func_call(Temp_label name,Tr_expList params)
 }
 Tr_exp Tr_assign(Tr_exp left,Tr_exp right)
 {
-    return Tr_Nx(T_Move(Tr_unEx(left),Tr_unEx(right)));
+    return Tr_Nx(T_Move(Tr_unEx(left),
+            Tr_unEx(right)));
 }
 Tr_exp Tr_seq(Tr_exp left,Tr_exp right)
 {

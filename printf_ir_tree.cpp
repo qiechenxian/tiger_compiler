@@ -1,5 +1,5 @@
 //
-// Created by ÇÒ³ÃÏÐ on 22/7/2020.
+// Created by ï¿½Ò³ï¿½ï¿½ï¿½ on 22/7/2020.
 //
 
 /*
@@ -136,18 +136,18 @@ static void pr_tree_exp(FILE *out, T_exp exp, int d) {
 }
 
 void printStmList(FILE *out, F_fragList stmList) {
-    fprintf(out, "\n¡ý---------------IR TREE BEFORE CANNO PRINTF START---------------¡ý\n");
+    fprintf(out, "\nâ†“---------------IR TREE BEFORE CANNO PRINTF START---------------â†“\n");
     if (out == nullptr) {
         fprintf(out, "File open false");
     }
     for (; stmList; stmList = stmList->tail) {
         pr_stm(out, stmList->head->u.proc.body, 0);
     }
-    fprintf(out, "\n¡ü---------------IR TREE BEFORE CANNO PRINTF OVER---------------¡ü\n");
+    fprintf(out, "\nâ†‘---------------IR TREE BEFORE CANNO PRINTF OVER---------------â†‘\n");
 }
 
 void printcannoList(FILE *out, T_stmList stmList) {
-    fprintf(out, "\n¡ý---------------IR TREE AFTER CANNO PRINTF START---------------¡ý\n");
+    fprintf(out, "\nâ†“---------------IR TREE AFTER CANNO PRINTF START---------------â†“\n");
     if (out == nullptr) {
         fprintf(out, "File open false");
     }
@@ -155,5 +155,5 @@ void printcannoList(FILE *out, T_stmList stmList) {
         pr_stm(out, stmList->head, 0);
         fprintf(out, "\n----dived line----\n");
     }
-    fprintf(out, "\n¡ü---------------IR TREE AFTER CANNO PRINTF OVER---------------¡ü\n");
+    fprintf(out, "\nâ†‘---------------IR TREE AFTER CANNO PRINTF OVER---------------â†‘\n");
 }

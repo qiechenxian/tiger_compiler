@@ -245,7 +245,7 @@ static void trace(T_stmList list)
     }
     else {printf("error from trace ");assert(0);}
 }
-static T_stmList getNext()
+static T_stmList getNext()//使所有基本快都被添加到轨迹中
 {
     if (!global_block.stmLists)
         return T_StmList(T_Label(global_block.labels), nullptr);
@@ -267,7 +267,7 @@ T_stmList C_traceSchedule(struct C_block b)
     global_block = b;
 
     for (sList=global_block.stmLists; sList; sList=sList->tail) {
-        S_enter(block_env, sList->head->head->u.LABEL, sList->head);
+        S_enter(block_env, sList->head->head->u.LABEL, sList->head);//
     }
     return getNext();
 }

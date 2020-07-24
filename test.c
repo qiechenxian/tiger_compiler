@@ -1,5 +1,6 @@
 
-int main(){
-    int a=10;
+int main() {
+    int a;
+    a=(-1);
     return 0;
 }
