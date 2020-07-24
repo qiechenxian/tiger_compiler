@@ -401,13 +401,12 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     /// 在符号表中创建该const变量的条目，特别保存const的初始值，供之后使用。
                     varEntry->u.var.cValues = E_SingleValue(d->u.var.init->u.intExp); // transExp保证正确
                     S_enter(venv, d->u.var.id, varEntry);
-                    return Tr_nopExp(); /// 常量声明应该到此为止 todo 验证正确性 是否需要assign
                 } else{
                     /**
                      * 非常量声明的初值处理
                      */
                     S_enter(venv, d->u.var.id, varEntry);
-                    return Tr_assign(Tr_simpleVar(var_access),e.exp); /// todo return assign op
+                    return Tr_assign(Tr_simpleVar(var_access),e.exp);
                 }
             }
 
@@ -494,7 +493,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     switch (s->kind) {
         case A_stm_::A_expStm:{
             expty expty_msg = transExp(venv, tenv, s->u.expStm,l_break,l_continue);
-            // todo translate
             return Expty(expty_msg.exp, expty_msg.ty);
         }
         case A_stm_::A_ifStm:{
@@ -506,13 +504,11 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             body = transStm(frame, venv, tenv, s->u.ifStm.body,l_break,l_continue);
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody,l_break,l_continue);
-                // todo translate
                 if (body.ty != elseBody.ty){
                     EM_error(s->pos, "return different type in if statement");
                 }
                 return Expty(Tr_if_else(test.exp,body.exp,elseBody.exp), body.ty);
             }
-            // todo translate
             return Expty(Tr_if_else(test.exp,body.exp, nullptr), body.ty);
         }
         case A_stm_::A_whileStm:{
@@ -591,15 +587,13 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         "expression not of expected type %s",
                         TY_toString(var.ty));
             }
-            // todo translate
             return Expty(Tr_assign(var.exp,exp.exp), TY_Void());
         }
-        case A_stm_::A_returnStm:{//to do translate  now translate it as put result in rv reg
+        case A_stm_::A_returnStm:{//todo translate  now translate it as put result in rv reg
             if (!s->u.returnStm){
                 return Expty(Tr_nopExp(), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
-            // todo 自建 translate
             return Expty(Tr_return(returnTy.exp), returnTy.ty);
         }
         case A_stm_::A_switchStm:{//not required in grammer
@@ -610,7 +604,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             A_caseList caseIter;
             for (caseIter = s->u.switchStm.body; caseIter; caseIter = caseIter->tail){
                 struct expty body = transStm(frame, venv, tenv, caseIter->head->body,l_break,l_continue);
-                // todo switch
+                // todo 扩展switch
             }
             return Expty(nullptr, TY_Void());
         }
@@ -644,7 +638,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
         }
         case A_exp_::A_charExp:{
             expty expty_msg = Expty(Tr_intExp(a->u.charExp), TY_Int());
-            expty_msg.isConst = true;//todo char translate
+            expty_msg.isConst = true;
             return expty_msg;
         }
         case A_exp_::A_callExp:{
@@ -743,29 +737,17 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 }
                 case A_eq:
                 case A_ne:{
-                    if (left.ty->kind == TY_ty_::TY_int){
-                        if (is_equal_ty(left.ty, right.ty))
-                            printf("int == int");
-                            /// todo translate
-                    }
-                    else if (left.ty->kind == TY_ty_::TY_char){
-                        if (is_equal_ty(left.ty, right.ty))
-                            printf("char == char");
-                            /// todo translate
-                    }
-                    else if (left.ty->kind == TY_ty_::TY_array){
+                    if (left.ty->kind == TY_ty_::TY_array){
                         if (right.ty->kind!=TY_ty_::TY_array  )
                             EM_error(a->u.opExp.right->pos,
                                     "%s expression given for RHS, expected %s",
                                     TY_toString(right.ty), TY_toString(left.ty));
-                        /// todo translate refEq
                     }
                     else if(left.ty->kind == TY_ty_::TY_struct){
                         if (right.ty->kind!=TY_ty_::TY_struct )
                             EM_error(a->u.opExp.right->pos,
                                     "%S expression given for RHS, expected struct tyepe",
                                     TY_toString(right.ty));
-                        /// todo translate refEq
                     } else{
                         EM_error(a->u.opExp.right->pos,
                                 "unexpected %s expression in comparison",
@@ -783,11 +765,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                                  TY_toString(right.ty), TY_toString(left.ty));
                     }
 
-                    if (left.ty->kind == TY_ty_::TY_int){
-                        /// todo translate
-                    } else if (left.ty->kind == TY_ty_::TY_char){
-                        /// todo translate
-                    } else{
+                    if (left.ty->kind != TY_ty_::TY_int and left.ty->kind != TY_ty_::TY_char)
+                    {
                         EM_error(a->u.opExp.right->pos,
                                  "unexpected %s expression in comparison",
                                  TY_toString(right.ty));
@@ -866,7 +845,7 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
         }
         case A_var_::A_structVar:{
             assert(0);
-            // todo struct type
+            // todo 扩展struct type
         }
     }
     assert(0);
