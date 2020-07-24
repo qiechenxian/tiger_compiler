@@ -563,9 +563,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             body = transStm(frame, venv, tenv, s->u.ifStm.body,l_break,l_continue);
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody,l_break,l_continue);
-                if (body.ty != elseBody.ty){
-                    EM_error(s->pos, "return different type in if statement");
-                }
+                // 此处本来有语义检查，但是正确实现比较复杂，且官方保证不会出错，所以删掉了 --loyx 2020/7/24
                 return Expty(Tr_if_else(test.exp,body.exp,elseBody.exp), body.ty);
             }
             return Expty(Tr_if_else(test.exp,body.exp, nullptr), body.ty);
