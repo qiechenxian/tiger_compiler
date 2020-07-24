@@ -140,7 +140,7 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
 
 
 /** frame 相关 */
-F_frame F_newFrame(Temp_label name, U_boolList formals){
+F_frame F_newFrame(Temp_label name, U_boolList formals){//todo comfirm 开心的栈帧时是否需要更新FP
     F_frame f = (F_frame)checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
