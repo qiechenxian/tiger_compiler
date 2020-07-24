@@ -10,6 +10,7 @@ E_envEntry E_VarEntry(bool isConst, Tr_access access, TY_ty ty){
     e->u.var.isConst = isConst;
     e->u.var.cValues = nullptr;
     e->u.var.access = access;
+    e->u.var.suffix_size = nullptr;
     e->u.var.ty = ty;
     return e;
 }

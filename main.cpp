@@ -10,26 +10,29 @@
 #include "codegen.h"
 
 using namespace std;
+static void doProc(F_frame frame, T_stm body)
+{
 
-static void doProc(F_frame frame, T_stm body) {
-
-    FILE *out = stderr;
+    FILE *out=stderr;
 
     AS_proc proc;
     //struct RA_result allocation;
     T_stmList stmList;
     AS_instrList iList;
 
-    F_tempMap = Temp_empty();
+    F_tempMap=Temp_empty();
 
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList));
-    printcannoList(out, stmList);
+    printcannoList (stderr,stmList);
 
-    iList = F_codegen(frame, stmList); /* 9 */
+
+    //fprintf(out,"111");
+    /* printStmList(stdout, stmList);*/
+    iList  = F_codegen(frame, stmList); /* 9 */
 
     fprintf(out, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
-    AS_printInstrList(out, iList, Temp_layerMap(F_tempMap, Temp_name()));
+    AS_printInstrList (out, iList,Temp_layerMap(F_tempMap,Temp_name()));
     fprintf(out, "END %s\n\n", Temp_labelString(F_getName(frame)));
 }
 
@@ -85,28 +88,25 @@ int main(int argc, char **argv) {
     S_table tenv = E_base_typeEntry();
     S_table venv = E_base_valueEntry(tenv);
     yyparse();
-
-    fprintf(stderr, "before semantic ast:\n");
+    fprintf(stderr, "\nbefore semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
     fprintf(stderr, "\n");
 
-    frags = SEM_transProgram(venv, tenv, absyn_root);
+    frags=SEM_transProgram(venv, tenv, absyn_root);
+    printStmList(stderr,frags);
+    fprintf(stderr, "\nsemantic check finish !\n");
+        for (;frags;frags=frags->tail){
+            if (frags->head->kind == F_frag_::F_procFrag)
+            {
+                doProc(frags->head->u.proc.frame, frags->head->u.proc.body);
+            }
+            //doProc(out, frags->head->u.proc.frame, frags->head->u.proc.body);
+            //else if (frags->head->kind == F_frag_::F_stringFrag)
+            //fprintf(out, "%s\n", frags->head->u.stringg.str);
+    }
 
     fprintf(stderr, "\nafter semantic ast:\n");
     pr_decList(stderr, absyn_root, 0);
-    fprintf(stderr, "\nsemantic check finish !\n");
-
-    printStmList(stderr, frags);
-
-    for (; frags; frags = frags->tail) {
-        if (frags->head->kind == F_frag_::F_procFrag) {
-            doProc(frags->head->u.proc.frame, frags->head->u.proc.body);
-        }
-        else if (frags->head->kind == F_frag_::F_stringFrag)
-        fprintf(stderr, "%s\n", frags->head->u.stringg.str);
-    }
-
-
     return 0;
 }
 

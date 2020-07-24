@@ -16,7 +16,18 @@ typedef struct E_constValues_ *E_constValues;
 struct E_envEntry_{
     enum {E_varEntry, E_funEntry}kind;
     union {
-        struct {bool isConst; E_constValues cValues; Tr_access access; TY_ty ty;}var;
+        struct {
+            bool isConst;
+            E_constValues cValues;
+            Tr_access access;
+            TY_ty ty;
+
+            /**
+             * 为翻译数组访问，需要在符号表中记录数组维度后缀和
+             * 约定后缀和数组以-1结尾。例如:[13, 3, 1, -1]
+             */
+            int* suffix_size;
+        }var;
         struct {Temp_label label; TY_tyList formals; TY_ty result;}fun;
     }u;
 };

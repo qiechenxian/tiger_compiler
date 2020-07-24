@@ -18,7 +18,7 @@ struct expty {
 
     /**
      * suffix_size是翻译数组访问时使用的
-     * 来源于INIT_initList->suffix_size
+     * 来源于transDec中，手动统计suffix信息
      * suffix_size中的-1标志结尾
      */
     int* suffix_size;

@@ -6,7 +6,7 @@
  * printtree.c - functions to print out intermediate representation (IR) trees.
  *
  */
-#include <stdio.h>
+#include <cstdio>
 #include "util.h"
 #include "symbol.h"
 #include "temp.h"
