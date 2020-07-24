@@ -72,7 +72,7 @@ static Temp_label nthLabel(Temp_labelList list, int i) {
  * 最后一个参数用来确定临时变量需要如何处理
  */
 static void format(char *result, c_string assem, Temp_tempList dst, Temp_tempList src, AS_targets jumps, Temp_map m) {
-    fprintf(stdout, "a format: assem=%s, dst=%p, src=%p\n", assem, dst, src);
+    fprintf(stderr, "a format: assem=%s, dst=%p, src=%p\n", assem, dst, src);
     char *p;
     int i = 0;
     for (p = assem; p && *p != '\0'; p++) {
@@ -114,7 +114,7 @@ static void format(char *result, c_string assem, Temp_tempList dst, Temp_tempLis
         }
     }
     result[i] = '\0';
-    fprintf(stdout, "result=%s\n", result);
+    fprintf(stderr, "result=%s\n", result);
 }
 
 void AS_print(FILE *out, AS_instr i, Temp_map m) {
