@@ -1,5 +1,5 @@
-const int x=4;
 
 int main(){
-    return x;
+    int a=10;
+    return a;
 }
