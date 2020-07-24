@@ -577,9 +577,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             }
             Tr_exp w_done=Tr_doneExp();
             Tr_exp w_init=Tr_initialExp();
-            Tr_exp save_break=Tr_newlabel();
-            Tr_exp save_conti=Tr_newlabel();
-            struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,save_break,save_conti);//trans之前应生成while的break与continue  label
+            struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,w_done,w_init);//trans之前应生成while的break与continue  label
             return Expty(Tr_while(test.exp,body.exp,w_done,w_init), body.ty);
         }
         case A_stm_::A_blockStm:{
