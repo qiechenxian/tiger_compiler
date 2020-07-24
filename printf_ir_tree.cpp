@@ -13,7 +13,6 @@
 #include "tree.h"
 #include "print_ir_tree.h"
 #include "frame.h"
-FILE* out=fopen("ir_tree_print.txt","w+");
 
 /* local function prototype */
 static void pr_tree_exp(FILE *out, T_exp exp, int d);
@@ -24,7 +23,9 @@ static void indent(FILE *out, int d) {
 }
 
 static char bin_oper[][12] = {
-        "T_BINOP", "T_MEM", "T_TEMP", "T_ESEQ", "T_NAME", "T_CONST", "T_CALL","T_RELOP"};
+        "T_add", "T_sub", "T_mul", "T_div",
+        "T_lshift", "T_rshift", "T_arshift",
+        "T_xor","T_mod"};
 
 static char rel_oper[][12] = {
         "T_lt", "T_le", "T_gt", "T_ge", "T_eq", "T_ne","T_not","T_and", "T_or"};
