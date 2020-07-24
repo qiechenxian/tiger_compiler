@@ -735,7 +735,15 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 }
                 case A_eq:
                 case A_ne:{
-                    if (left.ty->kind == TY_ty_::TY_array){
+                    if (left.ty->kind == TY_ty_::TY_int){
+                        if (is_equal_ty(left.ty, right.ty))
+                            return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    }
+                    else if (left.ty->kind == TY_ty_::TY_char){
+                        if (is_equal_ty(left.ty, right.ty))
+                            return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    }
+                    else if (left.ty->kind == TY_ty_::TY_array){
                         if (right.ty->kind!=TY_ty_::TY_array  )
                             EM_error(a->u.opExp.right->pos,
                                     "%s expression given for RHS, expected %s",
@@ -751,7 +759,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                                 "unexpected %s expression in comparison",
                                 TY_toString(right.ty));
                     }
-                    return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    assert(0);
                 }
                 case A_lt:
                 case A_le:
