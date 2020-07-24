@@ -655,14 +655,22 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                          S_getName(a->u.callExp.id));
                 return Expty(nullptr, TY_Void());
             }
+
             /// 针对putf的特殊处理
             if (strcmp(S_getName(a->u.callExp.id), "putf") == 0){
                 if (a->u.callExp.args->head->kind != A_exp_::A_stringExp){
                     EM_error(a->pos, "The first argument of putf must be a String");
                 }
-                // todo translate
-                return Expty(nullptr, TY_Void());
+                Tr_expList params = Tr_ExpList();
+                A_expList argIter = a->u.callExp.args;
+                /// putf由于是可变长参数，因此不检查类型
+                for (; argIter; argIter = argIter->tail){
+                    struct expty argType = transExp(venv, tenv, argIter->head, l_break, l_continue);
+                    Tr_expList_append(params, argType.exp);
+                }
+                return Expty(Tr_func_call(funEntry->u.fun.label, params), TY_Void());
             }
+
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
             A_expList argIter = a->u.callExp.args;
@@ -675,7 +683,6 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                             "incorrect type %s, expected %s",
                             TY_toString(argType.ty),
                             TY_toString(formals->head));
-                    /// todo translate
                 }
             }
             /// 检查参数个数
@@ -796,7 +803,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             }
         }
         case A_exp_::A_stringExp:
-            break;
+            return Expty(Tr_StringExp(a->u.stringExp), TY_Char());
     }
     assert(0);
 }

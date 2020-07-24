@@ -53,40 +53,43 @@ S_table E_base_valueEntry(S_table tenv){
     auto array1d = (TY_ty)S_look(tenv, S_Symbol((char*)"$int"));
 
     /// (1) int getint()
-    funEntry = E_FunEntry(nullptr, nullptr, TY_Int());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"getint"), nullptr, TY_Int());
     S_enter(t, S_Symbol((char*)"getint"), funEntry);
 
     /// (2) int getch()
-    funEntry = E_FunEntry(nullptr, nullptr, TY_Int());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"getch"), nullptr, TY_Int());
     S_enter(t, S_Symbol((char*)"getch"), funEntry);
 
     /// (3) int getarray(int [])
-    funEntry = E_FunEntry(nullptr, TY_TyList(array1d, nullptr), TY_Int());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"getarray"),
+            TY_TyList(array1d, nullptr), TY_Int());
     S_enter(t, S_Symbol((char*)"getarray"), funEntry);
 
     /// (4) void putint(int)
-    funEntry = E_FunEntry(nullptr, TY_TyList(TY_Int(), nullptr), TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"putint"),
+            TY_TyList(TY_Int(), nullptr), TY_Void());
     S_enter(t, S_Symbol((char*)"putint"), funEntry);
 
     /// (5) void putch(int)
-    funEntry = E_FunEntry(nullptr, TY_TyList(TY_Int(), nullptr), TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"putch"),
+            TY_TyList(TY_Int(), nullptr), TY_Void());
     S_enter(t, S_Symbol((char*)"putch"), funEntry);
 
     /// (6) void putarray(int, int[])
     TY_tyList formals = TY_TyList(TY_Int(), TY_TyList(array1d, nullptr));
-    funEntry = E_FunEntry(nullptr, formals,TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"putarray"), formals,TY_Void());
     S_enter(t, S_Symbol((char*)"putarray"), funEntry);
 
     /// (7) void putf()
-    funEntry = E_FunEntry(nullptr, nullptr, TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"putf"), nullptr, TY_Void());
     S_enter(t, S_Symbol((char*)"putf"), funEntry);
 
     /// (8) void starttime()
-    funEntry = E_FunEntry(nullptr, nullptr, TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"starttime"), nullptr, TY_Void());
     S_enter(t, S_Symbol((char*)"starttime"), funEntry);
 
     /// (9) void stoptime()
-    funEntry = E_FunEntry(nullptr, nullptr, TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"stoptime"), nullptr, TY_Void());
     S_enter(t, S_Symbol((char*)"stoptime"), funEntry);
 
     return t;

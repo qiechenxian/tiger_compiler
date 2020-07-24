@@ -597,3 +597,17 @@ Tr_exp  Tr_add_fuc_head_label(Tr_exp returnValue,Temp_label fun_label)
      temp=T_Seq(T_Label(fun_label),temp);
      return Tr_Nx(temp);
 }
+
+Tr_exp Tr_StringExp(c_string content)
+/**
+ * 字符串字面量翻译，有两个操作：1.创建string frag并添加list 2.返回T_Name(label)
+ * @param content 字符串
+ * @return T_Name(Temp_label)
+ */
+{
+    Temp_label str_pos = Temp_newLabel();
+    F_frag str_frag = F_StringFrag(str_pos, content);
+    fragList = F_FragList(str_frag, fragList);
+
+    return Tr_Ex(T_Name(str_pos));
+}
