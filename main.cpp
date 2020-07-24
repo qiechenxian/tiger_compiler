@@ -24,7 +24,7 @@ static void doProc(F_frame frame, T_stm body)
 
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList));
-    printcannoList (stmList);
+    printcannoList (stderr,stmList);
 
 
     //fprintf(out,"111");
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "\n");
 
     frags=SEM_transProgram(venv, tenv, absyn_root);
-    printStmList(frags);
+    printStmList(stderr,frags);
     fprintf(stderr, "\nsemantic check finish !\n");
         for (;frags;frags=frags->tail){
             if (frags->head->kind == F_frag_::F_procFrag)

@@ -7,6 +7,6 @@
 #include "tree.h"
 #include "temp.h"
 #include "frame.h"
-void printStmList ( F_fragList stmList);
-void printcannoList ( T_stmList stmList);
+void printStmList ( FILE *out,F_fragList stmList);
+void printcannoList (FILE *out, T_stmList stmList);
 #endif //COMPILER_DEV_CPP_PRINT_IR_TREE_H
