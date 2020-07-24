@@ -35,6 +35,37 @@ static TY_tyList makeFormalTys(S_table tenv, A_fieldList params);
 
 
 /** 辅助函数 */
+
+static int* makeSuffixSize(A_expList list)
+/**
+ * 该函数是为了从数组维度信息(a A_expList)中返回后缀和信息，供翻译数组访问时使用。
+ * \函数用于 1.数组声明 2.函数声明时，函数的数组形参处理
+ * \注意 由于函数的数组形参的维度信息(A_expList)没有经过transExp，
+ * 因此函数数组形参调用该函数前需要调用transExp，
+ * 调用transExp是因为，函数的数组形参的维度可能不是一个intExp，但是一个常量表达式，通过调用transExp
+ * 转换为intExp
+ *
+ * @param list 维度信息
+ * @return 维度后缀和
+ */
+{
+    int lens = 0;
+    for (A_expList iter = list; iter; iter = iter->tail, lens++);
+    int* suffix_size = (int*)checked_malloc((lens+1)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
+    int suffix_index = 0;
+    suffix_size[suffix_index++] = 1;
+    for (A_expList iter = list->tail; iter; iter = iter->tail, suffix_index++)
+    {
+        assert(iter->head->kind == A_exp_::A_intExp);
+        suffix_size[suffix_index] = 1;
+        for (int i = 0; i < suffix_index; i++){
+            suffix_size[i] *= iter->head->u.intExp;
+        }
+    }
+    suffix_size[suffix_index] = -1; // 放置结束标志
+    return suffix_size;
+}
+
 static int calculate(A_binOp op, int left, int right) {
     /**
      * 该函数服务于transExp中A_varOp情况。
@@ -247,14 +278,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             }
 
             /** 获取数组后缀和，供翻译数组访问时使用*/
-            int* suffix_size = (int*)checked_malloc((array_total_size+1)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
-            int suffix_index = 0;
-            for (A_expList iter = d->u.array.size; iter; iter = iter->tail)
-            {
-                assert(iter->head->kind == A_exp_::A_intExp);
-                suffix_size[suffix_index++] = iter->head->u.intExp;
-            }
-            suffix_size[suffix_index] = -1; // 放置结束标志
+            int* suffix_size = makeSuffixSize(d->u.array.size);
 
             Tr_access var_access;
             if (frame) {
@@ -479,8 +503,19 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             Tr_accessList argsCL = Tr_getFormals(fun_frame);
             for ( ; typeIter; typeIter = typeIter->tail, formalIter = formalIter->tail){
                 // 语义支持const形参，虽然语法没支持
-                S_enter(venv, formalIter->head->id,
-                        E_VarEntry(formalIter->head->isConst, argsCL->head, typeIter->head));
+
+                E_envEntry arg_entry = E_VarEntry(formalIter->head->isConst,argsCL->head,typeIter->head);
+                if (formalIter->head->size){
+                    /// 如果形参的size属性不为空，则表明这是个数组形参
+                    A_expList dimension = formalIter->head->size;
+                    for (A_expList iter = dimension; iter; iter = iter->tail){
+                        if (iter->head->kind != A_exp_::A_intExp)
+                            transExp(venv, tenv, iter->head, l_break, l_continue);
+                    }
+                    int *suffix_size = makeSuffixSize(dimension);
+                    arg_entry->u.var.suffix_size = suffix_size;
+                }
+                S_enter(venv, formalIter->head->id, arg_entry);
                 argsCL = argsCL->tail;
             }
                 /// trans body
