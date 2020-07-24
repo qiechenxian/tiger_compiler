@@ -680,6 +680,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 a->u.intExp = getConstValue(venv, a);
                 a->kind = A_exp_::A_intExp;
                 var.ty = TY_Int();
+                return Expty(Tr_intExp(a->u.intExp), TY_Int());
                 /// 此处会造成内存泄漏，泄漏对象：a->u.varExp所指的A_var对象
             }
             return var;
