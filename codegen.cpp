@@ -187,12 +187,16 @@ static Temp_temp munchExp(T_exp e) {
             return e->u.TEMP;
         }
         case T_exp_::T_NAME: {
+            // TODO
+            //全局变量lab
             /* NAME(lab) */
             Temp_label label = e->u.NAME;
             Temp_temp r = Temp_newTemp();
             //label处理？
-            sprintf(inst, "MOV %s,'d0\n", Temp_labelString(label));
+            sprintf(inst, "MOV 'd0,%s\n", Temp_labelString(label));
             emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+            sprintf(inst2,"MOV 'd0,['d0]\n");
+            emit(AS_Oper(inst2,L(r,NULL), NULL,NULL));
             return r;
         }
         case T_exp_::T_CALL:
@@ -289,7 +293,19 @@ static void munchStm(T_stm s) {
                     sprintf(inst, "MOV 'd0, 's0\n");
                     emit(AS_Move(inst, L(temp, NULL), L(munchExp(e1), NULL)));
                 }
-            } else {
+            }else if(dst->kind==T_exp_::T_NAME)
+            {
+                //存全局变量
+                /* MOVE(NAME(lab),e1) */
+                T_exp e1=src;
+                Temp_label lab=dst->u.NAME;
+                Temp_temp temp=Temp_newTemp();
+                sprintf(inst,"LDR 'd0,%s\n",Temp_labelString(lab));
+                emit(AS_Oper(inst,L(temp,NULL),NULL,NULL));
+                sprintf(inst2,"STR 's0, ['d0]\n",Temp_labelString(lab));
+                emit(AS_Oper(inst2,L(temp,NULL),L(munchExp(e1),NULL),NULL));
+            }
+            else {
                 assert(0);
             }
             break;
