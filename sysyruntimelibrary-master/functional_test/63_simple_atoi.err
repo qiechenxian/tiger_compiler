@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   functionDec(atoi_,
@@ -330,5 +331,4 @@ before semantic ast:
                  intExp(0))),
                comStmList())))))))))))),
    decList()))
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/63_simple_atoi.sy:13:5: error: return different type in if statement
-int == intint == intint == intint == int
+/mnt/e/compiler/compiler-dev-cpp-new/sysyruntimelibrary-master/functional_test/63_simple_atoi.sy:13:5: error: return different type in if statement

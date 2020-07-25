@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   variableDec(a,
@@ -47,7 +48,6 @@ before semantic ast:
          comStmList()))))),
     decList())))
 
-semantic check finish !
 after semantic ast:
  decList(
   variableDec(a,
@@ -95,4 +95,90 @@ after semantic ast:
                intExp(0))),
              comStmList()))           )),
          comStmList()))))),
-    decList())))int == int
+    decList())))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    MOVE(
+     NAME a,
+     CALL(
+      NAME getint,
+       TEMP tFP)),
+    MOVE(
+     NAME b,
+     CALL(
+      NAME getint,
+       TEMP tFP))),
+   SEQ(
+    SEQ(
+     SEQ(
+      SEQ(
+       CJUMP(T_eq,
+        NAME a,
+        NAME b,
+        L1,L2),
+       SEQ(
+        LABEL L1,
+        MOVE(
+         TEMP tRV,
+         CONST 1))),
+      JUMP(
+       NAME L3)),
+     SEQ(
+      LABEL L2,
+      MOVE(
+       TEMP tRV,
+       CONST 0))),
+    LABEL L3)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  NAME a,
+  CALL(
+   NAME getint,
+    TEMP tFP))
+----dived line----
+ MOVE(
+  NAME b,
+  CALL(
+   NAME getint,
+    TEMP tFP))
+----dived line----
+ CJUMP(T_eq,
+  NAME a,
+  NAME b,
+  L1,L2)
+----dived line----
+ LABEL L2
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 0)
+----dived line----
+ LABEL L3
+----dived line----
+ JUMP(
+  NAME L4)
+----dived line----
+ LABEL L1
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 1)
+----dived line----
+ JUMP(
+  NAME L3)
+----dived line----
+ LABEL L4
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
+Aborted

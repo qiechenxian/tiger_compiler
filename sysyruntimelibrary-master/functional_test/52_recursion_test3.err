@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   variableDec(a,
@@ -89,7 +90,6 @@ before semantic ast:
           comStmList()))))),
      decList()))))
 
-semantic check finish !
 after semantic ast:
  decList(
   variableDec(a,
@@ -180,3 +180,190 @@ after semantic ast:
               expList())))),
           comStmList()))))),
      decList()))))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L3,
+  SEQ(
+   SEQ(
+    EXP(
+     CONST 0),
+    MOVE(
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -4)),
+     CONST 5)),
+   MOVE(
+    TEMP tRV,
+    CALL(
+     NAME L0,
+      TEMP tFP,
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -4)))))) SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      SEQ(
+       SEQ(
+        CJUMP(T_lt,
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST 4)),
+         CONST 2,
+         L1,L2),
+        SEQ(
+         LABEL L1,
+         MOVE(
+          TEMP tRV,
+          CONST 1))),
+       LABEL L2),
+      MOVE(
+       NAME a,
+       BINOP(T_sub,
+        MEM(
+         BINOP(T_add,
+          TEMP tFP,
+          CONST 4)),
+        CONST 1))),
+     MOVE(
+      NAME r,
+      CALL(
+       NAME L0,
+        TEMP tFP,
+        NAME a))),
+    MOVE(
+     NAME r,
+     BINOP(T_mul,
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST 4)),
+      NAME r))),
+   MOVE(
+    TEMP tRV,
+    NAME r)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L3
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 5)
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CALL(
+   NAME L0,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4))))
+----dived line----
+ JUMP(
+  NAME L4)
+----dived line----
+ LABEL L4
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+a format: assem=L3:
+, dst=(nil), src=(nil)
+result=L3:
+
+a format: assem=MOV 'd0,#5
+, dst=0x55a9ac42c860, src=(nil)
+result=MOV 101,#5
+
+a format: assem=STR 's0,['d0,#-4]
+, dst=0x55a9ac42ca70, src=0x55a9ac42c8d0
+result=STR 101,[FP,#-4]
+
+a format: assem=BL L0
+, dst=0x55a9ac42cd10, src=(nil)
+result=BL L0
+
+a format: assem=MOV `d0, `s0
+, dst=0x55a9ac42cda0, src=0x55a9ac42cd80
+result=MOV `d0, `s0
+
+a format: assem=B L4
+, dst=(nil), src=(nil)
+result=B L4
+
+a format: assem=L4:
+, dst=(nil), src=(nil)
+result=L4:
+
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ CJUMP(T_lt,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST 4)),
+  CONST 2,
+  L1,L2)
+----dived line----
+ LABEL L2
+----dived line----
+ MOVE(
+  NAME a,
+  BINOP(T_sub,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST 4)),
+   CONST 1))
+----dived line----
+ MOVE(
+  NAME r,
+  CALL(
+   NAME L0,
+    TEMP tFP,
+    NAME a))
+----dived line----
+ MOVE(
+  NAME r,
+  BINOP(T_mul,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST 4)),
+   NAME r))
+----dived line----
+ MOVE(
+  TEMP tRV,
+  NAME r)
+----dived line----
+ JUMP(
+  NAME L5)
+----dived line----
+ LABEL L1
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 1)
+----dived line----
+ JUMP(
+  NAME L2)
+----dived line----
+ LABEL L5
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
+Aborted

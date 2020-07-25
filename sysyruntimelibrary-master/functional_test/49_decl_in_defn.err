@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   functionDec(main,
@@ -38,7 +39,6 @@ before semantic ast:
          comStmList()))))))),
   decList())
 
-semantic check finish !
 after semantic ast:
  decList(
   functionDec(main,
@@ -78,3 +78,109 @@ after semantic ast:
            intExp(0))),
          comStmList()))))))),
   decList())
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      EXP(
+       CONST 0),
+      MOVE(
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4)),
+       CONST 12)),
+     EXP(
+      CONST 0)),
+    EXP(
+     CALL(
+      NAME putint,
+       TEMP tFP,
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4))))),
+   MOVE(
+    TEMP tRV,
+    CONST 0)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 12)
+----dived line----
+ EXP(
+  CALL(
+   NAME putint,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4))))
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 0)
+----dived line----
+ JUMP(
+  NAME L1)
+----dived line----
+ LABEL L1
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+a format: assem=L0:
+, dst=(nil), src=(nil)
+result=L0:
+
+a format: assem=MOV 'd0,#12
+, dst=0x55f31819a940, src=(nil)
+result=MOV 100,#12
+
+a format: assem=STR 's0,['d0,#-4]
+, dst=0x55f31819ab50, src=0x55f31819a9b0
+result=STR 100,[FP,#-4]
+
+a format: assem=BL putint
+, dst=(nil), src=(nil)
+result=BL putint
+
+a format: assem=MOV 'd0,#0
+, dst=0x55f31819b140, src=(nil)
+result=MOV 101,#0
+
+a format: assem=MOV 'd0, 's0
+, dst=0x55f31819b1d0, src=0x55f31819b1b0
+result=MOV RV, 101
+
+a format: assem=B L1
+, dst=(nil), src=(nil)
+result=B L1
+
+a format: assem=L1:
+, dst=(nil), src=(nil)
+result=L1:
+
+BEGIN L0
+L0:
+MOV 100,#12
+STR 100,[FP,#-4]
+BL putint
+MOV 101,#0
+MOV RV, 101
+B L1
+L1:
+
+END L0
+

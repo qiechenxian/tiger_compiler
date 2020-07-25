@@ -1,10 +1,9 @@
 int a;
-int main()
-{
-    a=10;
-    int b=a+10;
+int b;
+int main(){
+    a = 10;
+    b = 3;
     int c;
-    c=10;
-    b=c+20;
-    return 0;
+    c = a / b;
+    return c;
 }

@@ -8,7 +8,6 @@
 #include "cannon.h"
 #include "print_ir_tree.h"
 #include "codegen.h"
-
 using namespace std;
 
 static void doProc(FILE *outfile,F_frame frame, T_stm body) {

@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   variableDec(a,
@@ -49,7 +50,6 @@ before semantic ast:
           comStmList())))))),
     decList())))
 
-semantic check finish !
 after semantic ast:
  decList(
   variableDec(a,
@@ -100,3 +100,77 @@ after semantic ast:
              simpleVar(c)))),
           comStmList())))))),
     decList())))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     MOVE(
+      NAME a,
+      CONST 10),
+     MOVE(
+      NAME b,
+      CONST 5)),
+    MOVE(
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -4)),
+     BINOP(T_add,
+      BINOP(T_add,
+       BINOP(T_mul,
+        NAME a,
+        CONST 2),
+       NAME b),
+      CONST 3))),
+   MOVE(
+    TEMP tRV,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4)))))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  NAME a,
+  CONST 10)
+----dived line----
+ MOVE(
+  NAME b,
+  CONST 5)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  BINOP(T_add,
+   BINOP(T_add,
+    BINOP(T_mul,
+     NAME a,
+     CONST 2),
+    NAME b),
+   CONST 3))
+----dived line----
+ MOVE(
+  TEMP tRV,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)))
+----dived line----
+ JUMP(
+  NAME L1)
+----dived line----
+ LABEL L1
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
+Aborted

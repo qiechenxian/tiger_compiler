@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   functionDec(main,
@@ -25,7 +26,6 @@ before semantic ast:
        comStmList()))))),
   decList())
 
-semantic check finish !
 after semantic ast:
  decList(
   functionDec(main,
@@ -52,3 +52,116 @@ after semantic ast:
           simpleVar(a)))),
        comStmList()))))),
   decList())
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    EXP(
+     CONST 0),
+    MOVE(
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -4)),
+     CALL(
+      NAME getint,
+       TEMP tFP))),
+   MOVE(
+    TEMP tRV,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4)))))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  TEMP t101,
+  BINOP(T_add,
+   TEMP tFP,
+   CONST -4))
+----dived line----
+ MOVE(
+  TEMP t100,
+  CALL(
+   NAME getint,
+    TEMP tFP))
+----dived line----
+ MOVE(
+  MEM(
+   TEMP t101),
+  TEMP t100)
+----dived line----
+ MOVE(
+  TEMP tRV,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)))
+----dived line----
+ JUMP(
+  NAME L1)
+----dived line----
+ LABEL L1
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+a format: assem=L0:
+, dst=(nil), src=(nil)
+result=L0:
+
+a format: assem=ADD 'd0,'s0,-4
+, dst=0x5645059ba650, src=0x5645059ba630
+result=ADD 102,FP,-4
+
+a format: assem=MOV 'd0, 's0
+, dst=0x5645059ba6e0, src=0x5645059ba6c0
+result=MOV 101, 102
+
+a format: assem=BL getint
+, dst=0x5645059ba980, src=(nil)
+result=BL getint
+
+a format: assem=MOV `d0, `s0
+, dst=0x5645059baa10, src=0x5645059ba9f0
+result=MOV `d0, `s0
+
+a format: assem=STR 's1,['s0]
+, dst=(nil), src=0x5645059baf20
+result=STR 100,[101]
+
+a format: assem=LDR 'd0,['s0,#-4]
+, dst=0x5645059bb4a0, src=0x5645059bb480
+result=LDR 104,[FP,#-4]
+
+a format: assem=MOV 'd0, 's0
+, dst=0x5645059bb530, src=0x5645059bb510
+result=MOV RV, 104
+
+a format: assem=B L1
+, dst=(nil), src=(nil)
+result=B L1
+
+a format: assem=L1:
+, dst=(nil), src=(nil)
+result=L1:
+
+BEGIN L0
+L0:
+ADD 102,FP,-4
+MOV 101, 102
+BL getint
+MOV `d0, `s0
+STR 100,[101]
+LDR 104,[FP,#-4]
+MOV RV, 104
+B L1
+L1:
+
+END L0
+
