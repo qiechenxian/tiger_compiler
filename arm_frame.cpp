@@ -140,11 +140,11 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
 
 
 /** frame 相关 */
-F_frame F_newFrame(Temp_label name, U_boolList formals){//todo comfirm 开心的栈帧时是否需要更新FP
+F_frame F_newFrame(Temp_label name, U_boolList formals){
     F_frame f = (F_frame)checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 0;
+    f->local_count = 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     f->locals=nullptr;
     return f;
 }
