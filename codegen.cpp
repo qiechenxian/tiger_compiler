@@ -345,7 +345,7 @@ static void munchStm(T_stm s) {
                     Temp_temp r1 = munchExp(e1);
                     Temp_tempList l = munchArgs(0, args);
                     Temp_tempList calldefs = NULL; // TODO
-                    // 此处未写，call(e1,args)
+                    // TODO 此处未写，call(e1,args)语义不明
                 }
             } else {
                 /* EXP(e) */
@@ -364,7 +364,7 @@ static void munchStm(T_stm s) {
                 /* JUMP(e) */
                 T_exp e1 = s->u.JUMP.exp;
                 Temp_labelList jumps = s->u.JUMP.jumps;
-                // TODO 此处未写，jump(e)
+                // TODO 此处未写，jump(e)语义不明
             }
             break;
         }
