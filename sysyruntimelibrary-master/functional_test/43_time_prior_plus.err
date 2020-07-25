@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   functionDec(main,
@@ -100,7 +101,6 @@ before semantic ast:
                comStmList()))))))))))))),
   decList())
 
-semantic check finish !
 after semantic ast:
  decList(
   functionDec(main,
@@ -199,3 +199,198 @@ after semantic ast:
                  intExp(0))),
                comStmList()))))))))))))),
   decList())
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      SEQ(
+       SEQ(
+        SEQ(
+         SEQ(
+          SEQ(
+           SEQ(
+            EXP(
+             CONST 0),
+            MOVE(
+             MEM(
+              BINOP(T_add,
+               TEMP tFP,
+               CONST -4)),
+             CONST 20)),
+           EXP(
+            CONST 0)),
+          MOVE(
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -8)),
+           CONST 5)),
+         EXP(
+          CONST 0)),
+        MOVE(
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST -12)),
+         CONST 6)),
+       EXP(
+        CONST 0)),
+      MOVE(
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -16)),
+       BINOP(T_sub,
+        CONST 0,
+        CONST 4))),
+     MOVE(
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -4)),
+      BINOP(T_sub,
+       BINOP(T_add,
+        MEM(
+         BINOP(T_add,
+          TEMP tFP,
+          CONST -4)),
+        BINOP(T_mul,
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST -12)),
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST -16)))),
+       BINOP(T_div,
+        BINOP(T_mod,
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST -8)),
+         BINOP(T_add,
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -4)),
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -16)))),
+        MEM(
+         BINOP(T_add,
+          TEMP tFP,
+          CONST -4)))))),
+    EXP(
+     CALL(
+      NAME putint,
+       TEMP tFP,
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4))))),
+   MOVE(
+    TEMP tRV,
+    CONST 0)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 20)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -8)),
+  CONST 5)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -12)),
+  CONST 6)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -16)),
+  BINOP(T_sub,
+   CONST 0,
+   CONST 4))
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  BINOP(T_sub,
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4)),
+    BINOP(T_mul,
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -12)),
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -16)))),
+   BINOP(T_div,
+    BINOP(T_mod,
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -8)),
+     BINOP(T_add,
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -4)),
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -16)))),
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4)))))
+----dived line----
+ EXP(
+  CALL(
+   NAME putint,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4))))
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 0)
+----dived line----
+ JUMP(
+  NAME L1)
+----dived line----
+ LABEL L1
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+Segmentation fault

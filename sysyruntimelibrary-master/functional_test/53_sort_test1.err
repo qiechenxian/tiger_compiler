@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   variableDec(n,
@@ -330,7 +331,6 @@ before semantic ast:
                       comStmList())))))))))))))))))),
     decList())))
 
-semantic check finish !
 after semantic ast:
  decList(
   variableDec(n,
@@ -662,3 +662,657 @@ after semantic ast:
                         intExp(0))),
                       comStmList())))))))))))))))))),
     decList())))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L13,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      SEQ(
+       SEQ(
+        SEQ(
+         SEQ(
+          SEQ(
+           SEQ(
+            SEQ(
+             SEQ(
+              SEQ(
+               SEQ(
+                SEQ(
+                 MOVE(
+                  NAME n,
+                  CONST 10),
+                 EXP(
+                  CONST 0)),
+                MOVE(
+                 MEM(
+                  BINOP(T_add,
+                   MEM(
+                    BINOP(T_add,
+                     TEMP tFP,
+                     CONST -40)),
+                   BINOP(T_mul,
+                    CONST 0,
+                    CONST 4))),
+                 CONST 4)),
+               MOVE(
+                MEM(
+                 BINOP(T_add,
+                  MEM(
+                   BINOP(T_add,
+                    TEMP tFP,
+                    CONST -40)),
+                  BINOP(T_mul,
+                   CONST 1,
+                   CONST 4))),
+                CONST 3)),
+              MOVE(
+               MEM(
+                BINOP(T_add,
+                 MEM(
+                  BINOP(T_add,
+                   TEMP tFP,
+                   CONST -40)),
+                 BINOP(T_mul,
+                  CONST 2,
+                  CONST 4))),
+               CONST 9)),
+             MOVE(
+              MEM(
+               BINOP(T_add,
+                MEM(
+                 BINOP(T_add,
+                  TEMP tFP,
+                  CONST -40)),
+                BINOP(T_mul,
+                 CONST 3,
+                 CONST 4))),
+              CONST 2)),
+            MOVE(
+             MEM(
+              BINOP(T_add,
+               MEM(
+                BINOP(T_add,
+                 TEMP tFP,
+                 CONST -40)),
+               BINOP(T_mul,
+                CONST 4,
+                CONST 4))),
+             CONST 0)),
+           MOVE(
+            MEM(
+             BINOP(T_add,
+              MEM(
+               BINOP(T_add,
+                TEMP tFP,
+                CONST -40)),
+              BINOP(T_mul,
+               CONST 5,
+               CONST 4))),
+            CONST 1)),
+          MOVE(
+           MEM(
+            BINOP(T_add,
+             MEM(
+              BINOP(T_add,
+               TEMP tFP,
+               CONST -40)),
+             BINOP(T_mul,
+              CONST 6,
+              CONST 4))),
+           CONST 6)),
+         MOVE(
+          MEM(
+           BINOP(T_add,
+            MEM(
+             BINOP(T_add,
+              TEMP tFP,
+              CONST -40)),
+            BINOP(T_mul,
+             CONST 7,
+             CONST 4))),
+          CONST 5)),
+        MOVE(
+         MEM(
+          BINOP(T_add,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -40)),
+           BINOP(T_mul,
+            CONST 8,
+            CONST 4))),
+         CONST 7)),
+       MOVE(
+        MEM(
+         BINOP(T_add,
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -40)),
+          BINOP(T_mul,
+           CONST 9,
+           CONST 4))),
+        CONST 8)),
+      EXP(
+       CONST 0)),
+     MOVE(
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -44)),
+      CALL(
+       NAME L0,
+        TEMP tFP,
+        MEM(
+         BINOP(T_add,
+          TEMP tFP,
+          CONST -40))))),
+    SEQ(
+     LABEL L15,
+     SEQ(
+      CJUMP(T_lt,
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -44)),
+       NAME n,
+       L18,L14),
+      SEQ(
+       LABEL L18,
+       SEQ(
+        SEQ(
+         SEQ(
+          SEQ(
+           SEQ(
+            SEQ(
+             EXP(
+              CONST 0),
+             MOVE(
+              MEM(
+               BINOP(T_add,
+                TEMP tFP,
+                CONST -48)),
+              MEM(
+               BINOP(T_add,
+                MEM(
+                 BINOP(T_add,
+                  TEMP tFP,
+                  CONST -40)),
+                BINOP(T_mul,
+                 MEM(
+                  BINOP(T_add,
+                   TEMP tFP,
+                   CONST -44)),
+                 CONST 4))))),
+            EXP(
+             CALL(
+              NAME putint,
+               TEMP tFP,
+               MEM(
+                BINOP(T_add,
+                 TEMP tFP,
+                 CONST -48))))),
+           MOVE(
+            MEM(
+             BINOP(T_add,
+              TEMP tFP,
+              CONST -48)),
+            CONST 10)),
+          EXP(
+           CALL(
+            NAME putch,
+             TEMP tFP,
+             MEM(
+              BINOP(T_add,
+               TEMP tFP,
+               CONST -48))))),
+         MOVE(
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -44)),
+          BINOP(T_add,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -44)),
+           CONST 1))),
+        SEQ(
+         JUMP(
+          NAME L15),
+         LABEL L14)))))),
+   MOVE(
+    TEMP tRV,
+    CONST 0))) SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      EXP(
+       CONST 0),
+      EXP(
+       CONST 0)),
+     MOVE(
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -4)),
+      CONST 0)),
+    SEQ(
+     LABEL L2,
+     SEQ(
+      CJUMP(T_lt,
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4)),
+       BINOP(T_sub,
+        NAME n,
+        CONST 1),
+       L12,L1),
+      SEQ(
+       LABEL L12,
+       SEQ(
+        SEQ(
+         SEQ(
+          MOVE(
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -8)),
+           CONST 0),
+          SEQ(
+           LABEL L6,
+           SEQ(
+            CJUMP(T_lt,
+             MEM(
+              BINOP(T_add,
+               TEMP tFP,
+               CONST -8)),
+             BINOP(T_sub,
+              BINOP(T_sub,
+               NAME n,
+               MEM(
+                BINOP(T_add,
+                 TEMP tFP,
+                 CONST -4))),
+              CONST 1),
+             L11,L5),
+            SEQ(
+             LABEL L11,
+             SEQ(
+              SEQ(
+               SEQ(
+                SEQ(
+                 CJUMP(T_gt,
+                  MEM(
+                   BINOP(T_add,
+                    MEM(
+                     BINOP(T_add,
+                      TEMP tFP,
+                      CONST 4)),
+                    BINOP(T_mul,
+                     MEM(
+                      BINOP(T_add,
+                       TEMP tFP,
+                       CONST -8)),
+                     CONST 4))),
+                  MEM(
+                   BINOP(T_add,
+                    MEM(
+                     BINOP(T_add,
+                      TEMP tFP,
+                      CONST 4)),
+                    BINOP(T_mul,
+                     BINOP(T_add,
+                      MEM(
+                       BINOP(T_add,
+                        TEMP tFP,
+                        CONST -8)),
+                      CONST 1),
+                     CONST 4))),
+                  L9,L10),
+                 SEQ(
+                  LABEL L9,
+                  SEQ(
+                   SEQ(
+                    SEQ(
+                     EXP(
+                      CONST 0),
+                     MOVE(
+                      MEM(
+                       BINOP(T_add,
+                        TEMP tFP,
+                        CONST -12)),
+                      MEM(
+                       BINOP(T_add,
+                        MEM(
+                         BINOP(T_add,
+                          TEMP tFP,
+                          CONST 4)),
+                        BINOP(T_mul,
+                         BINOP(T_add,
+                          MEM(
+                           BINOP(T_add,
+                            TEMP tFP,
+                            CONST -8)),
+                          CONST 1),
+                         CONST 4))))),
+                    MOVE(
+                     MEM(
+                      BINOP(T_add,
+                       MEM(
+                        BINOP(T_add,
+                         TEMP tFP,
+                         CONST 4)),
+                       BINOP(T_mul,
+                        BINOP(T_add,
+                         MEM(
+                          BINOP(T_add,
+                           TEMP tFP,
+                           CONST -8)),
+                         CONST 1),
+                        CONST 4))),
+                     MEM(
+                      BINOP(T_add,
+                       MEM(
+                        BINOP(T_add,
+                         TEMP tFP,
+                         CONST 4)),
+                       BINOP(T_mul,
+                        MEM(
+                         BINOP(T_add,
+                          TEMP tFP,
+                          CONST -8)),
+                        CONST 4))))),
+                   MOVE(
+                    MEM(
+                     BINOP(T_add,
+                      MEM(
+                       BINOP(T_add,
+                        TEMP tFP,
+                        CONST 4)),
+                      BINOP(T_mul,
+                       MEM(
+                        BINOP(T_add,
+                         TEMP tFP,
+                         CONST -8)),
+                       CONST 4))),
+                    MEM(
+                     BINOP(T_add,
+                      TEMP tFP,
+                      CONST -12)))))),
+                LABEL L10),
+               MOVE(
+                MEM(
+                 BINOP(T_add,
+                  TEMP tFP,
+                  CONST -8)),
+                BINOP(T_add,
+                 MEM(
+                  BINOP(T_add,
+                   TEMP tFP,
+                   CONST -8)),
+                 CONST 1))),
+              SEQ(
+               JUMP(
+                NAME L6),
+               LABEL L5)))))),
+         MOVE(
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -4)),
+          BINOP(T_add,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -4)),
+           CONST 1))),
+        SEQ(
+         JUMP(
+          NAME L2),
+         LABEL L1)))))),
+   MOVE(
+    TEMP tRV,
+    CONST 0)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L13
+----dived line----
+ MOVE(
+  NAME n,
+  CONST 10)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 0,
+     CONST 4))),
+  CONST 4)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 1,
+     CONST 4))),
+  CONST 3)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 2,
+     CONST 4))),
+  CONST 9)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 3,
+     CONST 4))),
+  CONST 2)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 4,
+     CONST 4))),
+  CONST 0)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 5,
+     CONST 4))),
+  CONST 1)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 6,
+     CONST 4))),
+  CONST 6)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 7,
+     CONST 4))),
+  CONST 5)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 8,
+     CONST 4))),
+  CONST 7)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     CONST 9,
+     CONST 4))),
+  CONST 8)
+----dived line----
+ MOVE(
+  TEMP t102,
+  BINOP(T_add,
+   TEMP tFP,
+   CONST -44))
+----dived line----
+ MOVE(
+  TEMP t101,
+  CALL(
+   NAME L0,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40))))
+----dived line----
+ MOVE(
+  MEM(
+   TEMP t102),
+  TEMP t101)
+----dived line----
+ LABEL L15
+----dived line----
+ CJUMP(T_lt,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -44)),
+  NAME n,
+  L18,L14)
+----dived line----
+ LABEL L14
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 0)
+----dived line----
+ JUMP(
+  NAME L19)
+----dived line----
+ LABEL L18
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -48)),
+  MEM(
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -40)),
+    BINOP(T_mul,
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST -44)),
+     CONST 4))))
+----dived line----
+ EXP(
+  CALL(
+   NAME putint,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -48))))
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -48)),
+  CONST 10)
+----dived line----
+ EXP(
+  CALL(
+   NAME putch,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -48))))
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -44)),
+  BINOP(T_add,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST -44)),
+   CONST 1))
+----dived line----
+ JUMP(
+  NAME L15)
+----dived line----
+ LABEL L19
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
+Aborted

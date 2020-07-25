@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   variableDec(x,
@@ -17,7 +18,6 @@ before semantic ast:
       comStmList()))),
    decList()))
 
-semantic check finish !
 after semantic ast:
  decList(
   variableDec(x,
@@ -35,3 +35,56 @@ after semantic ast:
         intExp(4))),
       comStmList()))),
    decList()))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  MOVE(
+   TEMP tRV,
+   NAME x))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  TEMP tRV,
+  NAME x)
+----dived line----
+ JUMP(
+  NAME L1)
+----dived line----
+ LABEL L1
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+a format: assem=L0:
+, dst=(nil), src=(nil)
+result=L0:
+
+a format: assem=MOV x,'d0
+, dst=0x558f102b3570, src=(nil)
+result=MOV x,100
+
+a format: assem=MOV 'd0, 's0
+, dst=0x558f102b3600, src=0x558f102b35e0
+result=MOV RV, 100
+
+a format: assem=B L1
+, dst=(nil), src=(nil)
+result=B L1
+
+a format: assem=L1:
+, dst=(nil), src=(nil)
+result=L1:
+
+BEGIN L0
+L0:
+MOV x,100
+MOV RV, 100
+B L1
+L1:
+
+END L0
+

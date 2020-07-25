@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   functionDec(main,
@@ -136,7 +137,6 @@ before semantic ast:
                comStmList()))))))))))))),
   decList())
 
-semantic check finish !
 after semantic ast:
  decList(
   functionDec(main,
@@ -270,4 +270,277 @@ after semantic ast:
                 returnStm(
                  intExp(0))),
                comStmList()))))))))))))),
-  decList())int == intint == int
+  decList())
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      SEQ(
+       SEQ(
+        SEQ(
+         SEQ(
+          SEQ(
+           SEQ(
+            EXP(
+             CONST 0),
+            EXP(
+             CONST 0)),
+           EXP(
+            CONST 0)),
+          EXP(
+           CONST 0)),
+         MOVE(
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -4)),
+          CONST 3)),
+        MOVE(
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST -8)),
+         CONST 8)),
+       MOVE(
+        MEM(
+         BINOP(T_add,
+          TEMP tFP,
+          CONST -12)),
+        BINOP(T_sub,
+         CONST 0,
+         CONST 4))),
+      MOVE(
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -16)),
+       CONST 15)),
+     EXP(
+      CONST 0)),
+    SEQ(
+     SEQ(
+      SEQ(
+       SEQ(
+        CJUMP(T_ne,
+         BINOP(T_mod,
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -16)),
+          BINOP(T_sub,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -8)),
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -4)))),
+         CONST 0,
+         L3,L1),
+        SEQ(
+         LABEL L1,
+         CJUMP(T_gt,
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -4)),
+          CONST 0,
+          L3,L5))),
+       SEQ(
+        LABEL L3,
+        SEQ(
+         CJUMP(T_eq,
+          BINOP(T_mod,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -16)),
+           CONST 3),
+          CONST 0,
+          L4,L2),
+         SEQ(
+          LABEL L2,
+          CJUMP(T_gt,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -12)),
+           CONST 0,
+           L4,L5))))),
+      SEQ(
+       LABEL L4,
+       SEQ(
+        MOVE(
+         MEM(
+          BINOP(T_add,
+           TEMP tFP,
+           CONST -20)),
+         BINOP(T_sub,
+          BINOP(T_add,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -16)),
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -12))),
+          BINOP(T_sub,
+           CONST 0,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -8))))),
+        EXP(
+         CALL(
+          NAME putint,
+           TEMP tFP,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -20))))))),
+     LABEL L5)),
+   MOVE(
+    TEMP tRV,
+    CONST 0)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 3)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -8)),
+  CONST 8)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -12)),
+  BINOP(T_sub,
+   CONST 0,
+   CONST 4))
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -16)),
+  CONST 15)
+----dived line----
+ CJUMP(T_ne,
+  BINOP(T_mod,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST -16)),
+   BINOP(T_sub,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -8)),
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -4)))),
+  CONST 0,
+  L3,L1)
+----dived line----
+ LABEL L1
+----dived line----
+ CJUMP(T_gt,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 0,
+  L3,L5)
+----dived line----
+ LABEL L5
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 0)
+----dived line----
+ JUMP(
+  NAME L6)
+----dived line----
+ LABEL L3
+----dived line----
+ CJUMP(T_eq,
+  BINOP(T_mod,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST -16)),
+   CONST 3),
+  CONST 0,
+  L4,L2)
+----dived line----
+ LABEL L2
+----dived line----
+ CJUMP(T_le,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -12)),
+  CONST 0,
+  L5,L4)
+----dived line----
+ LABEL L4
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -20)),
+  BINOP(T_sub,
+   BINOP(T_add,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -16)),
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -12))),
+   BINOP(T_sub,
+    CONST 0,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -8)))))
+----dived line----
+ EXP(
+  CALL(
+   NAME putint,
+    TEMP tFP,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -20))))
+----dived line----
+ JUMP(
+  NAME L5)
+----dived line----
+ LABEL L6
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+Segmentation fault

@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   arrayDec(a,
@@ -146,7 +147,6 @@ before semantic ast:
         comStmList())))),
     decList())))
 
-semantic check finish !
 after semantic ast:
  decList(
   arrayDec(a,
@@ -294,3 +294,589 @@ after semantic ast:
           intExp(0))),
         comStmList())))),
     decList())))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L11,
+  SEQ(
+   EXP(
+    CALL(
+     NAME putint,
+      TEMP tFP,
+      CALL(
+       NAME L0,
+        TEMP tFP,
+        NAME a))),
+   MOVE(
+    TEMP tRV,
+    CONST 0))) SEQ(
+  LABEL L0,
+  SEQ(
+   SEQ(
+    SEQ(
+     SEQ(
+      MOVE(
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4)),
+       CONST 0),
+      MOVE(
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -8)),
+       CONST 0)),
+     MOVE(
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -12)),
+      CONST 0)),
+    SEQ(
+     LABEL L2,
+     SEQ(
+      CJUMP(T_lt,
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4)),
+       CONST 5,
+       L10,L1),
+      SEQ(
+       LABEL L10,
+       SEQ(
+        SEQ(
+         SEQ(
+          LABEL L6,
+          SEQ(
+           CJUMP(T_lt,
+            MEM(
+             BINOP(T_add,
+              TEMP tFP,
+              CONST -8)),
+            CONST 5,
+            L9,L5),
+           SEQ(
+            LABEL L9,
+            SEQ(
+             SEQ(
+              MOVE(
+               MEM(
+                BINOP(T_add,
+                 TEMP tFP,
+                 CONST -12)),
+               BINOP(T_add,
+                MEM(
+                 BINOP(T_add,
+                  TEMP tFP,
+                  CONST -12)),
+                MEM(
+                 BINOP(T_add,
+                  BINOP(T_add,
+                   MEM(
+                    BINOP(T_add,
+                     TEMP tFP,
+                     CONST 4)),
+                   BINOP(T_mul,
+                    MEM(
+                     BINOP(T_add,
+                      TEMP tFP,
+                      CONST -4)),
+                    CONST 20)),
+                  BINOP(T_mul,
+                   MEM(
+                    BINOP(T_add,
+                     TEMP tFP,
+                     CONST -8)),
+                   CONST 4))))),
+              MOVE(
+               MEM(
+                BINOP(T_add,
+                 TEMP tFP,
+                 CONST -8)),
+               BINOP(T_add,
+                MEM(
+                 BINOP(T_add,
+                  TEMP tFP,
+                  CONST -8)),
+                CONST 1))),
+             SEQ(
+              JUMP(
+               NAME L6),
+              LABEL L5))))),
+         MOVE(
+          MEM(
+           BINOP(T_add,
+            TEMP tFP,
+            CONST -4)),
+          BINOP(T_add,
+           MEM(
+            BINOP(T_add,
+             TEMP tFP,
+             CONST -4)),
+           CONST 1))),
+        SEQ(
+         JUMP(
+          NAME L2),
+         LABEL L1)))))),
+   MOVE(
+    TEMP tRV,
+    MEM(
+     BINOP(T_add,
+      TEMP tFP,
+      CONST -12)))))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L11
+----dived line----
+ MOVE(
+  TEMP t101,
+  TEMP tFP)
+----dived line----
+ MOVE(
+  TEMP t100,
+  CALL(
+   NAME L0,
+    TEMP tFP,
+    NAME a))
+----dived line----
+ EXP(
+  CALL(
+   NAME putint,
+    TEMP t101,
+    TEMP t100))
+----dived line----
+ MOVE(
+  TEMP tRV,
+  CONST 0)
+----dived line----
+ JUMP(
+  NAME L12)
+----dived line----
+ LABEL L12
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+a format: assem=L11:
+, dst=(nil), src=(nil)
+result=L11:
+
+a format: assem=MOV 'd0, 's0
+, dst=0x55d59c4c2ae0, src=0x55d59c4c2ac0
+result=MOV 101, FP
+
+a format: assem=BL L0
+, dst=0x55d59c4c2d80, src=(nil)
+result=BL L0
+
+a format: assem=MOV `d0, `s0
+, dst=0x55d59c4c2e10, src=0x55d59c4c2df0
+result=MOV `d0, `s0
+
+a format: assem=BL putint
+, dst=(nil), src=(nil)
+result=BL putint
+
+a format: assem=MOV 'd0,#0
+, dst=0x55d59c4c3400, src=(nil)
+result=MOV 103,#0
+
+a format: assem=MOV 'd0, 's0
+, dst=0x55d59c4c3490, src=0x55d59c4c3470
+result=MOV RV, 103
+
+a format: assem=B L12
+, dst=(nil), src=(nil)
+result=B L12
+
+a format: assem=L12:
+, dst=(nil), src=(nil)
+result=L12:
+
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L0
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 0)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -8)),
+  CONST 0)
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -12)),
+  CONST 0)
+----dived line----
+ LABEL L2
+----dived line----
+ CJUMP(T_lt,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  CONST 5,
+  L10,L1)
+----dived line----
+ LABEL L1
+----dived line----
+ MOVE(
+  TEMP tRV,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -12)))
+----dived line----
+ JUMP(
+  NAME L13)
+----dived line----
+ LABEL L10
+----dived line----
+ LABEL L6
+----dived line----
+ CJUMP(T_lt,
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -8)),
+  CONST 5,
+  L9,L5)
+----dived line----
+ LABEL L5
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -4)),
+  BINOP(T_add,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST -4)),
+   CONST 1))
+----dived line----
+ JUMP(
+  NAME L2)
+----dived line----
+ LABEL L9
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -12)),
+  BINOP(T_add,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST -12)),
+   MEM(
+    BINOP(T_add,
+     BINOP(T_add,
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST 4)),
+      BINOP(T_mul,
+       MEM(
+        BINOP(T_add,
+         TEMP tFP,
+         CONST -4)),
+       CONST 20)),
+     BINOP(T_mul,
+      MEM(
+       BINOP(T_add,
+        TEMP tFP,
+        CONST -8)),
+      CONST 4)))))
+----dived line----
+ MOVE(
+  MEM(
+   BINOP(T_add,
+    TEMP tFP,
+    CONST -8)),
+  BINOP(T_add,
+   MEM(
+    BINOP(T_add,
+     TEMP tFP,
+     CONST -8)),
+   CONST 1))
+----dived line----
+ JUMP(
+  NAME L6)
+----dived line----
+ LABEL L13
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+a format: assem=L0:
+, dst=(nil), src=(nil)
+result=L0:
+
+a format: assem=MOV 'd0,#0
+, dst=0x55d59c4c8300, src=(nil)
+result=MOV 104,#0
+
+a format: assem=STR 's0,['d0,#-4]
+, dst=0x55d59c4c8510, src=0x55d59c4c8370
+result=STR 104,[FP,#-4]
+
+a format: assem=MOV 'd0,#0
+, dst=0x55d59c4c88f0, src=(nil)
+result=MOV 105,#0
+
+a format: assem=STR 's0,['d0,#-8]
+, dst=0x55d59c4c8b00, src=0x55d59c4c8960
+result=STR 105,[FP,#-8]
+
+a format: assem=MOV 'd0,#0
+, dst=0x55d59c4c8ee0, src=(nil)
+result=MOV 106,#0
+
+a format: assem=STR 's0,['d0,#-12]
+, dst=0x55d59c4c90f0, src=0x55d59c4c8f50
+result=STR 106,[FP,#-12]
+
+a format: assem=L2:
+, dst=(nil), src=(nil)
+result=L2:
+
+a format: assem=LDR 'd0,['s0,#-4]
+, dst=0x55d59c4c9840, src=0x55d59c4c9820
+result=LDR 107,[FP,#-4]
+
+a format: assem=MOV 'd0,#5
+, dst=0x55d59c4c9aa0, src=(nil)
+result=MOV 108,#5
+
+a format: assem=CMP 's0,'s1
+, dst=(nil), src=0x55d59c4c9b30
+result=CMP 107,108
+
+a format: assem=BLT L10
+, dst=(nil), src=(nil)
+result=BLT L10
+
+a format: assem=B L1
+, dst=(nil), src=(nil)
+result=B L1
+
+a format: assem=L1:
+, dst=(nil), src=(nil)
+result=L1:
+
+a format: assem=LDR 'd0,['s0,#-12]
+, dst=0x55d59c4ca3a0, src=0x55d59c4ca380
+result=LDR 109,[FP,#-12]
+
+a format: assem=MOV 'd0, 's0
+, dst=0x55d59c4ca430, src=0x55d59c4ca410
+result=MOV RV, 109
+
+a format: assem=B L13
+, dst=(nil), src=(nil)
+result=B L13
+
+a format: assem=L10:
+, dst=(nil), src=(nil)
+result=L10:
+
+a format: assem=L6:
+, dst=(nil), src=(nil)
+result=L6:
+
+a format: assem=LDR 'd0,['s0,#-8]
+, dst=0x55d59c4caf40, src=0x55d59c4caf20
+result=LDR 110,[FP,#-8]
+
+a format: assem=MOV 'd0,#5
+, dst=0x55d59c4cb1a0, src=(nil)
+result=MOV 111,#5
+
+a format: assem=CMP 's0,'s1
+, dst=(nil), src=0x55d59c4cb230
+result=CMP 110,111
+
+a format: assem=BLT L9
+, dst=(nil), src=(nil)
+result=BLT L9
+
+a format: assem=B L5
+, dst=(nil), src=(nil)
+result=B L5
+
+a format: assem=L5:
+, dst=(nil), src=(nil)
+result=L5:
+
+a format: assem=LDR 'd0,['s0,#-4]
+, dst=0x55d59c4cbc90, src=0x55d59c4cbc70
+result=LDR 113,[FP,#-4]
+
+a format: assem=ADD 'd0,'s0,1
+, dst=0x55d59c4cbd20, src=0x55d59c4cbd00
+result=ADD 112,113,1
+
+a format: assem=STR 's0,['d0,#-4]
+, dst=0x55d59c4cbf30, src=0x55d59c4cbd90
+result=STR 112,[FP,#-4]
+
+a format: assem=B L2
+, dst=(nil), src=(nil)
+result=B L2
+
+a format: assem=L9:
+, dst=(nil), src=(nil)
+result=L9:
+
+a format: assem=LDR 'd0,['s0,#-12]
+, dst=0x55d59c4cca60, src=0x55d59c4cca40
+result=LDR 115,[FP,#-12]
+
+a format: assem=LDR 'd0,['s0,#4]
+, dst=0x55d59c4cd430, src=0x55d59c4cd410
+result=LDR 119,[FP,#4]
+
+a format: assem=LDR 'd0,['s0,#-4]
+, dst=0x55d59c4cda20, src=0x55d59c4cda00
+result=LDR 121,[FP,#-4]
+
+a format: assem=MOV 'd0,#20
+, dst=0x55d59c4cdc80, src=(nil)
+result=MOV 122,#20
+
+a format: assem=MUL 'd0,'s0,'s1
+, dst=0x55d59c4cdd30, src=0x55d59c4cdd10
+result=MUL 120,121,122
+
+a format: assem=ADD 'd0,'s0,'s1
+, dst=0x55d59c4cdde0, src=0x55d59c4cddc0
+result=ADD 118,119,120
+
+a format: assem=LDR 'd0,['s0,#-8]
+, dst=0x55d59c4ce3d0, src=0x55d59c4ce3b0
+result=LDR 124,[FP,#-8]
+
+BEGIN L11
+L11:
+MOV 101, FP
+BL L0
+MOV `d0, `s0
+BL putint
+MOV 103,#0
+MOV RV, 103
+B L12
+L12:
+
+END L11
+
+BEGIN L0
+L0:
+MOV 104,#0
+STR 104,[FP,#-4]
+MOV 105,#0
+STR 105,[FP,#-8]
+MOV 106,#0
+STR 106,[FP,#-12]
+L2:
+LDR 107,[FP,#-4]
+MOV 108,#5
+CMP 107,108
+BLT L10
+B L1
+L1:
+LDR 109,[FP,#-12]
+MOV RV, 109
+B L13
+L10:
+L6:
+LDR 110,[FP,#-8]
+MOV 111,#5
+CMP 110,111
+BLT L9
+B L5
+L5:
+LDR 113,[FP,#-4]
+ADD 112,113,1
+STR 112,[FP,#-4]
+B L2
+L9:
+LDR 115,[FP,#-12]
+LDR 119,[FP,#4]
+LDR 121,[FP,#-4]
+MOV 122,#20
+MUL 120,121,122
+ADD 118,119,120
+a format: assem=MOV 'd0,#4
+, dst=0x55d59c4ce630, src=(nil)
+result=MOV 125,#4
+
+a format: assem=MUL 'd0,'s0,'s1
+, dst=0x55d59c4ce6e0, src=0x55d59c4ce6c0
+result=MUL 123,124,125
+
+a format: assem=ADD 'd0,'s0,'s1
+, dst=0x55d59c4ce790, src=0x55d59c4ce770
+result=ADD 117,118,123
+
+a format: assem=LDR 'd0,['s0]
+, dst=0x55d59c4ce820, src=0x55d59c4ce800
+result=LDR 116,[117]
+
+a format: assem=ADD 'd0,'s0,'s1
+, dst=0x55d59c4ce8d0, src=0x55d59c4ce8b0
+result=ADD 114,115,116
+
+a format: assem=STR 's0,['d0,#-12]
+, dst=0x55d59c4ceae0, src=0x55d59c4ce940
+result=STR 114,[FP,#-12]
+
+a format: assem=LDR 'd0,['s0,#-8]
+, dst=0x55d59c4cf250, src=0x55d59c4cf230
+result=LDR 127,[FP,#-8]
+
+a format: assem=ADD 'd0,'s0,1
+, dst=0x55d59c4cf2e0, src=0x55d59c4cf2c0
+result=ADD 126,127,1
+
+a format: assem=STR 's0,['d0,#-8]
+, dst=0x55d59c4cf4f0, src=0x55d59c4cf350
+result=STR 126,[FP,#-8]
+
+a format: assem=B L6
+, dst=(nil), src=(nil)
+result=B L6
+
+a format: assem=L13:
+, dst=(nil), src=(nil)
+result=L13:
+
+LDR 124,[FP,#-8]
+MOV 125,#4
+MUL 123,124,125
+ADD 117,118,123
+LDR 116,[117]
+ADD 114,115,116
+STR 114,[FP,#-12]
+LDR 127,[FP,#-8]
+ADD 126,127,1
+STR 126,[FP,#-8]
+B L6
+L13:
+
+END L0
+

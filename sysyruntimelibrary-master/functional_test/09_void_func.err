@@ -1,3 +1,4 @@
+
 before semantic ast:
  decList(
   variableDec(a,
@@ -75,7 +76,6 @@ before semantic ast:
             comStmList())))))),
       decList())))))
 
-semantic check finish !
 after semantic ast:
  decList(
   variableDec(a,
@@ -152,3 +152,74 @@ after semantic ast:
                simpleVar(c)))),
             comStmList())))))),
       decList())))))
+semantic check finish !
+
+↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
+ SEQ(
+  LABEL L1,
+  SEQ(
+   SEQ(
+    SEQ(
+     MOVE(
+      NAME a,
+      CONST 3),
+     MOVE(
+      NAME b,
+      CONST 2)),
+    EXP(
+     CALL(
+      NAME L0,
+       TEMP tFP,
+       NAME a,
+       NAME b))),
+   MOVE(
+    TEMP tRV,
+    NAME c))) SEQ(
+  LABEL L0,
+  SEQ(
+   MOVE(
+    NAME c,
+    BINOP(T_add,
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST 4)),
+     MEM(
+      BINOP(T_add,
+       TEMP tFP,
+       CONST 4)))),
+   EXP(
+    CONST 0)))
+↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
+
+↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
+ LABEL L1
+----dived line----
+ MOVE(
+  NAME a,
+  CONST 3)
+----dived line----
+ MOVE(
+  NAME b,
+  CONST 2)
+----dived line----
+ EXP(
+  CALL(
+   NAME L0,
+    TEMP tFP,
+    NAME a,
+    NAME b))
+----dived line----
+ MOVE(
+  TEMP tRV,
+  NAME c)
+----dived line----
+ JUMP(
+  NAME L2)
+----dived line----
+ LABEL L2
+----dived line----
+
+↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
+compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
+Aborted

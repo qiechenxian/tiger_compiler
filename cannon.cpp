@@ -97,8 +97,8 @@ static T_stm do_stm(T_stm stm) {
                             ExpRefList(&stm->u.MOVE.src, nullptr)),stm);
             } else if (stm->u.MOVE.dst->kind == T_exp_::T_MEM) {
                 return seq(recoder(
-                        ExpRefList(&stm->u.MOVE.dst->u.MEM,
-                                ExpRefList(&stm->u.MOVE.src, nullptr))),stm);
+                        ExpRefList(&stm->u.MOVE.dst->u.MEM,//注意这里，一般来说move的左端是目的操作数不会使用它的值，但move左端如果是Mem，其里面的寻址过程可能是有类似源操作数的操作，所以将&stm->u.MOVE.dst->u.MEM加入
+                                ExpRefList(&stm->u.MOVE.src, nullptr))),stm);//例如MOVE(MEM(binop1),CALL(l0)),其中的binop1接可能被保存在寄存器中
             } else if (stm->u.MOVE.dst->kind == T_exp_::T_ESEQ) {
                 T_stm s = stm->u.MOVE.dst->u.ESEQ.stm;
                 stm->u.MOVE.dst = s->u.MOVE.dst->u.ESEQ.exp;
@@ -116,7 +116,7 @@ static struct stmExp do_exp(T_exp exp){
                             ExpRefList(&exp->u.BINOP.right, nullptr))),exp);
         case T_exp_::T_MEM:
             return StmExp(recoder(ExpRefList(&exp->u.MEM, nullptr)),exp);
-        case T_exp_::T_ESEQ:{struct  stmExp x=do_exp(exp->u.ESEQ.exp);
+        case T_exp_::T_ESEQ:{struct stmExp x=do_exp(exp->u.ESEQ.exp);
         return StmExp(seq(do_stm(exp->u.ESEQ.stm),x.s),x.e);
         }
         case T_exp_::T_CALL:
