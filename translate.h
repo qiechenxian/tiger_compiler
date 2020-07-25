@@ -56,6 +56,7 @@ bool Tr_expList_isEmpty(Tr_expList list);
 Tr_exp Tr_nopExp();
 Tr_exp Tr_intExp(int int_value);
 Tr_exp Tr_simpleVar(Tr_access acc);
+Tr_exp Tr_simpleVarNoMem(Tr_access acc);
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension);
 Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension);
 Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right);

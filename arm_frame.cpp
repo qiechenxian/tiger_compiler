@@ -181,13 +181,14 @@ T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
         case F_access_::inReg:
             return T_Temp(acc->u.reg);
         case F_access_::inGlobal:
-            return T_Name(acc->u.global); /// 对于全局变量非数组返回T_Name
+            return T_Mem(T_Name(acc->u.global)); /// 对于全局变量非数组返回T_Name
     }
 }
 
 T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
 /**
- * 该函数是为了访问栈中数组的index处的地址，注意此函数只在初始化时使用，index是数组拉平后的索引
+ * 该函数是为了访问栈中数组的index处的地址，index是数组拉平后的索引
+ * \注意 !!!此函数只在初始化时使用!!!
  * @param acc 数组的基址
  * @param framePtr 栈基址
  * @param index 数组拉平后的索引

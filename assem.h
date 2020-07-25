@@ -11,7 +11,7 @@
 #include "temp.h"
 
 typedef struct AS_targets_ *AS_targets;
-typedef struct AS_targets_ {
+struct AS_targets_ {
     Temp_labelList labels;
 } ;
 

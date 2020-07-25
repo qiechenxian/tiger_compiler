@@ -277,9 +277,6 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 array_total_size *= subscript->u.intExp;
             }
 
-            /** 获取数组后缀和，供翻译数组访问时使用*/
-            int* suffix_size = makeSuffixSize(d->u.array.size);
-
             Tr_access var_access;
             if (frame) {
                 var_access = Tr_allocLocal(frame, true, array_total_size);
@@ -291,6 +288,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
             /// 数组声明，在符号表中的基本条目
             E_envEntry arrayEntry = E_VarEntry(d->u.array.isConst, var_access, array_ty);
+
+            /** 获取数组后缀和，供翻译数组访问时使用*/
+            int* suffix_size = makeSuffixSize(d->u.array.size);/// 该操作保证suffix_size的职责(判断是否为数组)正确。(2/2)
             arrayEntry->u.var.suffix_size = suffix_size; // 登记数组的后缀和
 
             /** 处理初值 */
@@ -859,12 +859,31 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                 struct expty expty_msg = Expty(nullptr, TY_Int());
                 return expty_msg;
             } else{
-                struct expty expty_msg = Expty(Tr_simpleVar(varEntry->u.var.access), actual_ty(varEntry->u.var.ty));
-                expty_msg.isConst = varEntry->u.var.isConst;
 
                 /// 如果访问的变量是数组，则额外返回后缀和信息，供访问数组翻译时使用
-                expty_msg.suffix_size = varEntry->u.var.suffix_size;
-                return expty_msg;
+                if (varEntry->u.var.suffix_size)
+                /**
+                 * 此处通过符号表中的varEntry的suffix_size域是否为空，来判断该varEntry是否为数组
+                 * 该做法十分危险且使suffix_size职责混乱，由于时间精力限制暂且这样实现
+                 * 我会在保证suffix_size职责正确处加上注释。 --loyx 2020/7/25
+                 */
+                {
+                    struct expty expty_msg = Expty(
+                            Tr_simpleVarNoMem(varEntry->u.var.access),
+                            actual_ty(varEntry->u.var.ty)
+                            );
+                    expty_msg.suffix_size = varEntry->u.var.suffix_size;
+                    expty_msg.isConst = varEntry->u.var.isConst;
+                    return expty_msg;
+                } else
+                {
+                    struct expty expty_msg = Expty(
+                            Tr_simpleVar(varEntry->u.var.access),
+                            actual_ty(varEntry->u.var.ty)
+                            );
+                    expty_msg.isConst = varEntry->u.var.isConst;
+                    return expty_msg;
+                }
             }
         }
         case A_var_::A_arrayVar:{

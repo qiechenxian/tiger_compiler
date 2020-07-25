@@ -262,6 +262,20 @@ Tr_exp Tr_simpleVar(Tr_access acc)
     return Tr_Ex(F_Exp(acc,tmp));
 }
 
+Tr_exp Tr_simpleVarNoMem(Tr_access acc)
+/**
+ * 在访问数组且未定位到元素时(例如：int a[2][4][3]; a[1][1] 或 a)，翻译结果为地址(不带T_MEM)
+ * 该函数是为了翻译不带下标的数组(例如上一行中的 a )，使其结果仅为地址计算
+ * 同时为 a[1][1] 这种访问的正确翻译提供基础
+ * @param acc  变量的acc (！注意：仅为数组变量服务)
+ * @return 不为T_MEM的翻译
+ */
+{
+    T_exp acc_with_mem = F_Exp(acc, T_Temp(F_FP()));
+    assert(acc_with_mem->kind == T_exp_::T_MEM);
+    return Tr_Ex(acc_with_mem->u.MEM);
+}
+
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 {
     return Tr_Ex(T_Mem(
