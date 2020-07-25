@@ -31,7 +31,7 @@ static void munchStm(T_stm s);
 static Temp_tempList munchArgs(int i, T_expList args);
 
 //调用库函数
-static void call_lib(c_string fun,Temp_temp rsreg,Temp_temp reg1,Temp_temp reg2);
+static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2);
 
 /*
  * 快速匹配没做
@@ -92,7 +92,8 @@ static Temp_temp munchExp(T_exp e) {
                 sprintf(inst, "LDR 'd0,[#%d]\n", i);
                 emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                 return r;
-            } else {
+            }
+            else {
                 /* MEM(e1) */
                 T_exp e1 = mem;
                 Temp_temp r = Temp_newTemp();
@@ -107,7 +108,7 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                sprintf(inst, "ADD 'd0,'s0,%d\n", i);
+                sprintf(inst, "ADD 'd0,'s0,#%d\n", i);
                 emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 return r;
             } else if (e->u.BINOP.op == T_add && e->u.BINOP.left->kind == T_exp_::T_CONST) {
@@ -115,7 +116,7 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.right;
                 int i = e->u.BINOP.left->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                sprintf(inst, "ADD 'd0,'s0,%d\n", i);
+                sprintf(inst, "ADD 'd0,'s0,#%d\n", i);
                 emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 return r;
             } else if (e->u.BINOP.op == T_sub && e->u.BINOP.right->kind == T_exp_::T_CONST) {
@@ -123,14 +124,14 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                sprintf(inst, "SUB 'd0,'s0,%d\n", i);
+                sprintf(inst, "SUB 'd0,'s0,#%d\n", i);
                 emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 return r;
             } else if (e->u.BINOP.op == T_sub && e->u.BINOP.left->kind == T_exp_::T_CONST) {
                 T_exp e1 = e->u.BINOP.right;
                 int i = e->u.BINOP.left->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                sprintf(inst, "SUB 'd0,'s0,%d\n", i);
+                sprintf(inst, "SUB 'd0,'s0,#%d\n", i);
                 emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 return r;
             } else if (e->u.BINOP.op == T_add) {
@@ -139,7 +140,6 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                //两源,如何操作？
                 sprintf(inst, "ADD 'd0,'s0,'s1\n");
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
@@ -149,7 +149,6 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                //两源,如何操作？
                 sprintf(inst, "SUB 'd0,'s0,'s1\n");
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
@@ -164,12 +163,13 @@ static Temp_temp munchExp(T_exp e) {
                 return r;
             } else if (e->u.BINOP.op == T_div) {
                 /* BINOP(DIV,e1,e2) */
-                //可以嵌入汇编divsi3
+                //嵌入汇编divsi3
+                //TODO 需测试div能否正常传递参数
                 T_exp e1 = e->u.BINOP.left, e2 = e->u.BINOP.right;
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__divsi3",r,r1,r2);
+                call_lib("__divsi3", r, r1, r2);
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
             } else {
@@ -190,18 +190,17 @@ static Temp_temp munchExp(T_exp e) {
             return e->u.TEMP;
         }
         case T_exp_::T_NAME: {
-            // TODO
-            //全局变量lab
+            // TODO 此Name节点的作用不明，全局变量取在MEM(NAME(lab))中
             /* NAME(lab) */
             Temp_label label = e->u.NAME;
             Temp_temp r = Temp_newTemp();
             //label处理？
-            sprintf(inst, "LDR 'd0,=%s\n", Temp_labelString(label));
+            sprintf(inst, "LDR 'd0,%s\n", Temp_labelString(label));
             emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
             return r;
         }
         case T_exp_::T_CALL:
-            //call？
+            //call 在stm中覆盖
         case T_exp_::T_ESEQ:
             //无
         default: {
@@ -228,7 +227,6 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,e1,CONST(i))),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
-                    //move(mem)？
                     sprintf(inst, "STR 's0,['d0,#%d]\n", i);
                     emit(AS_Oper(inst, L(munchExp(e1), NULL), L(munchExp(e2), NULL), NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_BINOP
@@ -237,7 +235,6 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,CONST(i),e1)),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
-                    //move(mem)
                     sprintf(inst, "STR 's0,['d0,#%d]\n", i);
                     emit(AS_Oper(inst, L(munchExp(e1), NULL), L(munchExp(e2), NULL), NULL));
                 } else if (src->kind == T_exp_::T_MEM) {
@@ -248,20 +245,31 @@ static void munchStm(T_stm s) {
                     Temp_temp r2 = munchExp(e2);
                     sprintf(inst, "LDR 'd0,['s0]\n");
                     emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
-                    sprintf(inst2, "STR 's0,['s1]\n");
-                    emit(AS_Oper(inst2, NULL, L(r, L(munchExp(e1), NULL)), NULL));
+                    sprintf(inst2, "STR ‘d0,['s0]\n");
+                    emit(AS_Oper(inst2, L(r, NULL), L(r1, NULL), NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_CONST) {
-                    /* MOVE(MEM(CONST(i)), e2) */
+                    /* MOVE(MEM(CONST(i)), e1) */
                     T_exp e1 = src;
                     int i = dst->u.MEM->u.CONST;\
-                    //无0寄存器怎么表示0+const?
+                    //TODO 无0寄存器怎么表示0+const?
                     sprintf(inst, "STR 's0,[#%d]\n", i);
                     emit(AS_Oper(inst, NULL, L(munchExp(e1), NULL), NULL));
-                } else {
+                } else if(dst->u.MEM->kind==T_exp_::T_NAME)
+                {
+                    /* MOVE(MEM(NAME(lab)), e1) */
+                    T_exp e1=src;
+                    Temp_temp r1=munchExp(e1);
+                    Temp_label label = dst->u.MEM->u.NAME;
+                    sprintf(inst,"LDR 'd0,=%s\n",Temp_labelString(label));
+                    emit(AS_Oper(inst,L(r1,NULL),L(r1,NULL),NULL));
+                }
+                else {
                     /* MOVE(MEM(e1), e2) */
                     T_exp e1 = dst->u.MEM, e2 = src;
-                    sprintf(inst, "STR 's1,['s0]\n");
-                    emit(AS_Oper(inst, NULL, L(munchExp(e1), L(munchExp(e2), NULL)), NULL));
+                    Temp_temp r1=munchExp(e1);
+                    Temp_temp r2=munchExp(e2);
+                    sprintf(inst, "STR 's0,['d0]\n");
+                    emit(AS_Oper(inst, L(r1, NULL), L(r2, NULL), NULL));
                 }
             } else if (dst->kind == T_exp_::T_TEMP) {
                 if (src->kind == T_exp_::T_CALL) {
@@ -272,7 +280,7 @@ static void munchStm(T_stm s) {
                         Temp_temp t = dst->u.TEMP;
                         Temp_tempList l = munchArgs(0, args);
                         Temp_tempList calldefs = NULL; // TODO
-                        //此处函数调用应该修改
+                        //TODO 函数调用测试能否正确传参
                         sprintf(inst, "BL %s\n", Temp_labelString(lab));
                         emit(AS_Oper(inst, L(F_RA(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
                         sprintf(inst2, "MOV `d0, `s0\n");
@@ -285,7 +293,9 @@ static void munchStm(T_stm s) {
                         Temp_temp r1 = munchExp(e1);
                         Temp_tempList l = munchArgs(0, args);
                         Temp_tempList calldefs = NULL; // TODO
-                        //此处未写，call(e1,args)
+                        //TODO，此处未写，call(e1,args)节点含义不明
+                        EM_error(0,"call(e1,args)节点含义不明");
+                        assert(0);
                     }
                 } else {
                     /* MOVE(TEMP(i),e2) */
@@ -294,19 +304,17 @@ static void munchStm(T_stm s) {
                     sprintf(inst, "MOV 'd0, 's0\n");
                     emit(AS_Move(inst, L(temp, NULL), L(munchExp(e1), NULL)));
                 }
-            }else if(dst->kind==T_exp_::T_NAME)
-            {
+            } else if (dst->kind == T_exp_::T_NAME) {
                 //存全局变量
                 /* MOVE(NAME(lab),e1) */
-                T_exp e1=src;
-                Temp_label lab=dst->u.NAME;
-                Temp_temp temp=Temp_newTemp();
-                sprintf(inst,"LDR 'd0,%s\n",Temp_labelString(lab));
-                emit(AS_Oper(inst,L(temp,NULL),NULL,NULL));
-                sprintf(inst2,"STR 's0, ['d0]\n",Temp_labelString(lab));
-                emit(AS_Oper(inst2,L(temp,NULL),L(munchExp(e1),NULL),NULL));
-            }
-            else {
+                T_exp e1 = src;
+                Temp_label lab = dst->u.NAME;
+                Temp_temp temp = Temp_newTemp();
+                sprintf(inst, "LDR 'd0,%s\n", Temp_labelString(lab));
+                emit(AS_Oper(inst, L(temp, NULL), NULL, NULL));
+                sprintf(inst2, "STR 's0, ['d0]\n", Temp_labelString(lab));
+                emit(AS_Oper(inst2, L(temp, NULL), L(munchExp(e1), NULL), NULL));
+            } else {
                 assert(0);
             }
             break;
@@ -345,7 +353,7 @@ static void munchStm(T_stm s) {
             }
             break;
         }
-        case T_stm_::T_JUMP:{
+        case T_stm_::T_JUMP: {
             if (s->u.JUMP.exp->kind == T_exp_::T_NAME) {
                 /* JUMP(NAME(lab)) */
                 Temp_label lab = s->u.JUMP.exp->u.NAME;
@@ -356,9 +364,10 @@ static void munchStm(T_stm s) {
                 /* JUMP(e) */
                 T_exp e1 = s->u.JUMP.exp;
                 Temp_labelList jumps = s->u.JUMP.jumps;
-                // 此处未写，jump(e)
+                // TODO 此处未写，jump(e)
             }
-            break;}
+            break;
+        }
         case T_stm_::T_CJUMP: {
             /* CJUMP(op,e1,e2,jt,jf) */
             T_relOp op = s->u.CJUMP.op;
@@ -408,6 +417,7 @@ static void munchStm(T_stm s) {
         }
     }
 }
+
 //// 用于过程调用中参数传递到正确位置，寄存器分配，未完成
 static Temp_tempList munchArgs(int i, T_expList args) {
     return NULL;
@@ -416,30 +426,29 @@ static Temp_tempList munchArgs(int i, T_expList args) {
 /*
  * 调用库函数 resReg=fun(arg1,arg2);
  */
-static void call_lib(c_string fun,Temp_temp rsreg,Temp_temp reg1,Temp_temp reg2)
-{
+static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2) {
     char *inst = (char *) checked_malloc(sizeof(char) * 120);
-    sprintf(inst,"stmfd SP!,{r0-r7}\n");//保护现场
-    emit(AS_Oper(inst,NULL,NULL,NULL));
+    sprintf(inst, "stmfd SP!,{r0-r7}\n");//保护现场
+    emit(AS_Oper(inst, NULL, NULL, NULL));
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * 120);
-    sprintf(inst2,"MOV r0, 's0\n");//传递操作数reg1->r0
-    emit(AS_Move(inst2,NULL,L(reg1,NULL)));
+    sprintf(inst2, "MOV r0, 's0\n");//传递操作数reg1->r0
+    emit(AS_Move(inst2, NULL, L(reg1, NULL)));
 
     char *inst3 = (char *) checked_malloc(sizeof(char) * 120);
-    sprintf(inst3,"MOV r1, 's0\n");//传递操作数reg2->r1
-    emit(AS_Move(inst3,NULL,L(reg2,NULL)));
+    sprintf(inst3, "MOV r1, 's0\n");//传递操作数reg2->r1
+    emit(AS_Move(inst3, NULL, L(reg2, NULL)));
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * 120);
-    sprintf(inst4,"bl %s\n",fun);
-    emit(AS_Oper(inst4,NULL,NULL,NULL));
+    sprintf(inst4, "bl %s\n", fun);
+    emit(AS_Oper(inst4, NULL, NULL, NULL));
 
     char *inst5 = (char *) checked_malloc(sizeof(char) * 120);
-    sprintf(inst5,"MOV 'd0, r0\n",rsreg);//取回返回值
-    emit(AS_Move(inst5,L(rsreg,NULL),NULL));
+    sprintf(inst5, "MOV 'd0, r0\n", rsreg);//取回返回值
+    emit(AS_Move(inst5, L(rsreg, NULL), NULL));
 
     char *inst6 = (char *) checked_malloc(sizeof(char) * 120);
-    sprintf(inst6,"ldmfd SP!,{r0-r7}\n");//恢复现场
-    emit(AS_Oper(inst6,NULL,NULL,NULL));
+    sprintf(inst6, "ldmfd SP!,{r0-r7}\n");//恢复现场
+    emit(AS_Oper(inst6, NULL, NULL, NULL));
 }
 
