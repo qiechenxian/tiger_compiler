@@ -30,6 +30,9 @@ static void munchStm(T_stm s);
 // 用于过程调用中参数传递到正确位置
 static Temp_tempList munchArgs(int i, T_expList args);
 
+//调用库函数
+static void call_lib(c_string fun,Temp_temp rsreg,Temp_temp reg1,Temp_temp reg2);
+
 /*
  * 快速匹配没做
  */
@@ -166,7 +169,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                sprintf(inst, "除法div\n");
+                call_lib("__divsi3",r,r1,r2);
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
             } else {
@@ -193,10 +196,8 @@ static Temp_temp munchExp(T_exp e) {
             Temp_label label = e->u.NAME;
             Temp_temp r = Temp_newTemp();
             //label处理？
-            sprintf(inst, "MOV 'd0,%s\n", Temp_labelString(label));
+            sprintf(inst, "LDR 'd0,=%s\n", Temp_labelString(label));
             emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-            sprintf(inst2,"MOV 'd0,['d0]\n");
-            emit(AS_Oper(inst2,L(r,NULL), NULL,NULL));
             return r;
         }
         case T_exp_::T_CALL:
@@ -411,3 +412,34 @@ static void munchStm(T_stm s) {
 static Temp_tempList munchArgs(int i, T_expList args) {
     return NULL;
 }
+
+/*
+ * 调用库函数 resReg=fun(arg1,arg2);
+ */
+static void call_lib(c_string fun,Temp_temp rsreg,Temp_temp reg1,Temp_temp reg2)
+{
+    char *inst = (char *) checked_malloc(sizeof(char) * 120);
+    sprintf(inst,"stmfd SP!,{r0-r7}\n");//保护现场
+    emit(AS_Oper(inst,NULL,NULL,NULL));
+
+    char *inst2 = (char *) checked_malloc(sizeof(char) * 120);
+    sprintf(inst2,"MOV r0, 's0\n");//传递操作数reg1->r0
+    emit(AS_Move(inst2,NULL,L(reg1,NULL)));
+
+    char *inst3 = (char *) checked_malloc(sizeof(char) * 120);
+    sprintf(inst3,"MOV r1, 's0\n");//传递操作数reg2->r1
+    emit(AS_Move(inst3,NULL,L(reg2,NULL)));
+
+    char *inst4 = (char *) checked_malloc(sizeof(char) * 120);
+    sprintf(inst4,"bl %s\n",fun);
+    emit(AS_Oper(inst4,NULL,NULL,NULL));
+
+    char *inst5 = (char *) checked_malloc(sizeof(char) * 120);
+    sprintf(inst5,"MOV 'd0, r0\n",rsreg);//取回返回值
+    emit(AS_Move(inst5,L(rsreg,NULL),NULL));
+
+    char *inst6 = (char *) checked_malloc(sizeof(char) * 120);
+    sprintf(inst6,"ldmfd SP!,{r0-r7}\n");//恢复现场
+    emit(AS_Oper(inst6,NULL,NULL,NULL));
+}
+
