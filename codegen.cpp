@@ -97,7 +97,7 @@ static Temp_temp munchExp(T_exp e) {
                 /* MEM(e1) */
                 T_exp e1 = mem;
                 Temp_temp r = Temp_newTemp();
-                sprintf(inst, "LDR 'd0 ['s0]\n");
+                sprintf(inst, "LDR 'd0,['s0]\n");
                 emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 return r;
             }
@@ -190,12 +190,23 @@ static Temp_temp munchExp(T_exp e) {
             return e->u.TEMP;
         }
         case T_exp_::T_NAME: {
-            // TODO 此Name节点的作用不明，全局变量取在MEM(NAME(lab))中
+            /**
+             * 此节点表示NAME(lab)， 意义为全局变量lab的地址
+             * 对应的汇编指令为： ldr r1, =lab
+             * arm汇编中全局变量的lab类似一个宏或者立即数，内容为该全局变量的地址。
+             * 但经过试验发现，全局变量的label(地址)不用使用 ldr r1, lab指令，直接将lab地址的内容加载到r1中
+             * 只能通过两步：
+             *      1. ldr r1, =lab  //先将全局变量的lab(地址)放到寄存器中
+             *      2. ldr r2, [r1]  //再根据全局变量的地址，取其中的内容
+             *
+             * 此节点的意义是先将全局变量的地址放在一个寄存器中，供之后使用
+             * --loyx 2020/7/26
+             */
             /* NAME(lab) */
             Temp_label label = e->u.NAME;
             Temp_temp r = Temp_newTemp();
             //label处理？
-            sprintf(inst, "LDR 'd0,%s\n", Temp_labelString(label));
+            sprintf(inst, "LDR 'd0,=%s\n", Temp_labelString(label));
             emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
             return r;
         }
@@ -254,15 +265,20 @@ static void munchStm(T_stm s) {
                     //TODO 无0寄存器怎么表示0+const?
                     sprintf(inst, "STR 's0,[#%d]\n", i);
                     emit(AS_Oper(inst, NULL, L(munchExp(e1), NULL), NULL));
-                } else if(dst->u.MEM->kind==T_exp_::T_NAME)
-                {
-                    /* MOVE(MEM(NAME(lab)), e1) */
-                    T_exp e1=src;
-                    Temp_temp r1=munchExp(e1);
-                    Temp_label label = dst->u.MEM->u.NAME;
-                    sprintf(inst,"LDR 'd0,=%s\n",Temp_labelString(label));
-                    emit(AS_Oper(inst,L(r1,NULL),L(r1,NULL),NULL));
                 }
+
+                /**
+                 * 此处交给MOVE(MEM(e1), e2)处理
+                 */
+//                else if(dst->u.MEM->kind==T_exp_::T_NAME)
+//                {
+//                    /* MOVE(MEM(NAME(lab)), e1) */
+//                    T_exp e1=src;
+//                    Temp_temp r1=munchExp(e1);
+//                    Temp_label label = dst->u.MEM->u.NAME;
+//                    sprintf(inst,"LDR 'd0,=%s\n",Temp_labelString(label));
+//                    emit(AS_Oper(inst,L(r1,NULL),L(r1,NULL),NULL));
+//                }
                 else {
                     /* MOVE(MEM(e1), e2) */
                     T_exp e1 = dst->u.MEM, e2 = src;
@@ -307,10 +323,17 @@ static void munchStm(T_stm s) {
             } else if (dst->kind == T_exp_::T_NAME) {
                 //存全局变量
                 /* MOVE(NAME(lab),e1) */
+                assert(0);
+                /**
+                 * IR表示中无MOVE(NAME(lab), e1)这种情况。
+                 * NAME(lab)表示全局变量的地址，当存全局变量时，表示为MOVE(MEM(NAME(lab)), e1)
+                 * 这样与存局部变量形成统一，同时MEM(NAME(lab))可表示取全局变量
+                 * --loyx 2020/7/26
+                 */
                 T_exp e1 = src;
                 Temp_label lab = dst->u.NAME;
                 Temp_temp temp = Temp_newTemp();
-                sprintf(inst, "LDR 'd0,%s\n", Temp_labelString(lab));
+                sprintf(inst, "LDR 'd0, =%s\n", Temp_labelString(lab));
                 emit(AS_Oper(inst, L(temp, NULL), NULL, NULL));
                 sprintf(inst2, "STR 's0, ['d0]\n", Temp_labelString(lab));
                 emit(AS_Oper(inst2, L(temp, NULL), L(munchExp(e1), NULL), NULL));
@@ -380,25 +403,25 @@ static void munchStm(T_stm s) {
             sprintf(inst, "CMP 's0,'s1\n");
             emit(AS_Oper(inst, NULL, L(r1, L(r2, NULL)), NULL));
 
-            char *opcode = "";
+            char *opcode;
             switch (op) {
                 case T_eq:
-                    opcode = "BEQ";
+                    opcode = (char*)"BEQ";
                     break;
                 case T_ne:
-                    opcode = "BNE";
+                    opcode = (char*)"BNE";
                     break;
                 case T_lt:
-                    opcode = "BLT";
+                    opcode = (char*)"BLT";
                     break;
                 case T_gt:
-                    opcode = "BGT";
+                    opcode = (char*)"BGT";
                     break;
                 case T_le:
-                    opcode = "BLE";
+                    opcode = (char*)"BLE";
                     break;
                 case T_ge:
-                    opcode = "BGE";
+                    opcode = (char*)"BGE";
                     break;
                 default: {
                     EM_error(0, "not find op.");
