@@ -453,9 +453,35 @@ static void munchStm(T_stm s) {
     }
 }
 
-//// 用于过程调用中参数传递到正确位置，寄存器分配，未完成
-static Temp_tempList munchArgs(int i, T_expList args) {
-    return NULL;
+static Temp_tempList munchArgs(int i, T_expList args)
+/**
+ * 调用过程中传参。
+ * \注意 这种传参方法没有使用压栈操作。而是在程序入口处提前分配传参空间。
+ * 这样的好处是比压栈的操作效率更高，且无需在函数返回后进行出栈操作。
+ * 但需要提前知道 调用函数 中 被调函数需要栈传参的最大空间(一个函数可能调用多个函数)。
+ * 这一点可在语义检查阶段加以统计
+ *
+ * 但arm中栈帧结构还不是很清楚，暂且这样实现。
+ * --loyx 2020/7/26
+ * @param i 第i个参数
+ * @param args
+ * @return
+ */
+{
+    if (args == nullptr){
+        return nullptr;
+    }
+    char *inst = (char*)checked_malloc(sizeof(char) * 120);
+    Temp_temp r = munchExp(args->head);
+    if (i)
+        sprintf(inst, "STR 's0, ['d0, #%d]\n", i*get_word_size());
+    else
+        sprintf(inst, "STR 's0, ['d0]\n");
+
+    emit(AS_Oper(inst, L(F_SP(), NULL), L(r, NULL), NULL));
+
+    Temp_tempList old = munchArgs(i + 1, args->tail);
+    return Temp_TempList(r, old);
 }
 
 /*

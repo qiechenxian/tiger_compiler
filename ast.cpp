@@ -58,7 +58,7 @@ A_dec A_VariableDec(A_pos pos, S_symbol type, S_symbol id, A_exp init, bool isCo
     a->u.var.id = id;
     a->u.var.init = init;
     a->u.var.isConst = isConst;
-    a->u.var.escape = false; /// 默认非逃逸变量
+    a->u.var.escape = true; /// 默认逃逸变量
     return a;
 }
 A_dec A_ArrayDec(A_pos pos, S_symbol base, S_symbol id, A_expList size, A_arrayInitList init, bool isConst){
@@ -70,7 +70,7 @@ A_dec A_ArrayDec(A_pos pos, S_symbol base, S_symbol id, A_expList size, A_arrayI
     a->u.array.size = size;
     a->u.array.init = init;
     a->u.array.isConst = isConst;
-    a->u.array.escape = false; /// 默认非逃逸变量
+    a->u.array.escape = true; /// 默认逃逸变量
     return a;
 }
 A_dec A_FunctionDec(A_pos pos, S_symbol id, A_fieldList params, S_symbol result, A_stm body){
@@ -215,7 +215,7 @@ A_field A_Field(A_pos pos, S_symbol id, S_symbol type, A_expList size){
     a-> id = id;
     a-> type = type;
     a->size = size;
-    a->escape = false; /// 默认非逃逸变量
+    a->escape = true; /// 默认逃逸变量，即所有变量均可放在寄存器中
     return a;
 }
 A_fieldList A_FieldList(A_field head, A_fieldList tail){
