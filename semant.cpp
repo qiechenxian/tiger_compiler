@@ -101,6 +101,7 @@ static int calculate(A_binOp op, int left, int right) {
         case A_mod:
             return left % right;
     }
+    assert(0);
 }
 
 static int getConstValue(S_table venv, A_exp a){
@@ -488,7 +489,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                 /// 登记函数id，提取形参类型
             TY_tyList formalTys = makeFormalTys(tenv, d->u.function.params);
-            Temp_label fun_label = Temp_newLabel();
+            Temp_label fun_label = Temp_namedLabel(S_getName(d->u.function.id)); /// 用函数名作函数label
             U_boolList formal_escape_list = makeFormalEscapeList(d->u.function.params);
             Tr_frame fun_frame = Tr_newFrame(fun_label, formal_escape_list);
             S_enter(venv, d->u.function.id, E_FunEntry(fun_label, formalTys, resultTy));
@@ -545,6 +546,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
         case A_dec_::A_typedef:
             assert(0); /// todo typedef
     }
+    assert(0);
 }
 
 
