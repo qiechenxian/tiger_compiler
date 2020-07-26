@@ -4,7 +4,7 @@
 #include "frame.h"
 #include "assem.h"
 const int F_WORD_SIZE = 4; /// 32位机器
-static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
+static const int F_K = 4; /// 保存在Reg中参数的数量(待定)
 static Temp_temp fp = nullptr;
 static Temp_temp sp = nullptr;
 static Temp_temp zero = nullptr;
@@ -114,18 +114,41 @@ Temp_label F_getGlobalLabel(F_access fa){
 }
 
 /** 辅助函数 */
-static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
+static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
+/**
+ * 根据escape分配形参access，目前escape全为true，即所有参数都不是必须要放到栈中
+ *
+ * 在老师配置的arm机器中，参数的放置位置如下：
+ *      以调用int foo(int a0, int a1, int a3, int a4, int a5, int a6, int a7)为例
+ *       旧FP-> |               |
+ *              |      ...      |
+ *              |       a7      |
+ *              |       a6      |
+ *              |       a5      |
+ *      旧SP->  |       a4      |
+ *        FP->  |   旧LR,FP等    |
+ *              |   局部变量等    |
+ *              |       a1      |
+ *              |       a2      |
+ *              |       a3      |
+ *              |       a4      |
+ *              |      ...      |
+ *         SP-> |               |
+ * @param frame 当前函数栈帧
+ * @param formals 形参escape信息
+ * @return 形参accessList
+ */
+{
     F_accessList access_list = nullptr, list_tail = nullptr;
     int args_inReg_cnt = 0;
+    int args_inFrame_cnt = 1;
     for (U_boolList iter = formals; iter; iter = iter->tail){
-//        assert(iter->head); // todo escape
         F_access access = nullptr;
         if (args_inReg_cnt <= F_K&&(iter->head==false)&&false){//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
             access = InReg(Temp_newTemp());
             args_inReg_cnt++;
         } else{
-            // todo 查看具体架构
-            access = InFrame((1 + args_inReg_cnt) * F_WORD_SIZE);//
+            access = InFrame(args_inFrame_cnt++ * F_WORD_SIZE);
         }
         if (access_list){
             list_tail->tail = F_AccessList(access, nullptr);
