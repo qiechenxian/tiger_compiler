@@ -294,13 +294,14 @@ static void munchStm(T_stm s) {
                         Temp_label lab = src->u.CALL.fun->u.NAME;
                         T_expList args = src->u.CALL.args;
                         Temp_temp t = dst->u.TEMP;
+
                         Temp_tempList l = munchArgs(0, args);
                         Temp_tempList calldefs = NULL; // TODO
                         //TODO 函数调用测试能否正确传参
                         sprintf(inst, "BL %s\n", Temp_labelString(lab));
                         emit(AS_Oper(inst, L(F_RA(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
-                        sprintf(inst2, "MOV `d0, `s0\n");
-                        emit(AS_Move(inst2, L(t, NULL), L(F_RA(), NULL)));
+                        sprintf(inst2, "MOV 'd0, 's0\n");
+                        emit(AS_Move(inst2, L(t, NULL), L(F_RV(), NULL)));
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
                         T_exp e1 = src->u.CALL.fun;
