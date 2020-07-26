@@ -1,12 +1,15 @@
-int a;
-int b;
-int test(int a)
-{
-    return a;
+
+int func(int p,int m,int n){
+    p=5;
+    m=4;
+    n=3;
+    return p+m+n;
 }
 int main(){
-    a=10;
-    b=3;
-    int c=a%b;
-    return 0;
+    int a;
+    int b;
+    int c;
+    func(a,b,c);
+    a=b;
+    return a;
 }

@@ -4,7 +4,7 @@
 #include "frame.h"
 #include "assem.h"
 const int F_WORD_SIZE = 4; /// 32位机器
-static const int F_K = 6; /// 保存在Reg中参数的数量(待定)
+static const int reg_num = 6; /// 保存在Reg中参数的数量(待定)
 static Temp_temp fp = nullptr;
 static Temp_temp sp = nullptr;
 static Temp_temp zero = nullptr;
@@ -117,15 +117,16 @@ Temp_label F_getGlobalLabel(F_access fa){
 static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
     F_accessList access_list = nullptr, list_tail = nullptr;
     int args_inReg_cnt = 0;
+    int args_all=0;
     for (U_boolList iter = formals; iter; iter = iter->tail){
+        args_all++;
 //        assert(iter->head); // todo escape
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K&&(iter->head==false)&&false){//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
+        if (args_inReg_cnt <= reg_num&&(iter->head==false)&&false){//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改 todo comfirm reg enable after reg alloc
             access = InReg(Temp_newTemp());
-            args_inReg_cnt++;
         } else{
             // todo 查看具体架构
-            access = InFrame((1 + args_inReg_cnt) * F_WORD_SIZE);//
+            access = InFrame(0);//leave space for reg save and FP save
         }
         if (access_list){
             list_tail->tail = F_AccessList(access, nullptr);
@@ -135,6 +136,14 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
             list_tail = access_list;
         }
     }
+    for(F_accessList temp=access_list;temp;temp=temp->tail)
+    {
+        if(temp->head->kind==F_access_::inFrame)
+        {
+            temp->head->u.offset=args_all*get_word_size();
+        }
+        args_all--;
+    }
     return access_list;
 }
 
@@ -143,8 +152,8 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals){
 F_frame F_newFrame(Temp_label name, U_boolList formals){
     F_frame f = (F_frame)checked_malloc(sizeof(*f));
     f->name = name;
-    f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    f->formals = makeFormalAccessList(f, formals);//formals为虚拟的前一个栈帧保存的参数列表实际并不在当前栈帧保存，不影响local_ccount
+    f->local_count =1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     f->locals=nullptr;
     return f;
 }
