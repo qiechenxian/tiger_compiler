@@ -33,8 +33,11 @@ Temp_temp F_RV()//取帧指针
     return rv;
 }
 Temp_temp F_SP(void) {
+
     if (sp == nullptr) {
-        sp = Temp_newTemp();
+        char save[5];
+        sprintf(save, "%s", "SP");
+        sp=Temp_new_special(save);
     }
     return sp;
 }

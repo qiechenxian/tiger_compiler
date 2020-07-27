@@ -80,4 +80,5 @@ Tr_exp Tr_StringExp(c_string content);
 void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals);
 T_stm T_fuc_call_param_in(bool tag,int parap_all,T_expList params);
 Tr_exp Tr_Nx(T_stm stm);
+void Tr_expList_append_opposite(T_expList list,Tr_exp exp);
 #endif //COMPILER_LOYX_TRANSLATE_H

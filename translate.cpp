@@ -80,7 +80,7 @@ static Tr_exp Tr_Ex(T_exp exp){
     ex->u.ex = exp;
     return ex;
 }
-static Tr_exp Tr_Nx(T_stm stm){
+Tr_exp Tr_Nx(T_stm stm){
     Tr_exp nx = (Tr_exp)checked_malloc(sizeof(*nx));
     nx->kind = Tr_exp_::Tr_nx;
     nx->u.nx = stm;
@@ -238,6 +238,17 @@ void Tr_expList_append(Tr_expList list, Tr_exp exp) {
     p->first=exp;
     p->last=nullptr;
     list->last=p;
+}
+void Tr_expList_append_opposite(T_expList list,Tr_exp exp)
+{
+    if(list->head= nullptr)
+    {
+        list->head=Tr_unEx(exp);
+        return;
+    }
+    T_expList p = (T_expList)checked_malloc(sizeof(*p));
+    p->head=Tr_unEx(exp);
+    list=p;
 }
 bool Tr_expList_isEmpty(Tr_expList list){
     return !list || !list->first;
