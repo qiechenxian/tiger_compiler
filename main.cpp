@@ -34,9 +34,9 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
     iList = F_codegen(frame, stmList);
 
-    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
+//    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
     AS_printInstrList(outfile, iList, Temp_layerMap(F_tempMap, Temp_name()));
-    fprintf(outfile, "END %s\n\n", Temp_labelString(F_getName(frame)));
+//    fprintf(outfile, "END %s\n\n", Temp_labelString(F_getName(frame)));
 }
 
 static void doGlobal(FILE *outfile, F_fragList fragList){

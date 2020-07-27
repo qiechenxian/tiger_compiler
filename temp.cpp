@@ -42,7 +42,7 @@ Temp_label Temp_newStringLabel()
 static int label = 0;
 Temp_label Temp_newLabel() {
     char buf[127];
-    sprintf(buf, "L%d", label++);
+    sprintf(buf, ".L%d", label++);
     return Temp_namedLabel(String(buf));
 }
 
