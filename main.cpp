@@ -10,6 +10,13 @@
 #include "codegen.h"
 using namespace std;
 
+/**
+ * 跨文件全局变量
+ */
+extern A_decList absyn_root;
+c_string INPUT_FILE;
+c_string OUTPUT_FILE;
+
 static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
     FILE *out = stderr;
@@ -23,7 +30,7 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList));
-    printcannoList(stderr, stmList);
+//    printcannoList(stderr, stmList);
 
     iList = F_codegen(frame, stmList);
 
@@ -32,18 +39,52 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
     fprintf(outfile, "END %s\n\n", Temp_labelString(F_getName(frame)));
 }
 
+static void doGlobal(FILE *outfile, F_fragList fragList){
+    int word_size = get_word_size();
+    fprintf(outfile, "\t.arch   armv7\n");
+    fprintf(outfile, "\t.file   \"%s\"\n", INPUT_FILE);
+    fprintf(outfile, "\t.data\n\n");
+    for (F_fragList iter = fragList; iter; iter = iter->tail){
+        F_frag frag = iter->head;
+        if (frag->kind == F_frag_::F_globalFrag){
+            int size = frag->u.global.size*word_size;
+            char* name = S_getName(frag->u.global.label);
+            if (frag->u.global.comm){
+                fprintf(outfile, "\t.comm   %s,%d,%d\n", name, size, word_size);
+                fprintf(outfile, "\n");
+                continue;
+            }
+            fprintf(outfile, "\t.global %s\n", name);
+            fprintf(outfile, "\t.align  2\n");
+            fprintf(outfile, "\t.type   %s, %%object\n", name);
+            fprintf(outfile, "\t.size   %s, %d\n", name, word_size);
+            fprintf(outfile, "%s:\n", name);
+            U_pairList init_iter = frag->u.global.init_values;
+            for (; init_iter; init_iter = init_iter->tail){
+                U_intPair init_pair = init_iter->head;
+                if (init_pair->x > 1){
+                    fprintf(outfile, "\t.space  %d\n", init_pair->x * word_size);
+                } else{
+                    fprintf(outfile, "\t.word   %d\n", init_pair->y);
+                }
+            }
+            fprintf(outfile, "\n");
+        } else if (frag->kind == F_frag_::F_stringFrag){
+            fprintf(outfile, "\t.section\t.rodata\n");
+            fprintf(outfile, "%s:\n", S_getName(frag->u.stringg.label));
+            fprintf(outfile, "\t.ascii  \"%s\\000\"", frag->u.stringg.str);
+            fprintf(outfile, "\n");
+        }
+    }
+    fprintf(outfile, "\n");
+}
+
 extern FILE *yyin;
 extern FILE *yyout;
 extern char *yytext;
 
 extern int yyparse();
 
-/**
- * 跨文件全局变量
- */
-extern A_decList absyn_root;
-c_string INPUT_FILE;
-c_string OUTPUT_FILE;
 
 
 int main(int argc, char **argv) {
@@ -85,25 +126,24 @@ int main(int argc, char **argv) {
     S_table venv = E_base_valueEntry(tenv);
     yyparse();
 
-    fprintf(stderr, "\nbefore semantic ast:\n");
-    pr_decList(stderr, absyn_root, 0);
-    fprintf(stderr, "\n");
+//    fprintf(stderr, "\nbefore semantic ast:\n");
+//    pr_decList(stderr, absyn_root, 0);
+//    fprintf(stderr, "\n");
 
     frags = SEM_transProgram(venv, tenv, absyn_root);
 
-    fprintf(stderr, "\nafter semantic ast:\n");
-    pr_decList(stderr, absyn_root, 0);
-    fprintf(stderr, "\nsemantic check finish !\n");
+//    fprintf(stderr, "\nafter semantic ast:\n");
+//    pr_decList(stderr, absyn_root, 0);
+//    fprintf(stderr, "\nsemantic check finish !\n");
 
-    printStmList(stderr, frags);
+//    printStmList(stderr, frags);
 
     //输出汇编指令的路径,应更改为文件名
     FILE *outfile=stdout;
+    doGlobal(outfile, frags);
     for (; frags; frags = frags->tail) {
         if (frags->head->kind == F_frag_::F_procFrag) {
-            doProc(outfile,frags->head->u.proc.frame, frags->head->u.proc.body);
-        } else if (frags->head->kind == F_frag_::F_stringFrag) {
-            fprintf(stderr, "%s\n", frags->head->u.stringg.str);
+            doProc(outfile, frags->head->u.proc.frame, frags->head->u.proc.body);
         }
     }
     return 0;

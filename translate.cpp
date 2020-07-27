@@ -193,13 +193,13 @@ Temp_label Tr_getGlobalLabel(Tr_access access){
 
 
 /** 全局变量的frag */
-void Tr_newIntFrag(Temp_label label, int value){
+void Tr_newIntFrag(Temp_label label, int value, bool comm){
     U_pairList pair_list = U_PairList(U_IntPair(1, value), nullptr);
-    F_frag int_frag = F_GlobalFrag(label, 1, pair_list);
+    F_frag int_frag = F_GlobalFrag(label, 1, pair_list, comm);
     fragList = F_FragList(int_frag, fragList);
 }
-void Tr_newArrayFrag(Temp_label label, int size, U_pairList values){
-    F_frag array_frag = F_GlobalFrag(label, size, values);
+void Tr_newArrayFrag(Temp_label label, int size, U_pairList values, bool comm){
+    F_frag array_frag = F_GlobalFrag(label, size, values, comm);
     fragList = F_FragList(array_frag, fragList);
 }
 
@@ -611,7 +611,7 @@ Tr_exp Tr_newlabel()
 }
 F_fragList Tr_getResult(void)
 {
-    return fragList;
+    return (F_fragList)U_reverseList(fragList);
 }
 Tr_exp  Tr_add_fuc_head_label(Tr_exp returnValue,Temp_label fun_label)
 {
@@ -627,7 +627,7 @@ Tr_exp Tr_StringExp(c_string content)
  * @return T_Name(Temp_label)
  */
 {
-    Temp_label str_pos = Temp_newLabel();
+    Temp_label str_pos = Temp_newStringLabel();
     F_frag str_frag = F_StringFrag(str_pos, content);
     fragList = F_FragList(str_frag, fragList);
 

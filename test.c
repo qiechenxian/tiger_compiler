@@ -1,15 +1,19 @@
+int a;
+int b = 1;
+int bb[1] = {1};
+int c[10];
+int d[3] = {0,1,3};
+int e[2][4][3] = {{},{3}};
 
-int func(int p,int m,int n){
-    p=5;
-    m=4;
-    n=3;
-    return p+m+n;
+int test(){
+    return 1;
 }
+
+int test1(){
+    return 2;
+}
+
 int main(){
-    int a;
-    int b;
-    int c;
-    func(a,b,c);
-    a=b;
-    return a;
+    putf("this is a string");
+    return 0;
 }

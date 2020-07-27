@@ -239,12 +239,13 @@ F_frag F_ProcFrag(T_stm body,F_frame frame)
     new_frag->u.proc.frame=frame;
     return new_frag;
 }
-F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values){
+F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values, bool comm){
     auto new_frag = (F_frag)checked_malloc(sizeof(F_frag_));
     new_frag->kind = F_frag_::F_globalFrag;
     new_frag->u.global.label = label;
     new_frag->u.global.size = size;
     new_frag->u.global.init_values = init_values;
+    new_frag->u.global.comm = comm;
     return new_frag;
 }
 T_stm F_procEntryExit1(F_frame frame,T_stm stm)
