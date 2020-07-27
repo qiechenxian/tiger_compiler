@@ -31,11 +31,18 @@ Temp_temp Temp_new_special(c_string s)
     return p;
 }
 
-static int label = 0;
+static int stringLabel = 0;
+Temp_label Temp_newStringLabel()
+{
+    char buf[127];
+    sprintf(buf, ".LC%d", stringLabel++);
+    return Temp_namedLabel(String(buf));
+}
 
+static int label = 0;
 Temp_label Temp_newLabel() {
     char buf[127];
-    sprintf(buf, "L%d", label++);
+    sprintf(buf, ".L%d", label++);
     return Temp_namedLabel(String(buf));
 }
 

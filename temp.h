@@ -13,6 +13,7 @@ Temp_temp Temp_newTemp();
 
 typedef  S_symbol Temp_label;
 Temp_label Temp_newLabel();
+Temp_label Temp_newStringLabel();
 Temp_label Temp_namedLabel(c_string name);
 c_string Temp_labelString(Temp_label s);
 

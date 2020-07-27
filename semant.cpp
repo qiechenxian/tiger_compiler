@@ -321,7 +321,8 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     Tr_newArrayFrag(
                             Tr_getGlobalLabel(var_access),
                             array_total_size,
-                            INIT_shrinkInitList(init_list)
+                            INIT_shrinkInitList(init_list),
+                            false
                             );
                     if (d->u.array.isConst){
                         arrayEntry->u.var.cValues = E_ArrayValue(init_list);
@@ -351,13 +352,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             if (not frame){
                 /// 全局数组无初始化，默认全0
 
-                U_intPair pair = U_IntPair(array_total_size, 0);
-                U_pairList shrink_zeros = U_PairList(pair, nullptr);
-
                 Tr_newArrayFrag(
                         Tr_getGlobalLabel(var_access),
                         array_total_size,
-                        shrink_zeros
+                        nullptr,
+                        true
                         );
                 if (d->u.array.isConst){
                     INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
@@ -440,7 +439,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                     // 全局变量的初值必须为常数表达式，此处前端保证优化为常数
                     assert(d->u.var.init->kind == A_exp_::A_intExp);
-                    Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp);
+                    Tr_newIntFrag(Tr_getGlobalLabel(var_access),  d->u.var.init->u.intExp, false);
 
                     /// 对于全局变量的翻译已归frag管理，无需翻译为ir
                     S_enter(venv, d->u.var.id, varEntry);
@@ -466,7 +465,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
             /// 无初值的全局变量
             if (not frame){
-                Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0);
+                Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0, true);
                 S_enter(venv, d->u.var.id, varEntry);
                 return Tr_nopExp();
             }

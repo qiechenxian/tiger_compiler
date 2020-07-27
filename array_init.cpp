@@ -111,7 +111,6 @@ U_pairList INIT_shrinkInitList(INIT_initList init_list){
     /**
      * 服务于全局数组的初值形式，initList中的exp都应为intExp
      */
-    assert(init_list->total_size > 1);
     assert(init_list->array[0]->kind == A_exp_::A_intExp);
     U_intPair pair = U_IntPair(1, init_list->array[0]->u.intExp);
     U_pairList shrink_array = U_PairList(pair, nullptr);
