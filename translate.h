@@ -78,5 +78,6 @@ F_fragList Tr_getResult();
 Tr_exp  Tr_add_fuc_head_label(Tr_exp returnValue,Temp_label fun_label);
 Tr_exp Tr_StringExp(c_string content);
 void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals);
-
+T_stm T_fuc_call_param_in(bool tag,int parap_all,T_expList params);
+Tr_exp Tr_Nx(T_stm stm);
 #endif //COMPILER_LOYX_TRANSLATE_H

@@ -717,6 +717,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     struct expty argType = transExp(venv, tenv, argIter->head, l_break, l_continue);
                     Tr_expList_append(params, argType.exp);
                 }
+
                 return Expty(Tr_func_call(funEntry->u.fun.label, params), TY_Void());
             }
 
@@ -724,23 +725,35 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             TY_tyList formals = funEntry->u.fun.formals;
             A_expList argIter = a->u.callExp.args;
             Tr_expList params=Tr_ExpList();
+            T_expList params_opposite=T_ExpList(nullptr, nullptr);
+            T_stm func_in_param= nullptr;
+            T_stm temp= nullptr;
+            int param_count=0;
             for ( ; argIter && formals; argIter = argIter->tail, formals = formals->tail){
                 struct expty argType = transExp(venv, tenv, argIter->head,l_break,l_continue);
                 Tr_expList_append(params,argType.exp);
+                Tr_expList_append_opposite(params_opposite,argType.exp);
+                param_count++;
                 if (!is_equal_ty(argType.ty, formals->head)){
                     EM_warning(argIter->head->pos,
-                            "incorrect type %s, expected %s",
-                            TY_toString(argType.ty),
-                            TY_toString(formals->head));
+                               "incorrect type %s, expected %s",
+                               TY_toString(argType.ty),
+                               TY_toString(formals->head));
                 }
+
             }
+            temp=T_fuc_call_param_in(false,param_count,params_opposite);//tag=true时为特殊情况
+            func_in_param=T_Seq(T_Move(T_Temp(F_SP()),T_Binop(T_sub,T_Temp(F_SP()),T_Const(param_count*get_word_size()))),T_Exp(T_Const(0)) );
+            func_in_param=T_Seq(func_in_param,temp);
             /// 检查参数个数
             if (argIter == nullptr && formals != nullptr){
                 EM_error(a->pos, "not enough arguments!");
             }else if (argIter != nullptr){
                 EM_error(a->pos, "too many arguments!");
             }
-            return Expty(Tr_func_call(funEntry->u.fun.label,params), actual_ty(funEntry->u.fun.result));
+            Tr_exp fuc_call=Tr_func_call(funEntry->u.fun.label,params);
+            fuc_call=Tr_seq(Tr_Nx(func_in_param),fuc_call);
+            return Expty(fuc_call, actual_ty(funEntry->u.fun.result));//因为要考虑调用gcc函数的情况，在这里进行参数压栈
         }
         case A_exp_::A_opExp:{
             A_binOp op = a->u.opExp.op;
