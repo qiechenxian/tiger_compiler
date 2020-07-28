@@ -447,7 +447,7 @@ static void munchStm(T_stm s) {
             emit(AS_Oper(inst2, NULL, NULL, AS_Targets(Temp_LabelList(jt, NULL))));
 
             sprintf(inst3, "\tb       %s\n", Temp_labelString(jf));
-            emit(AS_Oper(inst3, NULL, NULL, AS_Targets(Temp_LabelList(jf, NULL))));
+            emit(AS_Oper(inst3, NULL, NULL, AS_Targets(    Temp_LabelList(jf, NULL))));
             break;
         }
         default: {

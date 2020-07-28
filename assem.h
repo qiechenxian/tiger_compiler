@@ -9,6 +9,7 @@
 #include <string.h>
 #include "errormsg.h"
 #include "temp.h"
+#include "table.h"
 
 typedef struct AS_targets_ *AS_targets;
 struct AS_targets_ {
@@ -63,6 +64,11 @@ struct AS_instrList_ {
 };
 
 AS_instrList AS_InstrList(AS_instr head, AS_instrList tail);
+
+AS_instrList AS_instrUnion(AS_instrList ta, AS_instrList tb);
+AS_instrList AS_instrMinus(AS_instrList ta, AS_instrList tb);
+AS_instrList AS_instrIntersect(AS_instrList ta, AS_instrList tb);
+bool AS_instrInList(AS_instr i, AS_instrList il);
 
 //把list b 拼接到 list a后边
 AS_instrList AS_splice(AS_instrList a, AS_instrList b);

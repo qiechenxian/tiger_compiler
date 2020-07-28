@@ -54,6 +54,70 @@ AS_instrList AS_splice(AS_instrList a, AS_instrList b) {
     return a;
 }
 
+AS_instrList AS_instrUnion(AS_instrList ta, AS_instrList tb) {
+    AS_instr t;
+    AS_instrList tl = NULL;
+    TAB_table m = TAB_empty();
+
+    for (; ta; ta = ta->tail) {
+        t = ta->head;
+        if (TAB_look(m, t) == NULL) {
+            TAB_enter(m, t, (void *) "u");
+            tl = AS_InstrList(t, tl);
+        }
+    }
+
+    for (; tb; tb = tb->tail) {
+        t = tb->head;
+        if (TAB_look(m, t) == NULL) {
+            TAB_enter(m, t, (void *) "u");
+            tl = AS_InstrList(t, tl);
+        }
+    }
+
+    return tl;
+}
+
+AS_instrList AS_instrMinus(AS_instrList ta, AS_instrList tb) {
+    AS_instr t;
+    AS_instrList tl = NULL;
+    TAB_table m = TAB_empty();
+
+    for (; tb; tb = tb->tail) {
+        t = tb->head;
+        TAB_enter(m, t, (void *) "m");
+    }
+
+    for (; ta; ta = ta->tail) {
+        t = ta->head;
+        if (TAB_look(m, t) == NULL) {
+            tl = AS_InstrList(t, tl);
+        }
+    }
+
+    return tl;
+}
+
+AS_instrList AS_instrIntersect(AS_instrList ta, AS_instrList tb) {
+    AS_instr t;
+    AS_instrList tl = NULL;
+    TAB_table m = TAB_empty();
+
+    for (; ta; ta = ta->tail) {
+        t = ta->head;
+        TAB_enter(m, t, (void *) "i");
+    }
+
+    for (; tb; tb = tb->tail) {
+        t = tb->head;
+        if (TAB_look(m, t) != NULL) {
+            tl = AS_InstrList(t, tl);
+        }
+    }
+
+    return tl;
+}
+
 // 返回第n个temp和返回第n个label
 static Temp_temp nthTemp(Temp_tempList list, int i) {
     assert(list);
