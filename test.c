@@ -5,17 +5,12 @@ int c[10];
 int d[3] = {0,1,3};
 int e[2][4][3] = {{},{3}};
 
-int test(int a){
-    return 1;
-}
 
-int test1(){
-    return 2;
-}
 
 int main(){
-    int a=0;
-    test(a);
+    int a=5;
+    int b=12;
+    a=b/a;
     putf("this is a string");
     return 0;
 }

@@ -518,6 +518,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 S_enter(venv, formalIter->head->id, arg_entry);
                 argsCL = argsCL->tail;
             }
+                //func entrace port
+                T_stm func_entrace_port= nullptr;
+                T_Stmfd(T_ExpList(T_Temp(F_FP()),T_ExpList(T_Temp(F_SP()),T_ExpList(T_Temp(F_LR()),T_ExpList(T_Temp(F_PC()), nullptr)))));
                 /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body,l_break,l_continue);
             returnValue.exp =Tr_add_fuc_head_label(returnValue.exp,fun_label);
@@ -704,8 +707,12 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                          S_getName(a->u.callExp.id));
                 return Expty(nullptr, TY_Void());
             }
-
+            T_stm func_in_param= nullptr;
+            T_stm temp= nullptr;
+            Tr_expList params=Tr_ExpList();
+            T_expList params_opposite=T_ExpList(nullptr, nullptr);
             /// 针对putf的特殊处理
+            int param_count=0;
             if (strcmp(S_getName(a->u.callExp.id), "putf") == 0){
                 if (a->u.callExp.args->head->kind != A_exp_::A_stringExp){
                     EM_error(a->pos, "The first argument of putf must be a String");
@@ -714,21 +721,24 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 A_expList argIter = a->u.callExp.args;
                 /// putf由于是可变长参数，因此不检查类型
                 for (; argIter; argIter = argIter->tail){
+                    param_count++;
                     struct expty argType = transExp(venv, tenv, argIter->head, l_break, l_continue);
+                    Tr_expList_append_opposite(params_opposite,argType.exp);
                     Tr_expList_append(params, argType.exp);
                 }
-
-                return Expty(Tr_func_call(funEntry->u.fun.label, params), TY_Void());
+                temp=T_fuc_call_param_in(false,param_count,params_opposite);//tag=true时为特殊情况
+                func_in_param=T_Seq(T_Move(T_Temp(F_SP()),T_Binop(T_sub,T_Temp(F_SP()),T_Const(param_count*get_word_size()))),T_Exp(T_Const(0)) );
+                func_in_param=T_Seq(func_in_param,temp);
+                Tr_exp fuc_call=Tr_func_call(funEntry->u.fun.label,params);
+                fuc_call=Tr_seq(Tr_Nx(func_in_param),fuc_call);
+                return Expty(fuc_call, TY_Void());
             }
 
             /// 检查参数类型
             TY_tyList formals = funEntry->u.fun.formals;
             A_expList argIter = a->u.callExp.args;
-            Tr_expList params=Tr_ExpList();
-            T_expList params_opposite=T_ExpList(nullptr, nullptr);
-            T_stm func_in_param= nullptr;
-            T_stm temp= nullptr;
-            int param_count=0;
+
+
             for ( ; argIter && formals; argIter = argIter->tail, formals = formals->tail){
                 struct expty argType = transExp(venv, tenv, argIter->head,l_break,l_continue);
                 Tr_expList_append(params,argType.exp);

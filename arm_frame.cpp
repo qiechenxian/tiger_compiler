@@ -5,6 +5,8 @@
 #include "assem.h"
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 4; /// 保存在Reg中参数的数量(待定)
+static Temp_temp pc = nullptr;
+static Temp_temp lr = nullptr;
 static Temp_temp fp = nullptr;
 static Temp_temp sp = nullptr;
 static Temp_temp zero = nullptr;
@@ -31,6 +33,26 @@ Temp_temp F_RV()//取帧指针
         rv=Temp_new_special(save);
     }
     return rv;
+}
+Temp_temp F_PC()
+{
+    if(pc==nullptr)
+    {
+        char save[5];
+        sprintf(save, "%s", "PC");
+        pc=Temp_new_special(save);
+    }
+    return pc;
+}
+Temp_temp F_LR()
+{
+    if(lr==nullptr)
+    {
+        char save[5];
+        sprintf(save, "%s", "LR");
+        lr=Temp_new_special(save);
+    }
+    return lr;
 }
 Temp_temp F_SP(void) {
 

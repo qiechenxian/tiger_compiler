@@ -23,13 +23,15 @@ typedef enum {
 
 /** class */
 struct T_stm_{
-    enum {T_SEQ, T_LABEL, T_JUMP, T_CJUMP, T_MOVE, T_EXP} kind;
+    enum {T_SEQ, T_LABEL, T_JUMP, T_CJUMP, T_MOVE, T_EXP, T_STMFD,T_LDMFD} kind;
     union {
         struct {T_stm left; T_stm right;} SEQ;
         Temp_label LABEL;
         struct {T_exp exp; Temp_labelList jumps;} JUMP;
         struct {T_relOp op; T_exp left, right; Temp_label trues, falses;}CJUMP;
         struct {T_exp dst, src;} MOVE;
+        struct {T_expList exp_list;} STMFD;
+        struct {T_expList exp_list;} LDMFD;
         T_exp EXP;
     }u;
 };
@@ -61,6 +63,8 @@ T_stm T_Jump(T_exp exp, Temp_labelList labels);
 T_stm T_Cjump(T_relOp op, T_exp left, T_exp right, Temp_label, Temp_label);
 T_stm T_Move(T_exp dst, T_exp src);
 T_stm T_Exp(T_exp exp);
+T_stm T_Stmfd(T_expList exp);
+T_stm T_Ldmfd(T_expList exp);
 
 T_exp T_Binop(T_binOp op, T_exp left, T_exp right);
 T_exp T_Mem(T_exp exp);
