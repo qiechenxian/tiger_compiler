@@ -96,6 +96,8 @@ struct F_frame_{
     F_accessList formals;
     F_accessList locals;
     int local_count;
+    int callee_max_args;
+    bool isLeaf;
     /** instructions required view shift*/
 };//添加局部变量域
 
@@ -154,13 +156,12 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
  *              |       a7      |
  *              |       a6      |
  *              |       a5      |
- *      旧SP->  |       a4      |
+ *              |       a4      |
+ *              |       a3      |
+ *              |       a2      |
+ *              |       a1      |
  *        FP->  |   旧LR,FP等    |
  *              |   局部变量等    |
- *              |       a1      |
- *              |       a2      |
- *              |       a3      |
- *              |       a4      |
  *              |      ...      |
  *         SP-> |               |
  * @param frame 当前函数栈帧
@@ -198,6 +199,8 @@ F_frame F_newFrame(Temp_label name, U_boolList formals){
     f->formals = makeFormalAccessList(f, formals);
     f->local_count = 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     f->locals=nullptr;
+    f->isLeaf = false;
+    f->callee_max_args = 0;
     return f;
 }
 Temp_label F_getName(F_frame frame){
@@ -315,9 +318,79 @@ AS_instrList F_procEntryExit2(AS_instrList body) {
  *
  */
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
-    char buf[100];
-    sprintf(buf, "PROCEDURE %s\n", S_name(frame->name));
-    return AS_Proc(String(buf), body, "END\n");
+    AS_instrList head_inst_list, tail_inst_list;
+    AS_instrList head_inst_ptr, tail_inst_ptr;
+    int word_size = get_word_size();
+    char* name = Temp_labelString(frame->name);
+
+    /** 函数入口label*/
+    char* fun_label = (char*)checked_malloc(sizeof(char )*20);
+    sprintf(fun_label, "%s:\n", name);
+    head_inst_list = AS_InstrList(AS_Label(fun_label, frame->name), NULL);
+    head_inst_ptr = head_inst_list;
+
+    /** 函数入口处的汇编指令 */
+
+    int recover_offset;
+    if (frame->isLeaf){
+        char* inst = (char*)"\tstr     fp, [sp, #-4]!\n";
+        head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        head_inst_ptr = head_inst_ptr->tail;
+
+        recover_offset = 0;
+    } else{
+        char* inst = (char*)"\tstmfd   sp!, {fp, lr}\n";
+        head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        head_inst_ptr = head_inst_ptr->tail;
+
+        recover_offset = 1 * word_size;
+    }
+
+    // todo callee 保护的寄存器的相关指令
+
+    char* inst = (char*)checked_malloc(sizeof(char ) * 20);
+    sprintf(inst, "\tadd     fp, sp, #%d\n", recover_offset);
+    head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+    head_inst_ptr = head_inst_ptr->tail;
+
+    int space = frame->local_count + frame->callee_max_args; // todo 此处还应有要保护寄存器空间和临时变量空间
+    char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
+    sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
+    head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, NULL, NULL, NULL), NULL);
+    head_inst_ptr = head_inst_ptr->tail;
+
+    /** 将函数入口指令和body指令连接 */
+    head_inst_ptr->tail = body;
+
+    /** 函数出口指令 */
+    inst = (char*)checked_malloc(sizeof(char ) * 20);
+    sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
+    tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+    tail_inst_ptr = tail_inst_list;
+
+    if (frame->isLeaf){
+        inst = (char*)"\tldr     fp, [sp], #4\n";
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        tail_inst_ptr = tail_inst_ptr->tail;
+    } else{
+        inst = (char*)"\tldmfd   sp!, {fp, lr}\n";
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        tail_inst_ptr = tail_inst_ptr->tail;
+    }
+
+    inst = (char*)checked_malloc(sizeof(char ) * 20);
+    sprintf(inst, "\tbx      lr\n");
+    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+
+    /** 连接上出口指令 */
+    AS_instrList total_inst = AS_splice(head_inst_list, tail_inst_list);
+
+    char* entry_meta = (char*)checked_malloc(sizeof(char) * 100);
+    sprintf(entry_meta, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
+    char* exit_meta = (char*)checked_malloc(sizeof(char) * 100);
+    sprintf(exit_meta, "\t.size   %s, .-%s", name, name);
+
+    return AS_Proc(entry_meta, total_inst, exit_meta);
 }
 
 

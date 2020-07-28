@@ -47,7 +47,7 @@ AS_instrList AS_InstrList(AS_instr head, AS_instrList tail) {
 
 //把list b 拼接到 list a后边
 AS_instrList AS_splice(AS_instrList a, AS_instrList b) {
-    if (a = NULL) return b;
+    if (a == NULL) return b;
     AS_instrList p;
     for (p = a; p->tail != NULL; p = p->tail);
     p->tail = b;
@@ -208,7 +208,7 @@ void AS_printInstrList(FILE *out, AS_instrList iList, Temp_map m) {
     for (; iList; iList = iList->tail) {
         AS_print(out, iList->head, m);
     }
-    fprintf(out, "\n");
+//    fprintf(out, "\n");
 }
 
 AS_proc AS_Proc(c_string p, AS_instrList b, c_string e) {

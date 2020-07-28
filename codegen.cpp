@@ -4,7 +4,7 @@
 #include "codegen.h"
 
 /// 定义指令字符串长度，可调整大小，节省内存
-#define INST_LEN 20
+const int INST_LEN = 20;
 
 // 添加instr到指令表中
 static AS_instrList iList = NULL, last = NULL;

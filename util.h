@@ -11,7 +11,12 @@
 typedef char *c_string;
 c_string String(char *);
 
+
 void *checked_malloc(unsigned );
+
+typedef struct U_stringList_ *U_stringList ;
+struct U_stringList_{c_string head; U_stringList tail;};
+U_stringList U_StringList(c_string head, U_stringList tail);
 
 typedef struct U_boolList_ *U_boolList;
 struct U_boolList_{bool head; U_boolList tail;};

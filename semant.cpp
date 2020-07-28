@@ -523,7 +523,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 T_Stmfd(T_ExpList(T_Temp(F_FP()),T_ExpList(T_Temp(F_SP()),T_ExpList(T_Temp(F_LR()),T_ExpList(T_Temp(F_PC()), nullptr)))));
                 /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body,l_break,l_continue);
-            returnValue.exp =Tr_add_fuc_head_label(returnValue.exp,fun_label);
+//            returnValue.exp =Tr_add_fuc_head_label(returnValue.exp,fun_label);
                 /// 检查返回值
             if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
                 EM_error(d->u.function.body->pos,

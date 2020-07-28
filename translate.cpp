@@ -593,7 +593,9 @@ Tr_exp Tr_seq(Tr_exp left,Tr_exp right)
 }
 void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals)//todo
 {
-    F_frag pfrag = F_ProcFrag(Tr_unNx(body),frame);
+    T_stm stm = Tr_unNx(body);
+    stm = F_procEntryExit1(frame, stm);
+    F_frag pfrag = F_ProcFrag(stm,frame);
     fragList = F_FragList(pfrag, fragList);
 }
 Tr_exp Tr_return(Tr_exp ret_num)
