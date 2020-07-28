@@ -21,6 +21,7 @@ typedef  struct F_fragList_* F_fragList;
 typedef struct F_accessList_ *F_accessList;
 struct F_accessList_{F_access head; F_accessList tail;};
 
+void F_setFrameCalleeArgs(F_frame frame, int callee_args);
 F_frame F_newFrame(Temp_label name, U_boolList formals);
 Temp_label F_getName(F_frame frame);
 F_accessList F_getFormals(F_frame frame);

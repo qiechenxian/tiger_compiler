@@ -18,6 +18,7 @@ struct expty Expty(Tr_exp exp, TY_ty ty){
     e.ty = ty;
     e.isConst = false;
     e.suffix_size = nullptr;
+    e.callee_args = -1;
     return e;
 }
 
@@ -523,6 +524,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 T_Stmfd(T_ExpList(T_Temp(F_FP()),T_ExpList(T_Temp(F_SP()),T_ExpList(T_Temp(F_LR()),T_ExpList(T_Temp(F_PC()), nullptr)))));
                 /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body,l_break,l_continue);
+            F_setFrameCalleeArgs(fun_frame, returnValue.callee_args);
 //            returnValue.exp =Tr_add_fuc_head_label(returnValue.exp,fun_label);
                 /// 检查返回值
             if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
@@ -556,21 +558,28 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     switch (s->kind) {
         case A_stm_::A_expStm:{
             expty expty_msg = transExp(venv, tenv, s->u.expStm,l_break,l_continue);
-            return Expty(expty_msg.exp, expty_msg.ty);
+//            return Expty(expty_msg.exp, expty_msg.ty);
+            return expty_msg;
         }
         case A_stm_::A_ifStm:{
             struct expty test{}, body{}, elseBody{};
-            test = transExp(venv, tenv, s->u.ifStm.test,l_break,l_continue);
             if (test.ty->kind != TY_ty_::TY_int){
                 EM_error(s->u.ifStm.test->pos, "integer required");
             }
             body = transStm(frame, venv, tenv, s->u.ifStm.body,l_break,l_continue);
+            int callee_args = body.callee_args;
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody,l_break,l_continue);
+                if (elseBody.callee_args > callee_args)
+                    callee_args = elseBody.callee_args;
                 // 此处本来有语义检查，但是正确实现比较复杂，且官方保证不会出错，所以删掉了 --loyx 2020/7/24
-                return Expty(Tr_if_else(test.exp,body.exp,elseBody.exp), body.ty);
+                expty expty_msg = Expty(Tr_if_else(test.exp,body.exp,elseBody.exp), body.ty);
+                expty_msg.callee_args = callee_args;
+                return expty_msg;
             }
-            return Expty(Tr_if_else(test.exp,body.exp, nullptr), body.ty);
+            expty expty_msg = Expty(Tr_if_else(test.exp,body.exp, nullptr), body.ty);
+            expty_msg.callee_args = callee_args;
+            return expty_msg;
         }
         case A_stm_::A_whileStm:{
             struct expty test = transExp(venv, tenv, s->u.whileStm.test,l_break,l_continue);
@@ -580,7 +589,9 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             Tr_exp w_done=Tr_doneExp();
             Tr_exp w_init=Tr_initialExp();
             struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,w_done,w_init);//trans之前应生成while的break与continue  label
-            return Expty(Tr_while(test.exp,body.exp,w_done,w_init), body.ty);
+            expty expty_msg = Expty(Tr_while(test.exp,body.exp,w_done,w_init), body.ty);
+            expty_msg.callee_args = body.callee_args;
+            return expty_msg;
         }
         case A_stm_::A_blockStm:{
             if (!s->u.blockStm)
@@ -592,6 +603,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             S_beginScope(venv);
             Tr_exp temp= nullptr;
             A_comStmList comStmIter;
+            int callee_args = -1;
             for(comStmIter = s->u.blockStm; comStmIter; comStmIter = comStmIter->tail){
                 if (comStmIter->head->const_var_decStm){
                     A_decList decIter = comStmIter->head->const_var_decStm;
@@ -607,7 +619,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         }
                     }
                 }
-                if (comStmIter->head->stmSeq){
+                else if (comStmIter->head->stmSeq){
                     returnTy = transStm(frame, venv, tenv, comStmIter->head->stmSeq,l_break,l_continue);
                     if(true==initial_tag)
                     {
@@ -618,11 +630,15 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         save_temp.exp=Tr_seq(save_temp.exp,returnTy.exp);
                     }
                     /// 一个blockStm中可以有多处return
+                    if (returnTy.callee_args > callee_args)
+                        callee_args = returnTy.callee_args;
                 }
             }
             S_endScope(tenv);
             S_endScope(venv);
-            return Expty(save_temp.exp, returnTy.ty);
+            expty expty_msg = Expty(save_temp.exp, returnTy.ty);
+            expty_msg.callee_args = callee_args;
+            return expty_msg;
         }
         case A_stm_::A_assignStm:{
             struct expty var = transVar(venv, tenv, s->u.assignStm.var,l_break,l_continue);
@@ -725,7 +741,9 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     struct expty argType = transExp(venv, tenv, argIter->head, l_break, l_continue);
                     Tr_expList_append(params, argType.exp);
                 }
-                return Expty(Tr_func_call(funEntry->u.fun.label,params), TY_Void());
+                expty expty_msg = Expty(Tr_func_call(funEntry->u.fun.label,params), TY_Void());
+                expty_msg.callee_args = param_count;
+                return expty_msg;
             }
 
             /// 检查参数类型
@@ -751,7 +769,9 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             }else if (argIter != nullptr){
                 EM_error(a->pos, "too many arguments!");
             }
-            return Expty(Tr_func_call(funEntry->u.fun.label,params), actual_ty(funEntry->u.fun.result));//因为要考虑调用gcc函数的情况，在这里进行参数压栈
+            expty expty_msg = Expty(Tr_func_call(funEntry->u.fun.label,params), actual_ty(funEntry->u.fun.result));//因为要考虑调用gcc函数的情况，在这里进行参数压栈
+            expty_msg.callee_args = param_count;
+            return expty_msg;
         }
         case A_exp_::A_opExp:{
             A_binOp op = a->u.opExp.op;

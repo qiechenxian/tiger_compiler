@@ -22,6 +22,7 @@ struct expty {
      * suffix_size中的-1标志结尾
      */
     int* suffix_size;
+    int callee_args;
 };
 struct expty Expty(Tr_exp exp, TY_ty ty);
 
