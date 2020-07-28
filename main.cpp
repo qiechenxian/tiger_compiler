@@ -54,7 +54,7 @@ static void doGlobal(FILE *outfile, F_fragList fragList){
             int size = frag->u.global.size*word_size;
             char* name = S_getName(frag->u.global.label);
             if (frag->u.global.comm){
-                fprintf(outfile, "\t.comm   %s,%d,%d\n", name, size, word_size);
+                fprintf(outfile, "\t.comm   %s, %d, %d\n", name, size, word_size);
                 fprintf(outfile, "\n");
                 continue;
             }

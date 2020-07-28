@@ -97,7 +97,7 @@ struct F_frame_{
     F_accessList locals;
     int local_count;
     int callee_max_args;
-    int temp_reg;  /// todo 为寄存器分配后，保存临时变量预留的接口
+    int temp_space;  /// todo 为寄存器分配后，保存临时变量空间预留的接口
     bool isLeaf;
     /** instructions required view shift*/
 };//添加局部变量域
@@ -207,7 +207,7 @@ F_frame F_newFrame(Temp_label name, U_boolList formals){
     f->local_count = 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     f->locals=nullptr;
     f->isLeaf = true;
-    f->temp_reg = 0;
+    f->temp_space = 0;
     f->callee_max_args = -1;
     return f;
 }
@@ -361,14 +361,15 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
-    int space = frame->local_count + frame->callee_max_args + frame->temp_reg; // todo 此处还应有要保护寄存器空间
+    int space = frame->local_count + frame->callee_max_args + frame->temp_space; // todo 此处还应有要保护寄存器空间
     char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
     sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
     head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, NULL, NULL, NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
     /** 将函数入口指令和body指令连接 */
-    head_inst_ptr->tail = body;
+//    head_inst_ptr->tail = body;
+    head_inst_ptr->tail = body->tail;
 
     /** 函数出口指令 */
     inst = (char*)checked_malloc(sizeof(char ) * 20);
