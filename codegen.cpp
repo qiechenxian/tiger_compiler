@@ -525,10 +525,6 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
             emit(AS_Oper(inst, NULL, NULL, NULL));
         }
         count_func_param++;
-        //sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
-        //emit(AS_Oper(inst, L(F_RA(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
-        //sprintf(inst2, "\tmov     'd0, 's0\n");
-        //emit(AS_Move(inst2, L(t, NULL), L(F_RV(), NULL)));
         if (args == nullptr){
             return nullptr;
         }
