@@ -5,8 +5,7 @@
 #ifndef COMPILER_LIVENESS_H
 #define COMPILER_LIVENESS_H
 
-#include "graph.h"
-#include "assem.h"
+#include "flowgraph.h"
 
 typedef struct Live_moveList_ *Live_moveList;
 struct Live_moveList_ {

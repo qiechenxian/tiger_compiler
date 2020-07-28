@@ -8,7 +8,7 @@
 #include "temp.h"
 #include "assem.h"
 #include "graph.h"
-
+#include "liveness.h"
 /*
  * 参考链接
  * https://github.com/shihaoL/Tiger-Compiler/blob/master/src/color.c

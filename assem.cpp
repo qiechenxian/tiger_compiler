@@ -218,6 +218,14 @@ AS_proc AS_Proc(c_string p, AS_instrList b, c_string e) {
     proc->epilog = e;
     return proc;
 }
+bool AS_instrInList(AS_instr i, AS_instrList il) {
+    for (; il; il = il->tail) {
+        if (il->head == i) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 

@@ -68,7 +68,7 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
     G_table last_in = G_empty();
     G_table last_out = G_empty();
     Temp_tempList ci, co, li, lo;
-    bool flag = TRUE;
+    bool flag = true;
 
     // Loop
     while (flag) {
@@ -89,7 +89,7 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
             enterLiveMap(out, n, co);
         }
 
-        flag = FALSE;
+        flag = false;
         for (fl = G_nodes(flow); fl; fl = fl->tail) {
             n = fl->head;
             li = lookupLiveMap(in, n);
@@ -98,7 +98,7 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
             co = lookupLiveMap(last_out, n);
 
             if (!tempEqual(li, ci) || !tempEqual(lo, co)) {
-                flag = TRUE;
+                flag = true;
                 break;
             }
         }
@@ -141,7 +141,7 @@ static void solveLiveness(struct Live_graph *lg,
         // Spill Cost
         for (t = defuse; t; t = t->tail) {
             Temp_temp ti = t->head;
-            long spills = (long)Temp_lookPtr(spillCost, ti);
+            long spills = (long long)Temp_lookPtr(spillCost, ti);
             ++spills;
             Temp_enterPtr(spillCost, ti, (void*)spills);
         }
@@ -199,7 +199,7 @@ static void solveLiveness3(struct Live_graph *lg,
     G_node n, ndef, nedge, move_src, move_dst;
     Temp_tempList tdef, tuse, tout, tl, tedge, live = NULL;
     AS_instr inst;
-    bool blockStart = TRUE;
+    bool blockStart = true;
 
     // Traverse node
     fl = G_reverseNodes(G_nodes(flow));
@@ -207,7 +207,7 @@ static void solveLiveness3(struct Live_graph *lg,
     for (; fl; fl = fl->tail) {
         if (blockStart) {
             live = lookupLiveMap(out, fl->head);
-            blockStart = FALSE;
+            blockStart = false;
         }
 
         n = fl->head;
@@ -215,8 +215,8 @@ static void solveLiveness3(struct Live_graph *lg,
         tuse = FG_use(n);
         tdef = FG_def(n);
 
-        if (inst->kind == I_LABEL) {
-            blockStart = TRUE;
+        if (inst->kind == AS_instr_::I_LABEL) {
+            blockStart = true;
             continue;
         }
 
@@ -225,7 +225,7 @@ static void solveLiveness3(struct Live_graph *lg,
         // Spill Cost
         for (tl = defuse; tl; tl = tl->tail) {
             Temp_temp ti = tl->head;
-            long spills = (long)Temp_lookPtr(spillCost, ti);
+            long spills = (long long)Temp_lookPtr(spillCost, ti);
             ++spills;
             Temp_enterPtr(spillCost, ti, (void*)spills);
         }
