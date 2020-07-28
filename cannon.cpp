@@ -15,7 +15,6 @@ S_table block_env;
 static T_stmList getLast(T_stmList list);
 static void trace(T_stmList list);
 static T_stmList getNext();
-
 C_stmListList C_StmListList(T_stmList head,C_stmListList tail)
 {
     C_stmListList block_list=(C_stmListList)checked_malloc(sizeof(*block_list));
