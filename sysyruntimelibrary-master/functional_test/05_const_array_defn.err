@@ -1,161 +1,29 @@
-
-before semantic ast:
- decList(
-  arrayDec(a,
-   int,
-   expList(
-    intExp(5),
-    expList()),
-   arrayInitList(
-    singleInit(
-     intExp(0)),
-    arrayInitList(
-     singleInit(
-      intExp(1)),
-     arrayInitList(
-      singleInit(
-       intExp(2)),
-      arrayInitList(
-       singleInit(
-        intExp(3)),
-       arrayInitList(
-        singleInit(
-         intExp(4))))))),
-   FALSE),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       returnStm(
-        varExp(
-         arrayVar(
-          simpleVar(a),
-          intExp(4))))),
-      comStmList()))),
-   decList()))
-
-after semantic ast:
- decList(
-  arrayDec(a,
-   int,
-   expList(
-    intExp(5),
-    expList()),
-   arrayInitList(
-    singleInit(
-     intExp(0)),
-    arrayInitList(
-     singleInit(
-      intExp(1)),
-     arrayInitList(
-      singleInit(
-       intExp(2)),
-      arrayInitList(
-       singleInit(
-        intExp(3)),
-       arrayInitList(
-        singleInit(
-         intExp(4))))))),
-   FALSE),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       returnStm(
-        intExp(4))),
-      comStmList()))),
-   decList()))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  MOVE(
-   TEMP tRV,
-   MEM(
-    BINOP(T_add,
-     NAME a,
-     BINOP(T_mul,
-      CONST 4,
-      CONST 4)))))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  TEMP tRV,
-  MEM(
-   BINOP(T_add,
-    NAME a,
-    BINOP(T_mul,
-     CONST 4,
-     CONST 4))))
-----dived line----
- JUMP(
-  NAME L1)
-----dived line----
- LABEL L1
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-a format: assem=L0:
-, dst=(nil), src=(nil)
-result=L0:
-
-a format: assem=MOV a,'d0
-, dst=0x55cb9e0255f0, src=(nil)
-result=MOV a,102
-
-a format: assem=MOV 'd0,#4
-, dst=0x55cb9e025a40, src=(nil)
-result=MOV 104,#4
-
-a format: assem=MOV 'd0,#4
-, dst=0x55cb9e025ca0, src=(nil)
-result=MOV 105,#4
-
-a format: assem=MUL 'd0,'s0,'s1
-, dst=0x55cb9e025d50, src=0x55cb9e025d30
-result=MUL 103,104,105
-
-a format: assem=ADD 'd0,'s0,'s1
-, dst=0x55cb9e025e00, src=0x55cb9e025de0
-result=ADD 101,102,103
-
-a format: assem=LDR 'd0,['s0]
-, dst=0x55cb9e025e90, src=0x55cb9e025e70
-result=LDR 100,[101]
-
-a format: assem=MOV 'd0, 's0
-, dst=0x55cb9e025f20, src=0x55cb9e025f00
-result=MOV RV, 100
-
-a format: assem=B L1
-, dst=(nil), src=(nil)
-result=B L1
-
-a format: assem=L1:
-, dst=(nil), src=(nil)
-result=L1:
-
-BEGIN L0
-L0:
-MOV a,102
-MOV 104,#4
-MOV 105,#4
-MUL 103,104,105
-ADD 101,102,103
-LDR 100,[101]
-MOV RV, 100
-B L1
-L1:
-
-END L0
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/05_const_array_defn.sy"
+	.data
+	.global a
+	.align  2
+	.type   a, %object
+	.size   a, 4
+a:
+	.word   0
+	.word   1
+	.word   2
+	.word   3
+	.word   4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	mov     100, #4
+	mov     RV, 100
+	b       .L0
+.L0:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 

@@ -47,7 +47,7 @@ static void doGlobal(FILE *outfile, F_fragList fragList){
     int word_size = get_word_size();
     fprintf(outfile, "\t.arch   armv7\n");
     fprintf(outfile, "\t.file   \"%s\"\n", INPUT_FILE);
-    fprintf(outfile, "\t.data\n\n");
+    fprintf(outfile, "\t.data\n");
     for (F_fragList iter = fragList; iter; iter = iter->tail){
         F_frag frag = iter->head;
         if (frag->kind == F_frag_::F_globalFrag){
@@ -55,7 +55,7 @@ static void doGlobal(FILE *outfile, F_fragList fragList){
             char* name = S_getName(frag->u.global.label);
             if (frag->u.global.comm){
                 fprintf(outfile, "\t.comm   %s, %d, %d\n", name, size, word_size);
-                fprintf(outfile, "\n");
+//                fprintf(outfile, "\n");
                 continue;
             }
             fprintf(outfile, "\t.global %s\n", name);
@@ -72,15 +72,15 @@ static void doGlobal(FILE *outfile, F_fragList fragList){
                     fprintf(outfile, "\t.word   %d\n", init_pair->y);
                 }
             }
-            fprintf(outfile, "\n");
+//            fprintf(outfile, "\n");
         } else if (frag->kind == F_frag_::F_stringFrag){
             fprintf(outfile, "\t.section\t.rodata\n");
             fprintf(outfile, "%s:\n", S_getName(frag->u.stringg.label));
             fprintf(outfile, "\t.ascii  \"%s\\000\"", frag->u.stringg.str);
-            fprintf(outfile, "\n");
+//            fprintf(outfile, "\n");
         }
     }
-    fprintf(outfile, "\n");
+//    fprintf(outfile, "\n");
 }
 
 extern FILE *yyin;

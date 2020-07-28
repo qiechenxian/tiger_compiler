@@ -1,215 +1,40 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/19_neg_expr.sy"
+	.data
+	.comm   a, 4, 4
+	.comm   b, 4, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     fp, sp, #4
+	sub     sp, sp, #12
+	bl      getint
+	mov     101, RV
+	ldr     103, =a
+	str     101, [103]
+	bl      getint
+	mov     100, RV
+	ldr     104, =b
+	str     100, [104]
+	ldr     108, =a
+	ldr     107, [108]
+	ldr     110, =b
+	ldr     109, [110]
+	add     106, 107, 109
+	sub     105, 106, #0
+	str     105, [FP, #-8]
+	ldr     111, [FP, #-8]
+	str     111, [SP]
+	bl      putint
+	mov     112, #0
+	mov     RV, 112
+	b       .L0
+.L0:
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main
 
-before semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   variableDec(b,
-    int,
-    FALSE),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(a),
-         callExp(getint,
-          expList()))),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          callExp(getint,
-           expList()))),
-        comStmList(
-         comStm(
-          decList(
-           variableDec(c,
-            int,
-            FALSE),
-           decList()),),
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(c),
-            opExp(
-             sub,
-             intExp(0),
-             opExp(
-              add,
-              varExp(
-               simpleVar(a)),
-              varExp(
-               simpleVar(b)))))),
-          comStmList(
-           comStm(
-            expStm(
-             callExp(putint,
-              expList(
-               varExp(
-                simpleVar(c)),
-               expList()))),
-           comStmList(
-            comStm(
-             returnStm(
-              intExp(0))),
-            comStmList())))))))),
-    decList())))
-
-after semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   variableDec(b,
-    int,
-    FALSE),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(a),
-         callExp(getint,
-          expList()))),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          callExp(getint,
-           expList()))),
-        comStmList(
-         comStm(
-          decList(
-           variableDec(c,
-            int,
-            FALSE),
-           decList()),),
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(c),
-            opExp(
-             sub,
-             intExp(0),
-             opExp(
-              add,
-              varExp(
-               simpleVar(a)),
-              varExp(
-               simpleVar(b)))))),
-          comStmList(
-           comStm(
-            expStm(
-             callExp(putint,
-              expList(
-               varExp(
-                simpleVar(c)),
-               expList()))),
-           comStmList(
-            comStm(
-             returnStm(
-              intExp(0))),
-            comStmList())))))))),
-    decList())))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    SEQ(
-     SEQ(
-      SEQ(
-       MOVE(
-        NAME a,
-        CALL(
-         NAME getint,
-          TEMP tFP)),
-       MOVE(
-        NAME b,
-        CALL(
-         NAME getint,
-          TEMP tFP))),
-      EXP(
-       CONST 0)),
-     MOVE(
-      MEM(
-       BINOP(T_add,
-        TEMP tFP,
-        CONST -4)),
-      BINOP(T_sub,
-       CONST 0,
-       BINOP(T_add,
-        NAME a,
-        NAME b)))),
-    EXP(
-     CALL(
-      NAME putint,
-       TEMP tFP,
-       MEM(
-        BINOP(T_add,
-         TEMP tFP,
-         CONST -4))))),
-   MOVE(
-    TEMP tRV,
-    CONST 0)))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  NAME a,
-  CALL(
-   NAME getint,
-    TEMP tFP))
-----dived line----
- MOVE(
-  NAME b,
-  CALL(
-   NAME getint,
-    TEMP tFP))
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  BINOP(T_sub,
-   CONST 0,
-   BINOP(T_add,
-    NAME a,
-    NAME b)))
-----dived line----
- EXP(
-  CALL(
-   NAME putint,
-    TEMP tFP,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4))))
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 0)
-----dived line----
- JUMP(
-  NAME L1)
-----dived line----
- LABEL L1
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
-Aborted

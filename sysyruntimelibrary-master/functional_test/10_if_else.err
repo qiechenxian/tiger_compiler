@@ -1,144 +1,35 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/10_if_else.sy"
+	.data
+	.comm   a, 4, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	ldr     101, =a
+	mov     102, #10
+	str     102, [101]
+	ldr     104, =a
+	ldr     103, [104]
+	mov     105, #0
+	cmp     103, 105
+	bgt     .L0
+	b       .L1
+.L1:
+	mov     106, #0
+	mov     RV, 106
+.L2:
+	b       .L3
+.L0:
+	mov     107, #1
+	mov     RV, 107
+	b       .L2
+.L3:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 
-before semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       assignStm(
-        simpleVar(a),
-        intExp(10))),
-      comStmList(
-       comStm(
-        ifStm(
-         opExp(
-          gt,
-          varExp(
-           simpleVar(a)),
-          intExp(0)),
-         blockStm(
-          comStmList(
-           comStm(
-            returnStm(
-             intExp(1))),
-           comStmList())),/n         blockStm(
-          comStmList(
-           comStm(
-            returnStm(
-             intExp(0))),
-           comStmList()))         )),
-       comStmList())))),
-   decList()))
-
-after semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       assignStm(
-        simpleVar(a),
-        intExp(10))),
-      comStmList(
-       comStm(
-        ifStm(
-         opExp(
-          gt,
-          varExp(
-           simpleVar(a)),
-          intExp(0)),
-         blockStm(
-          comStmList(
-           comStm(
-            returnStm(
-             intExp(1))),
-           comStmList())),/n         blockStm(
-          comStmList(
-           comStm(
-            returnStm(
-             intExp(0))),
-           comStmList()))         )),
-       comStmList())))),
-   decList()))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  SEQ(
-   MOVE(
-    NAME a,
-    CONST 10),
-   SEQ(
-    SEQ(
-     SEQ(
-      SEQ(
-       CJUMP(T_gt,
-        NAME a,
-        CONST 0,
-        L1,L2),
-       SEQ(
-        LABEL L1,
-        MOVE(
-         TEMP tRV,
-         CONST 1))),
-      JUMP(
-       NAME L3)),
-     SEQ(
-      LABEL L2,
-      MOVE(
-       TEMP tRV,
-       CONST 0))),
-    LABEL L3)))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  NAME a,
-  CONST 10)
-----dived line----
- CJUMP(T_gt,
-  NAME a,
-  CONST 0,
-  L1,L2)
-----dived line----
- LABEL L2
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 0)
-----dived line----
- LABEL L3
-----dived line----
- JUMP(
-  NAME L4)
-----dived line----
- LABEL L1
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 1)
-----dived line----
- JUMP(
-  NAME L3)
-----dived line----
- LABEL L4
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
-Aborted

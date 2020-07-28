@@ -1,1318 +1,227 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/53_sort_test1.sy"
+	.data
+	.comm   n, 4, 4
+	.text
+	.align  2
+	.global bubblesort
+	.type   bubblesort, %function
+bubblesort:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	sub     sp, sp, #12
+	mov     101, #0
+	str     101, [FP, #-8]
+.L1:
+	ldr     102, [FP, #-8]
+	ldr     105, =n
+	ldr     104, [105]
+	sub     103, 104, #1
+	cmp     102, 103
+	blt     .L7
+	b       .L0
+.L0:
+	mov     106, #0
+	mov     RV, 106
+	b       .L11
+.L7:
+	mov     107, #0
+	str     107, [FP, #-12]
+.L3:
+	ldr     108, [FP, #-12]
+	ldr     112, =n
+	ldr     111, [112]
+	ldr     113, [FP, #-8]
+	sub     110, 111, 113
+	sub     109, 110, #1
+	cmp     108, 109
+	blt     .L6
+	b       .L2
+.L2:
+	ldr     115, [FP, #-8]
+	add     114, 115, #1
+	str     114, [FP, #-8]
+	b       .L1
+.L6:
+	add     118, FP, #4
+	ldr     120, [FP, #-12]
+	mov     121, #4
+	mul     119, 120, 121
+	add     117, 118, 119
+	ldr     116, [117]
+	add     124, FP, #4
+	ldr     127, [FP, #-12]
+	add     126, 127, #1
+	mov     128, #4
+	mul     125, 126, 128
+	add     123, 124, 125
+	ldr     122, [123]
+	cmp     116, 122
+	bgt     .L4
+	b       .L5
+.L5:
+	ldr     130, [FP, #-12]
+	add     129, 130, #1
+	str     129, [FP, #-12]
+	b       .L3
+.L4:
+	add     133, FP, #4
+	ldr     136, [FP, #-12]
+	add     135, 136, #1
+	mov     137, #4
+	mul     134, 135, 137
+	add     132, 133, 134
+	ldr     131, [132]
+	str     131, [FP, #-16]
+	add     140, FP, #4
+	ldr     143, [FP, #-12]
+	add     142, 143, #1
+	mov     144, #4
+	mul     141, 142, 144
+	add     139, 140, 141
+	add     146, FP, #4
+	ldr     148, [FP, #-12]
+	mov     149, #4
+	mul     147, 148, 149
+	add     145, 146, 147
+	ldr      138, [145]
+	str     138, [139]
+	add     152, FP, #4
+	ldr     154, [FP, #-12]
+	mov     155, #4
+	mul     153, 154, 155
+	add     151, 152, 153
+	add     156, FP, #-16
+	ldr      150, [156]
+	str     150, [151]
+	b       .L5
+.L11:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   bubblesort, .-bubblesort
 
-before semantic ast:
- decList(
-  variableDec(n,
-   int,
-   FALSE),
-  decList(
-   functionDec(bubblesort,
-    fieldList(
-     field(arr,
-      int,
-      expList(
-       intExp(0),
-       expList()),
-      FALSE,
-     fieldList()),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       decList(
-        variableDec(i,
-         int,
-         FALSE),
-        decList()),),
-      comStmList(
-       comStm(
-        decList(
-         variableDec(j,
-          int,
-          FALSE),
-         decList()),),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(i),
-          intExp(0))),
-        comStmList(
-         comStm(
-          whileStm(
-           opExp(
-            lt,
-            varExp(
-             simpleVar(i)),
-            opExp(
-             sub,
-             varExp(
-              simpleVar(n)),
-             intExp(1))),
-           blockStm(
-            comStmList(
-             comStm(
-              assignStm(
-               simpleVar(j),
-               intExp(0))),
-             comStmList(
-              comStm(
-               whileStm(
-                opExp(
-                 lt,
-                 varExp(
-                  simpleVar(j)),
-                 opExp(
-                  sub,
-                  opExp(
-                   sub,
-                   varExp(
-                    simpleVar(n)),
-                   varExp(
-                    simpleVar(i))),
-                  intExp(1))),
-                blockStm(
-                 comStmList(
-                  comStm(
-                   ifStm(
-                    opExp(
-                     gt,
-                     varExp(
-                      arrayVar(
-                       simpleVar(arr),
-                       varExp(
-                        simpleVar(j)))),
-                     varExp(
-                      arrayVar(
-                       simpleVar(arr),
-                       opExp(
-                        add,
-                        varExp(
-                         simpleVar(j)),
-                        intExp(1))))),
-                    blockStm(
-                     comStmList(
-                      comStm(
-                       decList(
-                        variableDec(tmp,
-                         int,
-                         FALSE),
-                        decList()),),
-                      comStmList(
-                       comStm(
-                        assignStm(
-                         simpleVar(tmp),
-                         varExp(
-                          arrayVar(
-                           simpleVar(arr),
-                           opExp(
-                            add,
-                            varExp(
-                             simpleVar(j)),
-                            intExp(1)))))),
-                       comStmList(
-                        comStm(
-                         assignStm(
-                          arrayVar(
-                           simpleVar(arr),
-                           opExp(
-                            add,
-                            varExp(
-                             simpleVar(j)),
-                            intExp(1))),
-                          varExp(
-                           arrayVar(
-                            simpleVar(arr),
-                            varExp(
-                             simpleVar(j)))))),
-                        comStmList(
-                         comStm(
-                          assignStm(
-                           arrayVar(
-                            simpleVar(arr),
-                            varExp(
-                             simpleVar(j))),
-                           varExp(
-                            simpleVar(tmp)))),
-                         comStmList())))))                    )),
-                  comStmList(
-                   comStm(
-                    assignStm(
-                     simpleVar(j),
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(j)),
-                      intExp(1)))),
-                   comStmList()))))
-),
-              comStmList(
-               comStm(
-                assignStm(
-                 simpleVar(i),
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(i)),
-                  intExp(1)))),
-               comStmList())))))
-),
-         comStmList(
-          comStm(
-           returnStm(
-            intExp(0))),
-          comStmList()))))))),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(n),
-         intExp(10))),
-       comStmList(
-        comStm(
-         decList(
-          arrayDec(a,
-           int,
-           expList(
-            intExp(10),
-            expList()),
-           FALSE),
-          decList()),),
-        comStmList(
-         comStm(
-          assignStm(
-           arrayVar(
-            simpleVar(a),
-            intExp(0)),
-           intExp(4))),
-         comStmList(
-          comStm(
-           assignStm(
-            arrayVar(
-             simpleVar(a),
-             intExp(1)),
-            intExp(3))),
-          comStmList(
-           comStm(
-            assignStm(
-             arrayVar(
-              simpleVar(a),
-              intExp(2)),
-             intExp(9))),
-           comStmList(
-            comStm(
-             assignStm(
-              arrayVar(
-               simpleVar(a),
-               intExp(3)),
-              intExp(2))),
-            comStmList(
-             comStm(
-              assignStm(
-               arrayVar(
-                simpleVar(a),
-                intExp(4)),
-               intExp(0))),
-             comStmList(
-              comStm(
-               assignStm(
-                arrayVar(
-                 simpleVar(a),
-                 intExp(5)),
-                intExp(1))),
-              comStmList(
-               comStm(
-                assignStm(
-                 arrayVar(
-                  simpleVar(a),
-                  intExp(6)),
-                 intExp(6))),
-               comStmList(
-                comStm(
-                 assignStm(
-                  arrayVar(
-                   simpleVar(a),
-                   intExp(7)),
-                  intExp(5))),
-                comStmList(
-                 comStm(
-                  assignStm(
-                   arrayVar(
-                    simpleVar(a),
-                    intExp(8)),
-                   intExp(7))),
-                 comStmList(
-                  comStm(
-                   assignStm(
-                    arrayVar(
-                     simpleVar(a),
-                     intExp(9)),
-                    intExp(8))),
-                  comStmList(
-                   comStm(
-                    decList(
-                     variableDec(i,
-                      int,
-                      FALSE),
-                     decList()),),
-                   comStmList(
-                    comStm(
-                     assignStm(
-                      simpleVar(i),
-                      callExp(bubblesort,
-                       expList(
-                        varExp(
-                         simpleVar(a)),
-                        expList())))),
-                    comStmList(
-                     comStm(
-                      whileStm(
-                       opExp(
-                        lt,
-                        varExp(
-                         simpleVar(i)),
-                        varExp(
-                         simpleVar(n))),
-                       blockStm(
-                        comStmList(
-                         comStm(
-                          decList(
-                           variableDec(tmp,
-                            int,
-                            FALSE),
-                           decList()),),
-                         comStmList(
-                          comStm(
-                           assignStm(
-                            simpleVar(tmp),
-                            varExp(
-                             arrayVar(
-                              simpleVar(a),
-                              varExp(
-                               simpleVar(i)))))),
-                          comStmList(
-                           comStm(
-                            expStm(
-                             callExp(putint,
-                              expList(
-                               varExp(
-                                simpleVar(tmp)),
-                               expList()))),
-                           comStmList(
-                            comStm(
-                             assignStm(
-                              simpleVar(tmp),
-                              intExp(10))),
-                            comStmList(
-                             comStm(
-                              expStm(
-                               callExp(putch,
-                                expList(
-                                 varExp(
-                                  simpleVar(tmp)),
-                                 expList()))),
-                             comStmList(
-                              comStm(
-                               assignStm(
-                                simpleVar(i),
-                                opExp(
-                                 add,
-                                 varExp(
-                                  simpleVar(i)),
-                                 intExp(1)))),
-                              comStmList()))))))))
-),
-                     comStmList(
-                      comStm(
-                       returnStm(
-                        intExp(0))),
-                      comStmList())))))))))))))))))),
-    decList())))
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     fp, sp, #4
+	sub     sp, sp, #56
+	ldr     159, =n
+	mov     160, #10
+	str     160, [159]
+	add     162, FP, #-44
+	mov     164, #0
+	mov     165, #4
+	mul     163, 164, 165
+	add     161, 162, 163
+	mov     166, #4
+	str     166, [161]
+	add     168, FP, #-44
+	mov     170, #1
+	mov     171, #4
+	mul     169, 170, 171
+	add     167, 168, 169
+	mov     172, #3
+	str     172, [167]
+	add     174, FP, #-44
+	mov     176, #2
+	mov     177, #4
+	mul     175, 176, 177
+	add     173, 174, 175
+	mov     178, #9
+	str     178, [173]
+	add     180, FP, #-44
+	mov     182, #3
+	mov     183, #4
+	mul     181, 182, 183
+	add     179, 180, 181
+	mov     184, #2
+	str     184, [179]
+	add     186, FP, #-44
+	mov     188, #4
+	mov     189, #4
+	mul     187, 188, 189
+	add     185, 186, 187
+	mov     190, #0
+	str     190, [185]
+	add     192, FP, #-44
+	mov     194, #5
+	mov     195, #4
+	mul     193, 194, 195
+	add     191, 192, 193
+	mov     196, #1
+	str     196, [191]
+	add     198, FP, #-44
+	mov     200, #6
+	mov     201, #4
+	mul     199, 200, 201
+	add     197, 198, 199
+	mov     202, #6
+	str     202, [197]
+	add     204, FP, #-44
+	mov     206, #7
+	mov     207, #4
+	mul     205, 206, 207
+	add     203, 204, 205
+	mov     208, #5
+	str     208, [203]
+	add     210, FP, #-44
+	mov     212, #8
+	mov     213, #4
+	mul     211, 212, 213
+	add     209, 210, 211
+	mov     214, #7
+	str     214, [209]
+	add     216, FP, #-44
+	mov     218, #9
+	mov     219, #4
+	mul     217, 218, 219
+	add     215, 216, 217
+	mov     220, #8
+	str     220, [215]
+	add     221, FP, #-48
+	mov     158, 221
+	add     222, FP, #-44
+	str     222, [SP]
+	bl      bubblesort
+	mov     157, RV
+	str     157, [158]
+.L9:
+	ldr     224, [FP, #-48]
+	ldr     226, =n
+	ldr     225, [226]
+	cmp     224, 225
+	blt     .L10
+	b       .L8
+.L8:
+	mov     227, #0
+	mov     RV, 227
+	b       .L13
+.L10:
+	add     230, FP, #-44
+	ldr     232, [FP, #-48]
+	mov     233, #4
+	mul     231, 232, 233
+	add     229, 230, 231
+	ldr     228, [229]
+	str     228, [FP, #-52]
+	ldr     234, [FP, #-52]
+	str     234, [SP]
+	bl      putint
+	mov     235, #10
+	str     235, [FP, #-52]
+	ldr     236, [FP, #-52]
+	str     236, [SP]
+	bl      putch
+	ldr     238, [FP, #-48]
+	add     237, 238, #1
+	str     237, [FP, #-48]
+	b       .L9
+.L13:
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main
 
-after semantic ast:
- decList(
-  variableDec(n,
-   int,
-   FALSE),
-  decList(
-   functionDec(bubblesort,
-    fieldList(
-     field(arr,
-      int,
-      expList(
-       intExp(0),
-       expList()),
-      FALSE,
-     fieldList()),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       decList(
-        variableDec(i,
-         int,
-         FALSE),
-        decList()),),
-      comStmList(
-       comStm(
-        decList(
-         variableDec(j,
-          int,
-          FALSE),
-         decList()),),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(i),
-          intExp(0))),
-        comStmList(
-         comStm(
-          whileStm(
-           opExp(
-            lt,
-            varExp(
-             simpleVar(i)),
-            opExp(
-             sub,
-             varExp(
-              simpleVar(n)),
-             intExp(1))),
-           blockStm(
-            comStmList(
-             comStm(
-              assignStm(
-               simpleVar(j),
-               intExp(0))),
-             comStmList(
-              comStm(
-               whileStm(
-                opExp(
-                 lt,
-                 varExp(
-                  simpleVar(j)),
-                 opExp(
-                  sub,
-                  opExp(
-                   sub,
-                   varExp(
-                    simpleVar(n)),
-                   varExp(
-                    simpleVar(i))),
-                  intExp(1))),
-                blockStm(
-                 comStmList(
-                  comStm(
-                   ifStm(
-                    opExp(
-                     gt,
-                     varExp(
-                      arrayVar(
-                       simpleVar(arr),
-                       varExp(
-                        simpleVar(j)))),
-                     varExp(
-                      arrayVar(
-                       simpleVar(arr),
-                       opExp(
-                        add,
-                        varExp(
-                         simpleVar(j)),
-                        intExp(1))))),
-                    blockStm(
-                     comStmList(
-                      comStm(
-                       decList(
-                        variableDec(tmp,
-                         int,
-                         FALSE),
-                        decList()),),
-                      comStmList(
-                       comStm(
-                        assignStm(
-                         simpleVar(tmp),
-                         varExp(
-                          arrayVar(
-                           simpleVar(arr),
-                           opExp(
-                            add,
-                            varExp(
-                             simpleVar(j)),
-                            intExp(1)))))),
-                       comStmList(
-                        comStm(
-                         assignStm(
-                          arrayVar(
-                           simpleVar(arr),
-                           opExp(
-                            add,
-                            varExp(
-                             simpleVar(j)),
-                            intExp(1))),
-                          varExp(
-                           arrayVar(
-                            simpleVar(arr),
-                            varExp(
-                             simpleVar(j)))))),
-                        comStmList(
-                         comStm(
-                          assignStm(
-                           arrayVar(
-                            simpleVar(arr),
-                            varExp(
-                             simpleVar(j))),
-                           varExp(
-                            simpleVar(tmp)))),
-                         comStmList())))))                    )),
-                  comStmList(
-                   comStm(
-                    assignStm(
-                     simpleVar(j),
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(j)),
-                      intExp(1)))),
-                   comStmList()))))
-),
-              comStmList(
-               comStm(
-                assignStm(
-                 simpleVar(i),
-                 opExp(
-                  add,
-                  varExp(
-                   simpleVar(i)),
-                  intExp(1)))),
-               comStmList())))))
-),
-         comStmList(
-          comStm(
-           returnStm(
-            intExp(0))),
-          comStmList()))))))),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(n),
-         intExp(10))),
-       comStmList(
-        comStm(
-         decList(
-          arrayDec(a,
-           int,
-           expList(
-            intExp(10),
-            expList()),
-           FALSE),
-          decList()),),
-        comStmList(
-         comStm(
-          assignStm(
-           arrayVar(
-            simpleVar(a),
-            intExp(0)),
-           intExp(4))),
-         comStmList(
-          comStm(
-           assignStm(
-            arrayVar(
-             simpleVar(a),
-             intExp(1)),
-            intExp(3))),
-          comStmList(
-           comStm(
-            assignStm(
-             arrayVar(
-              simpleVar(a),
-              intExp(2)),
-             intExp(9))),
-           comStmList(
-            comStm(
-             assignStm(
-              arrayVar(
-               simpleVar(a),
-               intExp(3)),
-              intExp(2))),
-            comStmList(
-             comStm(
-              assignStm(
-               arrayVar(
-                simpleVar(a),
-                intExp(4)),
-               intExp(0))),
-             comStmList(
-              comStm(
-               assignStm(
-                arrayVar(
-                 simpleVar(a),
-                 intExp(5)),
-                intExp(1))),
-              comStmList(
-               comStm(
-                assignStm(
-                 arrayVar(
-                  simpleVar(a),
-                  intExp(6)),
-                 intExp(6))),
-               comStmList(
-                comStm(
-                 assignStm(
-                  arrayVar(
-                   simpleVar(a),
-                   intExp(7)),
-                  intExp(5))),
-                comStmList(
-                 comStm(
-                  assignStm(
-                   arrayVar(
-                    simpleVar(a),
-                    intExp(8)),
-                   intExp(7))),
-                 comStmList(
-                  comStm(
-                   assignStm(
-                    arrayVar(
-                     simpleVar(a),
-                     intExp(9)),
-                    intExp(8))),
-                  comStmList(
-                   comStm(
-                    decList(
-                     variableDec(i,
-                      int,
-                      FALSE),
-                     decList()),),
-                   comStmList(
-                    comStm(
-                     assignStm(
-                      simpleVar(i),
-                      callExp(bubblesort,
-                       expList(
-                        varExp(
-                         simpleVar(a)),
-                        expList())))),
-                    comStmList(
-                     comStm(
-                      whileStm(
-                       opExp(
-                        lt,
-                        varExp(
-                         simpleVar(i)),
-                        varExp(
-                         simpleVar(n))),
-                       blockStm(
-                        comStmList(
-                         comStm(
-                          decList(
-                           variableDec(tmp,
-                            int,
-                            FALSE),
-                           decList()),),
-                         comStmList(
-                          comStm(
-                           assignStm(
-                            simpleVar(tmp),
-                            varExp(
-                             arrayVar(
-                              simpleVar(a),
-                              varExp(
-                               simpleVar(i)))))),
-                          comStmList(
-                           comStm(
-                            expStm(
-                             callExp(putint,
-                              expList(
-                               varExp(
-                                simpleVar(tmp)),
-                               expList()))),
-                           comStmList(
-                            comStm(
-                             assignStm(
-                              simpleVar(tmp),
-                              intExp(10))),
-                            comStmList(
-                             comStm(
-                              expStm(
-                               callExp(putch,
-                                expList(
-                                 varExp(
-                                  simpleVar(tmp)),
-                                 expList()))),
-                             comStmList(
-                              comStm(
-                               assignStm(
-                                simpleVar(i),
-                                opExp(
-                                 add,
-                                 varExp(
-                                  simpleVar(i)),
-                                 intExp(1)))),
-                              comStmList()))))))))
-),
-                     comStmList(
-                      comStm(
-                       returnStm(
-                        intExp(0))),
-                      comStmList())))))))))))))))))),
-    decList())))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L13,
-  SEQ(
-   SEQ(
-    SEQ(
-     SEQ(
-      SEQ(
-       SEQ(
-        SEQ(
-         SEQ(
-          SEQ(
-           SEQ(
-            SEQ(
-             SEQ(
-              SEQ(
-               SEQ(
-                SEQ(
-                 MOVE(
-                  NAME n,
-                  CONST 10),
-                 EXP(
-                  CONST 0)),
-                MOVE(
-                 MEM(
-                  BINOP(T_add,
-                   MEM(
-                    BINOP(T_add,
-                     TEMP tFP,
-                     CONST -40)),
-                   BINOP(T_mul,
-                    CONST 0,
-                    CONST 4))),
-                 CONST 4)),
-               MOVE(
-                MEM(
-                 BINOP(T_add,
-                  MEM(
-                   BINOP(T_add,
-                    TEMP tFP,
-                    CONST -40)),
-                  BINOP(T_mul,
-                   CONST 1,
-                   CONST 4))),
-                CONST 3)),
-              MOVE(
-               MEM(
-                BINOP(T_add,
-                 MEM(
-                  BINOP(T_add,
-                   TEMP tFP,
-                   CONST -40)),
-                 BINOP(T_mul,
-                  CONST 2,
-                  CONST 4))),
-               CONST 9)),
-             MOVE(
-              MEM(
-               BINOP(T_add,
-                MEM(
-                 BINOP(T_add,
-                  TEMP tFP,
-                  CONST -40)),
-                BINOP(T_mul,
-                 CONST 3,
-                 CONST 4))),
-              CONST 2)),
-            MOVE(
-             MEM(
-              BINOP(T_add,
-               MEM(
-                BINOP(T_add,
-                 TEMP tFP,
-                 CONST -40)),
-               BINOP(T_mul,
-                CONST 4,
-                CONST 4))),
-             CONST 0)),
-           MOVE(
-            MEM(
-             BINOP(T_add,
-              MEM(
-               BINOP(T_add,
-                TEMP tFP,
-                CONST -40)),
-              BINOP(T_mul,
-               CONST 5,
-               CONST 4))),
-            CONST 1)),
-          MOVE(
-           MEM(
-            BINOP(T_add,
-             MEM(
-              BINOP(T_add,
-               TEMP tFP,
-               CONST -40)),
-             BINOP(T_mul,
-              CONST 6,
-              CONST 4))),
-           CONST 6)),
-         MOVE(
-          MEM(
-           BINOP(T_add,
-            MEM(
-             BINOP(T_add,
-              TEMP tFP,
-              CONST -40)),
-            BINOP(T_mul,
-             CONST 7,
-             CONST 4))),
-          CONST 5)),
-        MOVE(
-         MEM(
-          BINOP(T_add,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -40)),
-           BINOP(T_mul,
-            CONST 8,
-            CONST 4))),
-         CONST 7)),
-       MOVE(
-        MEM(
-         BINOP(T_add,
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -40)),
-          BINOP(T_mul,
-           CONST 9,
-           CONST 4))),
-        CONST 8)),
-      EXP(
-       CONST 0)),
-     MOVE(
-      MEM(
-       BINOP(T_add,
-        TEMP tFP,
-        CONST -44)),
-      CALL(
-       NAME L0,
-        TEMP tFP,
-        MEM(
-         BINOP(T_add,
-          TEMP tFP,
-          CONST -40))))),
-    SEQ(
-     LABEL L15,
-     SEQ(
-      CJUMP(T_lt,
-       MEM(
-        BINOP(T_add,
-         TEMP tFP,
-         CONST -44)),
-       NAME n,
-       L18,L14),
-      SEQ(
-       LABEL L18,
-       SEQ(
-        SEQ(
-         SEQ(
-          SEQ(
-           SEQ(
-            SEQ(
-             EXP(
-              CONST 0),
-             MOVE(
-              MEM(
-               BINOP(T_add,
-                TEMP tFP,
-                CONST -48)),
-              MEM(
-               BINOP(T_add,
-                MEM(
-                 BINOP(T_add,
-                  TEMP tFP,
-                  CONST -40)),
-                BINOP(T_mul,
-                 MEM(
-                  BINOP(T_add,
-                   TEMP tFP,
-                   CONST -44)),
-                 CONST 4))))),
-            EXP(
-             CALL(
-              NAME putint,
-               TEMP tFP,
-               MEM(
-                BINOP(T_add,
-                 TEMP tFP,
-                 CONST -48))))),
-           MOVE(
-            MEM(
-             BINOP(T_add,
-              TEMP tFP,
-              CONST -48)),
-            CONST 10)),
-          EXP(
-           CALL(
-            NAME putch,
-             TEMP tFP,
-             MEM(
-              BINOP(T_add,
-               TEMP tFP,
-               CONST -48))))),
-         MOVE(
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -44)),
-          BINOP(T_add,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -44)),
-           CONST 1))),
-        SEQ(
-         JUMP(
-          NAME L15),
-         LABEL L14)))))),
-   MOVE(
-    TEMP tRV,
-    CONST 0))) SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    SEQ(
-     SEQ(
-      EXP(
-       CONST 0),
-      EXP(
-       CONST 0)),
-     MOVE(
-      MEM(
-       BINOP(T_add,
-        TEMP tFP,
-        CONST -4)),
-      CONST 0)),
-    SEQ(
-     LABEL L2,
-     SEQ(
-      CJUMP(T_lt,
-       MEM(
-        BINOP(T_add,
-         TEMP tFP,
-         CONST -4)),
-       BINOP(T_sub,
-        NAME n,
-        CONST 1),
-       L12,L1),
-      SEQ(
-       LABEL L12,
-       SEQ(
-        SEQ(
-         SEQ(
-          MOVE(
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -8)),
-           CONST 0),
-          SEQ(
-           LABEL L6,
-           SEQ(
-            CJUMP(T_lt,
-             MEM(
-              BINOP(T_add,
-               TEMP tFP,
-               CONST -8)),
-             BINOP(T_sub,
-              BINOP(T_sub,
-               NAME n,
-               MEM(
-                BINOP(T_add,
-                 TEMP tFP,
-                 CONST -4))),
-              CONST 1),
-             L11,L5),
-            SEQ(
-             LABEL L11,
-             SEQ(
-              SEQ(
-               SEQ(
-                SEQ(
-                 CJUMP(T_gt,
-                  MEM(
-                   BINOP(T_add,
-                    MEM(
-                     BINOP(T_add,
-                      TEMP tFP,
-                      CONST 4)),
-                    BINOP(T_mul,
-                     MEM(
-                      BINOP(T_add,
-                       TEMP tFP,
-                       CONST -8)),
-                     CONST 4))),
-                  MEM(
-                   BINOP(T_add,
-                    MEM(
-                     BINOP(T_add,
-                      TEMP tFP,
-                      CONST 4)),
-                    BINOP(T_mul,
-                     BINOP(T_add,
-                      MEM(
-                       BINOP(T_add,
-                        TEMP tFP,
-                        CONST -8)),
-                      CONST 1),
-                     CONST 4))),
-                  L9,L10),
-                 SEQ(
-                  LABEL L9,
-                  SEQ(
-                   SEQ(
-                    SEQ(
-                     EXP(
-                      CONST 0),
-                     MOVE(
-                      MEM(
-                       BINOP(T_add,
-                        TEMP tFP,
-                        CONST -12)),
-                      MEM(
-                       BINOP(T_add,
-                        MEM(
-                         BINOP(T_add,
-                          TEMP tFP,
-                          CONST 4)),
-                        BINOP(T_mul,
-                         BINOP(T_add,
-                          MEM(
-                           BINOP(T_add,
-                            TEMP tFP,
-                            CONST -8)),
-                          CONST 1),
-                         CONST 4))))),
-                    MOVE(
-                     MEM(
-                      BINOP(T_add,
-                       MEM(
-                        BINOP(T_add,
-                         TEMP tFP,
-                         CONST 4)),
-                       BINOP(T_mul,
-                        BINOP(T_add,
-                         MEM(
-                          BINOP(T_add,
-                           TEMP tFP,
-                           CONST -8)),
-                         CONST 1),
-                        CONST 4))),
-                     MEM(
-                      BINOP(T_add,
-                       MEM(
-                        BINOP(T_add,
-                         TEMP tFP,
-                         CONST 4)),
-                       BINOP(T_mul,
-                        MEM(
-                         BINOP(T_add,
-                          TEMP tFP,
-                          CONST -8)),
-                        CONST 4))))),
-                   MOVE(
-                    MEM(
-                     BINOP(T_add,
-                      MEM(
-                       BINOP(T_add,
-                        TEMP tFP,
-                        CONST 4)),
-                      BINOP(T_mul,
-                       MEM(
-                        BINOP(T_add,
-                         TEMP tFP,
-                         CONST -8)),
-                       CONST 4))),
-                    MEM(
-                     BINOP(T_add,
-                      TEMP tFP,
-                      CONST -12)))))),
-                LABEL L10),
-               MOVE(
-                MEM(
-                 BINOP(T_add,
-                  TEMP tFP,
-                  CONST -8)),
-                BINOP(T_add,
-                 MEM(
-                  BINOP(T_add,
-                   TEMP tFP,
-                   CONST -8)),
-                 CONST 1))),
-              SEQ(
-               JUMP(
-                NAME L6),
-               LABEL L5)))))),
-         MOVE(
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -4)),
-          BINOP(T_add,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -4)),
-           CONST 1))),
-        SEQ(
-         JUMP(
-          NAME L2),
-         LABEL L1)))))),
-   MOVE(
-    TEMP tRV,
-    CONST 0)))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L13
-----dived line----
- MOVE(
-  NAME n,
-  CONST 10)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 0,
-     CONST 4))),
-  CONST 4)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 1,
-     CONST 4))),
-  CONST 3)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 2,
-     CONST 4))),
-  CONST 9)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 3,
-     CONST 4))),
-  CONST 2)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 4,
-     CONST 4))),
-  CONST 0)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 5,
-     CONST 4))),
-  CONST 1)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 6,
-     CONST 4))),
-  CONST 6)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 7,
-     CONST 4))),
-  CONST 5)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 8,
-     CONST 4))),
-  CONST 7)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     CONST 9,
-     CONST 4))),
-  CONST 8)
-----dived line----
- MOVE(
-  TEMP t102,
-  BINOP(T_add,
-   TEMP tFP,
-   CONST -44))
-----dived line----
- MOVE(
-  TEMP t101,
-  CALL(
-   NAME L0,
-    TEMP tFP,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40))))
-----dived line----
- MOVE(
-  MEM(
-   TEMP t102),
-  TEMP t101)
-----dived line----
- LABEL L15
-----dived line----
- CJUMP(T_lt,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -44)),
-  NAME n,
-  L18,L14)
-----dived line----
- LABEL L14
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 0)
-----dived line----
- JUMP(
-  NAME L19)
-----dived line----
- LABEL L18
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -48)),
-  MEM(
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -40)),
-    BINOP(T_mul,
-     MEM(
-      BINOP(T_add,
-       TEMP tFP,
-       CONST -44)),
-     CONST 4))))
-----dived line----
- EXP(
-  CALL(
-   NAME putint,
-    TEMP tFP,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -48))))
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -48)),
-  CONST 10)
-----dived line----
- EXP(
-  CALL(
-   NAME putch,
-    TEMP tFP,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -48))))
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -44)),
-  BINOP(T_add,
-   MEM(
-    BINOP(T_add,
-     TEMP tFP,
-     CONST -44)),
-   CONST 1))
-----dived line----
- JUMP(
-  NAME L15)
-----dived line----
- LABEL L19
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
-Aborted

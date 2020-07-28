@@ -1,373 +1,42 @@
-
-before semantic ast:
- decList(
-  functionDec(main,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      decList(
-       variableDec(a,
-        int,
-        intExp(10),
-        FALSE),
-       decList()),),
-     comStmList(
-      comStm(
-       whileStm(
-        opExp(
-         gt,
-         varExp(
-          simpleVar(a)),
-         intExp(0)),
-        blockStm(
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(a),
-            opExp(
-             sub,
-             varExp(
-              simpleVar(a)),
-             intExp(1)))),
-          comStmList(
-           comStm(
-            ifStm(
-             opExp(
-              eq,
-              varExp(
-               simpleVar(a)),
-              intExp(5)),
-             breakStm()             )),
-           comStmList()))))
-),
-      comStmList(
-       comStm(
-        returnStm(
-         varExp(
-          simpleVar(a)))),
-       comStmList()))))),
-  decList())
-
-after semantic ast:
- decList(
-  functionDec(main,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      decList(
-       variableDec(a,
-        int,
-        intExp(10),
-        FALSE),
-       decList()),),
-     comStmList(
-      comStm(
-       whileStm(
-        opExp(
-         gt,
-         varExp(
-          simpleVar(a)),
-         intExp(0)),
-        blockStm(
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(a),
-            opExp(
-             sub,
-             varExp(
-              simpleVar(a)),
-             intExp(1)))),
-          comStmList(
-           comStm(
-            ifStm(
-             opExp(
-              eq,
-              varExp(
-               simpleVar(a)),
-              intExp(5)),
-             breakStm()             )),
-           comStmList()))))
-),
-      comStmList(
-       comStm(
-        returnStm(
-         varExp(
-          simpleVar(a)))),
-       comStmList()))))),
-  decList())
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    MOVE(
-     MEM(
-      BINOP(T_add,
-       TEMP tFP,
-       CONST -4)),
-     CONST 10),
-    SEQ(
-     LABEL L2,
-     SEQ(
-      CJUMP(T_gt,
-       MEM(
-        BINOP(T_add,
-         TEMP tFP,
-         CONST -4)),
-       CONST 0,
-       L7,L1),
-      SEQ(
-       LABEL L7,
-       SEQ(
-        SEQ(
-         MOVE(
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -4)),
-          BINOP(T_sub,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -4)),
-           CONST 1)),
-         SEQ(
-          SEQ(
-           CJUMP(T_eq,
-            MEM(
-             BINOP(T_add,
-              TEMP tFP,
-              CONST -4)),
-            CONST 5,
-            L5,L6),
-           SEQ(
-            LABEL L5,
-            JUMP(
-             NAME L3))),
-          LABEL L6)),
-        SEQ(
-         JUMP(
-          NAME L2),
-         LABEL L1)))))),
-   MOVE(
-    TEMP tRV,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4)))))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 10)
-----dived line----
- LABEL L2
-----dived line----
- CJUMP(T_gt,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 0,
-  L7,L1)
-----dived line----
- LABEL L1
-----dived line----
- MOVE(
-  TEMP tRV,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)))
-----dived line----
- JUMP(
-  NAME L8)
-----dived line----
- LABEL L7
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  BINOP(T_sub,
-   MEM(
-    BINOP(T_add,
-     TEMP tFP,
-     CONST -4)),
-   CONST 1))
-----dived line----
- CJUMP(T_eq,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 5,
-  L5,L6)
-----dived line----
- LABEL L6
-----dived line----
- JUMP(
-  NAME L2)
-----dived line----
- LABEL L5
-----dived line----
- JUMP(
-  NAME L3)
-----dived line----
- LABEL L8
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-a format: assem=L0:
-, dst=(nil), src=(nil)
-result=L0:
-
-a format: assem=MOV 'd0,#10
-, dst=0x55aba36bc900, src=(nil)
-result=MOV 101,#10
-
-a format: assem=STR 's0,['d0,#-4]
-, dst=0x55aba36bcb10, src=0x55aba36bc970
-result=STR 101,[FP,#-4]
-
-a format: assem=L2:
-, dst=(nil), src=(nil)
-result=L2:
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55aba36bd260, src=0x55aba36bd240
-result=LDR 102,[FP,#-4]
-
-a format: assem=MOV 'd0,#0
-, dst=0x55aba36bd4c0, src=(nil)
-result=MOV 103,#0
-
-a format: assem=CMP 's0,'s1
-, dst=(nil), src=0x55aba36bd550
-result=CMP 102,103
-
-a format: assem=BGT L7
-, dst=(nil), src=(nil)
-result=BGT L7
-
-a format: assem=B L1
-, dst=(nil), src=(nil)
-result=B L1
-
-a format: assem=L1:
-, dst=(nil), src=(nil)
-result=L1:
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55aba36bddc0, src=0x55aba36bdda0
-result=LDR 104,[FP,#-4]
-
-a format: assem=MOV 'd0, 's0
-, dst=0x55aba36bde50, src=0x55aba36bde30
-result=MOV RV, 104
-
-a format: assem=B L8
-, dst=(nil), src=(nil)
-result=B L8
-
-a format: assem=L7:
-, dst=(nil), src=(nil)
-result=L7:
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55aba36be980, src=0x55aba36be960
-result=LDR 106,[FP,#-4]
-
-a format: assem=SUB 'd0,'s0,1
-, dst=0x55aba36bea10, src=0x55aba36be9f0
-result=SUB 105,106,1
-
-a format: assem=STR 's0,['d0,#-4]
-, dst=0x55aba36bec20, src=0x55aba36bea80
-result=STR 105,[FP,#-4]
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55aba36bf1a0, src=0x55aba36bf180
-result=LDR 107,[FP,#-4]
-
-a format: assem=MOV 'd0,#5
-, dst=0x55aba36bf400, src=(nil)
-result=MOV 108,#5
-
-a format: assem=CMP 's0,'s1
-, dst=(nil), src=0x55aba36bf490
-result=CMP 107,108
-
-a format: assem=BEQ L5
-, dst=(nil), src=(nil)
-result=BEQ L5
-
-a format: assem=B L6
-, dst=(nil), src=(nil)
-result=B L6
-
-a format: assem=L6:
-, dst=(nil), src=(nil)
-result=L6:
-
-a format: assem=B L2
-, dst=(nil), src=(nil)
-result=B L2
-
-a format: assem=L5:
-, dst=(nil), src=(nil)
-result=L5:
-
-a format: assem=B L3
-, dst=(nil), src=(nil)
-result=B L3
-
-a format: assem=L8:
-, dst=(nil), src=(nil)
-result=L8:
-
-BEGIN L0
-L0:
-MOV 101,#10
-STR 101,[FP,#-4]
-L2:
-LDR 102,[FP,#-4]
-MOV 103,#0
-CMP 102,103
-BGT L7
-B L1
-L1:
-LDR 104,[FP,#-4]
-MOV RV, 104
-B L8
-L7:
-LDR 106,[FP,#-4]
-SUB 105,106,1
-STR 105,[FP,#-4]
-LDR 107,[FP,#-4]
-MOV 108,#5
-CMP 107,108
-BEQ L5
-B L6
-L6:
-B L2
-L5:
-B L3
-L8:
-
-END L0
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/10_break.sy"
+	.data
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	sub     sp, sp, #4
+	mov     101, #10
+	str     101, [FP, #-8]
+.L1:
+	ldr     102, [FP, #-8]
+	mov     103, #0
+	cmp     102, 103
+	bgt     .L4
+	b       .L0
+.L0:
+	ldr     104, [FP, #-8]
+	mov     RV, 104
+	b       .L5
+.L4:
+	ldr     106, [FP, #-8]
+	sub     105, 106, #1
+	str     105, [FP, #-8]
+	ldr     107, [FP, #-8]
+	mov     108, #5
+	cmp     107, 108
+	beq     .L2
+	b       .L3
+.L3:
+	b       .L1
+.L2:
+	b       .L0
+.L5:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 

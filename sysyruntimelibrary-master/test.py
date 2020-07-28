@@ -6,9 +6,8 @@ BASE = os.getcwd()
 PATH = [
     "functional_test",
     "performance_test",
-    "../cmake-build-wsl_profile/compiler_dev_cpp"
+    "../cmake-build-debug-wsl/compiler_2020"
 ]
-
 
 
 PATH_name = [

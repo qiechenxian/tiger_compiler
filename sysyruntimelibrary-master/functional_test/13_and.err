@@ -1,198 +1,48 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/13_and.sy"
+	.data
+	.comm   a, 4, 4
+	.comm   b, 4, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	bl      getint
+	mov     102, RV
+	ldr     104, =a
+	str     102, [104]
+	bl      getint
+	mov     101, RV
+	ldr     105, =b
+	str     101, [105]
+	ldr     107, =a
+	ldr     106, [107]
+	mov     108, #0
+	cmp     106, 108
+	bgt     .L1
+	b       .L0
+.L0:
+	ldr     110, =b
+	ldr     109, [110]
+	mov     111, #0
+	cmp     109, 111
+	bgt     .L1
+	b       .L2
+.L2:
+	mov     112, #0
+	mov     RV, 112
+.L3:
+	b       .L4
+.L1:
+	mov     113, #1
+	mov     RV, 113
+	b       .L3
+.L4:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 
-before semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   variableDec(b,
-    int,
-    FALSE),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(a),
-         callExp(getint,
-          expList()))),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          callExp(getint,
-           expList()))),
-        comStmList(
-         comStm(
-          ifStm(
-           opExp(
-            or,
-            varExp(
-             simpleVar(a)),
-            varExp(
-             simpleVar(b))),
-           blockStm(
-            comStmList(
-             comStm(
-              returnStm(
-               intExp(1))),
-             comStmList())),/n           blockStm(
-            comStmList(
-             comStm(
-              returnStm(
-               intExp(0))),
-             comStmList()))           )),
-         comStmList()))))),
-    decList())))
-
-after semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   variableDec(b,
-    int,
-    FALSE),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(a),
-         callExp(getint,
-          expList()))),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          callExp(getint,
-           expList()))),
-        comStmList(
-         comStm(
-          ifStm(
-           opExp(
-            or,
-            varExp(
-             simpleVar(a)),
-            varExp(
-             simpleVar(b))),
-           blockStm(
-            comStmList(
-             comStm(
-              returnStm(
-               intExp(1))),
-             comStmList())),/n           blockStm(
-            comStmList(
-             comStm(
-              returnStm(
-               intExp(0))),
-             comStmList()))           )),
-         comStmList()))))),
-    decList())))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    MOVE(
-     NAME a,
-     CALL(
-      NAME getint,
-       TEMP tFP)),
-    MOVE(
-     NAME b,
-     CALL(
-      NAME getint,
-       TEMP tFP))),
-   SEQ(
-    SEQ(
-     SEQ(
-      SEQ(
-       SEQ(
-        CJUMP(T_gt,
-         NAME a,
-         CONST 0,
-         L2,L1),
-        SEQ(
-         LABEL L1,
-         CJUMP(T_gt,
-          NAME b,
-          CONST 0,
-          L2,L3))),
-       SEQ(
-        LABEL L2,
-        MOVE(
-         TEMP tRV,
-         CONST 1))),
-      JUMP(
-       NAME L4)),
-     SEQ(
-      LABEL L3,
-      MOVE(
-       TEMP tRV,
-       CONST 0))),
-    LABEL L4)))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  NAME a,
-  CALL(
-   NAME getint,
-    TEMP tFP))
-----dived line----
- MOVE(
-  NAME b,
-  CALL(
-   NAME getint,
-    TEMP tFP))
-----dived line----
- CJUMP(T_gt,
-  NAME a,
-  CONST 0,
-  L2,L1)
-----dived line----
- LABEL L1
-----dived line----
- CJUMP(T_gt,
-  NAME b,
-  CONST 0,
-  L2,L3)
-----dived line----
- LABEL L3
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 0)
-----dived line----
- LABEL L4
-----dived line----
- JUMP(
-  NAME L5)
-----dived line----
- LABEL L2
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 1)
-----dived line----
- JUMP(
-  NAME L4)
-----dived line----
- LABEL L5
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
-Aborted

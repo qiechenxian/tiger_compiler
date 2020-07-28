@@ -1,224 +1,40 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_var_defn_func.sy"
+	.data
+	.text
+	.align  2
+	.global defn
+	.type   defn, %function
+defn:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	mov     100, #4
+	mov     RV, 100
+	b       .L0
+.L0:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   defn, .-defn
 
-before semantic ast:
- decList(
-  functionDec(defn,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      returnStm(
-       intExp(4))),
-     comStmList()))),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       decList(
-        variableDec(a,
-         int,
-         callExp(defn,
-          expList()),
-         FALSE),
-        decList()),),
-      comStmList(
-       comStm(
-        returnStm(
-         varExp(
-          simpleVar(a)))),
-       comStmList())))),
-   decList()))
-
-after semantic ast:
- decList(
-  functionDec(defn,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      returnStm(
-       intExp(4))),
-     comStmList()))),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       decList(
-        variableDec(a,
-         int,
-         callExp(defn,
-          expList()),
-         FALSE),
-        decList()),),
-      comStmList(
-       comStm(
-        returnStm(
-         varExp(
-          simpleVar(a)))),
-       comStmList())))),
-   decList()))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L1,
-  SEQ(
-   MOVE(
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4)),
-    CALL(
-     NAME L0,
-      TEMP tFP)),
-   MOVE(
-    TEMP tRV,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4))))) SEQ(
-  LABEL L0,
-  MOVE(
-   TEMP tRV,
-   CONST 4))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L1
-----dived line----
- MOVE(
-  TEMP t101,
-  BINOP(T_add,
-   TEMP tFP,
-   CONST -4))
-----dived line----
- MOVE(
-  TEMP t100,
-  CALL(
-   NAME L0,
-    TEMP tFP))
-----dived line----
- MOVE(
-  MEM(
-   TEMP t101),
-  TEMP t100)
-----dived line----
- MOVE(
-  TEMP tRV,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)))
-----dived line----
- JUMP(
-  NAME L2)
-----dived line----
- LABEL L2
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-a format: assem=L1:
-, dst=(nil), src=(nil)
-result=L1:
-
-a format: assem=ADD 'd0,'s0,-4
-, dst=0x556429fd5930, src=0x556429fd5910
-result=ADD 102,FP,-4
-
-a format: assem=MOV 'd0, 's0
-, dst=0x556429fd59c0, src=0x556429fd59a0
-result=MOV 101, 102
-
-a format: assem=BL L0
-, dst=0x556429fd5c60, src=(nil)
-result=BL L0
-
-a format: assem=MOV `d0, `s0
-, dst=0x556429fd5cf0, src=0x556429fd5cd0
-result=MOV `d0, `s0
-
-a format: assem=STR 's1,['s0]
-, dst=(nil), src=0x556429fd6200
-result=STR 100,[101]
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x556429fd6780, src=0x556429fd6760
-result=LDR 104,[FP,#-4]
-
-a format: assem=MOV 'd0, 's0
-, dst=0x556429fd6810, src=0x556429fd67f0
-result=MOV RV, 104
-
-a format: assem=B L2
-, dst=(nil), src=(nil)
-result=B L2
-
-a format: assem=L2:
-, dst=(nil), src=(nil)
-result=L2:
-
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 4)
-----dived line----
- JUMP(
-  NAME L3)
-----dived line----
- LABEL L3
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-a format: assem=L0:
-, dst=(nil), src=(nil)
-result=L0:
-
-a format: assem=MOV 'd0,#4
-, dst=0x556429fd7f40, src=(nil)
-result=MOV 105,#4
-
-a format: assem=MOV 'd0, 's0
-, dst=0x556429fd7fd0, src=0x556429fd7fb0
-result=MOV RV, 105
-
-a format: assem=B L3
-, dst=(nil), src=(nil)
-result=B L3
-
-a format: assem=L3:
-, dst=(nil), src=(nil)
-result=L3:
-
-BEGIN L1
-L1:
-ADD 102,FP,-4
-MOV 101, 102
-BL L0
-MOV `d0, `s0
-STR 100,[101]
-LDR 104,[FP,#-4]
-MOV RV, 104
-B L2
-L2:
-
-END L1
-
-BEGIN L0
-L0:
-MOV 105,#4
-MOV RV, 105
-B L3
-L3:
-
-END L0
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	sub     sp, sp, #4
+	add     103, FP, #-8
+	mov     102, 103
+	bl      defn
+	mov     101, RV
+	str     101, [102]
+	ldr     105, [FP, #-8]
+	mov     RV, 105
+	b       .L2
+.L2:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 

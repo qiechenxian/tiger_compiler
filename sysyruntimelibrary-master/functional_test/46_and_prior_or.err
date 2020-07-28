@@ -1,546 +1,80 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/46_and_prior_or.sy"
+	.data
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     fp, sp, #4
+	sub     sp, sp, #28
+	mov     101, #3
+	str     101, [FP, #-8]
+	mov     102, #8
+	str     102, [FP, #-12]
+	mov     103, #-4
+	str     103, [FP, #-16]
+	mov     104, #15
+	str     104, [FP, #-20]
+	ldr     106, [FP, #-20]
+	ldr     108, [FP, #-12]
+	ldr     109, [FP, #-8]
+	sub     107, 108, 109
+	stmfd   sp!, {r0-r7}
+	mov     r0, 106
+	mov     r1, 107
+	bl      __modsi3
+	mov     105, r0
+	ldmfd   sp!,{r0-r7}
+	mov     110, #0
+	cmp     105, 110
+	bne     .L2
+	b       .L0
+.L0:
+	ldr     111, [FP, #-8]
+	mov     112, #0
+	cmp     111, 112
+	bgt     .L2
+	b       .L4
+.L4:
+	mov     113, #0
+	mov     RV, 113
+	b       .L5
+.L2:
+	ldr     115, [FP, #-20]
+	mov     116, #3
+	stmfd   sp!, {r0-r7}
+	mov     r0, 115
+	mov     r1, 116
+	bl      __modsi3
+	mov     114, r0
+	ldmfd   sp!,{r0-r7}
+	mov     117, #0
+	cmp     114, 117
+	beq     .L3
+	b       .L1
+.L1:
+	ldr     118, [FP, #-16]
+	mov     119, #0
+	cmp     118, 119
+	ble     .L4
+	b       .L3
+.L3:
+	ldr     122, [FP, #-20]
+	ldr     123, [FP, #-16]
+	add     121, 122, 123
+	ldr     125, [FP, #-12]
+	sub     124, 125, #0
+	sub     120, 121, 124
+	str     120, [FP, #-24]
+	ldr     126, [FP, #-24]
+	str     126, [SP]
+	bl      putint
+	b       .L4
+.L5:
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main
 
-before semantic ast:
- decList(
-  functionDec(main,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      decList(
-       variableDec(a,
-        int,
-        FALSE),
-       decList()),),
-     comStmList(
-      comStm(
-       decList(
-        variableDec(b,
-         int,
-         FALSE),
-        decList()),),
-      comStmList(
-       comStm(
-        decList(
-         variableDec(c,
-          int,
-          FALSE),
-         decList()),),
-       comStmList(
-        comStm(
-         decList(
-          variableDec(d,
-           int,
-           FALSE),
-          decList()),),
-        comStmList(
-         comStm(
-          assignStm(
-           simpleVar(a),
-           intExp(3))),
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(b),
-            intExp(8))),
-          comStmList(
-           comStm(
-            assignStm(
-             simpleVar(c),
-             opExp(
-              sub,
-              intExp(0),
-              intExp(4)))),
-           comStmList(
-            comStm(
-             assignStm(
-              simpleVar(d),
-              intExp(15))),
-            comStmList(
-             comStm(
-              decList(
-               variableDec(t,
-                int,
-                FALSE),
-               decList()),),
-             comStmList(
-              comStm(
-               ifStm(
-                opExp(
-                 and,
-                 opExp(
-                  or,
-                  opExp(
-                   ne,
-                   opExp(
-                    mod,
-                    varExp(
-                     simpleVar(d)),
-                    opExp(
-                     sub,
-                     varExp(
-                      simpleVar(b)),
-                     varExp(
-                      simpleVar(a)))),
-                   intExp(0)),
-                  opExp(
-                   gt,
-                   varExp(
-                    simpleVar(a)),
-                   intExp(0))),
-                 opExp(
-                  or,
-                  opExp(
-                   eq,
-                   opExp(
-                    mod,
-                    varExp(
-                     simpleVar(d)),
-                    intExp(3)),
-                   intExp(0)),
-                  opExp(
-                   gt,
-                   varExp(
-                    simpleVar(c)),
-                   intExp(0)))),
-                blockStm(
-                 comStmList(
-                  comStm(
-                   assignStm(
-                    simpleVar(t),
-                    opExp(
-                     sub,
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(d)),
-                      varExp(
-                       simpleVar(c))),
-                     opExp(
-                      sub,
-                      intExp(0),
-                      varExp(
-                       simpleVar(b)))))),
-                  comStmList(
-                   comStm(
-                    expStm(
-                     callExp(putint,
-                      expList(
-                       varExp(
-                        simpleVar(t)),
-                       expList()))),
-                   comStmList())))                )),
-              comStmList(
-               comStm(
-                returnStm(
-                 intExp(0))),
-               comStmList()))))))))))))),
-  decList())
-
-after semantic ast:
- decList(
-  functionDec(main,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      decList(
-       variableDec(a,
-        int,
-        FALSE),
-       decList()),),
-     comStmList(
-      comStm(
-       decList(
-        variableDec(b,
-         int,
-         FALSE),
-        decList()),),
-      comStmList(
-       comStm(
-        decList(
-         variableDec(c,
-          int,
-          FALSE),
-         decList()),),
-       comStmList(
-        comStm(
-         decList(
-          variableDec(d,
-           int,
-           FALSE),
-          decList()),),
-        comStmList(
-         comStm(
-          assignStm(
-           simpleVar(a),
-           intExp(3))),
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(b),
-            intExp(8))),
-          comStmList(
-           comStm(
-            assignStm(
-             simpleVar(c),
-             intExp(-4))),
-           comStmList(
-            comStm(
-             assignStm(
-              simpleVar(d),
-              intExp(15))),
-            comStmList(
-             comStm(
-              decList(
-               variableDec(t,
-                int,
-                FALSE),
-               decList()),),
-             comStmList(
-              comStm(
-               ifStm(
-                opExp(
-                 and,
-                 opExp(
-                  or,
-                  opExp(
-                   ne,
-                   opExp(
-                    mod,
-                    varExp(
-                     simpleVar(d)),
-                    opExp(
-                     sub,
-                     varExp(
-                      simpleVar(b)),
-                     varExp(
-                      simpleVar(a)))),
-                   intExp(0)),
-                  opExp(
-                   gt,
-                   varExp(
-                    simpleVar(a)),
-                   intExp(0))),
-                 opExp(
-                  or,
-                  opExp(
-                   eq,
-                   opExp(
-                    mod,
-                    varExp(
-                     simpleVar(d)),
-                    intExp(3)),
-                   intExp(0)),
-                  opExp(
-                   gt,
-                   varExp(
-                    simpleVar(c)),
-                   intExp(0)))),
-                blockStm(
-                 comStmList(
-                  comStm(
-                   assignStm(
-                    simpleVar(t),
-                    opExp(
-                     sub,
-                     opExp(
-                      add,
-                      varExp(
-                       simpleVar(d)),
-                      varExp(
-                       simpleVar(c))),
-                     opExp(
-                      sub,
-                      intExp(0),
-                      varExp(
-                       simpleVar(b)))))),
-                  comStmList(
-                   comStm(
-                    expStm(
-                     callExp(putint,
-                      expList(
-                       varExp(
-                        simpleVar(t)),
-                       expList()))),
-                   comStmList())))                )),
-              comStmList(
-               comStm(
-                returnStm(
-                 intExp(0))),
-               comStmList()))))))))))))),
-  decList())
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    SEQ(
-     SEQ(
-      SEQ(
-       SEQ(
-        SEQ(
-         SEQ(
-          SEQ(
-           SEQ(
-            EXP(
-             CONST 0),
-            EXP(
-             CONST 0)),
-           EXP(
-            CONST 0)),
-          EXP(
-           CONST 0)),
-         MOVE(
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -4)),
-          CONST 3)),
-        MOVE(
-         MEM(
-          BINOP(T_add,
-           TEMP tFP,
-           CONST -8)),
-         CONST 8)),
-       MOVE(
-        MEM(
-         BINOP(T_add,
-          TEMP tFP,
-          CONST -12)),
-        BINOP(T_sub,
-         CONST 0,
-         CONST 4))),
-      MOVE(
-       MEM(
-        BINOP(T_add,
-         TEMP tFP,
-         CONST -16)),
-       CONST 15)),
-     EXP(
-      CONST 0)),
-    SEQ(
-     SEQ(
-      SEQ(
-       SEQ(
-        CJUMP(T_ne,
-         BINOP(T_mod,
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -16)),
-          BINOP(T_sub,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -8)),
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -4)))),
-         CONST 0,
-         L3,L1),
-        SEQ(
-         LABEL L1,
-         CJUMP(T_gt,
-          MEM(
-           BINOP(T_add,
-            TEMP tFP,
-            CONST -4)),
-          CONST 0,
-          L3,L5))),
-       SEQ(
-        LABEL L3,
-        SEQ(
-         CJUMP(T_eq,
-          BINOP(T_mod,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -16)),
-           CONST 3),
-          CONST 0,
-          L4,L2),
-         SEQ(
-          LABEL L2,
-          CJUMP(T_gt,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -12)),
-           CONST 0,
-           L4,L5))))),
-      SEQ(
-       LABEL L4,
-       SEQ(
-        MOVE(
-         MEM(
-          BINOP(T_add,
-           TEMP tFP,
-           CONST -20)),
-         BINOP(T_sub,
-          BINOP(T_add,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -16)),
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -12))),
-          BINOP(T_sub,
-           CONST 0,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -8))))),
-        EXP(
-         CALL(
-          NAME putint,
-           TEMP tFP,
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -20))))))),
-     LABEL L5)),
-   MOVE(
-    TEMP tRV,
-    CONST 0)))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 3)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -8)),
-  CONST 8)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -12)),
-  BINOP(T_sub,
-   CONST 0,
-   CONST 4))
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -16)),
-  CONST 15)
-----dived line----
- CJUMP(T_ne,
-  BINOP(T_mod,
-   MEM(
-    BINOP(T_add,
-     TEMP tFP,
-     CONST -16)),
-   BINOP(T_sub,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -8)),
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4)))),
-  CONST 0,
-  L3,L1)
-----dived line----
- LABEL L1
-----dived line----
- CJUMP(T_gt,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 0,
-  L3,L5)
-----dived line----
- LABEL L5
-----dived line----
- MOVE(
-  TEMP tRV,
-  CONST 0)
-----dived line----
- JUMP(
-  NAME L6)
-----dived line----
- LABEL L3
-----dived line----
- CJUMP(T_eq,
-  BINOP(T_mod,
-   MEM(
-    BINOP(T_add,
-     TEMP tFP,
-     CONST -16)),
-   CONST 3),
-  CONST 0,
-  L4,L2)
-----dived line----
- LABEL L2
-----dived line----
- CJUMP(T_le,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -12)),
-  CONST 0,
-  L5,L4)
-----dived line----
- LABEL L4
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -20)),
-  BINOP(T_sub,
-   BINOP(T_add,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -16)),
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -12))),
-   BINOP(T_sub,
-    CONST 0,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -8)))))
-----dived line----
- EXP(
-  CALL(
-   NAME putint,
-    TEMP tFP,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -20))))
-----dived line----
- JUMP(
-  NAME L5)
-----dived line----
- LABEL L6
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-Segmentation fault

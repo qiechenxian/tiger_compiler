@@ -1,526 +1,61 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/25_if_test4.sy"
+	.data
+	.text
+	.align  2
+	.global if_ifElse_
+	.type   if_ifElse_, %function
+if_ifElse_:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	sub     sp, sp, #8
+	mov     102, #5
+	str     102, [FP, #-8]
+	mov     103, #10
+	str     103, [FP, #-12]
+	ldr     104, [FP, #-8]
+	mov     105, #5
+	cmp     104, 105
+	beq     .L3
+	b       .L4
+.L4:
+	ldr     106, [FP, #-8]
+	mov     RV, 106
+	b       .L5
+.L3:
+	ldr     107, [FP, #-12]
+	mov     108, #10
+	cmp     107, 108
+	beq     .L0
+	b       .L1
+.L1:
+	ldr     110, [FP, #-8]
+	add     109, 110, #15
+	str     109, [FP, #-8]
+.L2:
+	b       .L4
+.L0:
+	mov     111, #25
+	str     111, [FP, #-8]
+	b       .L2
+.L5:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   if_ifElse_, .-if_ifElse_
 
-before semantic ast:
- decList(
-  functionDec(if_ifElse_,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      decList(
-       variableDec(a,
-        int,
-        FALSE),
-       decList()),),
-     comStmList(
-      comStm(
-       assignStm(
-        simpleVar(a),
-        intExp(5))),
-      comStmList(
-       comStm(
-        decList(
-         variableDec(b,
-          int,
-          FALSE),
-         decList()),),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          intExp(10))),
-        comStmList(
-         comStm(
-          ifStm(
-           opExp(
-            eq,
-            varExp(
-             simpleVar(a)),
-            intExp(5)),
-           blockStm(
-            comStmList(
-             comStm(
-              ifStm(
-               opExp(
-                eq,
-                varExp(
-                 simpleVar(b)),
-                intExp(10)),
-               assignStm(
-                simpleVar(a),
-                intExp(25)),/n               assignStm(
-                simpleVar(a),
-                opExp(
-                 add,
-                 varExp(
-                  simpleVar(a)),
-                 intExp(15)))               )),
-             comStmList()))           )),
-         comStmList(
-          comStm(
-           returnStm(
-            varExp(
-             simpleVar(a)))),
-          comStmList())))))))),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       returnStm(
-        callExp(if_ifElse_,
-         expList()))),
-      comStmList()))),
-   decList()))
-
-after semantic ast:
- decList(
-  functionDec(if_ifElse_,
-   fieldList(),
-   int,
-   blockStm(
-    comStmList(
-     comStm(
-      decList(
-       variableDec(a,
-        int,
-        FALSE),
-       decList()),),
-     comStmList(
-      comStm(
-       assignStm(
-        simpleVar(a),
-        intExp(5))),
-      comStmList(
-       comStm(
-        decList(
-         variableDec(b,
-          int,
-          FALSE),
-         decList()),),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          intExp(10))),
-        comStmList(
-         comStm(
-          ifStm(
-           opExp(
-            eq,
-            varExp(
-             simpleVar(a)),
-            intExp(5)),
-           blockStm(
-            comStmList(
-             comStm(
-              ifStm(
-               opExp(
-                eq,
-                varExp(
-                 simpleVar(b)),
-                intExp(10)),
-               assignStm(
-                simpleVar(a),
-                intExp(25)),/n               assignStm(
-                simpleVar(a),
-                opExp(
-                 add,
-                 varExp(
-                  simpleVar(a)),
-                 intExp(15)))               )),
-             comStmList()))           )),
-         comStmList(
-          comStm(
-           returnStm(
-            varExp(
-             simpleVar(a)))),
-          comStmList())))))))),
-  decList(
-   functionDec(main,
-    fieldList(),
-    int,
-    blockStm(
-     comStmList(
-      comStm(
-       returnStm(
-        callExp(if_ifElse_,
-         expList()))),
-      comStmList()))),
-   decList()))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L6,
-  MOVE(
-   TEMP tRV,
-   CALL(
-    NAME L0,
-     TEMP tFP))) SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    SEQ(
-     SEQ(
-      SEQ(
-       EXP(
-        CONST 0),
-       MOVE(
-        MEM(
-         BINOP(T_add,
-          TEMP tFP,
-          CONST -4)),
-        CONST 5)),
-      EXP(
-       CONST 0)),
-     MOVE(
-      MEM(
-       BINOP(T_add,
-        TEMP tFP,
-        CONST -8)),
-      CONST 10)),
-    SEQ(
-     SEQ(
-      CJUMP(T_eq,
-       MEM(
-        BINOP(T_add,
-         TEMP tFP,
-         CONST -4)),
-       CONST 5,
-       L4,L5),
-      SEQ(
-       LABEL L4,
-       SEQ(
-        SEQ(
-         SEQ(
-          SEQ(
-           CJUMP(T_eq,
-            MEM(
-             BINOP(T_add,
-              TEMP tFP,
-              CONST -8)),
-            CONST 10,
-            L1,L2),
-           SEQ(
-            LABEL L1,
-            MOVE(
-             MEM(
-              BINOP(T_add,
-               TEMP tFP,
-               CONST -4)),
-             CONST 25))),
-          JUMP(
-           NAME L3)),
-         SEQ(
-          LABEL L2,
-          MOVE(
-           MEM(
-            BINOP(T_add,
-             TEMP tFP,
-             CONST -4)),
-           BINOP(T_add,
-            MEM(
-             BINOP(T_add,
-              TEMP tFP,
-              CONST -4)),
-            CONST 15)))),
-        LABEL L3))),
-     LABEL L5)),
-   MOVE(
-    TEMP tRV,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4)))))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L6
-----dived line----
- MOVE(
-  TEMP tRV,
-  CALL(
-   NAME L0,
-    TEMP tFP))
-----dived line----
- JUMP(
-  NAME L7)
-----dived line----
- LABEL L7
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-a format: assem=L6:
-, dst=(nil), src=(nil)
-result=L6:
-
-a format: assem=BL L0
-, dst=0x55cede36cd70, src=(nil)
-result=BL L0
-
-a format: assem=MOV `d0, `s0
-, dst=0x55cede36ce00, src=0x55cede36cde0
-result=MOV `d0, `s0
-
-a format: assem=B L7
-, dst=(nil), src=(nil)
-result=B L7
-
-a format: assem=L7:
-, dst=(nil), src=(nil)
-result=L7:
-
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 5)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -8)),
-  CONST 10)
-----dived line----
- CJUMP(T_eq,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 5,
-  L4,L5)
-----dived line----
- LABEL L5
-----dived line----
- MOVE(
-  TEMP tRV,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)))
-----dived line----
- JUMP(
-  NAME L8)
-----dived line----
- LABEL L4
-----dived line----
- CJUMP(T_eq,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -8)),
-  CONST 10,
-  L1,L2)
-----dived line----
- LABEL L2
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  BINOP(T_add,
-   MEM(
-    BINOP(T_add,
-     TEMP tFP,
-     CONST -4)),
-   CONST 15))
-----dived line----
- LABEL L3
-----dived line----
- JUMP(
-  NAME L5)
-----dived line----
- LABEL L1
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  CONST 25)
-----dived line----
- JUMP(
-  NAME L3)
-----dived line----
- LABEL L8
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-a format: assem=L0:
-, dst=(nil), src=(nil)
-result=L0:
-
-a format: assem=MOV 'd0,#5
-, dst=0x55cede370650, src=(nil)
-result=MOV 103,#5
-
-a format: assem=STR 's0,['d0,#-4]
-, dst=0x55cede370860, src=0x55cede3706c0
-result=STR 103,[FP,#-4]
-
-a format: assem=MOV 'd0,#10
-, dst=0x55cede370c40, src=(nil)
-result=MOV 104,#10
-
-a format: assem=STR 's0,['d0,#-8]
-, dst=0x55cede370e50, src=0x55cede370cb0
-result=STR 104,[FP,#-8]
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55cede3713d0, src=0x55cede3713b0
-result=LDR 105,[FP,#-4]
-
-a format: assem=MOV 'd0,#5
-, dst=0x55cede371630, src=(nil)
-result=MOV 106,#5
-
-a format: assem=CMP 's0,'s1
-, dst=(nil), src=0x55cede3716c0
-result=CMP 105,106
-
-a format: assem=BEQ L4
-, dst=(nil), src=(nil)
-result=BEQ L4
-
-a format: assem=B L5
-, dst=(nil), src=(nil)
-result=B L5
-
-a format: assem=L5:
-, dst=(nil), src=(nil)
-result=L5:
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55cede371f30, src=0x55cede371f10
-result=LDR 107,[FP,#-4]
-
-a format: assem=MOV 'd0, 's0
-, dst=0x55cede371fc0, src=0x55cede371fa0
-result=MOV RV, 107
-
-a format: assem=B L8
-, dst=(nil), src=(nil)
-result=B L8
-
-a format: assem=L4:
-, dst=(nil), src=(nil)
-result=L4:
-
-a format: assem=LDR 'd0,['s0,#-8]
-, dst=0x55cede372900, src=0x55cede3728e0
-result=LDR 108,[FP,#-8]
-
-a format: assem=MOV 'd0,#10
-, dst=0x55cede372b60, src=(nil)
-result=MOV 109,#10
-
-a format: assem=CMP 's0,'s1
-, dst=(nil), src=0x55cede372bf0
-result=CMP 108,109
-
-a format: assem=BEQ L1
-, dst=(nil), src=(nil)
-result=BEQ L1
-
-a format: assem=B L2
-, dst=(nil), src=(nil)
-result=B L2
-
-a format: assem=L2:
-, dst=(nil), src=(nil)
-result=L2:
-
-a format: assem=LDR 'd0,['s0,#-4]
-, dst=0x55cede373650, src=0x55cede373630
-result=LDR 111,[FP,#-4]
-
-a format: assem=ADD 'd0,'s0,15
-, dst=0x55cede3736e0, src=0x55cede3736c0
-result=ADD 110,111,15
-
-a format: assem=STR 's0,['d0,#-4]
-, dst=0x55cede3738f0, src=0x55cede373750
-result=STR 110,[FP,#-4]
-
-a format: assem=L3:
-, dst=(nil), src=(nil)
-result=L3:
-
-a format: assem=B L5
-, dst=(nil), src=(nil)
-result=B L5
-
-a format: assem=L1:
-, dst=(nil), src=(nil)
-result=L1:
-
-a format: assem=MOV 'd0,#25
-, dst=0x55cede374260, src=(nil)
-result=MOV 112,#25
-
-a format: assem=STR 's0,['d0,#-4]
-, dst=0x55cede374470, src=0x55cede3742d0
-result=STR 112,[FP,#-4]
-
-a format: assem=B L3
-, dst=(nil), src=(nil)
-result=B L3
-
-a format: assem=L8:
-, dst=(nil), src=(nil)
-result=L8:
-
-BEGIN L6
-L6:
-BL L0
-MOV `d0, `s0
-B L7
-L7:
-
-END L6
-
-BEGIN L0
-L0:
-MOV 103,#5
-STR 103,[FP,#-4]
-MOV 104,#10
-STR 104,[FP,#-8]
-LDR 105,[FP,#-4]
-MOV 106,#5
-CMP 105,106
-BEQ L4
-B L5
-L5:
-LDR 107,[FP,#-4]
-MOV RV, 107
-B L8
-L4:
-LDR 108,[FP,#-8]
-MOV 109,#10
-CMP 108,109
-BEQ L1
-B L2
-L2:
-LDR 111,[FP,#-4]
-ADD 110,111,15
-STR 110,[FP,#-4]
-L3:
-B L5
-L1:
-MOV 112,#25
-STR 112,[FP,#-4]
-B L3
-L8:
-
-END L0
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	bl      if_ifElse_
+	mov     RV, RV
+	b       .L7
+.L7:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 

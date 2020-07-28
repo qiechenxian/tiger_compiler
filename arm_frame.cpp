@@ -362,13 +362,14 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr = head_inst_ptr->tail;
 
     int space = frame->local_count + frame->callee_max_args + frame->temp_space; // todo 此处还应有要保护寄存器空间
-    char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
-    sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
-    head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, NULL, NULL, NULL), NULL);
-    head_inst_ptr = head_inst_ptr->tail;
+    if (space>0){
+        char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
+        sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
+        head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, NULL, NULL, NULL), NULL);
+        head_inst_ptr = head_inst_ptr->tail;
+    }
 
     /** 将函数入口指令和body指令连接 */
-//    head_inst_ptr->tail = body;
     head_inst_ptr->tail = body->tail;
 
     /** 函数出口指令 */

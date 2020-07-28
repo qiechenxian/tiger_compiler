@@ -1,167 +1,39 @@
+	.arch   armv7
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_mod.sy"
+	.data
+	.comm   a, 4, 4
+	.comm   b, 4, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	str     fp, [sp, #-4]!
+	add     fp, sp, #0
+	sub     sp, sp, #4
+	ldr     100, =a
+	mov     101, #10
+	str     101, [100]
+	ldr     102, =b
+	mov     103, #3
+	str     103, [102]
+	ldr     106, =a
+	ldr     105, [106]
+	ldr     108, =b
+	ldr     107, [108]
+	stmfd   sp!, {r0-r7}
+	mov     r0, 105
+	mov     r1, 107
+	bl      __modsi3
+	mov     104, r0
+	ldmfd   sp!,{r0-r7}
+	str     104, [FP, #-8]
+	ldr     109, [FP, #-8]
+	mov     RV, 109
+	b       .L0
+.L0:
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   main, .-main
 
-before semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   variableDec(b,
-    int,
-    FALSE),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(a),
-         intExp(10))),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          intExp(3))),
-        comStmList(
-         comStm(
-          decList(
-           variableDec(c,
-            int,
-            FALSE),
-           decList()),),
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(c),
-            opExp(
-             mod,
-             varExp(
-              simpleVar(a)),
-             varExp(
-              simpleVar(b))))),
-          comStmList(
-           comStm(
-            returnStm(
-             varExp(
-              simpleVar(c)))),
-           comStmList()))))))),
-    decList())))
-
-after semantic ast:
- decList(
-  variableDec(a,
-   int,
-   FALSE),
-  decList(
-   variableDec(b,
-    int,
-    FALSE),
-   decList(
-    functionDec(main,
-     fieldList(),
-     int,
-     blockStm(
-      comStmList(
-       comStm(
-        assignStm(
-         simpleVar(a),
-         intExp(10))),
-       comStmList(
-        comStm(
-         assignStm(
-          simpleVar(b),
-          intExp(3))),
-        comStmList(
-         comStm(
-          decList(
-           variableDec(c,
-            int,
-            FALSE),
-           decList()),),
-         comStmList(
-          comStm(
-           assignStm(
-            simpleVar(c),
-            opExp(
-             mod,
-             varExp(
-              simpleVar(a)),
-             varExp(
-              simpleVar(b))))),
-          comStmList(
-           comStm(
-            returnStm(
-             varExp(
-              simpleVar(c)))),
-           comStmList()))))))),
-    decList())))
-semantic check finish !
-
-↓---------------IR TREE BEFORE CANNO PRINTF START---------------↓
- SEQ(
-  LABEL L0,
-  SEQ(
-   SEQ(
-    SEQ(
-     SEQ(
-      MOVE(
-       NAME a,
-       CONST 10),
-      MOVE(
-       NAME b,
-       CONST 3)),
-     EXP(
-      CONST 0)),
-    MOVE(
-     MEM(
-      BINOP(T_add,
-       TEMP tFP,
-       CONST -4)),
-     BINOP(T_mod,
-      NAME a,
-      NAME b))),
-   MOVE(
-    TEMP tRV,
-    MEM(
-     BINOP(T_add,
-      TEMP tFP,
-      CONST -4)))))
-↑---------------IR TREE BEFORE CANNO PRINTF OVER---------------↑
-
-↓---------------IR TREE AFTER CANNO PRINTF START---------------↓
- LABEL L0
-----dived line----
- MOVE(
-  NAME a,
-  CONST 10)
-----dived line----
- MOVE(
-  NAME b,
-  CONST 3)
-----dived line----
- MOVE(
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)),
-  BINOP(T_mod,
-   NAME a,
-   NAME b))
-----dived line----
- MOVE(
-  TEMP tRV,
-  MEM(
-   BINOP(T_add,
-    TEMP tFP,
-    CONST -4)))
-----dived line----
- JUMP(
-  NAME L1)
-----dived line----
- LABEL L1
-----dived line----
-
-↑---------------IR TREE AFTER CANNO PRINTF OVER---------------↑
-compiler_dev_cpp: /mnt/e/compiler/compiler-dev-cpp-new/codegen.cpp:293: void munchStm(T_stm): Assertion `0' failed.
-Aborted
