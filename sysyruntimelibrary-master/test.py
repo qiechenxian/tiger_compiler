@@ -1,5 +1,5 @@
-
 import os
+from typing import List
 
 BASE = os.getcwd()
 
@@ -42,18 +42,56 @@ def tester(base, in_files):
         s_file = os.path.join(base, prefix+".s")
         err_file = os.path.join(base, prefix+".err")
         exe = command.format(executable, s_file, in_file, err_file)
-        print("{}/{}:{}".format(cnt, total, exe))
+        print("{}/{}:{}".format(cnt+1, total, exe))
         os.system(exe)
+        yield s_file
 
 
 function_test_files = os.listdir(os.path.abspath(PATH[0]))
 function_test_in = list(filter(lambda x: x.endswith(".sy"), function_test_files))
 function_test_out = list(filter(lambda x: x.endswith(".out"), function_test_files))
-tester(PATH[0], function_test_in)
+function_test_sFile = list(tester(PATH[0], function_test_in))
 
 
 performance_test_files = os.listdir(os.path.abspath(PATH[1]))
 performance_test_in = list(filter(lambda x: x.endswith(".sy"), performance_test_files))
 performance_test_out = list(filter(lambda x: x.endswith(".out"), performance_test_files))
-tester(PATH[1], performance_test_in)
+performance_test_sFile = list(tester(PATH[1], performance_test_in))
 
+if_run = input("汇编并运行？(Y/n):")
+if if_run:
+    exit()
+
+assem = "gcc -o {{}} {{}} {}".format(os.path.join(BASE, "libsys.a"))
+
+
+def assem_proc(file_list: List[str]):
+    total = len(file_list)
+    for cnt, file in enumerate(file_list):
+        outfile = file.split('/')[-1].split('.')[0]
+        exe = assem.format(outfile, file)
+        print("{}/{}: {}".format(cnt+1, total, exe))
+        # os.system(exe)
+        yield outfile
+
+
+function_test_exe = list(assem_proc(function_test_sFile))
+performance_test_exe = list(assem_proc(performance_test_sFile))
+
+run = "./{}"
+out = "echo $? > {}.out"
+
+
+def run_proc(file_list):
+    total = len(file_list)
+    for cnt, file in enumerate(file_list):
+        exe = run.format(file)
+        print("{}/{}: {}".format(cnt+1, total, exe))
+        # os.system(exe)
+        exe = out.format(file)
+        print(exe)
+        # os.system(exe)
+
+
+run_proc(function_test_exe)
+run_proc(performance_test_exe)
