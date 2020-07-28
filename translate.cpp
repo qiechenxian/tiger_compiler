@@ -239,17 +239,6 @@ void Tr_expList_append(Tr_expList list, Tr_exp exp) {
     p->last=nullptr;
     list->last=p;
 }
-void Tr_expList_append_opposite(T_expList list,Tr_exp exp)
-{
-    if(list->head= nullptr)
-    {
-        list->head=Tr_unEx(exp);
-        return;
-    }
-    T_expList p = (T_expList)checked_malloc(sizeof(*p));
-    p->head=Tr_unEx(exp);
-    list=p;
-}
 bool Tr_expList_isEmpty(Tr_expList list){
     return !list || !list->first;
 }
@@ -642,50 +631,4 @@ Tr_exp Tr_StringExp(c_string content)
     fragList = F_FragList(str_frag, fragList);
 
     return Tr_Ex(T_Name(str_pos));
-}
-T_stm T_fuc_call_param_in(bool tag,int parap_all,T_expList params)
-{
-    parap_all=parap_all-1;
-    T_expList params_temp=params;
-    T_stm ret= nullptr;
-    int count=0;
-    if(tag==true&&parap_all<=4)
-    {
-        ret=T_Exp(T_Const(0));
-        return ret;
-    }
-    else if(tag==true&&parap_all>4)
-    {
-        for(;params_temp;params_temp=params_temp->tail)
-        {
-            count++;
-            if(ret== nullptr&&count<=parap_all-3)
-            {
-                ret=T_Move(T_Mem(T_Binop(T_add,T_Temp(F_SP()),T_Const(parap_all--*get_word_size()))),params_temp->head);
-            } else if(count<=parap_all-3)
-            {
-                ret=T_Seq(ret,T_Move(T_Mem(T_Binop(T_add,T_Temp(F_SP()),T_Const(parap_all--*get_word_size()))),params_temp->head));
-            }
-        }
-        return ret;
-    } else//tag==false
-    {
-        if(params->head== nullptr)
-        {
-            ret=T_Exp(T_Const(0));
-            return ret;
-        }
-        for(;params_temp;params_temp=params_temp->tail)
-        {
-            if(ret== nullptr)
-            {
-                ret=T_Move(T_Mem(T_Binop(T_add,T_Temp(F_SP()),T_Const(parap_all--*get_word_size()))),params_temp->head);
-            } else
-            {
-                ret=T_Seq(ret,T_Move(T_Mem(T_Binop(T_add,T_Temp(F_SP()),T_Const(parap_all--*get_word_size()))),params_temp->head));
-            }
-        }
-        return ret;
-    }
-    assert("wrong from T_fuc_call_param_in in tree.cpp");
 }

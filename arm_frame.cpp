@@ -12,7 +12,7 @@ static Temp_temp sp = nullptr;
 static Temp_temp zero = nullptr;
 static Temp_temp ra = nullptr;
 static Temp_temp rv = nullptr;
-
+static Temp_temp fr = nullptr;
 //栈帧结构
 Temp_temp F_FP()//取帧指针
 {
@@ -63,7 +63,11 @@ Temp_temp F_SP(void) {
     }
     return sp;
 }
+Temp_temp F_R(c_string save) {
 
+    fr=Temp_new_special(save);
+    return fr;
+}
 Temp_temp F_ZERO(void) {
     if (zero == nullptr) {
         zero = Temp_newTemp();

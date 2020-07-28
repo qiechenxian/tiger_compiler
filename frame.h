@@ -37,6 +37,7 @@ Temp_temp F_RA(void);
 Temp_temp F_RV(void);
 Temp_temp F_PC();
 Temp_temp F_LR();
+Temp_temp F_R(c_string save);
 int get_word_size();
 T_exp F_Exp(F_access acc, T_exp framePtr);
 T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index);
