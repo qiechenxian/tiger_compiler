@@ -45,6 +45,10 @@ static void munchStm(T_stm s);
 // 用于过程调用中参数传递到正确位置
 static Temp_tempList munchArgs(bool tag,int i, T_expList args);
 
+//调用者保存和恢复
+static void munchCallerSave();
+static void munchCallerRestore(Temp_tempList tl);
+
 //调用库函数
 static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2);
 
@@ -56,6 +60,9 @@ AS_instrList F_codegen(F_frame f, T_stmList stmList) {
     T_stmList stmList1;
     for (stmList1 = stmList; stmList1; stmList1 = stmList1->tail) {
         munchStm(stmList1->head);
+    }
+    if(last&&last->head->kind==AS_instr_::I_LABEL){
+        emit(AS_Oper("NOP\n",NULL,NULL,NULL));
     }
     list = iList;
     last = NULL;

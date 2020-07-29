@@ -80,7 +80,7 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
                 }
             }
 
-            if (inst->kind == AS_instr_::I_OPER&& inst->u.OPER.jumps != NULL) {
+            if (inst->kind == AS_instr_::I_OPER && inst->u.OPER.jumps != NULL) {
                 jumpnl = G_NodeList(n, jumpnl);
             }
 
@@ -89,7 +89,6 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
         }
         last_inst = inst;
     }
-
     // Handle jump instructions
     for (; jumpnl; jumpnl = jumpnl->tail) {
         n = jumpnl->head;
@@ -99,11 +98,10 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
             if (jump_n) {
                 G_addEdge(n, jump_n);
             } else {
-                EM_error(0, "fail to find node for label %s", Temp_labelString(jl->head));
+                EM_error(A_Pos(0,0,0,0), "fail to find node for label %s", Temp_labelString(jl->head));
             }
         }
     }
-
     return g;
 }
 

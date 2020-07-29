@@ -607,7 +607,9 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
 
     G_nodeList nl;
     for (nl = nodes; nl; nl = nl->tail) {
+
         long degree = G_degree(nl->head);
+
         G_enter(c.degree, nl->head, (void *) degree);
 
         if (Temp_look(precolored, node2Temp(nl->head))) {
@@ -616,7 +618,6 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         }
         c.initial = L(node2Temp(nl->head), c.initial);
     }
-
     colorMain();
 
     // for (nl = nodes; nl; nl = nl->tail) {
