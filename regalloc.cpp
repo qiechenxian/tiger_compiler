@@ -8,11 +8,13 @@ static void printTemp(void *t) {
     printf("node: %s\n", Temp_look(m, (Temp_temp) t));
 }
 
+//打印指令
 static void printInst(void *info) {
     AS_instr inst = (AS_instr) info;
     AS_print(stdout, inst, Temp_name());
 }
 
+//翻转instr list
 static AS_instrList reverseInstrList(AS_instrList il) {
     AS_instrList rl = NULL;
     for (; il; il = il->tail) {
@@ -21,6 +23,7 @@ static AS_instrList reverseInstrList(AS_instrList il) {
     return rl;
 }
 
+//返回 dst
 static Temp_tempList inst_def(AS_instr inst) {
     switch (inst->kind) {
         case AS_instr_::I_OPER:
@@ -32,6 +35,7 @@ static Temp_tempList inst_def(AS_instr inst) {
     }
 }
 
+//返回 src
 static Temp_tempList inst_use(AS_instr inst) {
     switch (inst->kind) {
         case AS_instr_::I_OPER:
@@ -44,6 +48,7 @@ static Temp_tempList inst_use(AS_instr inst) {
     return NULL;
 }
 
+//temp to node
 static G_node temp2Node(Temp_temp t, G_graph g) {
     if (t == NULL) return NULL;
     G_nodeList nodes = G_nodes(g);
@@ -53,39 +58,46 @@ static G_node temp2Node(Temp_temp t, G_graph g) {
     return NULL;
 }
 
+// node to temp
 static Temp_temp node2Temp(G_node n) {
     if (n == NULL) return NULL;
     return Live_gtemp(n);
 }
 
+// temp equal ?
 static bool tempEqual(Temp_tempList ta, Temp_tempList tb) {
     return Temp_equal(ta, tb);
 }
 
+// temp list ta minus tb
 static Temp_tempList tempMinus(Temp_tempList ta, Temp_tempList tb) {
     return Temp_minus(ta, tb);
 }
-
+// temp list ta Union tb
 static Temp_tempList tempUnion(Temp_tempList ta, Temp_tempList tb) {
     return Temp_union(ta, tb);
 }
-
+// temp list ta intersect tb
 static Temp_tempList tempIntersect(Temp_tempList ta, Temp_tempList tb) {
     return Temp_intersect(ta, tb);
 }
 
+//temp in templist?
 static bool tempIn(Temp_temp t, Temp_tempList tl) {
     return Temp_inList(t, tl);
 }
 
+//temp list(h,t)
 static Temp_tempList L(Temp_temp h, Temp_tempList t) {
     return Temp_TempList(h, t);
 }
 
+// instr in instr list?
 static bool instIn(AS_instr i, AS_instrList il) {
     return AS_instrInList(i, il);
 }
 
+//已合并的传送指令集合 get alias
 static G_node getAlias(G_node n, G_table aliases, Temp_tempList coalescedNodes) {
     Temp_temp t = node2Temp(n);
     if (tempIn(t, coalescedNodes)) {
@@ -137,6 +149,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         rewriteList = NULL;
 
 // Assign locals in memory
+//TODO 好像是动态分配，
         Temp_tempList tl;
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
@@ -157,6 +170,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             Temp_tempList tempSpilled = tempUnion(useSpilled, defSpilled);
 
 // Skip unspilled instructions
+// 跳过未溢出的指令
             if (tempSpilled == NULL) {
                 rewriteList = AS_InstrList(inst, rewriteList);
                 continue;
@@ -166,7 +180,8 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 char buf[128];
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
-                sprintf(buf, "movl %d(`s0), `d0  # spilled\n", F_accessOffset(local));
+                sprintf(buf, "LDR 'd0 ['s1,#%d] # spilled\n", F_accessOffset(local));
+                //sprintf(buf, "movl %d(`s0), `d0  # spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), L(temp, NULL), L(F_FP(), NULL), NULL), rewriteList);
             }
@@ -177,7 +192,8 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 char buf[128];
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
-                sprintf(buf, "movl `s0, %d(`s1)  # spilled\n", F_accessOffset(local));
+                sprintf(buf, "STR  's0, ['s1,#%d]  # spilled\n", F_accessOffset(local));
+                //sprintf(buf, "movl `s0, %d(`s1)  # spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), NULL, L(temp, L(F_FP(), NULL)), NULL), rewriteList);
             }
@@ -196,6 +212,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             AS_instr inst = il->head;
 
 // Remove coalesced moves
+//溢出已经合并的指令
             if (instIn(inst, col.coalescedMoves)) {
                 char buf[1024];
                 sprintf(buf, "# ");
