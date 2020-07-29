@@ -52,7 +52,6 @@ void F_initRegisters(void) {
     specialregs = Temp_TempList(fp,
                                 Temp_TempList(sp,
                                               Temp_TempList(lr, NULL)));
-
 }
 Temp_map F_initialRegisters(F_frame f){
     Temp_map m=Temp_empty();
@@ -74,7 +73,7 @@ Temp_map F_initialRegisters(F_frame f){
     Temp_enter(m, r8, "R8");
     Temp_enter(m, r9, "R9");
     Temp_enter(m, r10, "R10");
-
+    return m;
 }
 Temp_temp F_FP()//取帧指针
 {
@@ -136,15 +135,17 @@ Temp_temp F_ZERO(void) {
     return zero;
 }
 
-//TODO 需添加剩余寄存器
+//TODO 需添加剩余寄存器,是否需要fp，sp
 Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return Temp_TempList(r0,
+    return Temp_TempList(fp,
+            Temp_TempList(sp,
+                    Temp_TempList(r0,
                          Temp_TempList(r1,
-                                       Temp_TempList(r2,
-                                                     Temp_TempList(r3, NULL))));
+                                 Temp_TempList(r2,
+                                               Temp_TempList(r3, NULL))))));
 }
 
 //TODO 调用者保护寄存器

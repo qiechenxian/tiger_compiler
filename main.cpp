@@ -38,7 +38,7 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
     //AS_printInstrList(outfile,iList,Temp_layerMap(F_tempMap, Temp_name()));
     struct RA_result ra=RA_regAlloc(frame,iList);
     iList=ra.il;
-
+    AS_printInstrList(outfile,iList,Temp_layerMap(F_tempMap, Temp_name()));
 //    AS_proc proc_done = F_procEntryExit3(frame, iList);
 //
 ////    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));

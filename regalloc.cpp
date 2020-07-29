@@ -138,9 +138,10 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         live = Live_liveness(flow);
         G_show(stdout, G_nodes(live.graph), printTemp);
         initial = F_initialRegisters(f);
-        // TODO 失败报错
+
         col = COL_color(live.graph, initial, F_registers(),
                         live.worklistMoves, live.moveList, live.spillCost);
+
         if (col.spills == NULL) {
             break;
         }

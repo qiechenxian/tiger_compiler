@@ -129,7 +129,7 @@ static Temp_temp str2Color(c_string color, Temp_map regcolors, Temp_tempList reg
             return regs->head;
         }
     }
-    EM_error(0, "register not found for given color:");
+    EM_error(A_Pos(0,0,0,0), "register not found for given color:");
     printf("register not found for given color: %s\n", color);
     return NULL;
 }
@@ -642,8 +642,8 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         if (*it == 119) {
             color = NULL;
         }
-
         for (; adjs; adjs = adjs->tail) {
+
             nw = adjs->head;
             w = node2Temp(nw);
             G_node nw_alias = getAlias(nw);
@@ -655,7 +655,6 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
                 }
             }
         }
-
         if (okColors == NULL) {
             c.spilledNodes = L(t, c.spilledNodes);
         } else {
@@ -663,7 +662,6 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
             Temp_enter(colors, t, color2Str(okColors->head, precolored));
         }
     }
-
     Temp_tempList tl;
     for (tl = c.coalescedNodes; tl; tl = tl->tail) {
         G_node alias = getAlias(temp2Node(tl->head));
