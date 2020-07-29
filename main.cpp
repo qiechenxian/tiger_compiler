@@ -34,17 +34,18 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 //    printcannoList(stderr, stmList);
 
     iList = F_codegen(frame, stmList);
+    //fprintf(outfile,"%s",iList->tail->head->u.LABEL.assem);
+    //AS_printInstrList(outfile,iList,Temp_layerMap(F_tempMap, Temp_name()));
+    struct RA_result ra=RA_regAlloc(frame,iList);
+    iList=ra.il;
 
-//    struct RA_result ra=RA_regAlloc(frame,iList);
-//    iList=ra.il;
-
-    AS_proc proc_done = F_procEntryExit3(frame, iList);
-
-//    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
-    fprintf(outfile, "%s", proc_done->prolog);
-    AS_printInstrList(outfile, proc_done->body, Temp_layerMap(F_tempMap, Temp_name()));
-    fprintf(outfile, "%s\n", proc_done->epilog);
-    fprintf(outfile, "\n");
+//    AS_proc proc_done = F_procEntryExit3(frame, iList);
+//
+////    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
+//    fprintf(outfile, "%s", proc_done->prolog);
+//    AS_printInstrList(outfile, proc_done->body, Temp_layerMap(F_tempMap, Temp_name()));
+//    fprintf(outfile, "%s\n", proc_done->epilog);
+//    fprintf(outfile, "\n");
 //    fprintf(outfile, "END %s\n\n", Temp_labelString(F_getName(frame)));
 
 
@@ -151,8 +152,8 @@ int main(int argc, char **argv) {
 
     //输出汇编指令的路径,应更改为文件名
     FILE *outfile=stdout;
-    doGlobal(outfile, frags);
-    fprintf(outfile, "\t.text\n");
+//    doGlobal(outfile, frags);
+//    fprintf(outfile, "\t.text\n");
     for (; frags; frags = frags->tail) {
         if (frags->head->kind == F_frag_::F_procFrag) {
             doProc(outfile, frags->head->u.proc.frame, frags->head->u.proc.body);
