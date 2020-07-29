@@ -3,71 +3,78 @@
 //
 #include "frame.h"
 #include "assem.h"
+
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 4; /// 保存在Reg中参数的数量(待定)
-static Temp_temp pc = nullptr;
-static Temp_temp lr = nullptr;
-static Temp_temp fp = nullptr;
-static Temp_temp sp = nullptr;
+
+
+static Temp_temp r0 = NULL, r1 = NULL, r2 = NULL, r3 = NULL;
+static Temp_temp r4 = NULL, r5 = NULL, r6 = NULL, r7 = NULL, r8 = NULL, r9 = NULL, r10 = NULL;
+static Temp_temp fp = NULL;//r11, 帧指针
+static Temp_temp ip = NULL;//r12，子程序间scratch
+static Temp_temp sp = NULL;//r13，栈指针
+static Temp_temp lr = NULL;//r14,连接寄存器，用于保存子程序返回地址
+static Temp_temp pc = NULL;//r15，程序计数器
 static Temp_temp zero = nullptr;
-static Temp_temp ra = nullptr;
-static Temp_temp rv = nullptr;
+static Temp_temp ra = nullptr; //mips中的ra相当于arm的lr
+static Temp_temp rv = nullptr; //
 static Temp_temp fr = nullptr;
+
 //栈帧结构
 Temp_temp F_FP()//取帧指针
 {
-    if(fp==nullptr)
-    {
+    if (fp == nullptr) {
         char save[5];
         sprintf(save, "%s", "FP");
-        fp=Temp_new_special(save);
+        fp = Temp_new_special(save);
     }
     return fp;
 }
+
 Temp_temp F_RV()//取帧指针
 {
-    if(rv==nullptr)
-    {
+    if (rv == nullptr) {
         char save[5];
         sprintf(save, "%s", "RV");
-        rv=Temp_new_special(save);
+        rv = Temp_new_special(save);
     }
     return rv;
 }
-Temp_temp F_PC()
-{
-    if(pc==nullptr)
-    {
+
+Temp_temp F_PC() {
+    if (pc == nullptr) {
         char save[5];
         sprintf(save, "%s", "PC");
-        pc=Temp_new_special(save);
+        pc = Temp_new_special(save);
     }
     return pc;
 }
-Temp_temp F_LR()
-{
-    if(lr==nullptr)
-    {
+
+Temp_temp F_LR() {
+    if (lr == nullptr) {
         char save[5];
         sprintf(save, "%s", "LR");
-        lr=Temp_new_special(save);
+        lr = Temp_new_special(save);
     }
     return lr;
 }
+
 Temp_temp F_SP(void) {
 
     if (sp == nullptr) {
         char save[5];
         sprintf(save, "%s", "SP");
-        sp=Temp_new_special(save);
+        sp = Temp_new_special(save);
     }
     return sp;
 }
+
 Temp_temp F_R(c_string save) {
 
-    fr=Temp_new_special(save);
+    fr = Temp_new_special(save);
     return fr;
 }
+
 Temp_temp F_ZERO(void) {
     if (zero == nullptr) {
         zero = Temp_newTemp();
@@ -81,17 +88,20 @@ Temp_temp F_RA(void) {
     }
     return ra;
 }
+
 /** class declare */
-struct F_access_{
-    enum {inFrame, inReg, inGlobal}kind;
+struct F_access_ {
+    enum {
+        inFrame, inReg, inGlobal
+    } kind;
     struct {
         int offset;
         Temp_temp reg;
         Temp_label global;
-    }u;
+    } u;
 };
 
-struct F_frame_{
+struct F_frame_ {
     Temp_label name;
     F_accessList formals;
     F_accessList locals;
@@ -106,38 +116,44 @@ struct F_frame_{
 
 /** function prototype */
 static F_access InFrame(int offset);
+
 static F_access InReg(Temp_temp reg);
+
 static F_accessList F_AccessList(F_access head, F_accessList tail);
+
 static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals);
 
 
 /** 构造函数 */
-static F_access InFrame(int offset){
-    F_access fa = (F_access)checked_malloc(sizeof(*fa));
+static F_access InFrame(int offset) {
+    F_access fa = (F_access) checked_malloc(sizeof(*fa));
     fa->kind = F_access_::inFrame;
     fa->u.offset = offset;
     return fa;
 }
-static F_access InReg(Temp_temp reg){
-    F_access fa = (F_access)checked_malloc(sizeof(*fa));
+
+static F_access InReg(Temp_temp reg) {
+    F_access fa = (F_access) checked_malloc(sizeof(*fa));
     fa->kind = F_access_::inReg;
     fa->u.reg = reg;
     return fa;
 }
-static F_access InGlobal(Temp_label global){
-    auto fa = (F_access)checked_malloc(sizeof(F_access_));
+
+static F_access InGlobal(Temp_label global) {
+    auto fa = (F_access) checked_malloc(sizeof(F_access_));
     fa->kind = F_access_::inGlobal;
     fa->u.global = global;
     return fa;
 }
-static F_accessList F_AccessList(F_access head, F_accessList tail){
-    F_accessList p = (F_accessList)checked_malloc(sizeof(*p));
+
+static F_accessList F_AccessList(F_access head, F_accessList tail) {
+    F_accessList p = (F_accessList) checked_malloc(sizeof(*p));
     p->head = head;
     p->tail = tail;
     return p;
 }
 
-Temp_label F_getGlobalLabel(F_access fa){
+Temp_label F_getGlobalLabel(F_access fa) {
     /**
      * 为translate中的Tr_getGlobalLabel提供底层实现
      */
@@ -173,18 +189,18 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     F_accessList access_list = nullptr, list_tail = nullptr;
     int args_inReg_cnt = 0;
     int args_inFrame_cnt = 1;
-    for (U_boolList iter = formals; iter; iter = iter->tail){
+    for (U_boolList iter = formals; iter; iter = iter->tail) {
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K&&(iter->head==false)&&false){//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
+        if (args_inReg_cnt <= F_K && (iter->head == false) && false) {//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
             access = InReg(Temp_newTemp());
             args_inReg_cnt++;
-        } else{
+        } else {
             access = InFrame(args_inFrame_cnt++ * F_WORD_SIZE);
         }
-        if (access_list){
+        if (access_list) {
             list_tail->tail = F_AccessList(access, nullptr);
             list_tail = list_tail->tail;
-        } else{
+        } else {
             access_list = F_AccessList(access, nullptr);
             list_tail = access_list;
         }
@@ -194,46 +210,63 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
 
 
 /** frame 相关 */
-void F_setFrameCalleeArgs(F_frame frame, int callee_args)
-{
+void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
     frame->isLeaf = callee_args == -1;
     frame->callee_max_args = callee_args;
 }
 
-F_frame F_newFrame(Temp_label name, U_boolList formals){
-    F_frame f = (F_frame)checked_malloc(sizeof(*f));
+F_frame F_newFrame(Temp_label name, U_boolList formals) {
+    F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
     f->local_count = 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
-    f->locals=nullptr;
+    f->locals = nullptr;
     f->isLeaf = true;
     f->temp_space = 0;
     f->callee_max_args = -1;
     return f;
 }
-Temp_label F_getName(F_frame frame){
+
+Temp_label F_getName(F_frame frame) {
     return frame->name;
 }
-F_accessList F_getFormals(F_frame frame){
+
+F_accessList F_getFormals(F_frame frame) {
     return frame->formals;
 }
-F_access F_allocLocal(F_frame frame, bool escape, int size){
+
+int F_accessOffset(F_access a) {
+    if (a->kind != F_access_::inFrame) {
+        EM_error(0, "Offset of a reg access is invalid");
+    }
+
+    return a->u.offset;
+}
+
+Temp_temp F_accessReg(F_access a) {
+    if (a->kind != F_access_::inReg) {
+        EM_error(0, "Reg of a frame access is invalid");
+    }
+
+    return a->u.reg;
+}
+
+F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
     if (escape) {
-        F_access access=InFrame(F_WORD_SIZE  * (- frame->local_count));
-        frame->locals=F_AccessList(access,frame->locals);
+        F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
+        frame->locals = F_AccessList(access, frame->locals);
         return access;
-    }
-    else
-    {
+    } else {
         return InReg(Temp_newTemp());
     }
 }
-F_access F_allocGlobal(S_symbol global){
+
+F_access F_allocGlobal(S_symbol global) {
     /**
      * 仅返回一个全局变量的label
      */
-    return InGlobal((Temp_label)global);
+    return InGlobal((Temp_label) global);
 }
 
 T_exp F_Exp(F_access acc, T_exp framePtr)//将F_access转换为tree表达式
@@ -258,43 +291,43 @@ T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
  * @return T_Mem() 栈中 基址+offset+index 的位置
  */
 {
-    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size()*index + acc->u.offset)));
+    return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size() * index + acc->u.offset)));
 }
 
-int get_word_size()
-{
+int get_word_size() {
     return F_WORD_SIZE;
 }
+
 F_accessList F_formals(F_frame f) {
     return f->formals;
 }
 
 /// 片段相关F_frag
-F_fragList F_FragList(F_frag head,F_fragList tail)
-{
-    F_fragList new_frag_list=(F_fragList)checked_malloc(sizeof(*new_frag_list));
-    new_frag_list->head=head;
-    new_frag_list->tail=tail;
+F_fragList F_FragList(F_frag head, F_fragList tail) {
+    F_fragList new_frag_list = (F_fragList) checked_malloc(sizeof(*new_frag_list));
+    new_frag_list->head = head;
+    new_frag_list->tail = tail;
     return new_frag_list;
 }
-F_frag F_StringFrag(Temp_label label,c_string str)
-{
-    F_frag new_frag=(F_frag)checked_malloc(sizeof(*new_frag));
-    new_frag->kind=F_frag_::F_stringFrag;
-    new_frag->u.stringg.str=str;
-    new_frag->u.stringg.label=label;
+
+F_frag F_StringFrag(Temp_label label, c_string str) {
+    F_frag new_frag = (F_frag) checked_malloc(sizeof(*new_frag));
+    new_frag->kind = F_frag_::F_stringFrag;
+    new_frag->u.stringg.str = str;
+    new_frag->u.stringg.label = label;
     return new_frag;
 }
-F_frag F_ProcFrag(T_stm body,F_frame frame)
-{
-    F_frag new_frag=(F_frag)checked_malloc(sizeof(*new_frag));
-    new_frag->kind=F_frag_::F_procFrag;
-    new_frag->u.proc.body=body;
-    new_frag->u.proc.frame=frame;
+
+F_frag F_ProcFrag(T_stm body, F_frame frame) {
+    F_frag new_frag = (F_frag) checked_malloc(sizeof(*new_frag));
+    new_frag->kind = F_frag_::F_procFrag;
+    new_frag->u.proc.body = body;
+    new_frag->u.proc.frame = frame;
     return new_frag;
 }
-F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values, bool comm){
-    auto new_frag = (F_frag)checked_malloc(sizeof(F_frag_));
+
+F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values, bool comm) {
+    auto new_frag = (F_frag) checked_malloc(sizeof(F_frag_));
     new_frag->kind = F_frag_::F_globalFrag;
     new_frag->u.global.label = label;
     new_frag->u.global.size = size;
@@ -302,8 +335,8 @@ F_frag F_GlobalFrag(Temp_label label, int size, U_pairList init_values, bool com
     new_frag->u.global.comm = comm;
     return new_frag;
 }
-T_stm F_procEntryExit1(F_frame frame,T_stm stm)
-{
+
+T_stm F_procEntryExit1(F_frame frame, T_stm stm) {
     return stm;//中间代码阶段的虚实现
 }
 
@@ -329,10 +362,10 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     AS_instrList head_inst_list, tail_inst_list;
     AS_instrList head_inst_ptr, tail_inst_ptr;
     int word_size = get_word_size();
-    char* name = Temp_labelString(frame->name);
+    char *name = Temp_labelString(frame->name);
 
     /** 函数入口label*/
-    char* fun_label = (char*)checked_malloc(sizeof(char )*20);
+    char *fun_label = (char *) checked_malloc(sizeof(char) * 20);
     sprintf(fun_label, "%s:\n", name);
     head_inst_list = AS_InstrList(AS_Label(fun_label, frame->name), NULL);
     head_inst_ptr = head_inst_list;
@@ -340,14 +373,14 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     /** 函数入口处的汇编指令 */
 
     int recover_offset;
-    if (frame->isLeaf){
-        char* inst = (char*)"\tstr     fp, [sp, #-4]!\n";
+    if (frame->isLeaf) {
+        char *inst = (char *) "\tstr     fp, [sp, #-4]!\n";
         head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
 
         recover_offset = 0;
-    } else{
-        char* inst = (char*)"\tstmfd   sp!, {fp, lr}\n";
+    } else {
+        char *inst = (char *) "\tstmfd   sp!, {fp, lr}\n";
         head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
 
@@ -356,14 +389,14 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
     // todo callee 保护的寄存器的相关指令
 
-    char* inst = (char*)checked_malloc(sizeof(char ) * 20);
+    char *inst = (char *) checked_malloc(sizeof(char) * 20);
     sprintf(inst, "\tadd     fp, sp, #%d\n", recover_offset);
     head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
     int space = frame->local_count + frame->callee_max_args + frame->temp_space; // todo 此处还应有要保护寄存器空间
-    if (space>0){
-        char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
+    if (space > 0) {
+        char *frame_space = (char *) checked_malloc(sizeof(char) * 20);
         sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
         head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
@@ -373,31 +406,31 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr->tail = body->tail;
 
     /** 函数出口指令 */
-    inst = (char*)checked_malloc(sizeof(char ) * 20);
+    inst = (char *) checked_malloc(sizeof(char) * 20);
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
     tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     tail_inst_ptr = tail_inst_list;
 
-    if (frame->isLeaf){
-        inst = (char*)"\tldr     fp, [sp], #4\n";
+    if (frame->isLeaf) {
+        inst = (char *) "\tldr     fp, [sp], #4\n";
         tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         tail_inst_ptr = tail_inst_ptr->tail;
-    } else{
-        inst = (char*)"\tldmfd   sp!, {fp, lr}\n";
+    } else {
+        inst = (char *) "\tldmfd   sp!, {fp, lr}\n";
         tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         tail_inst_ptr = tail_inst_ptr->tail;
     }
 
-    inst = (char*)checked_malloc(sizeof(char ) * 20);
+    inst = (char *) checked_malloc(sizeof(char) * 20);
     sprintf(inst, "\tbx      lr\n");
     tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
 
     /** 连接上出口指令 */
     AS_instrList total_inst = AS_splice(head_inst_list, tail_inst_list);
 
-    char* entry_meta = (char*)checked_malloc(sizeof(char) * 100);
+    char *entry_meta = (char *) checked_malloc(sizeof(char) * 100);
     sprintf(entry_meta, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
-    char* exit_meta = (char*)checked_malloc(sizeof(char) * 100);
+    char *exit_meta = (char *) checked_malloc(sizeof(char) * 100);
     sprintf(exit_meta, "\t.size   %s, .-%s", name, name);
 
     return AS_Proc(entry_meta, total_inst, exit_meta);
@@ -405,3 +438,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
 
 Temp_map F_tempMap = nullptr;
+
+Temp_tempList F_registers(void) {
+    if ()
+}
