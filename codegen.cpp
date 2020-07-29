@@ -6,6 +6,7 @@
 /// 定义指令字符串长度，可调整大小，节省内存
 const int INST_LEN = 20;
 int count_func_param=0;//该全局变量用于调用sys库特殊处理时，判断前四个参数
+int args_count=0;
 // 添加instr到指令表中
 static AS_instrList iList = NULL, last = NULL;
 
@@ -253,6 +254,10 @@ static void munchStm(T_stm s) {
     char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    char *inst_r0 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    char *inst_r1 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    char *inst_r2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    char *inst_r3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     switch (s->kind) {
         case T_stm_::T_MOVE: {
             T_exp dst = s->u.MOVE.dst, src = s->u.MOVE.src;
@@ -318,10 +323,20 @@ static void munchStm(T_stm s) {
                         /* MOVE(TEMP(t),CALL(NAME(lab),args)) */
                         Temp_label lab = src->u.CALL.fun->u.NAME;
                         T_expList args = src->u.CALL.args;
+                        T_expList temp_args=args;
+                        args_count=0;//用于计算参数个数，静态栈帧不能直接stmfd
                         Temp_temp t = dst->u.TEMP;
                         bool special_tag=false;
                         count_func_param=0;
                         special_tag=Sys_lib_fuc_test(lab);
+                        if(true==special_tag)
+                        {
+                            while(temp_args)
+                            {
+                                args_count++;
+                                temp_args=temp_args->tail;
+                            }
+                        }
                         Temp_tempList l = munchArgs(special_tag,0, args);
                         Temp_tempList calldefs = NULL; // TODO
                         //TODO 函数调用测试能否正确传参
@@ -329,9 +344,18 @@ static void munchStm(T_stm s) {
                         emit(AS_Oper(inst, L(F_RA(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
                         if(special_tag==true)
                         {
-                            char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-                            sprintf(inst6, "\tldmfd   sp!,{r0-3}\n");//恢复现场
-                            emit(AS_Oper(inst6, NULL, NULL, NULL));
+                                count_func_param=count_func_param-2;
+                                sprintf(inst_r0, "\tldr     r0, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r0, NULL, L(F_SP(), NULL), NULL));
+                                count_func_param--;
+                                sprintf(inst_r1, "\tldr     r1, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r1, NULL, L(F_SP(), NULL), NULL));
+                                count_func_param--;
+                                sprintf(inst_r2, "\tldr     r2, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r2, NULL, L(F_SP(), NULL), NULL));
+                                count_func_param--;
+                                sprintf(inst_r3, "\tldr     r3, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r3, NULL, L(F_SP(), NULL), NULL));
                         }
                         sprintf(inst2, "\tmov     'd0, 's0\n");
                         emit(AS_Move(inst2, L(t, NULL), L(F_RV(), NULL)));
@@ -390,9 +414,19 @@ static void munchStm(T_stm s) {
                     /* EXP(CALL(eNAME(lab),args)) */
                     Temp_label lab = call->u.CALL.fun->u.NAME;
                     T_expList args = call->u.CALL.args;
+                    T_expList temp_args=args;
+                    args_count=0;//用于计算参数个数，静态栈帧不能直接stmfd
                     bool special_tag=false;
                     count_func_param=0;
                     special_tag=Sys_lib_fuc_test(lab);
+                    if(true==special_tag)
+                    {
+                        while(temp_args)
+                        {
+                            args_count++;
+                            temp_args=temp_args->tail;
+                        }
+                    }
                     Temp_tempList l = munchArgs(special_tag,0, args);
                     Temp_tempList calldefs = NULL; // TODO
                     // 函数调用？
@@ -400,9 +434,18 @@ static void munchStm(T_stm s) {
                     emit(AS_Oper(inst, calldefs, l, AS_Targets(Temp_LabelList(lab, NULL))));
                     if(special_tag==true)
                     {
-                        char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-                        sprintf(inst6, "\tldmfd   sp!,{r0-r3}\n");//恢复现场
-                        emit(AS_Oper(inst6, NULL, NULL, NULL));
+                        count_func_param=count_func_param-2;
+                        sprintf(inst_r0, "\tldr     r0, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r0, NULL, L(F_SP(), NULL), NULL));
+                        count_func_param--;
+                        sprintf(inst_r1, "\tldr     r1, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r1, NULL, L(F_SP(), NULL), NULL));
+                        count_func_param--;
+                        sprintf(inst_r2, "\tldr     r2, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r2, NULL, L(F_SP(), NULL), NULL));
+                        count_func_param--;
+                        sprintf(inst_r3, "\tldr     r3, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r3, NULL, L(F_SP(), NULL), NULL));
                     }
                 } else {
                     /* EXP(CALL(e,args)) */
@@ -518,17 +561,12 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
     }
     else
     {
-        if(count_func_param==0)
-        {
-            char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
-            sprintf(inst, "\tstmfd   sp!, {r0-r3}\n");//保护现场
-            emit(AS_Oper(inst, NULL, NULL, NULL));
-        }
         count_func_param++;
         if (args == nullptr){
             return nullptr;
         }
         char *inst = (char*)checked_malloc(sizeof(char) * INST_LEN);
+        char *str = (char*)checked_malloc(sizeof(char) * INST_LEN);
         Temp_temp r = munchExp(args->head);
         if(count_func_param>4)
         {
@@ -542,10 +580,14 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
             return Temp_TempList(r, old);
         } else
         {
-            sprintf(inst, "\tmov     r%d, ['d0]\n",count_func_param-1);
-            emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+            sprintf(str, "\tstr     r%d, ['d0, #%d]\n",count_func_param-1, (--args_count)*get_word_size());
+            emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+
+            sprintf(inst, "\tldr     r%d, ['s0]\n",count_func_param-1);
+            emit(AS_Oper(inst,NULL , L(r, NULL), NULL));
             Temp_tempList old = munchArgs(true,i + 1, args->tail);
             return Temp_TempList(r, old);
+            //sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
         }
     }
 }
