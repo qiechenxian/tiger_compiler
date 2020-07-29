@@ -211,7 +211,11 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
 
 /** frame 相关 */
 void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
-    frame->isLeaf = callee_args == -1;
+    if (strcmp(S_getName(frame->name), "main") == 0){
+        frame->isLeaf = false;
+    } else{
+        frame->isLeaf = callee_args == -1;
+    }
     frame->callee_max_args = callee_args;
 }
 
