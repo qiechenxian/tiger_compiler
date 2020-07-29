@@ -185,7 +185,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__aeabi_idiv", r, r1, r2);
+                call_lib("__aeabi_idiv", r, r1, r2);//todo 确认是否需要修改
                 //emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
             } else if(e->u.BINOP.op==T_mod){
@@ -195,7 +195,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__aeabi_idivmod",r,r1,r2);
+                call_lib("__aeabi_idivmod",r,r1,r2);//todo 确认是否需要修改
                 return r;
             }
             else {
@@ -623,7 +623,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
         emit(AS_Move(inst5, L(rsreg, NULL), NULL));
     } else
     {
-        assert("error from call_lib in codegen.cpp");
+        assert("error from call_lib in codegen.cpp ");
     }
     char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst6, "\tldmfd   sp!,{r0-r1}\n");//恢复现场
