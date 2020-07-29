@@ -595,7 +595,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
 /*
  * 调用库函数 resReg=fun(arg1,arg2);
  */
-static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2) {
+static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2) {//todo 确认是否需要修改
     char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst, "\tstmfd   sp!, {r0-r1}\n");//保护现场
     emit(AS_Oper(inst, NULL, NULL, NULL));
