@@ -8,6 +8,7 @@
 #include "cannon.h"
 #include "print_ir_tree.h"
 #include "codegen.h"
+#include "regalloc.h"
 using namespace std;
 
 /**
@@ -33,6 +34,10 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 //    printcannoList(stderr, stmList);
 
     iList = F_codegen(frame, stmList);
+
+//    struct RA_result ra=RA_regAlloc(frame,iList);
+//    iList=ra.il;
+
     AS_proc proc_done = F_procEntryExit3(frame, iList);
 
 //    fprintf(outfile, "BEGIN %s\n", Temp_labelString(F_getName(frame)));
@@ -41,6 +46,8 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
     fprintf(outfile, "%s\n", proc_done->epilog);
     fprintf(outfile, "\n");
 //    fprintf(outfile, "END %s\n\n", Temp_labelString(F_getName(frame)));
+
+
 }
 
 static void doGlobal(FILE *outfile, F_fragList fragList){

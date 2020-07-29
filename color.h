@@ -9,10 +9,7 @@
 #include "assem.h"
 #include "graph.h"
 #include "liveness.h"
-/*
- * 参考链接
- * https://github.com/shihaoL/Tiger-Compiler/blob/master/src/color.c
-*/
+
 struct COL_result {
     Temp_map coloring;
     Temp_tempList colored;
@@ -22,6 +19,13 @@ struct COL_result {
     G_table alias;
 };
 
+// 冲突图 ; 预着色 ; 寄存器列表;
+// 有可能合并的传送指令集和;节点映射;临时变量的定值次数
 struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
-                            AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost); //冲突图 ; 预着色 ; 寄存器列表
+                            AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost);
+
+
+////color和regalloc重复函数
+//static Temp_tempList instDef(AS_instr inst);
+//static Temp_tempList instUse(AS_instr inst);
 #endif //COMPILER_BUG_CONSTEXP_COLOR_H

@@ -341,7 +341,7 @@ static void munchStm(T_stm s) {
                         Temp_tempList calldefs = NULL; // TODO
                         //TODO 函数调用测试能否正确传参
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
-                        emit(AS_Oper(inst, L(F_RA(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
+                        emit(AS_Oper(inst, L(F_LR(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
                         if(special_tag==true)
                         {
                                 count_func_param=count_func_param-2;

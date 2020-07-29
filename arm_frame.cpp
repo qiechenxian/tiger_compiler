@@ -10,38 +10,105 @@ static const int F_K = 4; /// 保存在Reg中参数的数量(待定)
 
 static Temp_temp r0 = NULL, r1 = NULL, r2 = NULL, r3 = NULL;
 static Temp_temp r4 = NULL, r5 = NULL, r6 = NULL, r7 = NULL, r8 = NULL, r9 = NULL, r10 = NULL;
+
 static Temp_temp fp = NULL;//r11, 帧指针
 static Temp_temp ip = NULL;//r12，子程序间scratch
 static Temp_temp sp = NULL;//r13，栈指针
 static Temp_temp lr = NULL;//r14,连接寄存器，用于保存子程序返回地址
 static Temp_temp pc = NULL;//r15，程序计数器
 static Temp_temp zero = nullptr;
-static Temp_temp ra = nullptr; //mips中的ra相当于arm的lr
-static Temp_temp rv = nullptr; //
 static Temp_temp fr = nullptr;
+//static Temp_temp ra = nullptr; //mips中的ra相当于arm的lr
+//static Temp_temp rv = nullptr; //帧指针
 
-//栈帧结构
+static Temp_tempList registers = NULL;
+static Temp_tempList specialregs = NULL;
+
+
+/*
+ * 寄存器结构
+ */
+// 初始化
+void F_initRegisters(void) {
+
+    r0 = Temp_new_special("R0");
+    r1 = Temp_new_special("R1");
+    r2 = Temp_new_special("R2");
+    r3 = Temp_new_special("R3");
+    r4 = Temp_new_special("R4");
+    r5 = Temp_new_special("R5");
+    r6 = Temp_new_special("R6");
+    r7 = Temp_new_special("R7");
+    r8 = Temp_new_special("R8");
+    r9 = Temp_new_special("R9");
+    r10 = Temp_new_special("R10");
+
+    fp = Temp_new_special("FP");
+    sp = Temp_new_special("SP");
+    ip = Temp_new_special("IP");
+    lr = Temp_new_special("LR");
+    pc = Temp_new_special("PC");
+
+    specialregs = Temp_TempList(fp,
+                                Temp_TempList(sp,
+                                              Temp_TempList(lr, NULL)));
+
+}
+Temp_map F_initialRegisters(F_frame f){
+    Temp_map m=Temp_empty();
+
+    Temp_enter(m, fp, "FP");
+    Temp_enter(m, sp, "SP");
+    Temp_enter(m, lr, "LR");
+//    Temp_enter(m, ip, "IP");
+//    Temp_enter(m, pc, "PC");
+
+    Temp_enter(m, r0, "R0");
+    Temp_enter(m, r1, "R1");
+    Temp_enter(m, r2, "R2");
+    Temp_enter(m, r3, "R3");
+    Temp_enter(m, r4, "R4");
+    Temp_enter(m, r5, "R5");
+    Temp_enter(m, r6, "R6");
+    Temp_enter(m, r7, "R7");
+    Temp_enter(m, r8, "R8");
+    Temp_enter(m, r9, "R9");
+    Temp_enter(m, r10, "R10");
+
+}
 Temp_temp F_FP()//取帧指针
 {
-    if (fp == nullptr) {
-        char save[5];
-        sprintf(save, "%s", "FP");
-        fp = Temp_new_special(save);
+    if (fp == NULL) {
+        F_initRegisters();
     }
     return fp;
 }
-
-Temp_temp F_RV()//取帧指针
-{
-    if (rv == nullptr) {
-        char save[5];
-        sprintf(save, "%s", "RV");
-        rv = Temp_new_special(save);
+//TODO 取栈指针，为什么两个？
+Temp_temp F_RV(void){
+    if (fp == NULL) {
+        F_initRegisters();
     }
-    return rv;
+    return r0;
 }
 
-Temp_temp F_PC() {
+Temp_temp F_SP()//取栈指针
+{
+    if (sp == NULL) {
+        F_initRegisters();
+    }
+    return sp;
+}
+
+Temp_temp F_IP()//取栈指针
+{
+    if (ip == NULL) {
+        F_initRegisters();
+    }
+    return ip;
+}
+
+Temp_temp F_PC() //取pc
+{
     if (pc == nullptr) {
         char save[5];
         sprintf(save, "%s", "PC");
@@ -51,26 +118,13 @@ Temp_temp F_PC() {
 }
 
 Temp_temp F_LR() {
-    if (lr == nullptr) {
-        char save[5];
-        sprintf(save, "%s", "LR");
-        lr = Temp_new_special(save);
+    if (lr == NULL) {
+        F_initRegisters();
     }
     return lr;
 }
 
-Temp_temp F_SP(void) {
-
-    if (sp == nullptr) {
-        char save[5];
-        sprintf(save, "%s", "SP");
-        sp = Temp_new_special(save);
-    }
-    return sp;
-}
-
 Temp_temp F_R(c_string save) {
-
     fr = Temp_new_special(save);
     return fr;
 }
@@ -82,11 +136,31 @@ Temp_temp F_ZERO(void) {
     return zero;
 }
 
-Temp_temp F_RA(void) {
-    if (ra == nullptr) {
-        ra = Temp_newTemp();
+//TODO 需添加剩余寄存器
+Temp_tempList F_registers(void) {
+    if (fp == NULL) {
+        F_initRegisters();
     }
-    return ra;
+    return Temp_TempList(r0,
+                         Temp_TempList(r1,
+                                       Temp_TempList(r2,
+                                                     Temp_TempList(r3, NULL))));
+}
+
+//TODO 调用者保护寄存器
+Temp_tempList F_callersaves(void) {
+    if (fp == NULL) {
+        F_initRegisters();
+    }
+    return Temp_TempList(NULL, NULL);
+}
+
+//TODO
+Temp_tempList F_calleesaves(void) {
+    if (fp == NULL) {
+        F_initRegisters();
+    }
+    return Temp_TempList(NULL, NULL);
 }
 
 /** class declare */
@@ -353,7 +427,7 @@ AS_instrList F_procEntryExit2(AS_instrList body) {
     Temp_tempList calleeSaves = nullptr;
     if (!returnSink)
         returnSink = Temp_TempList(F_ZERO(),
-                                   Temp_TempList(F_RA(),
+                                   Temp_TempList(F_LR(),
                                                  Temp_TempList(F_SP(), calleeSaves)));
     return AS_splice(body, AS_InstrList(
             AS_Oper("", nullptr, returnSink, nullptr), nullptr));
@@ -459,7 +533,3 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
 
 Temp_map F_tempMap = nullptr;
-
-Temp_tempList F_registers(void) {
-    if ()
-}

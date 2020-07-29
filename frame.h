@@ -59,19 +59,15 @@ Temp_tempList F_registers(void);
 Temp_temp F_FP(void);
 Temp_temp F_SP(void);
 Temp_temp F_ZERO(void);
-Temp_temp F_RA(void);
+Temp_temp F_LR(void);
 Temp_temp F_RV(void);
 Temp_temp F_PC();
-Temp_temp F_LR();
 Temp_temp F_R(c_string save);
 
 void F_initRegisters(void);
 Temp_map F_initialRegisters(F_frame f);
 Temp_tempList F_callersaves(void);
 Temp_tempList F_calleesaves(void);
-
-
-
 
 
 int get_word_size();
