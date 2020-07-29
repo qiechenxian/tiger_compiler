@@ -185,7 +185,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__divsi3", r, r1, r2);
+                call_lib("__aeabi_idiv", r, r1, r2);
                 //emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
             } else if(e->u.BINOP.op==T_mod){
@@ -195,7 +195,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__modsi3",r,r1,r2);
+                call_lib("__aeabi_idivmod",r,r1,r2);
                 return r;
             }
             else {
@@ -597,7 +597,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
  */
 static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2) {
     char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst, "\tstmfd   sp!, {r0-r7}\n");//保护现场
+    sprintf(inst, "\tstmfd   sp!, {r0-r1}\n");//保护现场
     emit(AS_Oper(inst, NULL, NULL, NULL));
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
@@ -611,13 +611,22 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
     emit(AS_Oper(inst4, NULL, NULL, NULL));
-
-    char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst5, "\tmov     'd0, r0\n", rsreg);//取回返回值
-    emit(AS_Move(inst5, L(rsreg, NULL), NULL));
-
+    if(strcmp(fun,"__aeabi_idiv")==0) {
+        char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+        sprintf(inst5, "\tmov     'd0, r0\n", rsreg);//取回返回值
+        emit(AS_Move(inst5, L(rsreg, NULL), NULL));
+    }
+    else if(strcmp(fun,"__aeabi_idivmod")==0)
+    {
+        char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+        sprintf(inst5, "\tmov     'd0, r1\n", rsreg);//取回返回值
+        emit(AS_Move(inst5, L(rsreg, NULL), NULL));
+    } else
+    {
+        assert("error from call_lib in codegen.cpp");
+    }
     char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst6, "\tldmfd   sp!,{r0-r7}\n");//恢复现场
+    sprintf(inst6, "\tldmfd   sp!,{r0-r1}\n");//恢复现场
     emit(AS_Oper(inst6, NULL, NULL, NULL));
 }
 
