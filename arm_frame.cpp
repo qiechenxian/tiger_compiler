@@ -322,6 +322,23 @@ AS_instrList F_procEntryExit2(AS_instrList body) {
             AS_Oper("", nullptr, returnSink, nullptr), nullptr));
 }
 
+static int getSpace(F_frame frame)
+{
+    int local_space = 0;
+//    for (F_accessList iter = frame->locals; iter; iter = iter->tail){
+//        if (iter->head->kind == F_access_::inFrame){
+//            local_space += 1;
+//        }
+//    }
+    local_space = frame->local_count;
+
+    int callee_space = 0;
+    if (frame->callee_max_args > 0)
+        callee_space = frame->callee_max_args;
+
+    return local_space + callee_space + frame->temp_space;
+}
+
 /*
  *
  */
@@ -361,7 +378,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
-    int space = frame->local_count + frame->callee_max_args + frame->temp_space; // todo 此处还应有要保护寄存器空间
+    int space = getSpace(frame);// todo 此处还应有要保护寄存器空间
     if (space>0){
         char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
         sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
