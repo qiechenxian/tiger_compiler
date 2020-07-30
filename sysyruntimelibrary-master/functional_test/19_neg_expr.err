@@ -1,1 +1,53 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/19_neg_expr.sy"
+	.data
+	.comm   a, 4, 4
+	.comm   b, 4, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #12
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R1, R0
+	ldr     R10, =a
+	str     R1, [R10]
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R10, R0
+	ldr     R0, =b
+	str     R10, [R0]
+	ldr     R10, =a
+	ldr     R10, [R10]
+	ldr     R0, =b
+	ldr     R0, [R0]
+	add     R10, R10, R0
+	sub     R10, R10, #0
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	str     r0, [SP, #0]
+	ldr     r0, [R10]
+	bl      putint
+	ldr     r0, [SP, #0]
+	ldr     r1, [SP, #-4]
+	ldr     r2, [SP, #-8]
+	ldr     r3, [SP, #-12]
+	mov     R10, #0
+	mov     R0, R10
+	b       .L0
+.L0:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

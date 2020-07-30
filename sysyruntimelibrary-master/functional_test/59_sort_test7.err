@@ -1,1 +1,210 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/59_sort_test7.sy"
+	.data
+	.comm   n, 4, 4
+	.text
+	.align  2
+	.global Merge
+	.type   Merge, %function
+Merge:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #104
+!	ldr     R0, [FP, #12]
+	ldr     R10, [FP, #8]
+	sub     R10, R0, R10
+	add     R10, R10, #1
+	str     R10, [FP, #-8]
+	ldr     R0, [FP, #16]
+	ldr     R10, [FP, #12]
+	sub     R10, R0, R10
+	str     R10, [FP, #-12]
+	mov     R10, #0
+	str     R10, [FP, #-96]
+	mov     R10, #0
+	str     R10, [FP, #-100]
+.L1:
+	ldr     R10, [FP, #-96]
+	ldr     R0, [FP, #-8]
+	cmp     R10, R0
+	blt     .L2
+	b       .L0
+.L0:
+.L4:
+	ldr     R10, [FP, #-100]
+	ldr     R0, [FP, #-12]
+	cmp     R10, R0
+	blt     .L5
+	b       .L3
+.L3:
+	mov     R10, #0
+	str     R10, [FP, #-96]
+	mov     R10, #0
+	str     R10, [FP, #-100]
+	ldr     R10, [FP, #8]
+	str     R10, [FP, #-104]
+.L8:
+	ldr     R0, [FP, #-96]
+	ldr     R10, [FP, #-8]
+	cmp     R0, R10
+	bne     .L12
+	b       .L6
+.L6:
+	ldr     R0, [FP, #-100]
+	ldr     R10, [FP, #-12]
+	cmp     R0, R10
+	bne     .L12
+	b       .L7
+.L7:
+.L14:
+	ldr     R0, [FP, #-96]
+	ldr     R10, [FP, #-8]
+	cmp     R0, R10
+	blt     .L15
+	b       .L13
+.L13:
+.L17:
+	ldr     R0, [FP, #-100]
+	ldr     R10, [FP, #-12]
+	cmp     R0, R10
+	blt     .L18
+	b       .L16
+.L16:
+	mov     R10, #0
+	mov     R0, R10
+	b       .L24
+.L2:
+	add     R1, FP, #-52
+	ldr     R10, [FP, #-96]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R8, R1, R10
+	add     R10, FP, #4
+	ldr     R9, [FP, #-96]
+	ldr     R0, [FP, #8]
+	add     R9, R9, R0
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+# 	ldr      R10, [R10]
+	str     R8, [R10]
+	ldr     R10, [FP, #-96]
+	add     R10, R10, #1
+	str     R10, [FP, #-96]
+	b       .L1
+.L5:
+	add     R10, FP, #-92
+	ldr     R9, [FP, #-100]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R9, R10, R0
+	add     R1, FP, #4
+	ldr     R0, [FP, #-100]
+	ldr     R10, [FP, #12]
+	add     R0, R0, R10
+	add     R10, R0, #1
+	mov     R0, #4
+	mul     R0, R10, R0
+	add     R10, R1, R0
+# 	ldr      R10, [R10]
+	str     R9, [R10]
+	ldr     R10, [FP, #-100]
+	add     R10, R10, #1
+	str     R10, [FP, #-100]
+	b       .L4
+.L12:
+	add     R10, FP, #-52
+	ldr     R9, [FP, #-96]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R1, [R10]
+	add     R10, FP, #-92
+	ldr     R9, [FP, #-100]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R10, [R10]
+	add     R10, R10, #1
+	cmp     R1, R10
+	blt     .L9
+	b       .L10
+.L10:
+	add     R1, FP, #4
+	ldr     R10, [FP, #-104]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R8, R1, R10
+	add     R10, FP, #-92
+	ldr     R9, [FP, #-100]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+# 	ldr      R10, [R10]
+	str     R8, [R10]
+	ldr     R10, [FP, #-104]
+	add     R10, R10, #1
+	str     R10, [FP, #-104]
+	ldr     R10, [FP, #-100]
+	add     R10, R10, #1
+	str     R10, [FP, #-100]
+.L11:
+	b       .L8
+.L9:
+	add     R10, FP, #4
+	ldr     R9, [FP, #-104]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R9, R10, R0
+	add     R8, FP, #-52
+	ldr     R0, [FP, #-96]
+	mov     R10, #4
+	mul     R0, R0, R10
+	add     R10, R8, R0
+# 	ldr      R10, [R10]
+	str     R9, [R10]
+	ldr     R10, [FP, #-104]
+	add     R10, R10, #1
+	str     R10, [FP, #-104]
+	ldr     R10, [FP, #-96]
+	add     R10, R10, #1
+	str     R10, [FP, #-96]
+	b       .L11
+.L15:
+	add     R1, FP, #4
+	ldr     R10, [FP, #-104]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R8, R1, R10
+	add     R10, FP, #-52
+	ldr     R9, [FP, #-96]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+# 	ldr      R10, [R10]
+	str     R8, [R10]
+	ldr     R10, [FP, #-104]
+	add     R10, R10, #1
+	str     R10, [FP, #-104]
+	ldr     R10, [FP, #-96]
+	add     R10, R10, #1
+	str     R10, [FP, #-96]
+	b       .L14
+.L18:
+	add     R10, FP, #4
+	ldr     R9, [FP, #-104]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R9, R10, R0
+	add     R8, FP, #-92
+	ldr     R0, [FP, #-100]
+	mov     R10, #4
+	mul     R0, R0, R10
+	add     R10, R8, R0
+# 	ldr      R10, [R10]
+	str     R9, [R10]
+	ldr     R10, [FP, #-104]
+	add     R10, R10, #1
+	str     R10, [FP, #-104]
+	ldr     R10, [FP, #compiler_2020: malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)' failed.
+Aborted (core dumped)

@@ -1,1 +1,80 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/31_while_if_test2.sy"
+	.data
+	.text
+	.align  2
+	.global ifWhile
+	.type   ifWhile, %function
+ifWhile:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #12
+	mov     R10, #0
+	str     R10, [FP, #-8]
+	mov     R10, #3
+	str     R10, [FP, #-12]
+	ldr     R0, [FP, #-8]
+	mov     R10, #5
+	cmp     R0, R10
+	beq     .L6
+	b       .L7
+.L7:
+.L4:
+	ldr     R0, [FP, #-8]
+	mov     R10, #5
+	cmp     R0, R10
+	blt     .L5
+	b       .L3
+.L3:
+.L8:
+	ldr     R10, [FP, #-12]
+	mov     R0, R10
+	b       .L9
+.L6:
+.L1:
+	ldr     R0, [FP, #-12]
+	mov     R10, #2
+	cmp     R0, R10
+	beq     .L2
+	b       .L0
+.L0:
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #25
+	str     R10, [FP, #-12]
+	b       .L8
+.L2:
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #2
+	str     R10, [FP, #-12]
+	b       .L1
+.L5:
+	ldr     R0, [FP, #-12]
+	mov     R10, #2
+	mul     R10, R0, R10
+	str     R10, [FP, #-12]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #1
+	str     R10, [FP, #-8]
+	b       .L4
+.L9:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   ifWhile, .-ifWhile
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	bl      ifWhile
+# 	mov     R0, R0
+	b       .L10
+.L10:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

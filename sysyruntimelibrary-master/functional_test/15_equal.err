@@ -1,1 +1,51 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/15_equal.sy"
+	.data
+	.comm   a, 4, 4
+	.comm   b, 4, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R1, R0
+	ldr     R10, =a
+	str     R1, [R10]
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R10, R0
+	ldr     R0, =b
+	str     R10, [R0]
+	ldr     R10, =a
+	ldr     R10, [R10]
+	ldr     R0, =b
+	ldr     R0, [R0]
+	cmp     R10, R0
+	beq     .L0
+	b       .L1
+.L1:
+	mov     R10, #0
+	mov     R0, R10
+.L2:
+	b       .L3
+.L0:
+	mov     R10, #1
+	mov     R0, R10
+	b       .L2
+.L3:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

@@ -272,8 +272,8 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,e1,CONST(i))),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
-                    sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i);
-                    emit(AS_Oper(inst, L(munchExp(e1), NULL), L(munchExp(e2), NULL), NULL));
+                    sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
+                    emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_BINOP
                            && dst->u.MEM->u.BINOP.op == T_add
                            && dst->u.MEM->u.BINOP.left->kind == T_exp_::T_CONST) {
@@ -281,7 +281,7 @@ static void munchStm(T_stm s) {
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
                     sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i);
-                    emit(AS_Oper(inst, L(munchExp(e1), NULL), L(munchExp(e2), NULL), NULL));
+                    emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                 } else if (src->kind == T_exp_::T_MEM) {
                     /* MOVE(MEM(e1), MEM(e2)) */
                     T_exp e1 = dst->u.MEM, e2 = src->u.MEM;
@@ -300,22 +300,6 @@ static void munchStm(T_stm s) {
                     sprintf(inst, "\tstr     's0, [#%d]\n", i);
                     emit(AS_Oper(inst, NULL, L(munchExp(e1), NULL), NULL));
                 }
-
-                /**
-                 * 此处交给MOVE(MEM(e1), e2)处理
-                 */
-//                else if(dst->u.MEM->kind==T_exp_::T_NAME)
-//                {
-//                    /* MOVE(MEM(NAME(lab)), e1) */
-//                    T_exp e1=src;
-//                    Temp_temp r0 = Temp_newTemp();
-//                    Temp_label label = dst->u.MEM->u.NAME;
-//                    sprintf(inst,"\tldr     'd0, =%s\n",Temp_labelString(label));
-//                    emit(AS_Oper(inst,L(r0,NULL),NULL,NULL));
-//                    Temp_temp r1=munchExp(e1);
-//                    sprintf(inst2, "\tstr     's0, ['d0]\n");
-//                    emit(AS_Oper(inst2, L(r0, NULL), L(r1, NULL), NULL));
-//                }
                 else {
                     /* MOVE(MEM(e1), e2) */
                     T_exp e1 = dst->u.MEM, e2 = src;
@@ -557,11 +541,11 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
         char *inst = (char*)checked_malloc(sizeof(char) * INST_LEN);
         Temp_temp r = munchExp(args->head);
         if (i)
-            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i*get_word_size());
+            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i*get_word_size());
         else
-            sprintf(inst, "\tstr     's0, ['d0]\n");
+            sprintf(inst, "\tstr     's0, ['s1]\n");
 
-        emit(AS_Oper(inst, L(F_SP(), NULL), L(r, NULL), NULL));
+        emit(AS_Oper(inst, NULL, L(r, L(F_SP(), NULL)), NULL));
 
         Temp_tempList old = munchArgs(false,i + 1, args->tail);
         return Temp_TempList(r, old);
@@ -578,11 +562,11 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
         if(count_func_param>4)
         {
             if (i-4)
-                sprintf(inst, "\tstr     's0, ['d0, #%d]\n", (i-4)*get_word_size());
+                sprintf(inst, "\tstr     's0, ['s1, #%d]\n", (i-4)*get_word_size());
             else
-                sprintf(inst, "\tstr     's0, ['d0]\n");
+                sprintf(inst, "\tstr     's0, ['s1]\n");
 
-            emit(AS_Oper(inst, L(F_SP(), NULL), L(r, NULL), NULL));
+            emit(AS_Oper(inst, NULL, L(r, L(F_SP(),NULL)), NULL));
             Temp_tempList old = munchArgs(true,i + 1, args->tail);
             return Temp_TempList(r, old);
         } else

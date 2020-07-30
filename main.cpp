@@ -41,7 +41,7 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
     AS_proc proc_done = F_procEntryExit3(frame, iList);
     fprintf(outfile, "%s", proc_done->prolog);
     AS_printInstrList(outfile,proc_done->body,Temp_layerMap(F_tempMap, Temp_layerMap( ra.coloring, Temp_name())));
-    fprintf(outfile, "%s", proc_done->epilog);
+    fprintf(outfile, "%s\n", proc_done->epilog);
 
 }
 

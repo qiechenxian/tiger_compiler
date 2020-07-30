@@ -2,12 +2,6 @@
 	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/11_continue.sy"
 	.data
 	.text
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
 	.align  2
 	.global main
 	.type   main, %function

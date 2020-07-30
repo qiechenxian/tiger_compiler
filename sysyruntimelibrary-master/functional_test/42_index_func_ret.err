@@ -1,1 +1,117 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/42_index_func_ret.sy"
+	.data
+	.text
+	.align  2
+	.global _getMaxOfAll
+	.type   _getMaxOfAll, %function
+_getMaxOfAll:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	mov     R10, #-999999
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #8]
+	sub     R10, R10, #1
+	str     R10, [FP, #8]
+.L1:
+	ldr     R10, [FP, #8]
+	mov     R0, #-1
+	cmp     R10, R0
+	bgt     .L4
+	b       .L0
+.L0:
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L5
+.L4:
+	add     R10, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R0, [R10]
+	ldr     R10, [FP, #-8]
+	cmp     R0, R10
+	bgt     .L2
+	b       .L3
+.L3:
+	ldr     R10, [FP, #8]
+	sub     R10, R10, #1
+	str     R10, [FP, #8]
+	b       .L1
+.L2:
+	add     R1, FP, #4
+	ldr     R10, [FP, #8]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	str     R10, [FP, #-8]
+	b       .L3
+.L5:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   _getMaxOfAll, .-_getMaxOfAll
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #24
+	add     R9, FP, #-16
+	mov     R1, #0
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #-2
+	str     R1, [R10]
+	add     R9, FP, #-16
+	mov     R1, #1
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #2
+	str     R1, [R10]
+	add     R9, FP, #-16
+	mov     R1, #2
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #-7
+	str     R1, [R10]
+	add     R1, FP, #-20
+# 	mov     R1, R1
+	add     R2, FP, #-16
+# 	mov     R2, R2
+	add     R10, FP, #-16
+	str     R10, [SP]
+	mov     R3, #3
+	str     R3, [SP, #4]
+	bl      _getMaxOfAll
+	mov     R10, R0
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R2, R10
+# 	ldr      R10, [R10]
+	str     R1, [R10]
+	ldr     R10, [FP, #-20]
+	str     r0, [SP, #0]
+	ldr     r0, [R10]
+	bl      putint
+	ldr     r0, [SP, #0]
+	ldr     r1, [SP, #-4]
+	ldr     r2, [SP, #-8]
+	ldr     r3, [SP, #-12]
+	mov     R10, #0
+	mov     R0, R10
+	b       .L6
+.L6:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

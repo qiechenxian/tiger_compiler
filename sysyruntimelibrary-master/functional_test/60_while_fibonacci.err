@@ -1,1 +1,97 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/60_while_fibonacci.sy"
+	.data
+	.comm   n, 4, 4
+	.text
+	.align  2
+	.global fib
+	.type   fib, %function
+fib:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #16
+	mov     R10, #0
+	str     R10, [FP, #-8]
+	mov     R10, #1
+	str     R10, [FP, #-12]
+	ldr     R0, [FP, #4]
+	mov     R10, #0
+	cmp     R0, R10
+	beq     .L0
+	b       .L1
+.L1:
+	ldr     R0, [FP, #4]
+	mov     R10, #1
+	cmp     R0, R10
+	beq     .L2
+	b       .L3
+.L3:
+.L5:
+	ldr     R0, [FP, #4]
+	mov     R10, #1
+	cmp     R0, R10
+	bgt     .L6
+	b       .L4
+.L4:
+	ldr     R10, [FP, #-16]
+	mov     R0, R10
+	b       .L7
+.L0:
+	mov     R10, #0
+	mov     R0, R10
+	b       .L1
+.L2:
+	mov     R10, #1
+	mov     R0, R10
+	b       .L3
+.L6:
+	ldr     R0, [FP, #-8]
+	ldr     R10, [FP, #-12]
+	add     R10, R0, R10
+	str     R10, [FP, #-16]
+	ldr     R10, [FP, #-12]
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-16]
+	str     R10, [FP, #-12]
+	ldr     R10, [FP, #4]
+	sub     R10, R10, #1
+	str     R10, [FP, #4]
+	b       .L5
+.L7:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   fib, .-fib
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #8
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R1, R0
+	ldr     R10, =n
+	str     R1, [R10]
+	add     R1, FP, #-8
+# 	mov     R1, R1
+	ldr     R2, =n
+	ldr     R2, [R2]
+	str     R2, [SP]
+	bl      fib
+	mov     R10, R0
+	str     R10, [R1]
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L8
+.L8:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

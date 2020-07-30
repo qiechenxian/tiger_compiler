@@ -3,28 +3,6 @@
 	.data
 	.comm   a, 48, 4
 	.text
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
-register not found for given color: FP
 	.align  2
 	.global main
 	.type   main, %function

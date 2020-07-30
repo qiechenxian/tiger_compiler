@@ -1,1 +1,62 @@
-Segmentation fault (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/25_if_test4.sy"
+	.data
+	.text
+	.align  2
+	.global if_ifElse_
+	.type   if_ifElse_, %function
+if_ifElse_:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #12
+	mov     R10, #5
+	str     R10, [FP, #-8]
+	mov     R10, #10
+	str     R10, [FP, #-12]
+	ldr     R0, [FP, #-8]
+	mov     R10, #5
+	cmp     R0, R10
+	beq     .L3
+	b       .L4
+.L4:
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L5
+.L3:
+	ldr     R0, [FP, #-12]
+	mov     R10, #10
+	cmp     R0, R10
+	beq     .L0
+	b       .L1
+.L1:
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #15
+	str     R10, [FP, #-8]
+.L2:
+	b       .L4
+.L0:
+	mov     R10, #25
+	str     R10, [FP, #-8]
+	b       .L2
+.L5:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   if_ifElse_, .-if_ifElse_
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	bl      if_ifElse_
+# 	mov     R0, R0
+	b       .L6
+.L6:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main
