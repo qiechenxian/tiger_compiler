@@ -1,112 +1,54 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/42_index_func_ret.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/42_index_func_ret.sy:0:0: error: fail to find node for label putint
 	.align  2
 	.global _getMaxOfAll
 	.type   _getMaxOfAll, %function
 _getMaxOfAll:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     101, #-999999
-	str     101, [FP, #-8]
-	ldr     103, [FP, #8]
-	sub     102, 103, #1
-	str     102, [FP, #8]
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	mov     R10, #-999999
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #8]
+	sub     R10, R10, #1
+	str     R10, [FP, #8]
 .L1:
-	ldr     104, [FP, #8]
-	mov     105, #-1
-	cmp     104, 105
+	ldr     R10, [FP, #8]
+	mov     R0, #-1
+	cmp     R10, R0
 	bgt     .L4
 	b       .L0
 .L0:
-	ldr     106, [FP, #-8]
-	mov     RV, 106
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
 	b       .L5
 .L4:
-	add     109, FP, #4
-	ldr     111, [FP, #8]
-	mov     112, #4
-	mul     110, 111, 112
-	add     108, 109, 110
-	ldr     107, [108]
-	ldr     113, [FP, #-8]
-	cmp     107, 113
+	add     R10, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R0, [R10]
+	ldr     R10, [FP, #-8]
+	cmp     R0, R10
 	bgt     .L2
 	b       .L3
 .L3:
-	ldr     115, [FP, #8]
-	sub     114, 115, #1
-	str     114, [FP, #8]
+	ldr     R10, [FP, #8]
+	sub     R10, R10, #1
+	str     R10, [FP, #8]
 	b       .L1
 .L2:
-	add     118, FP, #4
-	ldr     120, [FP, #8]
-	mov     121, #4
-	mul     119, 120, 121
-	add     117, 118, 119
-	ldr     116, [117]
-	str     116, [FP, #-8]
+	add     R1, FP, #4
+	ldr     R10, [FP, #8]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	str     R10, [FP, #-8]
 	b       .L3
 .L5:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   _getMaxOfAll, .-_getMaxOfAll
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	stmfd   sp!, {fp, lr}
-	add     fp, sp, #4
-	sub     sp, sp, #24
-	add     126, FP, #-16
-	mov     128, #0
-	mov     129, #4
-	mul     127, 128, 129
-	add     125, 126, 127
-	mov     130, #-2
-	str     130, [125]
-	add     132, FP, #-16
-	mov     134, #1
-	mov     135, #4
-	mul     133, 134, 135
-	add     131, 132, 133
-	mov     136, #2
-	str     136, [131]
-	add     138, FP, #-16
-	mov     140, #2
-	mov     141, #4
-	mul     139, 140, 141
-	add     137, 138, 139
-	mov     142, #-7
-	str     142, [137]
-	add     143, FP, #-20
-	mov     124, 143
-	add     144, FP, #-16
-	mov     123, 144
-	add     145, FP, #-16
-	str     145, [SP]
-	mov     146, #3
-	str     146, [SP, #4]
-	bl      _getMaxOfAll
-	mov     122, RV
-	mov     151, #4
-	mul     150, 122, 151
-	add     149, 123, 150
-	ldr      148, [149]
-	str     148, [124]
-	ldr     152, [FP, #-20]
-	str     152, [SP]
-	bl      putint
-	mov     153, #0
-	mov     RV, 153
-	b       .L7
-.L7:
-	sub     sp, fp, #4
-	ldmfd   sp!, {fp, lr}
-	bx      lr
-	.size   main, .-main
-

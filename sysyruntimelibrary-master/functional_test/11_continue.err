@@ -1,44 +1,40 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/11_continue.sy"
-	.data
-	.text
 	.align  2
 	.global main
 	.type   main, %function
 main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     101, #10
-	str     101, [FP, #-8]
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #8
+	mov     R10, #10
+	str     R10, [FP, #-8]
 .L1:
-	ldr     102, [FP, #-8]
-	mov     103, #0
-	cmp     102, 103
+	ldr     R10, [FP, #-8]
+	mov     R0, #0
+	cmp     R10, R0
 	bgt     .L4
 	b       .L0
 .L0:
-	ldr     104, [FP, #-8]
-	mov     RV, 104
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
 	b       .L5
 .L4:
-	ldr     105, [FP, #-8]
-	mov     106, #5
-	cmp     105, 106
+	ldr     R10, [FP, #-8]
+	mov     R0, #5
+	cmp     R10, R0
 	bgt     .L2
 	b       .L3
 .L3:
-	ldr     107, [FP, #-8]
-	mov     RV, 107
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
 	b       .L1
 .L2:
-	ldr     109, [FP, #-8]
-	sub     108, 109, #1
-	str     108, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	sub     R10, R10, #1
+	str     R10, [FP, #-8]
 	b       .L1
 .L5:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
 	bx      lr
 	.size   main, .-main
-

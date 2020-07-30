@@ -1,89 +1,35 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/36_domain_test.sy"
-	.data
-	.comm   a, 8, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/36_domain_test.sy:0:0: error: fail to find node for label func
 	.align  2
 	.global func
 	.type   func, %function
 func:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	ldr     101, =a
-	mov     103, #0
-	mov     104, #4
-	mul     102, 103, 104
-	add     100, 101, 102
-	mov     105, #1
-	str     105, [100]
-	add     108, FP, #4
-	ldr     113, =a
-	mov     115, #0
-	mov     116, #4
-	mul     114, 115, 116
-	add     112, 113, 114
-	ldr     111, [112]
-	sub     110, 111, #3
-	mov     117, #4
-	mul     109, 110, 117
-	add     107, 108, 109
-	ldr     106, [107]
-	mov     RV, 106
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	ldr     R1, =a
+	mov     R10, #0
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     105, R1, R10
+	mov     R10, #1
+	str     R10, [105]
+	add     R10, FP, #4
+	ldr     R8, =a
+	mov     R0, #0
+	mov     R9, #4
+	mul     R0, R0, R9
+	add     R0, R8, R0
+	ldr     R0, [R0]
+	sub     R9, R0, #3
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R10, [R10]
+	mov     R0, R10
 	b       .L0
 .L0:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   func, .-func
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #16
-	add     121, FP, #-20
-	mov     123, #0
-	mov     124, #4
-	mul     122, 123, 124
-	add     120, 121, 122
-	mov     125, #-1
-	str     125, [120]
-	add     127, FP, #-20
-	mov     129, #1
-	mov     130, #4
-	mul     128, 129, 130
-	add     126, 127, 128
-	mov     131, #4
-	str     131, [126]
-	add     133, FP, #-20
-	mov     135, #2
-	mov     136, #4
-	mul     134, 135, 136
-	add     132, 133, 134
-	mov     137, #8
-	str     137, [132]
-	add     138, FP, #-8
-	mov     119, 138
-	add     139, FP, #-20
-	str     139, [SP]
-	bl      func
-	mov     118, RV
-	str     118, [119]
-	ldr     142, [FP, #-8]
-	add     145, FP, #-20
-	mov     147, #1
-	mov     148, #4
-	mul     146, 147, 148
-	add     144, 145, 146
-	ldr     143, [144]
-	add     141, 142, 143
-	mov     RV, 141
-	b       .L2
-.L2:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

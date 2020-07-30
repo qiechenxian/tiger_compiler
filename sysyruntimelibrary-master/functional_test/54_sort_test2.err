@@ -1,215 +1,87 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/54_sort_test2.sy"
-	.data
-	.comm   n, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/54_sort_test2.sy:0:0: error: fail to find node for label putch
 	.align  2
 	.global insertsort
 	.type   insertsort, %function
 insertsort:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #12
-	mov     100, #1
-	str     100, [FP, #-8]
+	add     FP, SP, #0
+	sub     SP, SP, #16
+	mov     R10, #1
+	str     R10, [FP, #-8]
 .L1:
-	ldr     101, [FP, #-8]
-	ldr     103, =n
-	ldr     102, [103]
-	cmp     101, 102
+	ldr     R10, [FP, #-8]
+	ldr     R0, =n
+	ldr     R0, [R0]
+	cmp     R10, R0
 	blt     .L6
 	b       .L0
 .L0:
-	mov     104, #0
-	mov     RV, 104
+	mov     R10, #0
+	mov     R0, R10
 	b       .L10
 .L6:
-	add     107, FP, #4
-	ldr     109, [FP, #-8]
-	mov     110, #4
-	mul     108, 109, 110
-	add     106, 107, 108
-	ldr     105, [106]
-	str     105, [FP, #-12]
-	ldr     112, [FP, #-8]
-	sub     111, 112, #1
-	str     111, [FP, #-16]
+	add     R1, FP, #4
+	ldr     R10, [FP, #-8]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	str     R10, [FP, #-12]
+	ldr     R10, [FP, #-8]
+	sub     R10, R10, #1
+	str     R10, [FP, #-16]
 .L4:
-	ldr     113, [FP, #-16]
-	mov     114, #-1
-	cmp     113, 114
+	ldr     R0, [FP, #-16]
+	mov     R10, #-1
+	cmp     R0, R10
 	bgt     .L5
 	b       .L2
 .L2:
-	ldr     115, [FP, #-12]
-	add     118, FP, #4
-	ldr     120, [FP, #-16]
-	mov     121, #4
-	mul     119, 120, 121
-	add     117, 118, 119
-	ldr     116, [117]
-	cmp     115, 116
+	ldr     R8, [FP, #-12]
+	add     R10, FP, #4
+	ldr     R9, [FP, #-16]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R10, [R10]
+	cmp     R8, R10
 	blt     .L5
 	b       .L3
 .L3:
-	add     124, FP, #4
-	ldr     127, [FP, #-16]
-	add     126, 127, #1
-	mov     128, #4
-	mul     125, 126, 128
-	add     123, 124, 125
-	add     129, FP, #-12
-	ldr      122, [129]
-	str     122, [123]
-	ldr     131, [FP, #-8]
-	add     130, 131, #1
-	str     130, [FP, #-8]
+	add     R10, FP, #4
+	ldr     R0, [FP, #-16]
+	add     R0, R0, #1
+	mov     R9, #4
+	mul     R0, R0, R9
+	add     R0, R10, R0
+	add     R10, FP, #-12
+# 	ldr      R10, [R10]
+	str     R10, [R0]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #1
+	str     R10, [FP, #-8]
 	b       .L1
 .L5:
-	add     134, FP, #4
-	ldr     137, [FP, #-16]
-	add     136, 137, #1
-	mov     138, #4
-	mul     135, 136, 138
-	add     133, 134, 135
-	add     140, FP, #4
-	ldr     142, [FP, #-16]
-	mov     143, #4
-	mul     141, 142, 143
-	add     139, 140, 141
-	ldr      132, [139]
-	str     132, [133]
-	ldr     145, [FP, #-16]
-	sub     144, 145, #1
-	str     144, [FP, #-16]
+	add     R10, FP, #4
+	ldr     R0, [FP, #-16]
+	add     R0, R0, #1
+	mov     R9, #4
+	mul     R0, R0, R9
+	add     R1, R10, R0
+	add     R10, FP, #4
+	ldr     R9, [FP, #-16]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+# 	ldr      R10, [R10]
+	str     R10, [R1]
+	ldr     R10, [FP, #-16]
+	sub     R10, R10, #1
+	str     R10, [FP, #-16]
 	b       .L4
 .L10:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   insertsort, .-insertsort
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	stmfd   sp!, {fp, lr}
-	add     fp, sp, #4
-	sub     sp, sp, #56
-	ldr     148, =n
-	mov     149, #10
-	str     149, [148]
-	add     151, FP, #-44
-	mov     153, #0
-	mov     154, #4
-	mul     152, 153, 154
-	add     150, 151, 152
-	mov     155, #4
-	str     155, [150]
-	add     157, FP, #-44
-	mov     159, #1
-	mov     160, #4
-	mul     158, 159, 160
-	add     156, 157, 158
-	mov     161, #3
-	str     161, [156]
-	add     163, FP, #-44
-	mov     165, #2
-	mov     166, #4
-	mul     164, 165, 166
-	add     162, 163, 164
-	mov     167, #9
-	str     167, [162]
-	add     169, FP, #-44
-	mov     171, #3
-	mov     172, #4
-	mul     170, 171, 172
-	add     168, 169, 170
-	mov     173, #2
-	str     173, [168]
-	add     175, FP, #-44
-	mov     177, #4
-	mov     178, #4
-	mul     176, 177, 178
-	add     174, 175, 176
-	mov     179, #0
-	str     179, [174]
-	add     181, FP, #-44
-	mov     183, #5
-	mov     184, #4
-	mul     182, 183, 184
-	add     180, 181, 182
-	mov     185, #1
-	str     185, [180]
-	add     187, FP, #-44
-	mov     189, #6
-	mov     190, #4
-	mul     188, 189, 190
-	add     186, 187, 188
-	mov     191, #6
-	str     191, [186]
-	add     193, FP, #-44
-	mov     195, #7
-	mov     196, #4
-	mul     194, 195, 196
-	add     192, 193, 194
-	mov     197, #5
-	str     197, [192]
-	add     199, FP, #-44
-	mov     201, #8
-	mov     202, #4
-	mul     200, 201, 202
-	add     198, 199, 200
-	mov     203, #7
-	str     203, [198]
-	add     205, FP, #-44
-	mov     207, #9
-	mov     208, #4
-	mul     206, 207, 208
-	add     204, 205, 206
-	mov     209, #8
-	str     209, [204]
-	add     210, FP, #-48
-	mov     147, 210
-	add     211, FP, #-44
-	str     211, [SP]
-	bl      insertsort
-	mov     146, RV
-	str     146, [147]
-.L8:
-	ldr     213, [FP, #-48]
-	ldr     215, =n
-	ldr     214, [215]
-	cmp     213, 214
-	blt     .L9
-	b       .L7
-.L7:
-	mov     216, #0
-	mov     RV, 216
-	b       .L12
-.L9:
-	add     219, FP, #-44
-	ldr     221, [FP, #-48]
-	mov     222, #4
-	mul     220, 221, 222
-	add     218, 219, 220
-	ldr     217, [218]
-	str     217, [FP, #-52]
-	ldr     223, [FP, #-52]
-	str     223, [SP]
-	bl      putint
-	mov     224, #10
-	str     224, [FP, #-52]
-	ldr     225, [FP, #-52]
-	str     225, [SP]
-	bl      putch
-	ldr     227, [FP, #-48]
-	add     226, 227, #1
-	str     226, [FP, #-48]
-	b       .L8
-.L12:
-	sub     sp, fp, #4
-	ldmfd   sp!, {fp, lr}
-	bx      lr
-	.size   main, .-main
-

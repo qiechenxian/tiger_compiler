@@ -1,23 +1,19 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/01_var_defn.sy"
-	.data
-	.comm   a, 4, 4
-	.text
 	.align  2
 	.global main
 	.type   main, %function
 main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	ldr     100, =a
-	mov     101, #10
-	str     101, [100]
-	mov     102, #0
-	mov     RV, 102
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	ldr     105, =a
+	mov     R10, #10
+	str     R10, [105]
+	mov     R10, #0
+	mov     R0, R10
 	b       .L0
 .L0:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
 	bx      lr
 	.size   main, .-main
-

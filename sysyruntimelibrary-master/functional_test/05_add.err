@@ -1,34 +1,28 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/05_add.sy"
-	.data
-	.comm   a, 4, 4
-	.comm   b, 4, 4
-	.text
 	.align  2
 	.global main
 	.type   main, %function
 main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	ldr     100, =a
-	mov     101, #10
-	str     101, [100]
-	ldr     102, =b
-	mov     103, #20
-	str     103, [102]
-	ldr     106, =a
-	ldr     105, [106]
-	ldr     108, =b
-	ldr     107, [108]
-	add     104, 105, 107
-	str     104, [FP, #-8]
-	ldr     109, [FP, #-8]
-	mov     RV, 109
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #8
+	ldr     105, =a
+	mov     R10, #10
+	str     R10, [105]
+	ldr     107, =b
+	mov     R10, #20
+	str     R10, [107]
+	ldr     R10, =a
+	ldr     R10, [R10]
+	ldr     R0, =b
+	ldr     R0, [R0]
+	add     R10, R10, R0
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
 	b       .L0
 .L0:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
 	bx      lr
 	.size   main, .-main
-

@@ -1,106 +1,88 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/28_while_test2.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/28_while_test2.sy:0:0: error: fail to find node for label FourWhile
 	.align  2
 	.global FourWhile
 	.type   FourWhile, %function
 FourWhile:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #16
-	mov     100, #5
-	str     100, [FP, #-8]
-	mov     101, #6
-	str     101, [FP, #-12]
-	mov     102, #7
-	str     102, [FP, #-16]
-	mov     103, #10
-	str     103, [FP, #-20]
+	add     FP, SP, #0
+	sub     SP, SP, #20
+	mov     R10, #5
+	str     R10, [FP, #-8]
+	mov     R10, #6
+	str     R10, [FP, #-12]
+	mov     R10, #7
+	str     R10, [FP, #-16]
+	mov     R10, #10
+	str     R10, [FP, #-20]
 .L1:
-	ldr     104, [FP, #-8]
-	mov     105, #20
-	cmp     104, 105
+	ldr     R0, [FP, #-8]
+	mov     R10, #20
+	cmp     R0, R10
 	blt     .L11
 	b       .L0
 .L0:
-	ldr     108, [FP, #-8]
-	ldr     110, [FP, #-12]
-	ldr     111, [FP, #-20]
-	add     109, 110, 111
-	add     107, 108, 109
-	ldr     112, [FP, #-16]
-	add     106, 107, 112
-	mov     RV, 106
+	ldr     R1, [FP, #-8]
+	ldr     R10, [FP, #-12]
+	ldr     R0, [FP, #-20]
+	add     R10, R10, R0
+	add     R0, R1, R10
+	ldr     R10, [FP, #-16]
+	add     R10, R0, R10
+	mov     R0, R10
 	b       .L12
 .L11:
-	ldr     114, [FP, #-8]
-	add     113, 114, #3
-	str     113, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #3
+	str     R10, [FP, #-8]
 .L3:
-	ldr     115, [FP, #-12]
-	mov     116, #10
-	cmp     115, 116
+	ldr     R0, [FP, #-12]
+	mov     R10, #10
+	cmp     R0, R10
 	blt     .L10
 	b       .L2
 .L2:
-	ldr     118, [FP, #-12]
-	sub     117, 118, #2
-	str     117, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	sub     R10, R10, #2
+	str     R10, [FP, #-12]
 	b       .L1
 .L10:
-	ldr     120, [FP, #-12]
-	add     119, 120, #1
-	str     119, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #1
+	str     R10, [FP, #-12]
 .L5:
-	ldr     121, [FP, #-16]
-	mov     122, #7
-	cmp     121, 122
+	ldr     R0, [FP, #-16]
+	mov     R10, #7
+	cmp     R0, R10
 	beq     .L9
 	b       .L4
 .L4:
-	ldr     124, [FP, #-16]
-	add     123, 124, #1
-	str     123, [FP, #-16]
+	ldr     R10, [FP, #-16]
+	add     R10, R10, #1
+	str     R10, [FP, #-16]
 	b       .L3
 .L9:
-	ldr     126, [FP, #-16]
-	sub     125, 126, #1
-	str     125, [FP, #-16]
+	ldr     R10, [FP, #-16]
+	sub     R10, R10, #1
+	str     R10, [FP, #-16]
 .L7:
-	ldr     127, [FP, #-20]
-	mov     128, #20
-	cmp     127, 128
+	ldr     R0, [FP, #-20]
+	mov     R10, #20
+	cmp     R0, R10
 	blt     .L8
 	b       .L6
 .L6:
-	ldr     130, [FP, #-20]
-	sub     129, 130, #1
-	str     129, [FP, #-20]
+	ldr     R10, [FP, #-20]
+	sub     R10, R10, #1
+	str     R10, [FP, #-20]
 	b       .L5
 .L8:
-	ldr     132, [FP, #-20]
-	add     131, 132, #3
-	str     131, [FP, #-20]
+	ldr     R10, [FP, #-20]
+	add     R10, R10, #3
+	str     R10, [FP, #-20]
 	b       .L7
 .L12:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   FourWhile, .-FourWhile
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	bl      FourWhile
-	mov     RV, RV
-	b       .L14
-.L14:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

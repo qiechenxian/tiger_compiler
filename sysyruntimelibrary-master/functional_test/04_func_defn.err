@@ -1,50 +1,20 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/04_func_defn.sy"
-	.data
-	.comm   a, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/04_func_defn.sy:0:0: error: fail to find node for label func
 	.align  2
 	.global func
 	.type   func, %function
 func:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	ldr     101, [FP, #4]
-	sub     100, 101, #1
-	str     100, [FP, #4]
-	ldr     102, [FP, #4]
-	mov     RV, 102
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	ldr     R10, [FP, #4]
+	sub     R10, R10, #1
+	str     R10, [FP, #4]
+	ldr     R10, [FP, #4]
+	mov     R0, R10
 	b       .L0
 .L0:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   func, .-func
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	ldr     105, =a
-	mov     106, #10
-	str     106, [105]
-	add     107, FP, #-8
-	mov     104, 107
-	ldr     109, =a
-	ldr     108, [109]
-	str     108, [SP]
-	bl      func
-	mov     103, RV
-	str     103, [104]
-	ldr     111, [FP, #-8]
-	mov     RV, 111
-	b       .L2
-.L2:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

@@ -1,75 +1,52 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/51_recursion_test2.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/51_recursion_test2.sy:0:0: error: fail to find node for label fib
 	.align  2
 	.global fib
 	.type   fib, %function
 fib:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #8
-	ldr     105, [FP, #4]
-	mov     106, #0
-	cmp     105, 106
+	add     FP, SP, #0
+	sub     SP, SP, #12
+	ldr     R10, [FP, #4]
+	mov     R1, #0
+	cmp     R10, R1
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     107, [FP, #4]
-	mov     108, #1
-	cmp     107, 108
+	ldr     R10, [FP, #4]
+	mov     R1, #1
+	cmp     R10, R1
 	beq     .L2
 	b       .L3
 .L3:
-	ldr     110, [FP, #4]
-	sub     109, 110, #1
-	str     109, [FP, #-8]
-	ldr     112, [FP, #4]
-	sub     111, 112, #2
-	str     111, [FP, #-12]
-	ldr     113, [FP, #-8]
-	str     113, [SP]
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #1
+	str     R1, [FP, #-8]
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #2
+	str     R1, [FP, #-12]
+	ldr     R1, [FP, #-8]
+	str     R1, [SP]
 	bl      fib
-	mov     102, RV
-	mov     104, 102
-	ldr     115, [FP, #-12]
-	str     115, [SP]
+	mov     R1, R0
+# 	mov     R1, R1
+	ldr     R2, [FP, #-12]
+	str     R2, [SP]
 	bl      fib
-	mov     103, RV
-	add     116, 104, 103
-	mov     RV, 116
+	mov     R10, R0
+	add     R10, R1, R10
+	mov     R0, R10
 	b       .L4
 .L0:
-	mov     117, #0
-	mov     RV, 117
+	mov     R10, #0
+	mov     R0, R10
 	b       .L1
 .L2:
-	mov     118, #1
-	mov     RV, 118
+	mov     R10, #1
+	mov     R0, R10
 	b       .L3
 .L4:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   fib, .-fib
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     119, #10
-	str     119, [FP, #-8]
-	ldr     120, [FP, #-8]
-	str     120, [SP]
-	bl      fib
-	mov     RV, RV
-	b       .L6
-.L6:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

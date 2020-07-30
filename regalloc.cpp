@@ -134,9 +134,9 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     int tryNum = 0;
     while (++tryNum < 7) {
         flow = FG_AssemFlowGraph(il, f);
-        G_show(stdout, G_nodes(flow), printInst);
+//        G_show(stdout, G_nodes(flow), printInst);
         live = Live_liveness(flow);
-        G_show(stdout, G_nodes(live.graph), printTemp);
+//        G_show(stdout, G_nodes(live.graph), printTemp);
         initial = F_initialRegisters(f);
 
         col = COL_color(live.graph, initial, F_registers(),

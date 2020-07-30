@@ -1,59 +1,36 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/50_recursion_test1.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/50_recursion_test1.sy:0:0: error: fail to find node for label fact
 	.align  2
 	.global fact
 	.type   fact, %function
 fact:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	ldr     103, [FP, #4]
-	mov     104, #0
-	cmp     103, 104
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	ldr     R10, [FP, #4]
+	mov     R1, #0
+	cmp     R10, R1
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     106, [FP, #4]
-	sub     105, 106, #1
-	str     105, [FP, #-8]
-	ldr     107, [FP, #4]
-	mov     102, 107
-	ldr     108, [FP, #-8]
-	str     108, [SP]
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #1
+	str     R1, [FP, #-8]
+	ldr     R1, [FP, #4]
+# 	mov     R1, R1
+	ldr     R2, [FP, #-8]
+	str     R2, [SP]
 	bl      fact
-	mov     101, RV
-	mul     110, 102, 101
-	mov     RV, 110
+	mov     R10, R0
+	mul     R10, R1, R10
+	mov     R0, R10
 	b       .L2
 .L0:
-	mov     111, #1
-	mov     RV, 111
+	mov     R10, #1
+	mov     R0, R10
 	b       .L1
 .L2:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   fact, .-fact
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     112, #4
-	str     112, [FP, #-8]
-	ldr     113, [FP, #-8]
-	str     113, [SP]
-	bl      fact
-	mov     RV, RV
-	b       .L4
-.L4:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

@@ -129,8 +129,8 @@ static Temp_temp str2Color(c_string color, Temp_map regcolors, Temp_tempList reg
             return regs->head;
         }
     }
-    EM_error(A_Pos(0,0,0,0), "register not found for given color:");
-    printf("register not found for given color: %s\n", color);
+//    EM_error(A_Pos(0,0,0,0), "register not found for given color:");
+//    printf("register not found for given color: %s\n", color);
     return NULL;
 }
 

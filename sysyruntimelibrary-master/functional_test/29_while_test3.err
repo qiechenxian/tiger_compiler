@@ -1,213 +1,179 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/29_while_test3.sy"
-	.data
-	.comm   g, 4, 4
-	.comm   h, 4, 4
-	.comm   f, 4, 4
-	.comm   e, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/29_while_test3.sy:0:0: error: fail to find node for label EightWhile
 	.align  2
 	.global EightWhile
 	.type   EightWhile, %function
 EightWhile:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #16
-	mov     100, #5
-	str     100, [FP, #-8]
-	mov     101, #6
-	str     101, [FP, #-12]
-	mov     102, #7
-	str     102, [FP, #-16]
-	mov     103, #10
-	str     103, [FP, #-20]
+	add     FP, SP, #0
+	sub     SP, SP, #20
+	mov     R10, #5
+	str     R10, [FP, #-8]
+	mov     R10, #6
+	str     R10, [FP, #-12]
+	mov     R10, #7
+	str     R10, [FP, #-16]
+	mov     R10, #10
+	str     R10, [FP, #-20]
 .L1:
-	ldr     104, [FP, #-8]
-	mov     105, #20
-	cmp     104, 105
+	ldr     R0, [FP, #-8]
+	mov     R10, #20
+	cmp     R0, R10
 	blt     .L23
 	b       .L0
 .L0:
-	ldr     109, [FP, #-8]
-	ldr     111, [FP, #-12]
-	ldr     112, [FP, #-20]
-	add     110, 111, 112
-	add     108, 109, 110
-	ldr     113, [FP, #-16]
-	add     107, 108, 113
-	ldr     118, =e
-	ldr     117, [118]
-	ldr     119, [FP, #-20]
-	add     116, 117, 119
-	ldr     121, =g
-	ldr     120, [121]
-	sub     115, 116, 120
-	ldr     123, =h
-	ldr     122, [123]
-	add     114, 115, 122
-	sub     106, 107, 114
-	mov     RV, 106
+	ldr     R1, [FP, #-8]
+	ldr     R10, [FP, #-12]
+	ldr     R0, [FP, #-20]
+	add     R10, R10, R0
+	add     R0, R1, R10
+	ldr     R10, [FP, #-16]
+	add     R10, R0, R10
+	ldr     R0, =e
+	ldr     R0, [R0]
+	ldr     R9, [FP, #-20]
+	add     R0, R0, R9
+	ldr     R9, =g
+	ldr     R9, [R9]
+	sub     R1, R0, R9
+	ldr     R0, =h
+	ldr     R0, [R0]
+	add     R0, R1, R0
+	sub     R10, R10, R0
+	mov     R0, R10
 	b       .L24
 .L23:
-	ldr     125, [FP, #-8]
-	add     124, 125, #3
-	str     124, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #3
+	str     R10, [FP, #-8]
 .L3:
-	ldr     126, [FP, #-12]
-	mov     127, #10
-	cmp     126, 127
+	ldr     R0, [FP, #-12]
+	mov     R10, #10
+	cmp     R0, R10
 	blt     .L22
 	b       .L2
 .L2:
-	ldr     129, [FP, #-12]
-	sub     128, 129, #2
-	str     128, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	sub     R10, R10, #2
+	str     R10, [FP, #-12]
 	b       .L1
 .L22:
-	ldr     131, [FP, #-12]
-	add     130, 131, #1
-	str     130, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #1
+	str     R10, [FP, #-12]
 .L5:
-	ldr     132, [FP, #-16]
-	mov     133, #7
-	cmp     132, 133
+	ldr     R0, [FP, #-16]
+	mov     R10, #7
+	cmp     R0, R10
 	beq     .L21
 	b       .L4
 .L4:
-	ldr     135, [FP, #-16]
-	add     134, 135, #1
-	str     134, [FP, #-16]
+	ldr     R10, [FP, #-16]
+	add     R10, R10, #1
+	str     R10, [FP, #-16]
 	b       .L3
 .L21:
-	ldr     137, [FP, #-16]
-	sub     136, 137, #1
-	str     136, [FP, #-16]
+	ldr     R10, [FP, #-16]
+	sub     R10, R10, #1
+	str     R10, [FP, #-16]
 .L7:
-	ldr     138, [FP, #-20]
-	mov     139, #20
-	cmp     138, 139
+	ldr     R0, [FP, #-20]
+	mov     R10, #20
+	cmp     R0, R10
 	blt     .L20
 	b       .L6
 .L6:
-	ldr     141, [FP, #-20]
-	sub     140, 141, #1
-	str     140, [FP, #-20]
+	ldr     R10, [FP, #-20]
+	sub     R10, R10, #1
+	str     R10, [FP, #-20]
 	b       .L5
 .L20:
-	ldr     143, [FP, #-20]
-	add     142, 143, #3
-	str     142, [FP, #-20]
+	ldr     R10, [FP, #-20]
+	add     R10, R10, #3
+	str     R10, [FP, #-20]
 .L9:
-	ldr     145, =e
-	ldr     144, [145]
-	mov     146, #1
-	cmp     144, 146
+	ldr     R10, =e
+	ldr     R10, [R10]
+	mov     R0, #1
+	cmp     R10, R0
 	bgt     .L19
 	b       .L8
 .L8:
-	ldr     147, =e
-	ldr     150, =e
-	ldr     149, [150]
-	add     148, 149, #1
-	str     148, [147]
+	ldr     152, =e
+	ldr     R10, =e
+	ldr     R10, [R10]
+	add     R10, R10, #1
+	str     R10, [152]
 	b       .L7
 .L19:
-	ldr     151, =e
-	ldr     154, =e
-	ldr     153, [154]
-	sub     152, 153, #1
-	str     152, [151]
+	ldr     156, =e
+	ldr     R10, =e
+	ldr     R10, [R10]
+	sub     R10, R10, #1
+	str     R10, [156]
 .L11:
-	ldr     156, =f
-	ldr     155, [156]
-	mov     157, #2
-	cmp     155, 157
+	ldr     R10, =f
+	ldr     R0, [R10]
+	mov     R10, #2
+	cmp     R0, R10
 	bgt     .L18
 	b       .L10
 .L10:
-	ldr     158, =f
-	ldr     161, =f
-	ldr     160, [161]
-	add     159, 160, #1
-	str     159, [158]
+	ldr     163, =f
+	ldr     R10, =f
+	ldr     R10, [R10]
+	add     R10, R10, #1
+	str     R10, [163]
 	b       .L9
 .L18:
-	ldr     162, =f
-	ldr     165, =f
-	ldr     164, [165]
-	sub     163, 164, #2
-	str     163, [162]
+	ldr     167, =f
+	ldr     R10, =f
+	ldr     R10, [R10]
+	sub     R10, R10, #2
+	str     R10, [167]
 .L13:
-	ldr     167, =g
-	ldr     166, [167]
-	mov     168, #3
-	cmp     166, 168
+	ldr     R10, =g
+	ldr     R10, [R10]
+	mov     R0, #3
+	cmp     R10, R0
 	blt     .L17
 	b       .L12
 .L12:
-	ldr     169, =g
-	ldr     172, =g
-	ldr     171, [172]
-	sub     170, 171, #8
-	str     170, [169]
+	ldr     174, =g
+	ldr     R10, =g
+	ldr     R10, [R10]
+	sub     R10, R10, #8
+	str     R10, [174]
 	b       .L11
 .L17:
-	ldr     173, =g
-	ldr     176, =g
-	ldr     175, [176]
-	add     174, 175, #10
-	str     174, [173]
+	ldr     178, =g
+	ldr     R10, =g
+	ldr     R10, [R10]
+	add     R10, R10, #10
+	str     R10, [178]
 .L15:
-	ldr     178, =h
-	ldr     177, [178]
-	mov     179, #10
-	cmp     177, 179
+	ldr     R10, =h
+	ldr     R0, [R10]
+	mov     R10, #10
+	cmp     R0, R10
 	blt     .L16
 	b       .L14
 .L14:
-	ldr     180, =h
-	ldr     183, =h
-	ldr     182, [183]
-	sub     181, 182, #1
-	str     181, [180]
+	ldr     185, =h
+	ldr     R10, =h
+	ldr     R10, [R10]
+	sub     R10, R10, #1
+	str     R10, [185]
 	b       .L13
 .L16:
-	ldr     184, =h
-	ldr     187, =h
-	ldr     186, [187]
-	add     185, 186, #8
-	str     185, [184]
+	ldr     189, =h
+	ldr     R10, =h
+	ldr     R10, [R10]
+	add     R10, R10, #8
+	str     R10, [189]
 	b       .L15
 .L24:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   EightWhile, .-EightWhile
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	ldr     188, =g
-	mov     189, #1
-	str     189, [188]
-	ldr     190, =h
-	mov     191, #2
-	str     191, [190]
-	ldr     192, =e
-	mov     193, #4
-	str     193, [192]
-	ldr     194, =f
-	mov     195, #6
-	str     195, [194]
-	bl      EightWhile
-	mov     RV, RV
-	b       .L26
-.L26:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

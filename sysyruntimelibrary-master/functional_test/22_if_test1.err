@@ -1,52 +1,34 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/22_if_test1.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/22_if_test1.sy:0:0: error: fail to find node for label ifElse
 	.align  2
 	.global ifElse
 	.type   ifElse, %function
 ifElse:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     101, #5
-	str     101, [FP, #-8]
-	ldr     102, [FP, #-8]
-	mov     103, #5
-	cmp     102, 103
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	mov     R10, #5
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, #5
+	cmp     R10, R0
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     105, [FP, #-8]
-	mov     106, #2
-	mul     104, 105, 106
-	str     104, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, #2
+	mul     R10, R10, R0
+	str     R10, [FP, #-8]
 .L2:
-	ldr     107, [FP, #-8]
-	mov     RV, 107
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
 	b       .L3
 .L0:
-	mov     108, #25
-	str     108, [FP, #-8]
+	mov     R10, #25
+	str     R10, [FP, #-8]
 	b       .L2
 .L3:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   ifElse, .-ifElse
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	bl      ifElse
-	mov     RV, RV
-	b       .L5
-.L5:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-
