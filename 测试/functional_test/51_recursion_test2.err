@@ -1,0 +1,75 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/51_recursion_test2.sy"
+	.data
+	.text
+	.align  2
+	.global fib
+	.type   fib, %function
+fib:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #12
+	ldr     R10, [FP, #4]
+	mov     R1, #0
+	cmp     R10, R1
+	beq     .L0
+	b       .L1
+.L1:
+	ldr     R10, [FP, #4]
+	mov     R1, #1
+	cmp     R10, R1
+	beq     .L2
+	b       .L3
+.L3:
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #1
+	str     R1, [FP, #-8]
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #2
+	str     R1, [FP, #-12]
+	ldr     R1, [FP, #-8]
+	str     R1, [SP]
+	bl      fib
+	mov     R1, R0
+# 	mov     R1, R1
+	ldr     R2, [FP, #-12]
+	str     R2, [SP]
+	bl      fib
+	mov     R10, R0
+	add     R10, R1, R10
+	mov     R0, R10
+	b       .L4
+.L0:
+	mov     R10, #0
+	mov     R0, R10
+	b       .L1
+.L2:
+	mov     R10, #1
+	mov     R0, R10
+	b       .L3
+.L4:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   fib, .-fib
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #8
+	mov     R1, #10
+	str     R1, [FP, #-8]
+	ldr     R1, [FP, #-8]
+	str     R1, [SP]
+	bl      fib
+# 	mov     R0, R0
+	b       .L5
+.L5:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

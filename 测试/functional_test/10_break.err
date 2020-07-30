@@ -1,0 +1,42 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/10_break.sy"
+	.data
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #8
+	mov     R10, #10
+	str     R10, [FP, #-8]
+.L1:
+	ldr     R10, [FP, #-8]
+	mov     R0, #0
+	cmp     R10, R0
+	bgt     .L4
+	b       .L0
+.L0:
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L5
+.L4:
+	ldr     R10, [FP, #-8]
+	sub     R10, R10, #1
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, #5
+	cmp     R10, R0
+	beq     .L2
+	b       .L3
+.L3:
+	b       .L1
+.L2:
+	b       .L0
+.L5:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

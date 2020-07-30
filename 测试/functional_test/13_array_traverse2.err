@@ -1,0 +1,84 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/13_array_traverse2.sy"
+	.data
+	.comm   a, 108, 4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #20
+	mov     R10, #0
+	str     R10, [FP, #-16]
+	mov     R10, #0
+	str     R10, [FP, #-12]
+	mov     R10, #0
+	str     R10, [FP, #-8]
+	mov     R10, #0
+	str     R10, [FP, #-20]
+.L1:
+	ldr     R0, [FP, #-16]
+	mov     R10, #3
+	cmp     R0, R10
+	blt     .L8
+	b       .L0
+.L0:
+	mov     R10, #0
+	mov     R0, R10
+	b       .L9
+.L8:
+.L3:
+	ldr     R0, [FP, #-12]
+	mov     R10, #3
+	cmp     R0, R10
+	blt     .L7
+	b       .L2
+.L2:
+	ldr     R10, [FP, #-16]
+	add     R10, R10, #1
+	str     R10, [FP, #-16]
+	b       .L1
+.L7:
+.L5:
+	ldr     R0, [FP, #-8]
+	mov     R10, #3
+	cmp     R0, R10
+	blt     .L6
+	b       .L4
+.L4:
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #1
+	str     R10, [FP, #-12]
+	b       .L3
+.L6:
+	ldr     R1, =a
+	ldr     R10, [FP, #-16]
+	mov     R0, #36
+	mul     R10, R10, R0
+	add     R1, R1, R10
+	ldr     R10, [FP, #-12]
+	mov     R0, #12
+	mul     R10, R10, R0
+	add     R1, R1, R10
+	ldr     R10, [FP, #-8]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R9, R1, R10
+	add     R10, FP, #-20
+# 	ldr      R10, [R10]
+	str     R9, [R10]
+	ldr     R10, [FP, #-20]
+	add     R10, R10, #1
+	str     R10, [FP, #-20]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #1
+	str     R10, [FP, #-8]
+	b       .L5
+.L9:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

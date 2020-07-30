@@ -1,0 +1,66 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/23_if_test2.sy"
+	.data
+	.text
+	.align  2
+	.global ifElseElseIf
+	.type   ifElseElseIf, %function
+ifElseElseIf:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #12
+	mov     R10, #66
+	str     R10, [FP, #-8]
+	mov     R10, #8923
+	str     R10, [FP, #-12]
+	ldr     R0, [FP, #-8]
+	mov     R10, #5
+	cmp     R0, R10
+	beq     .L3
+	b       .L4
+.L4:
+	ldr     R0, [FP, #-8]
+	mov     R10, #10
+	cmp     R0, R10
+	beq     .L0
+	b       .L1
+.L1:
+	ldr     R0, [FP, #-8]
+	mov     R10, #2
+	mul     R10, R0, R10
+	str     R10, [FP, #-12]
+.L2:
+.L5:
+	ldr     R10, [FP, #-12]
+	mov     R0, R10
+	b       .L6
+.L3:
+	mov     R10, #25
+	str     R10, [FP, #-12]
+	b       .L5
+.L0:
+	mov     R10, #42
+	str     R10, [FP, #-12]
+	b       .L2
+.L6:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   ifElseElseIf, .-ifElseElseIf
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	bl      ifElseElseIf
+# 	mov     R0, R0
+	b       .L7
+.L7:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

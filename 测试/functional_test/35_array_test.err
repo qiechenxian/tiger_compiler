@@ -1,0 +1,102 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/35_array_test.sy"
+	.data
+	.comm   field, 8, 4
+	.text
+	.align  2
+	.global func
+	.type   func, %function
+func:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	add     R1, FP, #4
+	ldr     R10, =field
+	mov     R9, #0
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R10, [R10]
+	sub     R10, R10, #3
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	mov     R0, R10
+	b       .L0
+.L0:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   func, .-func
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #24
+	ldr     R9, =field
+	mov     R1, #0
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #1
+	str     R1, [R10]
+	ldr     R9, =field
+	mov     R1, #1
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #2
+	str     R1, [R10]
+	add     R9, FP, #-20
+	mov     R1, #0
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #-1
+	str     R1, [R10]
+	add     R9, FP, #-20
+	mov     R1, #1
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R9, R9, R1
+	add     R1, FP, #-20
+	mov     R2, #0
+	mov     R10, #4
+	mul     R10, R2, R10
+	add     R1, R1, R10
+	ldr     R1, [R1]
+	sub     R1, R1, #2
+	str     R1, [R9]
+	add     R9, FP, #-20
+	mov     R1, #1
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R1, R9, R1
+	ldr     R1, [R1]
+	str     R1, [FP, #-24]
+	add     R9, FP, #-20
+	mov     R1, #2
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+	mov     R1, #16
+	str     R1, [R10]
+	add     R1, FP, #-20
+	str     R1, [SP]
+	bl      func
+	mov     R10, R0
+	add     R10, R10, #2
+	ldr     R0, [FP, #-24]
+	add     R10, R10, R0
+	mov     R0, R10
+	b       .L1
+.L1:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

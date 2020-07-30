@@ -1,0 +1,2 @@
+compiler_2020: /mnt/e/workspace_clion/compiler_2020/table.cpp:46: void* TAB_look(TAB_table, void*): Assertion `t && key' failed.
+Aborted (core dumped)

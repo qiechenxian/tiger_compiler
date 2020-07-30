@@ -1,0 +1,30 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/05_const_array_defn.sy"
+	.data
+	.global a
+	.align  2
+	.type   a, %object
+	.size   a, 4
+a:
+	.word   0
+	.word   1
+	.word   2
+	.word   3
+	.word   4
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	mov     R10, #4
+	mov     R0, R10
+	b       .L0
+.L0:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main
