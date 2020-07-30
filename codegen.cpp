@@ -610,7 +610,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     else if(strcmp(fun,"__aeabi_idivmod")==0)
     {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        sprintf(inst5, "\tmov     'd0, 'S0\n");//取回返回值
+        sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
         emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), NULL)));
     } else
     {

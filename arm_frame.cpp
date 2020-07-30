@@ -178,17 +178,16 @@ Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return Temp_TempList(r0,
+    return /*Temp_TempList(r0,
             Temp_TempList(r1,
                     Temp_TempList(r2,
-                            Temp_TempList(r3,
+                            Temp_TempList(r3,*/
                                     Temp_TempList(r4,
                                             Temp_TempList(r5,
                                                     Temp_TempList(r6,
                                                             Temp_TempList(r7,
                                                                     Temp_TempList(r8,
-                                                                            Temp_TempList(r9,
-                                                                                    Temp_TempList(r10,NULL)))))))))));
+                                                                            Temp_TempList(r9,NULL))))));//))));
 }
 
 //TODO 调用者保护寄存器
