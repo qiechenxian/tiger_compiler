@@ -98,7 +98,7 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
             if (jump_n) {
                 G_addEdge(n, jump_n);
             } else {
-                EM_error(A_Pos(0,0,0,0), "fail to find node for label %s", Temp_labelString(jl->head));
+                EM_error(0, "fail to find node for label %s", Temp_labelString(jl->head));
             }
         }
     }

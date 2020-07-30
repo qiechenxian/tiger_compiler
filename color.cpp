@@ -138,7 +138,6 @@ static Temp_temp str2Color(c_string color, Temp_map regcolors, Temp_tempList reg
 static c_string color2Str(Temp_temp reg, Temp_map regcolors) {
     c_string color = Temp_look(regcolors, reg);
     if (color == NULL) {
-        EM_error(0, "color not found for given register");
         printf("color not found for given register: %s\n", tempName(reg));
     }
     return color;
@@ -298,6 +297,7 @@ static void enableMoves(Temp_tempList tl) {
         }
     }
 }
+
 //
 static void decrementDegree(G_node n) {
     Temp_temp t = node2Temp(n);
@@ -325,6 +325,7 @@ static void addWorkList(Temp_temp t) {
         c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
     }
 }
+
 // temp t ok？
 static bool OK(Temp_temp t, Temp_temp r) {
     G_node nt = temp2Node(t);
@@ -688,73 +689,73 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     return ret;
 }
 
-//static struct COL_result COL_color2(G_graph ig, Temp_map initial, Temp_tempList regs,
-//                                    AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
-//    //your code here.
-//    struct COL_result ret;
-//
-//    Temp_map precolored = initial;
-//    Temp_map colors = Temp_layerMap(Temp_empty(), initial);
-//    G_nodeList spilledNodes = NULL, coloredNodes = NULL;
-//    G_nodeList nodes = G_nodes(ig);
-//    G_nodeList temps = NULL;
-//
-//    G_nodeList nl;
-//    for (nl = nodes; nl; nl = nl->tail) {
-//        if (Temp_look(precolored, node2Temp(nl->head))) {
-//            continue;
-//        }
-//        temps = G_NodeList(nl->head, temps);
-//    }
-//
-//    while (temps != NULL) {
-//        G_node n = temps->head;
-//        Temp_tempList okColors = cloneRegs(regs);
-//        G_nodeList adjs = G_adj(n);
-//        G_node adj;
-//        c_string color;
-//
-//        for (; adjs; adjs = adjs->tail) {
-//            adj = adjs->head;
-//            if ((color = Temp_look(colors, node2Temp(adj))) != NULL) {
-//                Temp_temp colorTemp = str2Color(color, precolored, regs);
-//                if (colorTemp) {
-//                    okColors = tempMinus(okColors,
-//                                         Temp_TempList(colorTemp, NULL));
-//                }
-//            }
-//        }
-//
-//        if (okColors == NULL) {
-//            spilledNodes = G_NodeList(n, spilledNodes);
-//        } else {
-//            coloredNodes = G_NodeList(n, coloredNodes);
-//            Temp_enter(colors, node2Temp(n), color2Str(okColors->head, precolored));
-//        }
-//
-//        // Next
-//        temps = temps->tail;
-//    }
-//
-//    ret.coloring = colors;
-//
-//    ret.colored = NULL;
-//    for (; coloredNodes; coloredNodes = coloredNodes->tail) {
-//        ret.colored = Temp_TempList(node2Temp(coloredNodes->head), ret.colored);
-//    }
-//
-//    ret.spills = NULL;
-//    for (; spilledNodes; spilledNodes = spilledNodes->tail) {
-//        printf("spilled: %s\n", tempName(node2Temp(spilledNodes->head)));
-//        ret.spills = Temp_TempList(node2Temp(spilledNodes->head), ret.spills);
-//    }
-//
-//    ret.alias = G_empty();
-//    ret.coalescedMoves = NULL;
-//    ret.coalescedNodes = NULL;
-//
-//    return ret;
-//}
+static struct COL_result COL_color2(G_graph ig, Temp_map initial, Temp_tempList regs,
+                                    AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
+    //your code here.
+    struct COL_result ret;
+
+    Temp_map precolored = initial;
+    Temp_map colors = Temp_layerMap(Temp_empty(), initial);
+    G_nodeList spilledNodes = NULL, coloredNodes = NULL;
+    G_nodeList nodes = G_nodes(ig);
+    G_nodeList temps = NULL;
+
+    G_nodeList nl;
+    for (nl = nodes; nl; nl = nl->tail) {
+        if (Temp_look(precolored, node2Temp(nl->head))) {
+            continue;
+        }
+        temps = G_NodeList(nl->head, temps);
+    }
+
+    while (temps != NULL) {
+        G_node n = temps->head;
+        Temp_tempList okColors = cloneRegs(regs);
+        G_nodeList adjs = G_adj(n);
+        G_node adj;
+        c_string color;
+
+        for (; adjs; adjs = adjs->tail) {
+            adj = adjs->head;
+            if ((color = Temp_look(colors, node2Temp(adj))) != NULL) {
+                Temp_temp colorTemp = str2Color(color, precolored, regs);
+                if (colorTemp) {
+                    okColors = tempMinus(okColors,
+                                         Temp_TempList(colorTemp, NULL));
+                }
+            }
+        }
+
+        if (okColors == NULL) {
+            spilledNodes = G_NodeList(n, spilledNodes);
+        } else {
+            coloredNodes = G_NodeList(n, coloredNodes);
+            Temp_enter(colors, node2Temp(n), color2Str(okColors->head, precolored));
+        }
+
+        // Next
+        temps = temps->tail;
+    }
+
+    ret.coloring = colors;
+
+    ret.colored = NULL;
+    for (; coloredNodes; coloredNodes = coloredNodes->tail) {
+        ret.colored = Temp_TempList(node2Temp(coloredNodes->head), ret.colored);
+    }
+
+    ret.spills = NULL;
+    for (; spilledNodes; spilledNodes = spilledNodes->tail) {
+        printf("spilled: %s\n", tempName(node2Temp(spilledNodes->head)));
+        ret.spills = Temp_TempList(node2Temp(spilledNodes->head), ret.spills);
+    }
+
+    ret.alias = G_empty();
+    ret.coalescedMoves = NULL;
+    ret.coalescedNodes = NULL;
+
+    return ret;
+}
 
 
 

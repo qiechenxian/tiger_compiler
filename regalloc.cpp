@@ -73,10 +73,12 @@ static bool tempEqual(Temp_tempList ta, Temp_tempList tb) {
 static Temp_tempList tempMinus(Temp_tempList ta, Temp_tempList tb) {
     return Temp_minus(ta, tb);
 }
+
 // temp list ta Union tb
 static Temp_tempList tempUnion(Temp_tempList ta, Temp_tempList tb) {
     return Temp_union(ta, tb);
 }
+
 // temp list ta intersect tb
 static Temp_tempList tempIntersect(Temp_tempList ta, Temp_tempList tb) {
     return Temp_intersect(ta, tb);
@@ -155,7 +157,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
             //TODO local的大小
-            F_access local = F_allocLocal(f, true,get_word_size());
+            F_access local = F_allocLocal(f, true, get_word_size());
             TAB_enter(spilledLocal, tl->head, local);
         }
 
