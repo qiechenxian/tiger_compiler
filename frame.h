@@ -62,6 +62,10 @@ Temp_temp F_ZERO(void);
 Temp_temp F_LR(void);
 Temp_temp F_RV(void);
 Temp_temp F_PC();
+Temp_temp F_R0();
+Temp_temp F_R1();
+Temp_temp F_R2();
+Temp_temp F_R3();
 Temp_temp F_R(c_string save);
 
 void F_initRegisters(void);

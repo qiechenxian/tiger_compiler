@@ -1,69 +1,45 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/52_recursion_test3.sy"
-	.data
-	.comm   a, 4, 4
-	.comm   r, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/52_recursion_test3.sy:0:0: error: fail to find node for label fac
 	.align  2
 	.global fac
 	.type   fac, %function
 fac:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	ldr     102, [FP, #4]
-	mov     103, #2
-	cmp     102, 103
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	ldr     R10, [FP, #4]
+	mov     R1, #2
+	cmp     R10, R1
 	blt     .L0
 	b       .L1
 .L1:
-	ldr     104, =a
-	ldr     106, [FP, #4]
-	sub     105, 106, #1
-	str     105, [104]
-	ldr     108, =a
-	ldr     107, [108]
-	str     107, [SP]
+	ldr     109, =a
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #1
+	str     R1, [109]
+	ldr     R1, =a
+	ldr     R1, [R1]
+	str     R1, [SP]
 	bl      fac
-	mov     101, RV
-	ldr     110, =r
-	str     101, [110]
-	ldr     111, =r
-	ldr     113, [FP, #4]
+	mov     R10, R0
+	ldr     114, =r
+	str     R10, [114]
 	ldr     115, =r
-	ldr     114, [115]
-	mul     112, 113, 114
-	str     112, [111]
-	ldr     117, =r
-	ldr     116, [117]
-	mov     RV, 116
+	ldr     R9, [FP, #4]
+	ldr     R10, =r
+	ldr     R10, [R10]
+	mul     R10, R9, R10
+	str     R10, [115]
+	ldr     R10, =r
+	ldr     R10, [R10]
+	mov     R0, R10
 	b       .L2
 .L0:
-	mov     118, #1
-	mov     RV, 118
+	mov     R10, #1
+	mov     R0, R10
 	b       .L1
 .L2:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   fac, .-fac
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     119, #5
-	str     119, [FP, #-8]
-	ldr     120, [FP, #-8]
-	str     120, [SP]
-	bl      fac
-	mov     RV, RV
-	b       .L4
-.L4:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

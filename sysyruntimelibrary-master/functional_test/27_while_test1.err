@@ -1,66 +1,48 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/27_while_test1.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/27_while_test1.sy:0:0: error: fail to find node for label doubleWhile
 	.align  2
 	.global doubleWhile
 	.type   doubleWhile, %function
 doubleWhile:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #8
-	mov     100, #5
-	str     100, [FP, #-8]
-	mov     101, #7
-	str     101, [FP, #-12]
+	add     FP, SP, #0
+	sub     SP, SP, #12
+	mov     R10, #5
+	str     R10, [FP, #-8]
+	mov     R10, #7
+	str     R10, [FP, #-12]
 .L1:
-	ldr     102, [FP, #-8]
-	mov     103, #100
-	cmp     102, 103
+	ldr     R0, [FP, #-8]
+	mov     R10, #100
+	cmp     R0, R10
 	blt     .L5
 	b       .L0
 .L0:
-	ldr     104, [FP, #-12]
-	mov     RV, 104
+	ldr     R10, [FP, #-12]
+	mov     R0, R10
 	b       .L6
 .L5:
-	ldr     106, [FP, #-8]
-	add     105, 106, #30
-	str     105, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #30
+	str     R10, [FP, #-8]
 .L3:
-	ldr     107, [FP, #-12]
-	mov     108, #100
-	cmp     107, 108
+	ldr     R0, [FP, #-12]
+	mov     R10, #100
+	cmp     R0, R10
 	blt     .L4
 	b       .L2
 .L2:
-	ldr     110, [FP, #-12]
-	sub     109, 110, #100
-	str     109, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	sub     R10, R10, #100
+	str     R10, [FP, #-12]
 	b       .L1
 .L4:
-	ldr     112, [FP, #-12]
-	add     111, 112, #6
-	str     111, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #6
+	str     R10, [FP, #-12]
 	b       .L3
 .L6:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   doubleWhile, .-doubleWhile
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	bl      doubleWhile
-	mov     RV, RV
-	b       .L8
-.L8:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

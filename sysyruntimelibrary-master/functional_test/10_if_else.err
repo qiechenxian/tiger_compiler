@@ -1,35 +1,31 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/10_if_else.sy"
-	.data
-	.comm   a, 4, 4
-	.text
 	.align  2
 	.global main
 	.type   main, %function
 main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	ldr     101, =a
-	mov     102, #10
-	str     102, [101]
-	ldr     104, =a
-	ldr     103, [104]
-	mov     105, #0
-	cmp     103, 105
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #4
+	ldr     106, =a
+	mov     R10, #10
+	str     R10, [106]
+	ldr     R10, =a
+	ldr     R0, [R10]
+	mov     R10, #0
+	cmp     R0, R10
 	bgt     .L0
 	b       .L1
 .L1:
-	mov     106, #0
-	mov     RV, 106
+	mov     R10, #0
+	mov     R0, R10
 .L2:
 	b       .L3
 .L0:
-	mov     107, #1
-	mov     RV, 107
+	mov     R10, #1
+	mov     R0, R10
 	b       .L2
 .L3:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
 	bx      lr
 	.size   main, .-main
-

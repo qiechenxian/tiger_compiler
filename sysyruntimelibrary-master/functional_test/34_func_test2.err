@@ -1,125 +1,78 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/34_func_test2.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/34_func_test2.sy:0:0: error: fail to find node for label func4
 	.align  2
 	.global func1
 	.type   func1, %function
 func1:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     100, #1
-	str     100, [FP, #-8]
-	ldr     101, [FP, #-8]
-	mov     RV, 101
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	mov     R10, #1
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
 	b       .L0
 .L0:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
-	.size   func1, .-func1
-
-	.align  2
+	.size   func1, .-func1	.align  2
 	.global func2
 	.type   func2, %function
 func2:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     102, #2
-	str     102, [FP, #-8]
-	ldr     103, [FP, #-8]
-	mov     RV, 103
-	b       .L2
-.L2:
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	mov     R10, #2
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L1
+.L1:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
-	.size   func2, .-func2
-
-	.align  2
+	.size   func2, .-func2	.align  2
 	.global func3
 	.type   func3, %function
 func3:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	mov     104, #4
-	str     104, [FP, #-8]
-	ldr     105, [FP, #-8]
-	mov     RV, 105
-	b       .L4
-.L4:
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	mov     R10, #4
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L2
+.L2:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
-	.size   func3, .-func3
-
-	.align  2
+	.size   func3, .-func3	.align  2
 	.global func4
 	.type   func4, %function
 func4:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #12
-	mov     106, #8
-	str     106, [FP, #-12]
-	ldr     107, [FP, #-12]
-	str     107, [FP, #-8]
-	mov     108, #16
-	str     108, [FP, #-16]
-	ldr     110, [FP, #-8]
-	ldr     111, [FP, #-16]
-	add     109, 110, 111
-	str     109, [FP, #-8]
-	ldr     112, [FP, #-8]
-	mov     RV, 112
-	b       .L6
-.L6:
+	add     FP, SP, #0
+	sub     SP, SP, #16
+	mov     R10, #8
+	str     R10, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	str     R10, [FP, #-8]
+	mov     R10, #16
+	str     R10, [FP, #-16]
+	ldr     R10, [FP, #-8]
+	ldr     R0, [FP, #-16]
+	add     R10, R10, R0
+	str     R10, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	mov     R0, R10
+	b       .L3
+.L3:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   func4, .-func4
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #12
-	mov     120, #32
-	str     120, [FP, #-8]
-	mov     121, #32
-	str     121, [FP, #-12]
-	mov     122, #32
-	str     122, [FP, #-16]
-	bl      func1
-	mov     113, RV
-	mov     115, 113
-	bl      func2
-	mov     114, RV
-	add     124, 115, 114
-	mov     117, 124
-	bl      func3
-	mov     116, RV
-	add     125, 117, 116
-	mov     119, 125
-	bl      func4
-	mov     118, RV
-	add     129, 119, 118
-	ldr     130, [FP, #-8]
-	add     128, 129, 130
-	ldr     131, [FP, #-12]
-	add     127, 128, 131
-	ldr     132, [FP, #-16]
-	add     126, 127, 132
-	mov     RV, 126
-	b       .L8
-.L8:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

@@ -1,101 +1,28 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/35_array_test.sy"
-	.data
-	.comm   field, 8, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/35_array_test.sy:0:0: error: fail to find node for label func
 	.align  2
 	.global func
 	.type   func, %function
 func:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	add     102, FP, #4
-	ldr     107, =field
-	mov     109, #0
-	mov     110, #4
-	mul     108, 109, 110
-	add     106, 107, 108
-	ldr     105, [106]
-	sub     104, 105, #3
-	mov     111, #4
-	mul     103, 104, 111
-	add     101, 102, 103
-	ldr     100, [101]
-	mov     RV, 100
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	add     R1, FP, #4
+	ldr     R10, =field
+	mov     R9, #0
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+	ldr     R10, [R10]
+	sub     R10, R10, #3
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	mov     R0, R10
 	b       .L0
 .L0:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   func, .-func
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #20
-	ldr     114, =field
-	mov     116, #0
-	mov     117, #4
-	mul     115, 116, 117
-	add     113, 114, 115
-	mov     118, #1
-	str     118, [113]
-	ldr     120, =field
-	mov     122, #1
-	mov     123, #4
-	mul     121, 122, 123
-	add     119, 120, 121
-	mov     124, #2
-	str     124, [119]
-	add     126, FP, #-20
-	mov     128, #0
-	mov     129, #4
-	mul     127, 128, 129
-	add     125, 126, 127
-	mov     130, #-1
-	str     130, [125]
-	add     132, FP, #-20
-	mov     134, #1
-	mov     135, #4
-	mul     133, 134, 135
-	add     131, 132, 133
-	add     139, FP, #-20
-	mov     141, #0
-	mov     142, #4
-	mul     140, 141, 142
-	add     138, 139, 140
-	ldr     137, [138]
-	sub     136, 137, #2
-	str     136, [131]
-	add     145, FP, #-20
-	mov     147, #1
-	mov     148, #4
-	mul     146, 147, 148
-	add     144, 145, 146
-	ldr     143, [144]
-	str     143, [FP, #-24]
-	add     150, FP, #-20
-	mov     152, #2
-	mov     153, #4
-	mul     151, 152, 153
-	add     149, 150, 151
-	mov     154, #16
-	str     154, [149]
-	add     155, FP, #-20
-	str     155, [SP]
-	bl      func
-	mov     112, RV
-	add     158, 112, #2
-	ldr     159, [FP, #-24]
-	add     157, 158, 159
-	mov     RV, 157
-	b       .L2
-.L2:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

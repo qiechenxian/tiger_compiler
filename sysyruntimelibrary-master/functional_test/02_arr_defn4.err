@@ -1,70 +1,66 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/02_arr_defn4.sy"
-	.data
-	.text
 	.align  2
 	.global main
 	.type   main, %function
 main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #64
-	mov     100, #1
-	str     100, [FP, #-36]
-	mov     101, #2
-	str     101, [FP, #-32]
-	mov     102, #3
-	str     102, [FP, #-28]
-	mov     103, #4
-	str     103, [FP, #-24]
-	mov     104, #5
-	str     104, [FP, #-20]
-	mov     105, #6
-	str     105, [FP, #-16]
-	mov     106, #7
-	str     106, [FP, #-12]
-	mov     107, #8
-	str     107, [FP, #-8]
-	add     111, FP, #-36
-	mov     113, #0
-	mov     114, #8
-	mul     112, 113, 114
-	add     110, 111, 112
-	mov     116, #0
-	mov     117, #4
-	mul     115, 116, 117
-	add     109, 110, 115
-	ldr     108, [109]
-	str     108, [FP, #-68]
-	add     121, FP, #-36
-	mov     123, #0
-	mov     124, #8
-	mul     122, 123, 124
-	add     120, 121, 122
-	mov     126, #1
-	mov     127, #4
-	mul     125, 126, 127
-	add     119, 120, 125
-	ldr     118, [119]
-	str     118, [FP, #-64]
-	mov     128, #3
-	str     128, [FP, #-60]
-	mov     129, #4
-	str     129, [FP, #-56]
-	mov     130, #5
-	str     130, [FP, #-52]
-	mov     131, #6
-	str     131, [FP, #-48]
-	mov     132, #7
-	str     132, [FP, #-44]
-	mov     133, #8
-	str     133, [FP, #-40]
-	mov     134, #0
-	mov     RV, 134
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #68
+	mov     R10, #1
+	str     R10, [FP, #-36]
+	mov     R10, #2
+	str     R10, [FP, #-32]
+	mov     R10, #3
+	str     R10, [FP, #-28]
+	mov     R10, #4
+	str     R10, [FP, #-24]
+	mov     R10, #5
+	str     R10, [FP, #-20]
+	mov     R10, #6
+	str     R10, [FP, #-16]
+	mov     R10, #7
+	str     R10, [FP, #-12]
+	mov     R10, #8
+	str     R10, [FP, #-8]
+	add     R1, FP, #-36
+	mov     R10, #0
+	mov     R0, #8
+	mul     R10, R10, R0
+	add     R1, R1, R10
+	mov     R10, #0
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	str     R10, [FP, #-68]
+	add     R1, FP, #-36
+	mov     R10, #0
+	mov     R0, #8
+	mul     R10, R10, R0
+	add     R1, R1, R10
+	mov     R10, #1
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	str     R10, [FP, #-64]
+	mov     R10, #3
+	str     R10, [FP, #-60]
+	mov     R10, #4
+	str     R10, [FP, #-56]
+	mov     R10, #5
+	str     R10, [FP, #-52]
+	mov     R10, #6
+	str     R10, [FP, #-48]
+	mov     R10, #7
+	str     R10, [FP, #-44]
+	mov     R10, #8
+	str     R10, [FP, #-40]
+	mov     R10, #0
+	mov     R0, R10
 	b       .L0
 .L0:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
 	bx      lr
 	.size   main, .-main
-

@@ -43,11 +43,16 @@ void F_initRegisters(void) {
     r9 = Temp_new_special("R9");
     r10 = Temp_new_special("R10");
 
-    fp = Temp_new_special("FP");
-    sp = Temp_new_special("SP");
-    ip = Temp_new_special("IP");
-    lr = Temp_new_special("LR");
-    pc = Temp_new_special("PC");
+//    fp = Temp_new_special("11111FP");
+//    sp = Temp_new_special("SP");
+//    ip = Temp_new_special("IP");
+//    lr = Temp_new_special("LR");
+//    pc = Temp_new_special("PC");
+    fp = Temp_newTemp();
+    sp = Temp_newTemp();
+    ip = Temp_newTemp();
+    lr = Temp_newTemp();
+    pc = Temp_newTemp();
 
     specialregs = Temp_TempList(fp,
                                 Temp_TempList(sp,
@@ -135,17 +140,55 @@ Temp_temp F_ZERO(void) {
     return zero;
 }
 
+Temp_temp F_R0()
+{
+    if (r0 == nullptr) {
+        F_initRegisters();
+    }
+    return r0;
+}
+
+Temp_temp F_R1()
+{
+    if (r1 == nullptr){
+        F_initRegisters();
+    }
+    return r1;
+}
+
+Temp_temp F_R2()
+{
+    if (r2 == nullptr){
+        F_initRegisters();
+    }
+    return r2;
+}
+
+Temp_temp F_F3()
+{
+    if (r3 == nullptr)
+    {
+        F_initRegisters();
+    }
+    return r3;
+}
+
 //TODO 需添加剩余寄存器,是否需要fp，sp
 Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return Temp_TempList(fp,
-            Temp_TempList(sp,
-                    Temp_TempList(r0,
-                         Temp_TempList(r1,
-                                 Temp_TempList(r2,
-                                               Temp_TempList(r3, NULL))))));
+    return Temp_TempList(r0,
+            Temp_TempList(r1,
+                    Temp_TempList(r2,
+                            Temp_TempList(r3,
+                                    Temp_TempList(r4,
+                                            Temp_TempList(r5,
+                                                    Temp_TempList(r6,
+                                                            Temp_TempList(r7,
+                                                                    Temp_TempList(r8,
+                                                                            Temp_TempList(r9,
+                                                                                    Temp_TempList(r10,NULL)))))))))));
 }
 
 //TODO 调用者保护寄存器
@@ -486,15 +529,15 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     // todo callee 保护的寄存器的相关指令
 
     char *inst = (char *) checked_malloc(sizeof(char) * 20);
-    sprintf(inst, "\tadd     fp, sp, #%d\n", recover_offset);
-    head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+    sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
+    head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, Temp_TempList(F_FP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
     int space = getSpace(frame);// todo 此处还应有要保护寄存器空间
     if (space>0){
         char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
-        sprintf(frame_space, "\tsub     sp, sp, #%d\n", space * word_size);
-        head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, NULL, NULL, NULL), NULL);
+        sprintf(frame_space, "\tsub     'd0, 's0, #%d\n", space * word_size);
+        head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
     }
 

@@ -1,40 +1,17 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_var_defn_func.sy"
-	.data
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_var_defn_func.sy:0:0: error: fail to find node for label defn
 	.align  2
 	.global defn
 	.type   defn, %function
 defn:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	mov     100, #4
-	mov     RV, 100
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	mov     R10, #4
+	mov     R0, R10
 	b       .L0
 .L0:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   defn, .-defn
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	add     103, FP, #-8
-	mov     102, 103
-	bl      defn
-	mov     101, RV
-	str     101, [102]
-	ldr     105, [FP, #-8]
-	mov     RV, 105
-	b       .L2
-.L2:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   main, .-main
-

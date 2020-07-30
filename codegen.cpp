@@ -20,20 +20,17 @@ static void emit(AS_instr instr) {
     }
 }
 
-Temp_tempList L(Temp_temp h, Temp_tempList t) {
+Temp_tempList L(Temp_temp h, Temp_tempList t)
+{
     return Temp_TempList(h, t);
 }
 bool Sys_lib_fuc_test(Temp_label lab)
 {
-    if(strcmp("getint",Temp_labelString(lab))==0||strcmp("getch",Temp_labelString(lab))==0
-       ||strcmp("getarray",Temp_labelString(lab))==0||strcmp("putint",Temp_labelString(lab))==0
-       ||strcmp("putch",Temp_labelString(lab))==0||strcmp("putarray",Temp_labelString(lab))==0
-       ||strcmp("putf",Temp_labelString(lab))==0||strcmp("starttime",Temp_labelString(lab))==0
-       ||strcmp("stoptime",Temp_labelString(lab))==0)
-    {
-        return true;
-    }
-    return false;
+    return strcmp("getint", Temp_labelString(lab)) == 0 || strcmp("getch", Temp_labelString(lab)) == 0
+           || strcmp("getarray", Temp_labelString(lab)) == 0 || strcmp("putint", Temp_labelString(lab)) == 0
+           || strcmp("putch", Temp_labelString(lab)) == 0 || strcmp("putarray", Temp_labelString(lab)) == 0
+           || strcmp("putf", Temp_labelString(lab)) == 0 || strcmp("starttime", Temp_labelString(lab)) == 0
+           || strcmp("stoptime", Temp_labelString(lab)) == 0;
 }
 
 // 用于表达式的匹配，每种情形的从句将匹配一个瓦片
@@ -603,37 +600,37 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
  * 调用库函数 resReg=fun(arg1,arg2);
  */
 static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp reg2) {//todo 确认是否需要修改
-    char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst, "\tstmfd   sp!, {r0-r1}\n");//保护现场
-    emit(AS_Oper(inst, NULL, NULL, NULL));
+//    char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
+//    sprintf(inst, "\tstmfd   sp!, {r0-r1}\n");//保护现场
+//    emit(AS_Oper(inst, NULL, NULL, NULL));
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst2, "\tmov     r0, 's0\n");//传递操作数reg1->r0
-    emit(AS_Move(inst2, NULL, L(reg1, NULL)));
+    sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
+    emit(AS_Move(inst2, L(F_R0(), NULL), L(reg1, NULL)));
 
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst3, "\tmov     r1, 's0\n");//传递操作数reg2->r1
-    emit(AS_Move(inst3, NULL, L(reg2, NULL)));
+    sprintf(inst3, "\tmov     'd0, 's0\n");//传递操作数reg2->r1
+    emit(AS_Move(inst3, L(F_R1(), NULL), L(reg2, NULL)));
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
     emit(AS_Oper(inst4, NULL, NULL, NULL));
     if(strcmp(fun,"__aeabi_idiv")==0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        sprintf(inst5, "\tmov     'd0, r0\n", rsreg);//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), NULL));
+        sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
+        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), NULL)));
     }
     else if(strcmp(fun,"__aeabi_idivmod")==0)
     {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        sprintf(inst5, "\tmov     'd0, r1\n", rsreg);//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), NULL));
+        sprintf(inst5, "\tmov     'd0, 'S0\n");//取回返回值
+        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), NULL)));
     } else
     {
         assert("error from call_lib in codegen.cpp ");
     }
-    char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst6, "\tldmfd   sp!,{r0-r1}\n");//恢复现场
-    emit(AS_Oper(inst6, NULL, NULL, NULL));
+//    char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+//    sprintf(inst6, "\tldmfd   sp!,{r0-r1}\n");//恢复现场
+//    emit(AS_Oper(inst6, NULL, NULL, NULL));
 }
 

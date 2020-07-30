@@ -1,96 +1,56 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/61_rec_fibonacci.sy"
-	.data
-	.comm   n, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/61_rec_fibonacci.sy:0:0: error: fail to find node for label putch
 	.align  2
 	.global f
 	.type   f, %function
 f:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #12
-	ldr     106, [FP, #4]
-	mov     107, #1
-	cmp     106, 107
+	add     FP, SP, #0
+	sub     SP, SP, #16
+	ldr     R10, [FP, #4]
+	mov     R1, #1
+	cmp     R10, R1
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     108, [FP, #4]
-	mov     109, #2
-	cmp     108, 109
+	ldr     R10, [FP, #4]
+	mov     R1, #2
+	cmp     R10, R1
 	beq     .L2
 	b       .L3
 .L3:
-	ldr     111, [FP, #4]
-	sub     110, 111, #1
-	str     110, [FP, #-8]
-	ldr     113, [FP, #4]
-	sub     112, 113, #2
-	str     112, [FP, #-12]
-	add     114, FP, #-16
-	mov     105, 114
-	ldr     115, [FP, #-8]
-	str     115, [SP]
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #1
+	str     R1, [FP, #-8]
+	ldr     R1, [FP, #4]
+	sub     R1, R1, #2
+	str     R1, [FP, #-12]
+	add     R1, FP, #-16
+# 	mov     R1, R1
+	ldr     R1, [FP, #-8]
+	str     R1, [SP]
 	bl      f
-	mov     102, RV
-	mov     104, 102
-	ldr     117, [FP, #-12]
-	str     117, [SP]
+	mov     R1, R0
+# 	mov     R1, R1
+	ldr     R2, [FP, #-12]
+	str     R2, [SP]
 	bl      f
-	mov     103, RV
-	add     118, 104, 103
-	str     118, [105]
-	ldr     119, [FP, #-16]
-	mov     RV, 119
+	mov     R10, R0
+	add     R10, R1, R10
+	str     R10, [R1]
+	ldr     R10, [FP, #-16]
+	mov     R0, R10
 	b       .L4
 .L0:
-	mov     120, #1
-	mov     RV, 120
+	mov     R10, #1
+	mov     R0, R10
 	b       .L1
 .L2:
-	mov     121, #1
-	mov     RV, 121
+	mov     R10, #1
+	mov     R0, R10
 	b       .L3
 .L4:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   f, .-f
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	stmfd   sp!, {fp, lr}
-	add     fp, sp, #4
-	sub     sp, sp, #20
-	bl      getint
-	mov     124, RV
-	ldr     125, =n
-	str     124, [125]
-	add     126, FP, #-8
-	mov     123, 126
-	ldr     128, =n
-	ldr     127, [128]
-	str     127, [SP]
-	bl      f
-	mov     122, RV
-	str     122, [123]
-	ldr     129, [FP, #-8]
-	str     129, [SP]
-	bl      putint
-	mov     130, #10
-	str     130, [FP, #-16]
-	ldr     131, [FP, #-16]
-	str     131, [SP]
-	bl      putch
-	ldr     132, [FP, #-8]
-	mov     RV, 132
-	b       .L6
-.L6:
-	sub     sp, fp, #4
-	ldmfd   sp!, {fp, lr}
-	bx      lr
-	.size   main, .-main
-

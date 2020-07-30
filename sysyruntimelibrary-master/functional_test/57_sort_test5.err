@@ -1,371 +1,44 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/57_sort_test5.sy"
-	.data
-	.comm   n, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/57_sort_test5.sy:0:0: error: fail to find node for label swap
 	.align  2
 	.global swap
 	.type   swap, %function
 swap:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #4
-	add     104, FP, #4
-	ldr     106, [FP, #8]
-	mov     107, #4
-	mul     105, 106, 107
-	add     103, 104, 105
-	ldr     102, [103]
-	str     102, [FP, #-8]
-	add     110, FP, #4
-	ldr     112, [FP, #8]
-	mov     113, #4
-	mul     111, 112, 113
-	add     109, 110, 111
-	add     115, FP, #4
-	ldr     117, [FP, #12]
-	mov     118, #4
-	mul     116, 117, 118
-	add     114, 115, 116
-	ldr      108, [114]
-	str     108, [109]
-	add     121, FP, #4
-	ldr     123, [FP, #12]
-	mov     124, #4
-	mul     122, 123, 124
-	add     120, 121, 122
-	add     125, FP, #-8
-	ldr      119, [125]
-	str     119, [120]
-	mov     126, #0
-	mov     RV, 126
+	add     FP, SP, #0
+	sub     SP, SP, #8
+	add     R1, FP, #4
+	ldr     R10, [FP, #8]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	str     R10, [FP, #-8]
+	add     R1, FP, #4
+	ldr     R10, [FP, #8]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R1, R1, R10
+	add     R10, FP, #4
+	ldr     R9, [FP, #12]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R10, R10, R0
+# 	ldr      R10, [R10]
+	str     R10, [R1]
+	add     R10, FP, #4
+	ldr     R9, [FP, #12]
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R0, R10, R0
+	add     R10, FP, #-8
+# 	ldr      R10, [R10]
+	str     R10, [R0]
+	mov     R10, #0
+	mov     R0, R10
 	b       .L18
 .L18:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   swap, .-swap
-
-	.align  2
-	.global heap_ajust
-	.type   heap_ajust, %function
-heap_ajust:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #8
-	ldr     129, [FP, #8]
-	str     129, [FP, #-8]
-	ldr     132, [FP, #-8]
-	mov     133, #2
-	mul     131, 132, 133
-	add     130, 131, #1
-	str     130, [FP, #-12]
-.L1:
-	ldr     134, [FP, #-12]
-	ldr     136, [FP, #12]
-	add     135, 136, #1
-	cmp     134, 135
-	blt     .L8
-	b       .L0
-.L0:
-	mov     137, #0
-	mov     RV, 137
-	b       .L20
-.L8:
-	ldr     138, [FP, #-12]
-	ldr     139, [FP, #12]
-	cmp     138, 139
-	blt     .L3
-	b       .L2
-.L2:
-	add     142, FP, #4
-	ldr     144, [FP, #-12]
-	mov     145, #4
-	mul     143, 144, 145
-	add     141, 142, 143
-	ldr     140, [141]
-	add     148, FP, #4
-	ldr     151, [FP, #-12]
-	add     150, 151, #1
-	mov     152, #4
-	mul     149, 150, 152
-	add     147, 148, 149
-	ldr     146, [147]
-	cmp     140, 146
-	blt     .L3
-	b       .L4
-.L4:
-	add     155, FP, #4
-	ldr     157, [FP, #-8]
-	mov     158, #4
-	mul     156, 157, 158
-	add     154, 155, 156
-	ldr     153, [154]
-	add     161, FP, #4
-	ldr     163, [FP, #-12]
-	mov     164, #4
-	mul     162, 163, 164
-	add     160, 161, 162
-	ldr     159, [160]
-	cmp     153, 159
-	bgt     .L5
-	b       .L6
-.L6:
-	add     165, FP, #-8
-	mov     128, 165
-	add     166, FP, #4
-	str     166, [SP]
-	ldr     167, [FP, #-8]
-	str     167, [SP, #4]
-	ldr     168, [FP, #-12]
-	str     168, [SP, #8]
-	bl      swap
-	mov     127, RV
-	str     127, [128]
-	ldr     170, [FP, #-12]
-	str     170, [FP, #-8]
-	ldr     173, [FP, #-8]
-	mov     174, #2
-	mul     172, 173, 174
-	add     171, 172, #1
-	str     171, [FP, #-12]
-.L7:
-	b       .L1
-.L3:
-	ldr     176, [FP, #-12]
-	add     175, 176, #1
-	str     175, [FP, #-12]
-	b       .L4
-.L5:
-	mov     177, #0
-	mov     RV, 177
-	b       .L7
-.L20:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   heap_ajust, .-heap_ajust
-
-	.align  2
-	.global heap_sort
-	.type   heap_sort, %function
-heap_sort:
-	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #12
-	ldr     186, [FP, #8]
-	mov     187, #2
-	stmfd   sp!, {r0-r7}
-	mov     r0, 186
-	mov     r1, 187
-	bl      __divsi3
-	mov     185, r0
-	ldmfd   sp!,{r0-r7}
-	sub     184, 185, #1
-	str     184, [FP, #-8]
-.L10:
-	ldr     188, [FP, #-8]
-	mov     189, #-1
-	cmp     188, 189
-	bgt     .L11
-	b       .L9
-.L9:
-	ldr     191, [FP, #8]
-	sub     190, 191, #1
-	str     190, [FP, #-8]
-.L13:
-	ldr     192, [FP, #-8]
-	mov     193, #0
-	cmp     192, 193
-	bgt     .L14
-	b       .L12
-.L12:
-	mov     194, #0
-	mov     RV, 194
-	b       .L22
-.L11:
-	ldr     196, [FP, #8]
-	sub     195, 196, #1
-	str     195, [FP, #-12]
-	add     197, FP, #-12
-	mov     183, 197
-	add     198, FP, #4
-	str     198, [SP]
-	ldr     199, [FP, #-8]
-	str     199, [SP, #4]
-	ldr     200, [FP, #-12]
-	str     200, [SP, #8]
-	bl      heap_ajust
-	mov     182, RV
-	str     182, [183]
-	ldr     202, [FP, #-8]
-	sub     201, 202, #1
-	str     201, [FP, #-8]
-	b       .L10
-.L14:
-	mov     203, #0
-	str     203, [FP, #-16]
-	add     204, FP, #-12
-	mov     181, 204
-	add     205, FP, #4
-	str     205, [SP]
-	ldr     206, [FP, #-16]
-	str     206, [SP, #4]
-	ldr     207, [FP, #-8]
-	str     207, [SP, #8]
-	bl      swap
-	mov     180, RV
-	str     180, [181]
-	ldr     209, [FP, #-8]
-	sub     208, 209, #1
-	str     208, [FP, #-12]
-	add     210, FP, #-12
-	mov     179, 210
-	add     211, FP, #4
-	str     211, [SP]
-	ldr     212, [FP, #-16]
-	str     212, [SP, #4]
-	ldr     213, [FP, #-12]
-	str     213, [SP, #8]
-	bl      heap_ajust
-	mov     178, RV
-	str     178, [179]
-	ldr     215, [FP, #-8]
-	sub     214, 215, #1
-	str     214, [FP, #-8]
-	b       .L13
-.L22:
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   heap_sort, .-heap_sort
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	stmfd   sp!, {fp, lr}
-	add     fp, sp, #4
-	sub     sp, sp, #56
-	ldr     218, =n
-	mov     219, #10
-	str     219, [218]
-	add     221, FP, #-44
-	mov     223, #0
-	mov     224, #4
-	mul     222, 223, 224
-	add     220, 221, 222
-	mov     225, #4
-	str     225, [220]
-	add     227, FP, #-44
-	mov     229, #1
-	mov     230, #4
-	mul     228, 229, 230
-	add     226, 227, 228
-	mov     231, #3
-	str     231, [226]
-	add     233, FP, #-44
-	mov     235, #2
-	mov     236, #4
-	mul     234, 235, 236
-	add     232, 233, 234
-	mov     237, #9
-	str     237, [232]
-	add     239, FP, #-44
-	mov     241, #3
-	mov     242, #4
-	mul     240, 241, 242
-	add     238, 239, 240
-	mov     243, #2
-	str     243, [238]
-	add     245, FP, #-44
-	mov     247, #4
-	mov     248, #4
-	mul     246, 247, 248
-	add     244, 245, 246
-	mov     249, #0
-	str     249, [244]
-	add     251, FP, #-44
-	mov     253, #5
-	mov     254, #4
-	mul     252, 253, 254
-	add     250, 251, 252
-	mov     255, #1
-	str     255, [250]
-	add     257, FP, #-44
-	mov     259, #6
-	mov     260, #4
-	mul     258, 259, 260
-	add     256, 257, 258
-	mov     261, #6
-	str     261, [256]
-	add     263, FP, #-44
-	mov     265, #7
-	mov     266, #4
-	mul     264, 265, 266
-	add     262, 263, 264
-	mov     267, #5
-	str     267, [262]
-	add     269, FP, #-44
-	mov     271, #8
-	mov     272, #4
-	mul     270, 271, 272
-	add     268, 269, 270
-	mov     273, #7
-	str     273, [268]
-	add     275, FP, #-44
-	mov     277, #9
-	mov     278, #4
-	mul     276, 277, 278
-	add     274, 275, 276
-	mov     279, #8
-	str     279, [274]
-	mov     280, #0
-	str     280, [FP, #-48]
-	add     281, FP, #-48
-	mov     217, 281
-	add     282, FP, #-44
-	str     282, [SP]
-	ldr     284, =n
-	ldr     283, [284]
-	str     283, [SP, #4]
-	bl      heap_sort
-	mov     216, RV
-	str     216, [217]
-.L16:
-	ldr     285, [FP, #-48]
-	ldr     287, =n
-	ldr     286, [287]
-	cmp     285, 286
-	blt     .L17
-	b       .L15
-.L15:
-	mov     288, #0
-	mov     RV, 288
-	b       .L24
-.L17:
-	add     291, FP, #-44
-	ldr     293, [FP, #-48]
-	mov     294, #4
-	mul     292, 293, 294
-	add     290, 291, 292
-	ldr     289, [290]
-	str     289, [FP, #-52]
-	ldr     295, [FP, #-52]
-	str     295, [SP]
-	bl      putint
-	mov     296, #10
-	str     296, [FP, #-52]
-	ldr     297, [FP, #-52]
-	str     297, [SP]
-	bl      putch
-	ldr     299, [FP, #-48]
-	add     298, 299, #1
-	str     298, [FP, #-48]
-	b       .L16
-.L24:
-	sub     sp, fp, #4
-	ldmfd   sp!, {fp, lr}
-	bx      lr
-	.size   main, .-main
-

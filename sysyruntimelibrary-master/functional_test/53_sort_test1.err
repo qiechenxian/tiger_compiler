@@ -1,227 +1,99 @@
-	.arch   armv7
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/53_sort_test1.sy"
-	.data
-	.comm   n, 4, 4
-	.text
+/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/53_sort_test1.sy:0:0: error: fail to find node for label putch
 	.align  2
 	.global bubblesort
 	.type   bubblesort, %function
 bubblesort:
 	str     fp, [sp, #-4]!
-	add     fp, sp, #0
-	sub     sp, sp, #12
-	mov     101, #0
-	str     101, [FP, #-8]
+	add     FP, SP, #0
+	sub     SP, SP, #16
+	mov     R10, #0
+	str     R10, [FP, #-8]
 .L1:
-	ldr     102, [FP, #-8]
-	ldr     105, =n
-	ldr     104, [105]
-	sub     103, 104, #1
-	cmp     102, 103
+	ldr     R10, [FP, #-8]
+	ldr     R0, =n
+	ldr     R0, [R0]
+	sub     R0, R0, #1
+	cmp     R10, R0
 	blt     .L7
 	b       .L0
 .L0:
-	mov     106, #0
-	mov     RV, 106
+	mov     R10, #0
+	mov     R0, R10
 	b       .L11
 .L7:
-	mov     107, #0
-	str     107, [FP, #-12]
+	mov     R10, #0
+	str     R10, [FP, #-12]
 .L3:
-	ldr     108, [FP, #-12]
-	ldr     112, =n
-	ldr     111, [112]
-	ldr     113, [FP, #-8]
-	sub     110, 111, 113
-	sub     109, 110, #1
-	cmp     108, 109
+	ldr     R1, [FP, #-12]
+	ldr     R10, =n
+	ldr     R0, [R10]
+	ldr     R10, [FP, #-8]
+	sub     R10, R0, R10
+	sub     R10, R10, #1
+	cmp     R1, R10
 	blt     .L6
 	b       .L2
 .L2:
-	ldr     115, [FP, #-8]
-	add     114, 115, #1
-	str     114, [FP, #-8]
+	ldr     R10, [FP, #-8]
+	add     R10, R10, #1
+	str     R10, [FP, #-8]
 	b       .L1
 .L6:
-	add     118, FP, #4
-	ldr     120, [FP, #-12]
-	mov     121, #4
-	mul     119, 120, 121
-	add     117, 118, 119
-	ldr     116, [117]
-	add     124, FP, #4
-	ldr     127, [FP, #-12]
-	add     126, 127, #1
-	mov     128, #4
-	mul     125, 126, 128
-	add     123, 124, 125
-	ldr     122, [123]
-	cmp     116, 122
+	add     R1, FP, #4
+	ldr     R10, [FP, #-12]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R10, R1, R10
+	ldr     R10, [R10]
+	add     R1, FP, #4
+	ldr     R0, [FP, #-12]
+	add     R9, R0, #1
+	mov     R0, #4
+	mul     R0, R9, R0
+	add     R0, R1, R0
+	ldr     R0, [R0]
+	cmp     R10, R0
 	bgt     .L4
 	b       .L5
 .L5:
-	ldr     130, [FP, #-12]
-	add     129, 130, #1
-	str     129, [FP, #-12]
+	ldr     R10, [FP, #-12]
+	add     R10, R10, #1
+	str     R10, [FP, #-12]
 	b       .L3
 .L4:
-	add     133, FP, #4
-	ldr     136, [FP, #-12]
-	add     135, 136, #1
-	mov     137, #4
-	mul     134, 135, 137
-	add     132, 133, 134
-	ldr     131, [132]
-	str     131, [FP, #-16]
-	add     140, FP, #4
-	ldr     143, [FP, #-12]
-	add     142, 143, #1
-	mov     144, #4
-	mul     141, 142, 144
-	add     139, 140, 141
-	add     146, FP, #4
-	ldr     148, [FP, #-12]
-	mov     149, #4
-	mul     147, 148, 149
-	add     145, 146, 147
-	ldr      138, [145]
-	str     138, [139]
-	add     152, FP, #4
-	ldr     154, [FP, #-12]
-	mov     155, #4
-	mul     153, 154, 155
-	add     151, 152, 153
-	add     156, FP, #-16
-	ldr      150, [156]
-	str     150, [151]
+	add     R10, FP, #4
+	ldr     R0, [FP, #-12]
+	add     R0, R0, #1
+	mov     R9, #4
+	mul     R0, R0, R9
+	add     R10, R10, R0
+	ldr     R10, [R10]
+	str     R10, [FP, #-16]
+	add     R9, FP, #4
+	ldr     R10, [FP, #-12]
+	add     R0, R10, #1
+	mov     R10, #4
+	mul     R10, R0, R10
+	add     R0, R9, R10
+	add     R9, FP, #4
+	ldr     R1, [FP, #-12]
+	mov     R10, #4
+	mul     R1, R1, R10
+	add     R10, R9, R1
+# 	ldr      R10, [R10]
+	str     R10, [R0]
+	add     R1, FP, #4
+	ldr     R10, [FP, #-12]
+	mov     R0, #4
+	mul     R10, R10, R0
+	add     R0, R1, R10
+	add     R10, FP, #-16
+# 	ldr      R10, [R10]
+	str     R10, [R0]
 	b       .L5
 .L11:
+NOP
 	sub     sp, fp, #0
 	ldr     fp, [sp], #4
 	bx      lr
 	.size   bubblesort, .-bubblesort
-
-	.align  2
-	.global main
-	.type   main, %function
-main:
-	stmfd   sp!, {fp, lr}
-	add     fp, sp, #4
-	sub     sp, sp, #56
-	ldr     159, =n
-	mov     160, #10
-	str     160, [159]
-	add     162, FP, #-44
-	mov     164, #0
-	mov     165, #4
-	mul     163, 164, 165
-	add     161, 162, 163
-	mov     166, #4
-	str     166, [161]
-	add     168, FP, #-44
-	mov     170, #1
-	mov     171, #4
-	mul     169, 170, 171
-	add     167, 168, 169
-	mov     172, #3
-	str     172, [167]
-	add     174, FP, #-44
-	mov     176, #2
-	mov     177, #4
-	mul     175, 176, 177
-	add     173, 174, 175
-	mov     178, #9
-	str     178, [173]
-	add     180, FP, #-44
-	mov     182, #3
-	mov     183, #4
-	mul     181, 182, 183
-	add     179, 180, 181
-	mov     184, #2
-	str     184, [179]
-	add     186, FP, #-44
-	mov     188, #4
-	mov     189, #4
-	mul     187, 188, 189
-	add     185, 186, 187
-	mov     190, #0
-	str     190, [185]
-	add     192, FP, #-44
-	mov     194, #5
-	mov     195, #4
-	mul     193, 194, 195
-	add     191, 192, 193
-	mov     196, #1
-	str     196, [191]
-	add     198, FP, #-44
-	mov     200, #6
-	mov     201, #4
-	mul     199, 200, 201
-	add     197, 198, 199
-	mov     202, #6
-	str     202, [197]
-	add     204, FP, #-44
-	mov     206, #7
-	mov     207, #4
-	mul     205, 206, 207
-	add     203, 204, 205
-	mov     208, #5
-	str     208, [203]
-	add     210, FP, #-44
-	mov     212, #8
-	mov     213, #4
-	mul     211, 212, 213
-	add     209, 210, 211
-	mov     214, #7
-	str     214, [209]
-	add     216, FP, #-44
-	mov     218, #9
-	mov     219, #4
-	mul     217, 218, 219
-	add     215, 216, 217
-	mov     220, #8
-	str     220, [215]
-	add     221, FP, #-48
-	mov     158, 221
-	add     222, FP, #-44
-	str     222, [SP]
-	bl      bubblesort
-	mov     157, RV
-	str     157, [158]
-.L9:
-	ldr     224, [FP, #-48]
-	ldr     226, =n
-	ldr     225, [226]
-	cmp     224, 225
-	blt     .L10
-	b       .L8
-.L8:
-	mov     227, #0
-	mov     RV, 227
-	b       .L13
-.L10:
-	add     230, FP, #-44
-	ldr     232, [FP, #-48]
-	mov     233, #4
-	mul     231, 232, 233
-	add     229, 230, 231
-	ldr     228, [229]
-	str     228, [FP, #-52]
-	ldr     234, [FP, #-52]
-	str     234, [SP]
-	bl      putint
-	mov     235, #10
-	str     235, [FP, #-52]
-	ldr     236, [FP, #-52]
-	str     236, [SP]
-	bl      putch
-	ldr     238, [FP, #-48]
-	add     237, 238, #1
-	str     237, [FP, #-48]
-	b       .L9
-.L13:
-	sub     sp, fp, #4
-	ldmfd   sp!, {fp, lr}
-	bx      lr
-	.size   main, .-main
-
