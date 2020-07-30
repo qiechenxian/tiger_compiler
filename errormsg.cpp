@@ -43,6 +43,9 @@ void EM_warning(A_pos pos, const char* message, ...){
 }
 
 void EM_error(A_pos pos, const char* message, ...){
+    if (not pos){
+        pos = A_Pos(0,0,0,0);
+    }
     fprintf(stderr, "%s:%d:%d: error: ", FILE_NAME, pos->first_line, pos->first_column);
     va_list ap;
     va_start(ap, message);
