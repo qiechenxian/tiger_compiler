@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/58_sort_test6.sy:0:0: error: fail to find node for label .L0
+Segmentation fault (core dumped)

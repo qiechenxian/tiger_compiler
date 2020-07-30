@@ -1,3 +1,8 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/00_arr_defn2.sy"
+	.data
+	.comm   a, 400, 4
+	.text
 	.align  2
 	.global main
 	.type   main, %function

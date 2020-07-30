@@ -1,17 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/06_var_defn_func.sy:0:0: error: fail to find node for label defn
-	.align  2
-	.global defn
-	.type   defn, %function
-defn:
-	str     fp, [sp, #-4]!
-	add     FP, SP, #0
-	sub     SP, SP, #4
-	mov     R10, #4
-	mov     R0, R10
-	b       .L0
-.L0:
-NOP
-	sub     sp, fp, #0
-	ldr     fp, [sp], #4
-	bx      lr
-	.size   defn, .-defn
+Segmentation fault (core dumped)

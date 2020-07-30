@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/45_equal_prior_logic.sy:0:0: error: fail to find node for label putint
+Segmentation fault (core dumped)

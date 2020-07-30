@@ -1,3 +1,8 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/08_arr_assign.sy"
+	.data
+	.comm   a, 40, 4
+	.text
 	.align  2
 	.global main
 	.type   main, %function
@@ -9,9 +14,9 @@ main:
 	mov     R10, #0
 	mov     R0, #4
 	mul     R10, R10, R0
-	add     105, R1, R10
+	add     R0, R1, R10
 	mov     R10, #1
-	str     R10, [105]
+	str     R10, [R0]
 	mov     R10, #0
 	mov     R0, R10
 	b       .L0

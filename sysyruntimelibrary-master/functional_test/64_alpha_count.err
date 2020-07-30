@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/64_alpha_count.sy:0:0: error: fail to find node for label getch
+Segmentation fault (core dumped)

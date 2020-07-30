@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/14_or.sy:0:0: error: fail to find node for label getint
+Segmentation fault (core dumped)

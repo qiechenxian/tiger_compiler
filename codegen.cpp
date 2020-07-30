@@ -290,8 +290,8 @@ static void munchStm(T_stm s) {
                     Temp_temp r2 = munchExp(e2);
                     sprintf(inst, "\tldr      'd0, ['s0]\n");
                     emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
-                    sprintf(inst2, "\tstr     'd0, ['s0]\n");
-                    emit(AS_Oper(inst2, L(r, NULL), L(r1, NULL), NULL));
+                    sprintf(inst2, "\tstr     's0, ['s1]\n");
+                    emit(AS_Oper(inst2, NULL, L(r1, L(r, NULL)), NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_CONST) {
                     /* MOVE(MEM(CONST(i)), e1) */
                     T_exp e1 = src;
@@ -308,18 +308,21 @@ static void munchStm(T_stm s) {
 //                {
 //                    /* MOVE(MEM(NAME(lab)), e1) */
 //                    T_exp e1=src;
-//                    Temp_temp r1=munchExp(e1);
+//                    Temp_temp r0 = Temp_newTemp();
 //                    Temp_label label = dst->u.MEM->u.NAME;
-//                    sprintf(inst,"\tldr 'd0,=%s\n",Temp_labelString(label));
-//                    emit(AS_Oper(inst,L(r1,NULL),L(r1,NULL),NULL));
+//                    sprintf(inst,"\tldr     'd0, =%s\n",Temp_labelString(label));
+//                    emit(AS_Oper(inst,L(r0,NULL),NULL,NULL));
+//                    Temp_temp r1=munchExp(e1);
+//                    sprintf(inst2, "\tstr     's0, ['d0]\n");
+//                    emit(AS_Oper(inst2, L(r0, NULL), L(r1, NULL), NULL));
 //                }
                 else {
                     /* MOVE(MEM(e1), e2) */
                     T_exp e1 = dst->u.MEM, e2 = src;
                     Temp_temp r1=munchExp(e1);
                     Temp_temp r2=munchExp(e2);
-                    sprintf(inst, "\tstr     's0, ['d0]\n");
-                    emit(AS_Oper(inst, L(r1, NULL), L(r2, NULL), NULL));
+                    sprintf(inst, "\tstr     's0, ['s1]\n");
+                    emit(AS_Oper(inst, NULL, L(r2, L(r1, NULL)), NULL));
                 }
             } else if (dst->kind == T_exp_::T_TEMP) {
                 if (src->kind == T_exp_::T_CALL) {

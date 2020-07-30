@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/60_while_fibonacci.sy:0:0: error: fail to find node for label .L3
+Segmentation fault (core dumped)

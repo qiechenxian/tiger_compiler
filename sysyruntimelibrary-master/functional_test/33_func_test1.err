@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/33_func_test1.sy:0:0: error: fail to find node for label .L1
+Segmentation fault (core dumped)

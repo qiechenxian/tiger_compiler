@@ -1,3 +1,37 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/17_less_eq.sy"
+	.data
+	.global a
+	.align  2
+	.type   a, %object
+	.size   a, 4
+a:
+	.word   5
+	.global s
+	.align  2
+	.type   s, %object
+	.size   s, 4
+s:
+	.word   0
+	.word   1
+	.word   2
+	.word   3
+	.word   4
+	.word   5
+	.word   6
+	.word   7
+	.word   8
+	.word   9
+	.text
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
+register not found for given color: FP
 	.align  2
 	.global main
 	.type   main, %function

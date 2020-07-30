@@ -5,7 +5,7 @@
 
 static void printTemp(void *t) {
     Temp_map m = Temp_name();
-    printf("node: %s\n", Temp_look(m, (Temp_temp) t));
+    fprintf(stderr, "node: %s\n", Temp_look(m, (Temp_temp) t));
 }
 
 //打印指令
@@ -136,9 +136,9 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     int tryNum = 0;
     while (++tryNum < 7) {
         flow = FG_AssemFlowGraph(il, f);
-//        G_show(stdout, G_nodes(flow), printInst);
+//        G_show(stderr, G_nodes(flow), printInst);
         live = Live_liveness(flow);
-//        G_show(stdout, G_nodes(live.graph), printTemp);
+//        G_show(stderr, G_nodes(live.graph), printTemp);
         initial = F_initialRegisters(f);
 
         col = COL_color(live.graph, initial, F_registers(),

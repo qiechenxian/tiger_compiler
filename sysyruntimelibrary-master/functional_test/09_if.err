@@ -1,3 +1,8 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/09_if.sy"
+	.data
+	.comm   a, 4, 4
+	.text
 	.align  2
 	.global main
 	.type   main, %function
@@ -5,13 +10,13 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #4
-	ldr     106, =a
+	ldr     R0, =a
 	mov     R10, #10
-	str     R10, [106]
+	str     R10, [R0]
 	ldr     R10, =a
-	ldr     R0, [R10]
-	mov     R10, #0
-	cmp     R0, R10
+	ldr     R10, [R10]
+	mov     R0, #0
+	cmp     R10, R0
 	bgt     .L0
 	b       .L1
 .L1:

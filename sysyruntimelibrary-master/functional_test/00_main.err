@@ -1,3 +1,7 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/00_main.sy"
+	.data
+	.text
 	.align  2
 	.global main
 	.type   main, %function

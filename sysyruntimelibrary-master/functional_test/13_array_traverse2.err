@@ -1,1 +1,1 @@
-/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/13_array_traverse2.sy:0:0: error: fail to find node for label .L7
+Segmentation fault (core dumped)

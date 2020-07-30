@@ -1,3 +1,9 @@
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/11_while.sy"
+	.data
+	.comm   a, 4, 4
+	.comm   b, 4, 4
+	.text
 	.align  2
 	.global main
 	.type   main, %function
@@ -5,12 +11,12 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #4
-	ldr     105, =b
+	ldr     R0, =b
 	mov     R10, #0
-	str     R10, [105]
-	ldr     107, =a
+	str     R10, [R0]
+	ldr     R0, =a
 	mov     R10, #3
-	str     R10, [107]
+	str     R10, [R0]
 .L1:
 	ldr     R10, =a
 	ldr     R10, [R10]
@@ -24,18 +30,18 @@ main:
 	mov     R0, R10
 	b       .L3
 .L2:
-	ldr     114, =b
+	ldr     R0, =b
 	ldr     R10, =b
+	ldr     R9, [R10]
+	ldr     R10, =a
 	ldr     R10, [R10]
+	add     R10, R9, R10
+	str     R10, [R0]
 	ldr     R0, =a
-	ldr     R0, [R0]
-	add     R10, R10, R0
-	str     R10, [114]
-	ldr     120, =a
 	ldr     R10, =a
 	ldr     R10, [R10]
 	sub     R10, R10, #1
-	str     R10, [120]
+	str     R10, [R0]
 	b       .L1
 .L3:
 NOP
