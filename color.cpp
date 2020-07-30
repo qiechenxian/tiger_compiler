@@ -571,7 +571,6 @@ static void colorMain() {
 
 struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
                             AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
-    //your code here.
     struct COL_result ret;
 
     c.precolored = initial;
