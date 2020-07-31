@@ -337,14 +337,20 @@ static void munchStm(T_stm s) {
                                 sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
                                 emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
                                 count_func_param--;
-                                sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
+                                if(count_func_param>=0){
+                                    sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                                    emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
+                                }
                                 count_func_param--;
-                                sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
+                                if(count_func_param>=0) {
+                                    sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
+                                    emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
+                                }
                                 count_func_param--;
-                                sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
+                                if(count_func_param>=0) {
+                                    sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
+                                    emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
+                                }
                         }
                         sprintf(inst2, "\tmov     'd0, 's0\n");
                         emit(AS_Move(inst2, L(t, NULL), L(F_RV(), NULL)));
@@ -426,15 +432,21 @@ static void munchStm(T_stm s) {
                         count_func_param=count_func_param-2;
                         sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
                         emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
+
                         count_func_param--;
+                        if(count_func_param>=0) {
                         sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
+                        emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));}
+
                         count_func_param--;
+                        if(count_func_param>=0) {
                         sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
+                        emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));}
+
                         count_func_param--;
+                        if(count_func_param>=0) {
                         sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
+                        emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));}
                     }
                 } else {
                     /* EXP(CALL(e,args)) */
@@ -567,7 +579,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
             emit(AS_Oper(inst, NULL, L(r, L(F_SP(),NULL)), NULL));
             Temp_tempList old = munchArgs(true,i + 1, args->tail);
             return Temp_TempList(r, old);
-        } else
+        } else if(args_count>=0)
         {
             switch (count_func_param-1) {
                 case 0: {
@@ -576,6 +588,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
 
                     sprintf(inst, "\tldr     'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R0(), NULL), L(r, NULL), NULL));
+                    break;
                 }
                 case 1:{
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r1  s1预着色为sp
@@ -583,6 +596,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
 
                     sprintf(inst, "\tldr    'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R1(), NULL) , L(r, NULL), NULL));
+                    break;
                 }
                 case 2:{
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r2  s1预着色为sp
@@ -590,6 +604,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
 
                     sprintf(inst, "\tldr    'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R2(),NULL) , L(r, NULL), NULL));
+                    break;
                 }
                 case 3:{
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r3  s1预着色为sp
@@ -597,6 +612,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
 
                     sprintf(inst, "\tldr    'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R3(),NULL) , L(r, NULL), NULL));
+                    break;
                 }
             }
             Temp_tempList old = munchArgs(true,i + 1, args->tail);
