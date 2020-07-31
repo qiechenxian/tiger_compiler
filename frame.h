@@ -14,9 +14,9 @@
 
 
 //栈的声明
-typedef struct F_frame_* F_frame;
-typedef struct F_access_* F_access;
 
+typedef struct F_access_* F_access;
+typedef struct F_frame_* F_frame;
 typedef struct F_accessList_ *F_accessList;
 struct F_accessList_{F_access head; F_accessList tail;};
 static F_accessList F_AccessList(F_access head, F_accessList tail);
@@ -82,6 +82,6 @@ F_accessList F_formals(F_frame f);
 T_stm F_procEntryExit1(F_frame frame, T_stm stm);
 AS_instrList F_procEntryExit2(AS_instrList body);
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
-
+Temp_label get_done_label(F_frame f_frame);
 
 #endif //COMPILER_LOYX_FRAME_H

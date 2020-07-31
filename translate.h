@@ -71,7 +71,7 @@ Tr_exp Tr_while(Tr_exp w_cond,Tr_exp w_stmt,Tr_exp w_break,Tr_exp w_continue);
 Tr_exp Tr_func_call(Temp_label name,Tr_expList params);
 Tr_exp Tr_assign(Tr_exp left,Tr_exp right);
 Tr_exp Tr_seq(Tr_exp left,Tr_exp right);
-Tr_exp Tr_return(Tr_exp ret_num);
+Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame);
 Tr_exp Tr_newlabel();
 Tr_frame Tr_root_frame();
 F_fragList Tr_getResult();

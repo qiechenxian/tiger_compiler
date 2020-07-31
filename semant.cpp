@@ -668,7 +668,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                 return Expty(Tr_nopExp(), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
-            return Expty(Tr_return(returnTy.exp), returnTy.ty);
+            return Expty(Tr_return(returnTy.exp,frame), returnTy.ty);
         }
         case A_stm_::A_switchStm:{//not required in grammer
             struct expty key = transExp(venv, tenv, s->u.switchStm.exp,l_break,l_continue);

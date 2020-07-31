@@ -220,12 +220,14 @@ struct F_access_ {
 
 struct F_frame_ {
     Temp_label name;
+    Temp_label func_done_label;
     F_accessList formals;
     F_accessList locals;
     int local_count;
     int callee_max_args;
     int temp_space;  /// todo 为寄存器分配后，保存临时变量空间预留的接口
     bool isLeaf;
+
     /** instructions required view shift*/
 };//添加局部变量域
 
@@ -345,6 +347,7 @@ F_frame F_newFrame(Temp_label name, U_boolList formals) {
     f->isLeaf = true;
     f->temp_space = 0;
     f->callee_max_args = -1;
+    f->func_done_label=Temp_newLabel();
     return f;
 }
 
@@ -579,6 +582,9 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
     return AS_Proc(entry_meta, total_inst, exit_meta);
 }
-
+Temp_label get_done_label(F_frame f_frame)
+{
+    return f_frame->func_done_label;
+}
 
 Temp_map F_tempMap = nullptr;

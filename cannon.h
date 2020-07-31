@@ -16,7 +16,7 @@ satisfying the following properties:
   1.  No SEQ's or ESEQ's
   2.  The parent of every CALL is an EXP(..) or a MOVE(TEMP t,..)
 */
-struct C_block C_basicBlocks(T_stmList stmList);
+struct C_block C_basicBlocks(T_stmList stmList,F_frame func_frame);
 /* basicBlocks : Tree.stm list -> (Tree.stm list list * Tree.label)
 	       From a list of cleaned trees, produce a list of
 	 basic blocks satisfying the following properties:
