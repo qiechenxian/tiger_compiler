@@ -569,11 +569,36 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
             return Temp_TempList(r, old);
         } else
         {
-            sprintf(str, "\tstr     r%d, ['d0, #%d]\n",count_func_param-1, (--args_count)*get_word_size());
-            emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+            switch (count_func_param-1) {
+                case 0: {
+                    sprintf(str, "\tstr     's0, ['s1, #%d]\n",(--args_count)*get_word_size());//s0预着色为r0  s1预着色为sp
+                    emit(AS_Oper(str,NULL, NULL, NULL));
 
-            sprintf(inst, "\tldr     r%d, ['s0]\n",count_func_param-1);
-            emit(AS_Oper(inst,NULL , L(r, NULL), NULL));
+                    sprintf(inst, "\tldr     'd0, ['s0]\n");
+                    emit(AS_Oper(inst,L(F_R0(), NULL), L(r, NULL), NULL));
+                }
+                case 1:{
+                    sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r1  s1预着色为sp
+                    emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+
+                    sprintf(inst, "\tldr     r%d, ['s0]\n");
+                    emit(AS_Oper(inst,L(F_R1(), NULL) , L(r, NULL), NULL));//d0预着色为r1
+                }
+                case 2:{
+                    sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r2  s1预着色为sp
+                    emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+
+                    sprintf(inst, "\tldr     r%d, ['s0]\n");
+                    emit(AS_Oper(inst,NULL , L(r, NULL), NULL));//d0预着色为r2
+                }
+                case 3:{
+                    sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r3  s1预着色为sp
+                    emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+
+                    sprintf(inst, "\tldr     r%d, ['s0]\n");
+                    emit(AS_Oper(inst,NULL , L(r, NULL), NULL));//d0预着色为r3
+                }
+            }
             Temp_tempList old = munchArgs(true,i + 1, args->tail);
             return Temp_TempList(r, old);
             //sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);

@@ -162,12 +162,31 @@ static patchList PatchList(Temp_label *head, patchList tail){
     return p;
 }
 static patchList connect_PatchList(patchList left, patchList right){
-    while(left->tail!= nullptr)
+    patchList head=PatchList(nullptr, nullptr);
+    patchList temp=head;
+    for(;left;left=left->tail)
     {
-        left=left->tail;
+        if(temp->head== nullptr)
+        {
+            temp->head=left->head;
+        } else
+        {
+            temp->tail=PatchList(left->head, nullptr);
+            temp=temp->tail;
+        }
     }
-    left->tail=right;
-    return left;
+    for(;right;right=right->tail)
+    {
+        if(temp->head== nullptr)
+        {
+            temp->head=right->head;
+        } else
+        {
+            temp->tail=PatchList(right->head, nullptr);
+            temp=temp->tail;
+        }
+    }
+    return head;
 }
 
 /** delegate to frame.h */

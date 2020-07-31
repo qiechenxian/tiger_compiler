@@ -1,6 +1,7 @@
 //
 // Created by Administrator on 11/7/2020.
 //
+#include "translate.h"
 #include "cannon.h"
 typedef struct expRefList_* expRefList;
 struct expRefList_ {T_exp *head;expRefList tail;};
@@ -148,15 +149,16 @@ static T_stm recoder(expRefList refList) {
         );
     }
 }
-C_stmListList cut_stm(T_stmList pre_stm,T_stmList now_stm,Temp_label temp_done)//裁剪stm并完成开始新的block
+C_stmListList cut_stm(T_stmList pre_stm,T_stmList now_stm,Temp_label temp_done)
 {
-    if(now_stm == nullptr)
+    if(now_stm == nullptr)//done 去掉了为出口处理预留的label与jump label
     {
         T_stmList done_blcok= T_StmList(
-                T_Jump(T_Name(temp_done),
-                        Temp_LabelList(temp_done, nullptr)),
+        T_Jump(T_Name(temp_done),
+                       Temp_LabelList(temp_done, nullptr)),
                         nullptr);
         pre_stm->tail=done_blcok;
+        //pre_stm->tail=T_StmList(T_Exp(T_Const(0)), nullptr);
         return nullptr;
     }
     else if(now_stm->head->kind==T_stm_::T_CJUMP||now_stm->head->kind==T_stm_::T_JUMP)
