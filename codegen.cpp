@@ -4,7 +4,7 @@
 #include "codegen.h"
 
 /// 定义指令字符串长度，可调整大小，节省内存
-const int INST_LEN = 120;
+const int INST_LEN = 40;
 int count_func_param=0;//该全局变量用于调用sys库特殊处理时，判断前四个参数
 int args_count=0;
 // 添加instr到指令表中

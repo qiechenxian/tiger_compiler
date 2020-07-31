@@ -52,7 +52,7 @@ static int* makeSuffixSize(A_expList list)
 {
     int lens = 0;
     for (A_expList iter = list; iter; iter = iter->tail, lens++);
-    int* suffix_size = (int*)checked_malloc((lens+5)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
+    int* suffix_size = (int*)checked_malloc((lens+1)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
     int suffix_index = 0;
     suffix_size[suffix_index++] = 1;
     for (A_expList iter = list->tail; iter; iter = iter->tail, suffix_index++)
@@ -698,6 +698,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
         case A_exp_::A_varExp:{
             expty var = transVar(venv, tenv, a->u.varExp,l_break,l_continue);
             if (var.isConst){
+//                free(a->u.varExp);
                 a->u.intExp = getConstValue(venv, a);
                 a->kind = A_exp_::A_intExp;
                 var.ty = TY_Int();
@@ -791,6 +792,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     a->kind = A_exp_::A_intExp;
                     expty expty_msg = Expty(Tr_intExp(a->u.intExp), TY_Int());
                     expty_msg.isConst = true;
+//                    free(temp_left);
+//                    free(temp_right);
                     return expty_msg;
                     /// 此处会造成内存泄漏，泄漏对象：temp_left, temp_right所指对象
                 }
@@ -800,6 +803,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     a->kind = A_exp_::A_intExp;
                     expty expty_msg = Expty(Tr_intExp(a->u.intExp), TY_Int());
                     expty_msg.isConst = true;
+//                    free(temp_right);
                     return expty_msg;
                     /// 此处会造成内存泄漏，泄漏对象：temp_left所指对象
             }

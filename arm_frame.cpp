@@ -497,7 +497,7 @@ static int getSpace(F_frame frame)
  *
  */
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
-    const int INST_SIZE = 120;
+    const int INST_SIZE = 40;
     AS_instrList head_inst_list, tail_inst_list;
     AS_instrList head_inst_ptr, tail_inst_ptr;
     int word_size = get_word_size();
