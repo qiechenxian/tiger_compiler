@@ -125,11 +125,11 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                if (i < 200) {
+                if (i < 200&&i>-200) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
-                    sprintf(inst, "\tldr     'd0, '=%d\n", i);
+                    sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                     sprintf(inst2,"\tadd     'd0, 's0, 'd0\n");
                     emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
@@ -140,11 +140,11 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.right;
                 int i = e->u.BINOP.left->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                if (i < 200) {
+                if (i < 200&&i>-200) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
-                    sprintf(inst, "\tldr     'd0, '=%d\n", i);
+                    sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                     sprintf(inst2,"\tadd     'd0, 's0, 'd0\n");
                     emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
@@ -155,14 +155,14 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                if (i < 200) {
+                if (i < 200&&i>-200) {
                     sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
-                    sprintf(inst, "\tldr     'd0, '=%d\n", i);
+                    sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                    sprintf(inst2,"\tsub     'd0, 's0, 'd0\n");
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                    sprintf(inst2,"\tsub     'd0, 's0, 'd1\n");
+                    emit(AS_Oper(inst2,L(r,L(r,NULL)),L(munchExp(e1),NULL),NULL));
                 }
 //                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
 //                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
@@ -176,7 +176,7 @@ static Temp_temp munchExp(T_exp e) {
                     sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
-                    sprintf(inst, "\tldr     'd0, '=%d\n", i);
+                    sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                     sprintf(inst2,"\tsub     'd0, 's0, 'd0\n");
                     emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
