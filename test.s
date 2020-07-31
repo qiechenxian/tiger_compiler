@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "0_my_test.c"
+	.file   "test.c"
 	.data
 	.text
 	.align  2
@@ -8,19 +8,35 @@
 main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
-	sub     SP, SP, #12
+	sub     SP, SP, #8
+	mov     R9, #10
+	str     R9, [FP, #-8]
+.L1:
 	ldr     R9, [FP, #-8]
-	str     r0, [SP, #0]
-	ldr     r0, [R9]
-	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
-	ldr     R9, [FP, #-8]
-	mov     R0, R9
+	mov     R4, #0
+	cmp     R9, R4
+	bgt     .L4
 	b       .L0
 .L0:
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
+	b       .L5
+.L4:
+	ldr     R9, [FP, #-8]
+	mov     R4, #5
+	cmp     R9, R4
+	bgt     .L2
+	b       .L3
+.L3:
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
+	b       .L1
+.L2:
+	ldr     R9, [FP, #-8]
+	sub     R9, R9, #1
+	str     R9, [FP, #-8]
+	b       .L1
+.L5:
 NOP
 	sub     sp, fp, #4
 	ldmfd   sp!, {fp, lr}
