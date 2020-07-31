@@ -6,7 +6,7 @@
 #include "util.h"
 #include "table.h"
 
-#define TAB_SIZE 31
+#define TAB_SIZE 16
 
 typedef struct binder_* binder;
 struct binder_{

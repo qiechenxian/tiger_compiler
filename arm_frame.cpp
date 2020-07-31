@@ -340,7 +340,7 @@ F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    f->local_count = 1 + 7; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     f->locals = nullptr;
     f->isLeaf = true;
     f->temp_space = 0;
@@ -537,10 +537,22 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
     int space = getSpace(frame);// todo 此处还应有要保护寄存器空间
     if (space>0){
-        char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-        sprintf(frame_space, "\tsub     'd0, 's0, #%d\n", space * word_size);
-        head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-        head_inst_ptr = head_inst_ptr->tail;
+        if (space < 200){
+            char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
+            sprintf(frame_space, "\tsub     'd0, 's0, #%d\n", space * word_size);
+            head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
+            head_inst_ptr = head_inst_ptr->tail;
+        } else{
+            char *temp = (char*)checked_malloc(sizeof(char ) * INST_SIZE);
+            sprintf(temp, "\tldr     r4, =%d\n", space * word_size);
+            head_inst_ptr->tail = AS_InstrList(AS_Oper(temp, NULL, NULL, NULL), NULL);
+            head_inst_ptr = head_inst_ptr->tail;
+
+            char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
+            sprintf(frame_space, "\tsub     'd0, 's0, r4\n", space * word_size);
+            head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
+            head_inst_ptr = head_inst_ptr->tail;
+        }
     }
 
     /** 将函数入口指令和body指令连接 */
