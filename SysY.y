@@ -306,12 +306,12 @@ Cond:
 
 LOrExp:
     LAndExp {$$ = $1}
-    | LOrExp OR LAndExp {$$ = A_OpExp(A_POS(@$), $1, A_and, $3)}
+    | LOrExp OR LAndExp {$$ = A_OpExp(A_POS(@$), $1, A_or, $3)}
     ;
 
 LAndExp:
     EqExp {$$ = $1}
-    | LAndExp AND EqExp {$$ = A_OpExp(A_POS(@$), $1, A_or, $3)}
+    | LAndExp AND EqExp {$$ = A_OpExp(A_POS(@$), $1, A_and, $3)}
     ;
 
 EqExp:

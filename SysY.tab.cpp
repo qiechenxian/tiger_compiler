@@ -2188,7 +2188,7 @@ yyreduce:
 
 /* Line 1464 of yacc.c  */
 #line 309 ".\\SysY.y"
-    {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), A_and, (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), A_or, (yyvsp[(3) - (3)].exp));}
     break;
 
   case 71:
@@ -2202,7 +2202,7 @@ yyreduce:
 
 /* Line 1464 of yacc.c  */
 #line 314 ".\\SysY.y"
-    {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), A_or, (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), A_and, (yyvsp[(3) - (3)].exp));}
     break;
 
   case 73:
