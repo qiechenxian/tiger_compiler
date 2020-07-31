@@ -579,24 +579,24 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
                 }
                 case 1:{
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r1  s1预着色为sp
-                    emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+                    emit(AS_Oper(str,NULL, NULL, NULL));
 
-                    sprintf(inst, "\tldr     r%d, ['s0]\n");
-                    emit(AS_Oper(inst,L(F_R1(), NULL) , L(r, NULL), NULL));//d0预着色为r1
+                    sprintf(inst, "\tldr    'd0, ['s0]\n");
+                    emit(AS_Oper(inst,L(F_R1(), NULL) , L(r, NULL), NULL));
                 }
                 case 2:{
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r2  s1预着色为sp
-                    emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+                    emit(AS_Oper(str,NULL, NULL, NULL));
 
-                    sprintf(inst, "\tldr     r%d, ['s0]\n");
-                    emit(AS_Oper(inst,NULL , L(r, NULL), NULL));//d0预着色为r2
+                    sprintf(inst, "\tldr    'd0, ['s0]\n");
+                    emit(AS_Oper(inst,L(F_R2(),NULL) , L(r, NULL), NULL));
                 }
                 case 3:{
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r3  s1预着色为sp
-                    emit(AS_Oper(str,L(F_SP(), NULL), NULL, NULL));
+                    emit(AS_Oper(str,NULL, NULL, NULL));
 
-                    sprintf(inst, "\tldr     r%d, ['s0]\n");
-                    emit(AS_Oper(inst,NULL , L(r, NULL), NULL));//d0预着色为r3
+                    sprintf(inst, "\tldr    'd0, ['s0]\n");
+                    emit(AS_Oper(inst,L(F_R3(),NULL) , L(r, NULL), NULL));
                 }
             }
             Temp_tempList old = munchArgs(true,i + 1, args->tail);
