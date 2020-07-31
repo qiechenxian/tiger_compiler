@@ -52,7 +52,7 @@ static int* makeSuffixSize(A_expList list)
 {
     int lens = 0;
     for (A_expList iter = list; iter; iter = iter->tail, lens++);
-    int* suffix_size = (int*)checked_malloc((lens+1)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
+    int* suffix_size = (int*)checked_malloc((lens+5)*sizeof(int)); // 比数组长度多1，以放置结束标志-1
     int suffix_index = 0;
     suffix_size[suffix_index++] = 1;
     for (A_expList iter = list->tail; iter; iter = iter->tail, suffix_index++)
@@ -376,7 +376,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                 auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
                 init_list_tr->array_length=null_init->total_size;
-                init_list_tr->array=(Tr_exp*)checked_malloc(null_init->total_size*sizeof(Tr_exp));
+                init_list_tr->array=(Tr_exp*)checked_malloc((null_init->total_size+5)*sizeof(Tr_exp));
                 for(int i=0;i < null_init->total_size;i++)
                 {
                     struct expty temp=transExp(venv,tenv,null_init->array[i],l_break,l_continue);;

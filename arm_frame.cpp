@@ -497,13 +497,14 @@ static int getSpace(F_frame frame)
  *
  */
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
+    const int INST_SIZE = 120;
     AS_instrList head_inst_list, tail_inst_list;
     AS_instrList head_inst_ptr, tail_inst_ptr;
     int word_size = get_word_size();
     char *name = Temp_labelString(frame->name);
 
     /** 函数入口label*/
-    char *fun_label = (char *) checked_malloc(sizeof(char) * 20);
+    char *fun_label = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(fun_label, "%s:\n", name);
     head_inst_list = AS_InstrList(AS_Label(fun_label, frame->name), NULL);
     head_inst_ptr = head_inst_list;
@@ -527,14 +528,14 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
     // todo callee 保护的寄存器的相关指令
 
-    char *inst = (char *) checked_malloc(sizeof(char) * 20);
+    char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
     head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, Temp_TempList(F_FP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
     int space = getSpace(frame);// todo 此处还应有要保护寄存器空间
     if (space>0){
-        char *frame_space = (char*)checked_malloc(sizeof(char) * 20);
+        char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
         sprintf(frame_space, "\tsub     'd0, 's0, #%d\n", space * word_size);
         head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
@@ -544,7 +545,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr->tail = body->tail;
 
     /** 函数出口指令 */
-    inst = (char *) checked_malloc(sizeof(char) * 20);
+    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
     tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     tail_inst_ptr = tail_inst_list;
@@ -559,16 +560,16 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         tail_inst_ptr = tail_inst_ptr->tail;
     }
 
-    inst = (char *) checked_malloc(sizeof(char) * 20);
+    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tbx      lr\n");
     tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
 
     /** 连接上出口指令 */
     AS_instrList total_inst = AS_splice(head_inst_list, tail_inst_list);
 
-    char *entry_meta = (char *) checked_malloc(sizeof(char) * 100);
+    char *entry_meta = (char *) checked_malloc(sizeof(char) * INST_SIZE*3);
     sprintf(entry_meta, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
-    char *exit_meta = (char *) checked_malloc(sizeof(char) * 100);
+    char *exit_meta = (char *) checked_malloc(sizeof(char) * INST_SIZE*3);
     sprintf(exit_meta, "\t.size   %s, .-%s", name, name);
 
     return AS_Proc(entry_meta, total_inst, exit_meta);
