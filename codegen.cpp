@@ -333,9 +333,11 @@ static void munchStm(T_stm s) {
                         emit(AS_Oper(inst, L(F_LR(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
                         if(special_tag==true)
                         {
-                                count_func_param=count_func_param-2;
-                                sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                            count_func_param=count_func_param-2;
+                            if(count_func_param>=0) {
+                                sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
                                 emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
+                            }
                                 count_func_param--;
                                 if(count_func_param>=0){
                                     sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
@@ -430,8 +432,9 @@ static void munchStm(T_stm s) {
                     if(special_tag==true)
                     {
                         count_func_param=count_func_param-2;
+                        if(count_func_param>=0) {
                         sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
+                        emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));}
 
                         count_func_param--;
                         if(count_func_param>=0) {
@@ -594,7 +597,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r1  s1预着色为sp
                     emit(AS_Oper(str,NULL, L(F_R1(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tldr    'd0, ['s0]\n");
+                    sprintf(inst, "\tldr     'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R1(), NULL) , L(r, NULL), NULL));
                     break;
                 }
@@ -602,7 +605,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r2  s1预着色为sp
                     emit(AS_Oper(str,NULL, L(F_R2(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tldr    'd0, ['s0]\n");
+                    sprintf(inst, "\tldr     'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R2(),NULL) , L(r, NULL), NULL));
                     break;
                 }
@@ -610,7 +613,7 @@ static Temp_tempList munchArgs(bool tag,int i, T_expList args)
                     sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count)*get_word_size());//s0预着色为r3  s1预着色为sp
                     emit(AS_Oper(str,NULL, L(F_R3(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tldr    'd0, ['s0]\n");
+                    sprintf(inst, "\tldr     'd0, ['s0]\n");
                     emit(AS_Oper(inst,L(F_R3(),NULL) , L(r, NULL), NULL));
                     break;
                 }
