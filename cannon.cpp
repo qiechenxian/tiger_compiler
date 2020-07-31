@@ -194,14 +194,13 @@ C_stmListList block_trans(T_stmList stm,Temp_label temp_done)//负责完成block
         return(C_StmListList(stm,cut_stm(stm,stm->tail,temp_done)));
     }
 }
-struct C_block C_basicBlocks(T_stmList stmList)
+struct C_block C_basicBlocks(T_stmList stmList,F_frame func_frame)
 {
     struct C_block my_block{};
-    Temp_label temp=Temp_newLabel();
+    Temp_label temp=get_done_label(func_frame);
     my_block.labels=temp;//函数出口处理程序所在label
     my_block.stmLists=block_trans(stmList,temp);
     return my_block;
-
 }
 static T_stmList getLast(T_stmList list)
 {
