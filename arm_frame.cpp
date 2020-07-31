@@ -526,7 +526,9 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         recover_offset = 1 * word_size;
     }
 
-    // todo callee 保护的寄存器的相关指令
+    // todo 优化
+    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r10}\n", NULL, NULL, NULL),NULL);
+    head_inst_ptr = head_inst_ptr->tail;
 
     char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
@@ -549,6 +551,9 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
     tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     tail_inst_ptr = tail_inst_list;
+
+    tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r10}\n", NULL, NULL, NULL), NULL);
+    tail_inst_ptr = tail_inst_ptr->tail;
 
     if (frame->isLeaf) {
         inst = (char *) "\tldr     fp, [sp], #4\n";
