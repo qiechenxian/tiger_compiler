@@ -11,6 +11,7 @@ E_envEntry E_VarEntry(bool isConst, Tr_access access, TY_ty ty){
     e->u.var.cValues = nullptr;
     e->u.var.access = access;
     e->u.var.suffix_size = nullptr; /// 该操作保证suffix_size的职责(判断是否为数组)正确。(1/2)
+    e->u.var.isFormal = false;
     e->u.var.ty = ty;
     return e;
 }

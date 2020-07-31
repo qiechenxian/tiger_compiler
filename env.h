@@ -27,6 +27,7 @@ struct E_envEntry_{
              * 约定后缀和数组以-1结尾。例如:[13, 3, 1, -1]
              */
             int* suffix_size;
+            bool isFormal;
         }var;
         struct {Temp_label label; TY_tyList formals; TY_ty result;}fun;
     }u;

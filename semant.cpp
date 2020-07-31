@@ -516,6 +516,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     int *suffix_size = makeSuffixSize(dimension);
                     arg_entry->u.var.suffix_size = suffix_size;
                 }
+                arg_entry->u.var.isFormal = true;
                 S_enter(venv, formalIter->head->id, arg_entry);
                 argsCL = argsCL->tail;
             }
@@ -741,6 +742,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 for (; argIter; argIter = argIter->tail){
                     param_count++;
                     struct expty argType = transExp(venv, tenv, argIter->head, l_break, l_continue);
+//                    Tr_exp arg_exp = Tr_addMemForArg(argType.exp);
+//                    Tr_expList_append(params, arg_exp);
                     Tr_expList_append(params, argType.exp);
                 }
                 expty expty_msg = Expty(Tr_func_call(funEntry->u.fun.label,params), TY_Void());
@@ -755,7 +758,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
 
             for ( ; argIter && formals; argIter = argIter->tail, formals = formals->tail){
                 struct expty argType = transExp(venv, tenv, argIter->head,l_break,l_continue);
-                Tr_expList_append(params,argType.exp);
+//                Tr_exp arg_exp = Tr_addMemForArg(argType.exp);
+                Tr_expList_append(params, argType.exp);
                 param_count++;
                 if (!is_equal_ty(argType.ty, formals->head)){
                     EM_warning(argIter->head->pos,
@@ -898,7 +902,7 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
             } else{
 
                 /// 如果访问的变量是数组，则额外返回后缀和信息，供访问数组翻译时使用
-                if (varEntry->u.var.suffix_size)
+                if (varEntry->u.var.suffix_size and not varEntry->u.var.isFormal)
                 /**
                  * 此处通过符号表中的varEntry的suffix_size域是否为空，来判断该varEntry是否为数组
                  * 该做法十分危险且使suffix_size职责混乱，由于时间精力限制暂且这样实现
@@ -919,6 +923,7 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
                             actual_ty(varEntry->u.var.ty)
                             );
                     expty_msg.isConst = varEntry->u.var.isConst;
+                    expty_msg.suffix_size = varEntry->u.var.suffix_size;
                     return expty_msg;
                 }
             }
