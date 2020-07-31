@@ -125,7 +125,7 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                if (i < 200) {
+                if (i < 200&&i>-200) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
@@ -140,7 +140,7 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.right;
                 int i = e->u.BINOP.left->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                if (i < 200) {
+                if (i < 200&&i>-200) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
@@ -155,7 +155,7 @@ static Temp_temp munchExp(T_exp e) {
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
                 Temp_temp r = Temp_newTemp();
-                if (i < 200) {
+                if (i < 200&&i>-200) {
                     sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
