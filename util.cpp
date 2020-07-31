@@ -11,7 +11,7 @@ void* checked_malloc(unsigned len){
 }
 
 c_string String(char *str){
-    unsigned len = strlen(str);
+    unsigned len = strlen(str)+10;
     c_string p = (c_string)checked_malloc(len * sizeof(char));
     strcpy(p, str);
     return p;
