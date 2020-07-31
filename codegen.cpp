@@ -73,8 +73,6 @@ AS_instrList F_codegen(F_frame f, T_stmList stmList) {
  */
 static Temp_temp munchExp(T_exp e) {
     char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     switch (e->kind) {
         case T_exp_::T_MEM: {
             T_exp mem = e->u.MEM;
@@ -280,7 +278,7 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,CONST(i),e1)),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
-                    sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i);
+                    sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
                     emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                 } else if (src->kind == T_exp_::T_MEM) {
                     /* MOVE(MEM(e1), MEM(e2)) */
@@ -336,17 +334,17 @@ static void munchStm(T_stm s) {
                         if(special_tag==true)
                         {
                                 count_func_param=count_func_param-2;
-                                sprintf(inst_r0, "\tldr     r0, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r0, NULL, L(F_SP(), NULL), NULL));
+                                sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
                                 count_func_param--;
-                                sprintf(inst_r1, "\tldr     r1, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r1, NULL, L(F_SP(), NULL), NULL));
+                                sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
                                 count_func_param--;
-                                sprintf(inst_r2, "\tldr     r2, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r2, NULL, L(F_SP(), NULL), NULL));
+                                sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
                                 count_func_param--;
-                                sprintf(inst_r3, "\tldr     r3, ['s0, #%d]\n",count_func_param*get_word_size());
-                                emit(AS_Oper(inst_r3, NULL, L(F_SP(), NULL), NULL));
+                                sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                                emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
                         }
                         sprintf(inst2, "\tmov     'd0, 's0\n");
                         emit(AS_Move(inst2, L(t, NULL), L(F_RV(), NULL)));
@@ -426,17 +424,17 @@ static void munchStm(T_stm s) {
                     if(special_tag==true)
                     {
                         count_func_param=count_func_param-2;
-                        sprintf(inst_r0, "\tldr     r0, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r0, NULL, L(F_SP(), NULL), NULL));
+                        sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
                         count_func_param--;
-                        sprintf(inst_r1, "\tldr     r1, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r1, NULL, L(F_SP(), NULL), NULL));
+                        sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
                         count_func_param--;
-                        sprintf(inst_r2, "\tldr     r2, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r2, NULL, L(F_SP(), NULL), NULL));
+                        sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
                         count_func_param--;
-                        sprintf(inst_r3, "\tldr     r3, ['s0, #%d]\n",count_func_param*get_word_size());
-                        emit(AS_Oper(inst_r3, NULL, L(F_SP(), NULL), NULL));
+                        sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n",count_func_param*get_word_size());
+                        emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
                     }
                 } else {
                     /* EXP(CALL(e,args)) */
