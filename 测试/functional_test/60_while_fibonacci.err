@@ -71,10 +71,10 @@ main:
 	add     FP, SP, #4
 	sub     SP, SP, #8
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R9, R0
 	ldr     R4, =n
 	str     R9, [R4]

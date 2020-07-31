@@ -178,10 +178,10 @@ main:
 	add     R9, FP, #-8
 # 	mov     R9, R9
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R8, R0
 	str     R8, [R9]
 	mov     R9, #0
@@ -207,10 +207,10 @@ main:
 	b       .L23
 .L23:
 	bl      starttime
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R9, #0
 	str     R9, [FP, #-16]
 .L30:
@@ -232,26 +232,26 @@ main:
 	b       .L32
 .L32:
 	bl      stoptime
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	ldr     R9, [FP, #-20]
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	mov     R9, #10
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putch
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	mov     R9, #0
 	mov     R0, R9
 	b       .L39
@@ -270,21 +270,21 @@ main:
 	str     R9, [FP, #-16]
 	b       .L18
 .L21:
-	ldr     R9, =A
-	ldr     R8, [FP, #-16]
+	ldr     R5, =A
+	ldr     R9, [FP, #-16]
 	mov     R4, #4096
-	mul     R4, R8, R4
-	add     R9, R9, R4
-	ldr     R4, [FP, #-12]
-	mov     R8, #4
-	mul     R4, R4, R8
-	add     R9, R9, R4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	ldr     R9, [FP, #-12]
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R9, R5, R9
 # 	mov     R9, R9
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R8, R0
 	str     R8, [R9]
 	ldr     R9, [FP, #-12]
@@ -306,21 +306,21 @@ main:
 	str     R9, [FP, #-16]
 	b       .L24
 .L27:
-	ldr     R9, =B
-	ldr     R4, [FP, #-16]
-	mov     R8, #4096
-	mul     R4, R4, R8
-	add     R9, R9, R4
+	ldr     R4, =B
+	ldr     R8, [FP, #-16]
+	mov     R9, #4096
+	mul     R5, R8, R9
+	add     R4, R4, R5
 	ldr     R8, [FP, #-12]
-	mov     R4, #4
-	mul     R4, R8, R4
-	add     R9, R9, R4
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R9, R4, R5
 # 	mov     R9, R9
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R8, R0
 	str     R8, [R9]
 	ldr     R9, [FP, #-12]

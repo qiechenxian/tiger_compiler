@@ -12,18 +12,18 @@ main:
 	add     FP, SP, #4
 	sub     SP, SP, #4
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R9, R0
 	ldr     R4, =a
 	str     R9, [R4]
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R9, R0
 	ldr     R4, =b
 	str     R9, [R4]
@@ -31,20 +31,20 @@ main:
 	ldr     R9, [R9]
 	mov     R4, #0
 	cmp     R9, R4
-	bgt     .L0
+	bgt     .L1
+	b       .L0
+.L0:
+	ldr     R9, =b
+	ldr     R4, [R9]
+	mov     R9, #0
+	cmp     R4, R9
+	bgt     .L1
 	b       .L2
 .L2:
 	mov     R9, #0
 	mov     R0, R9
 .L3:
 	b       .L4
-.L0:
-	ldr     R9, =b
-	ldr     R4, [R9]
-	mov     R9, #0
-	cmp     R4, R9
-	ble     .L2
-	b       .L1
 .L1:
 	mov     R9, #1
 	mov     R0, R9

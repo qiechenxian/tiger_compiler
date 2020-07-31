@@ -552,25 +552,25 @@ main:
 	add     R9, FP, #-8
 # 	mov     R9, R9
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R8, R0
 	str     R8, [R9]
 	bl      getint
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R9, R0
 	ldr     R4, =staticvalue
 	str     R9, [R4]
 	bl      starttime
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 .L18:
 	ldr     R9, [FP, #-8]
 	mov     R4, #0
@@ -579,10 +579,10 @@ main:
 	b       .L17
 .L17:
 	bl      stoptime
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R9, #10000
 	str     r0, [SP, #4]
 	ldr     r0, [R9]
@@ -590,10 +590,10 @@ main:
 	str     r1, [SP, #0]
 	ldr     r1, [R4]
 	bl      putarray
-	ldr     r0, [SP, #4]
-	ldr     r1, [SP, #0]
-	ldr     r2, [SP, #-4]
-	ldr     r3, [SP, #-8]
+	ldr     R0, [SP, #4]
+	ldr     R1, [SP, #0]
+	ldr     R2, [SP, #-4]
+	ldr     R3, [SP, #-8]
 	mov     R9, #0
 	mov     R0, R9
 	b       .L22

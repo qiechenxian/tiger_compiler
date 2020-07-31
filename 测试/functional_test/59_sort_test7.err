@@ -47,13 +47,7 @@ Merge:
 	ldr     R4, [FP, #-96]
 	ldr     R9, [FP, #-8]
 	cmp     R4, R9
-	bne     .L12
-	b       .L6
-.L6:
-	ldr     R4, [FP, #-100]
-	ldr     R9, [FP, #-12]
-	cmp     R4, R9
-	bne     .L12
+	bne     .L6
 	b       .L7
 .L7:
 .L14:
@@ -112,6 +106,12 @@ Merge:
 	add     R9, R9, #1
 	str     R9, [FP, #-100]
 	b       .L4
+.L6:
+	ldr     R9, [FP, #-100]
+	ldr     R4, [FP, #-12]
+	cmp     R9, R4
+	beq     .L7
+	b       .L12
 .L12:
 	add     R4, FP, #-52
 	ldr     R8, [FP, #-96]
@@ -407,20 +407,20 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	mov     R9, #10
 	str     R9, [FP, #-52]
 	ldr     R9, [FP, #-52]
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putch
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	ldr     R9, [FP, #-48]
 	add     R9, R9, #1
 	str     R9, [FP, #-48]

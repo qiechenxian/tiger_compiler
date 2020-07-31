@@ -22,8 +22,26 @@ main:
 	add     R4, R4, R9
 	ldr     R9, [FP, #-8]
 	cmp     R4, R9
-	beq     .L1
-	b       .L0
+	beq     .L0
+	b       .L2
+.L2:
+	ldr     R4, [FP, #-16]
+	mov     R9, #0
+	cmp     R4, R9
+	blt     .L5
+	b       .L4
+.L4:
+	ldr     R4, [FP, #-8]
+	ldr     R9, [FP, #-16]
+	sub     R4, R4, R9
+	ldr     R9, [FP, #-12]
+	cmp     R4, R9
+	beq     .L3
+	b       .L6
+.L6:
+	mov     R9, #0
+	mov     R0, R9
+	b       .L7
 .L0:
 	ldr     R5, [FP, #-20]
 	ldr     R9, [FP, #-8]
@@ -33,18 +51,8 @@ main:
 	bl      __aeabi_idiv
 	mov     R9, R0
 	cmp     R5, R9
-	bne     .L1
-	b       .L2
-.L2:
-	ldr     R9, [FP, #-16]
-	mov     R4, #0
-	cmp     R9, R4
-	blt     .L4
-	b       .L6
-.L6:
-	mov     R9, #0
-	mov     R0, R9
-	b       .L7
+	beq     .L2
+	b       .L1
 .L1:
 	ldr     R8, [FP, #-12]
 	ldr     R9, [FP, #-16]
@@ -61,26 +69,18 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	b       .L2
-.L4:
-	ldr     R4, [FP, #-8]
-	ldr     R9, [FP, #-16]
-	sub     R4, R4, R9
-	ldr     R9, [FP, #-12]
-	cmp     R4, R9
-	beq     .L5
-	b       .L3
 .L3:
 	ldr     R5, [FP, #-8]
 	ldr     R9, [FP, #-20]
 	mov     R4, #2
 	mul     R9, R9, R4
 	cmp     R5, R9
-	bne     .L6
+	beq     .L6
 	b       .L5
 .L5:
 	mov     R9, #1
@@ -89,10 +89,10 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	b       .L6
 .L7:
 NOP

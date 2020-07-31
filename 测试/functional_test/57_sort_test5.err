@@ -75,24 +75,7 @@ heap_ajust:
 	ldr     R4, [FP, #-12]
 	ldr     R9, [FP, #12]
 	cmp     R4, R9
-	blt     .L3
-	b       .L2
-.L2:
-	add     R9, FP, #4
-	ldr     R8, [FP, #-12]
-	mov     R4, #4
-	mul     R4, R8, R4
-	add     R9, R9, R4
-	ldr     R5, [R9]
-	add     R6, FP, #4
-	ldr     R9, [FP, #-12]
-	add     R9, R9, #1
-	mov     R4, #4
-	mul     R9, R9, R4
-	add     R4, R6, R9
-	ldr     R9, [R4]
-	cmp     R5, R9
-	blt     .L3
+	blt     .L2
 	b       .L4
 .L4:
 	add     R9, FP, #4
@@ -131,6 +114,23 @@ heap_ajust:
 	str     R9, [FP, #-12]
 .L7:
 	b       .L1
+.L2:
+	add     R9, FP, #4
+	ldr     R8, [FP, #-12]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R8, [R9]
+	add     R5, FP, #4
+	ldr     R9, [FP, #-12]
+	add     R9, R9, #1
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R5, R9
+	ldr     R4, [R4]
+	cmp     R8, R4
+	bge     .L4
+	b       .L3
 .L3:
 	ldr     R9, [FP, #-12]
 	add     R9, R9, #1
@@ -353,20 +353,20 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	mov     R9, #10
 	str     R9, [FP, #-52]
 	ldr     R9, [FP, #-52]
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putch
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	ldr     R9, [FP, #-48]
 	add     R9, R9, #1
 	str     R9, [FP, #-48]

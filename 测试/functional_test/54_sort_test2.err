@@ -38,8 +38,22 @@ insertsort:
 	ldr     R4, [FP, #-16]
 	mov     R9, #-1
 	cmp     R4, R9
-	bgt     .L5
-	b       .L2
+	bgt     .L2
+	b       .L3
+.L3:
+	add     R8, FP, #4
+	ldr     R9, [FP, #-16]
+	add     R4, R9, #1
+	mov     R9, #4
+	mul     R9, R4, R9
+	add     R8, R8, R9
+	add     R9, FP, #-12
+# 	ldr      R9, [R9]
+	str     R8, [R9]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #1
+	str     R9, [FP, #-8]
+	b       .L1
 .L2:
 	ldr     R5, [FP, #-12]
 	add     R8, FP, #4
@@ -49,22 +63,8 @@ insertsort:
 	add     R9, R8, R9
 	ldr     R9, [R9]
 	cmp     R5, R9
-	blt     .L5
-	b       .L3
-.L3:
-	add     R8, FP, #4
-	ldr     R4, [FP, #-16]
-	add     R9, R4, #1
-	mov     R7, #4
-	mul     R9, R9, R7
-	add     R8, R8, R9
-	add     R9, FP, #-12
-# 	ldr      R9, [R9]
-	str     R8, [R9]
-	ldr     R9, [FP, #-8]
-	add     R9, R9, #1
-	str     R9, [FP, #-8]
-	b       .L1
+	bge     .L3
+	b       .L5
 .L5:
 	add     R8, FP, #4
 	ldr     R4, [FP, #-16]
@@ -199,20 +199,20 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	mov     R9, #10
 	str     R9, [FP, #-52]
 	ldr     R9, [FP, #-52]
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putch
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	ldr     R9, [FP, #-48]
 	add     R9, R9, #1
 	str     R9, [FP, #-48]

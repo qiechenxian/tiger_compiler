@@ -26,10 +26,10 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	mov     R9, #0
 	mov     R0, R9
 	b       .L8
@@ -37,45 +37,46 @@ main:
 	add     R9, FP, #-2008
 # 	mov     R9, R9
 	bl      getch
-	ldr     r0, [SP, #-4]
-	ldr     r1, [SP, #-8]
-	ldr     r2, [SP, #-12]
-	ldr     r3, [SP, #-16]
+	ldr     R0, [SP, #-4]
+	ldr     R1, [SP, #-8]
+	ldr     R2, [SP, #-12]
+	ldr     R3, [SP, #-16]
 	mov     R8, R0
 	str     R8, [R9]
 	ldr     R4, [FP, #-2008]
 	mov     R9, #40
 	cmp     R4, R9
-	bgt     .L4
-	b       .L2
-.L2:
+	bgt     .L2
+	b       .L4
+.L4:
 	ldr     R4, [FP, #-2008]
-	mov     R9, #91
+	mov     R9, #96
 	cmp     R4, R9
-	blt     .L4
+	bgt     .L3
 	b       .L6
 .L6:
 	ldr     R9, [FP, #-2012]
 	add     R9, R9, #1
 	str     R9, [FP, #-2012]
 	b       .L1
-.L4:
+.L2:
 	ldr     R4, [FP, #-2008]
-	mov     R9, #96
+	mov     R9, #91
 	cmp     R4, R9
-	bgt     .L5
-	b       .L3
-.L3:
-	ldr     R4, [FP, #-2008]
-	mov     R9, #123
-	cmp     R4, R9
-	bge     .L6
+	bge     .L4
 	b       .L5
 .L5:
 	ldr     R9, [FP, #-2016]
 	add     R9, R9, #1
 	str     R9, [FP, #-2016]
 	b       .L6
+.L3:
+	ldr     R4, [FP, #-2008]
+	mov     R9, #123
+	cmp     R4, R9
+	blt     .L5
+	b       .L9
+.L9:
 .L8:
 NOP
 	sub     sp, fp, #4

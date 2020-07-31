@@ -27,18 +27,8 @@ main:
 	mov     R9, R1
 	mov     R4, #0
 	cmp     R9, R4
-	bne     .L2
-	b       .L0
-.L0:
-	ldr     R9, [FP, #-8]
-	mov     R4, #0
-	cmp     R9, R4
-	bgt     .L2
-	b       .L4
-.L4:
-	mov     R9, #0
-	mov     R0, R9
-	b       .L5
+	bne     .L0
+	b       .L2
 .L2:
 	ldr     R9, [FP, #-20]
 	mov     R4, #3
@@ -48,13 +38,17 @@ main:
 	mov     R9, R1
 	mov     R4, #0
 	cmp     R9, R4
-	beq     .L3
-	b       .L1
-.L1:
-	ldr     R4, [FP, #-16]
+	beq     .L1
+	b       .L4
+.L4:
+	mov     R9, #0
+	mov     R0, R9
+	b       .L5
+.L0:
+	ldr     R4, [FP, #-8]
 	mov     R9, #0
 	cmp     R4, R9
-	ble     .L4
+	ble     .L2
 	b       .L3
 .L3:
 	ldr     R4, [FP, #-20]
@@ -68,11 +62,18 @@ main:
 	str     r0, [SP, #0]
 	ldr     r0, [R9]
 	bl      putint
-	ldr     r0, [SP, #0]
-	ldr     r1, [SP, #-4]
-	ldr     r2, [SP, #-8]
-	ldr     r3, [SP, #-12]
+	ldr     R0, [SP, #0]
+	ldr     R1, [SP, #-4]
+	ldr     R2, [SP, #-8]
+	ldr     R3, [SP, #-12]
 	b       .L4
+.L1:
+	ldr     R9, [FP, #-16]
+	mov     R4, #0
+	cmp     R9, R4
+	bgt     .L3
+	b       .L6
+.L6:
 .L5:
 NOP
 	sub     sp, fp, #4
