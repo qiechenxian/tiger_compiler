@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/35_array_test.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/35_array_test.sy"
 	.data
 	.comm   field, 8, 4
 	.text
@@ -10,19 +10,19 @@ func:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #4
-	add     R1, FP, #4
-	ldr     R10, =field
+	add     R8, FP, #4
+	ldr     R6, =field
 	mov     R9, #0
-	mov     R0, #4
-	mul     R0, R9, R0
-	add     R10, R10, R0
-	ldr     R10, [R10]
-	sub     R10, R10, #3
-	mov     R0, #4
-	mul     R10, R10, R0
-	add     R10, R1, R10
-	ldr     R10, [R10]
-	mov     R0, R10
+	mov     R7, #4
+	mul     R9, R9, R7
+	add     R4, R6, R9
+	ldr     R9, [R4]
+	sub     R9, R9, #3
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R9, R8, R9
+	ldr     R9, [R9]
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP
@@ -38,61 +38,61 @@ main:
 	add     FP, SP, #4
 	sub     SP, SP, #24
 	ldr     R9, =field
-	mov     R1, #0
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #1
-	str     R1, [R10]
+	mov     R8, #0
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #1
+	str     R4, [R9]
 	ldr     R9, =field
-	mov     R1, #1
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #2
-	str     R1, [R10]
+	mov     R4, #1
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #2
+	str     R9, [R4]
 	add     R9, FP, #-20
-	mov     R1, #0
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #-1
-	str     R1, [R10]
+	mov     R8, #0
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #-1
+	str     R4, [R9]
 	add     R9, FP, #-20
-	mov     R1, #1
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R9, R9, R1
-	add     R1, FP, #-20
-	mov     R2, #0
-	mov     R10, #4
-	mul     R10, R2, R10
-	add     R1, R1, R10
-	ldr     R1, [R1]
-	sub     R1, R1, #2
-	str     R1, [R9]
+	mov     R4, #1
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R5, R9, R4
+	add     R6, FP, #-20
+	mov     R4, #0
+	mov     R9, #4
+	mul     R9, R4, R9
+	add     R4, R6, R9
+	ldr     R9, [R4]
+	sub     R4, R9, #2
+	str     R4, [R5]
 	add     R9, FP, #-20
-	mov     R1, #1
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-	ldr     R1, [R1]
-	str     R1, [FP, #-24]
+	mov     R8, #1
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R9, [R9]
+	str     R9, [FP, #-24]
 	add     R9, FP, #-20
-	mov     R1, #2
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #16
-	str     R1, [R10]
-	add     R1, FP, #-20
-	str     R1, [SP]
+	mov     R4, #2
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #16
+	str     R9, [R4]
+	add     R9, FP, #-20
+	str     R9, [SP]
 	bl      func
-	mov     R10, R0
-	add     R10, R10, #2
-	ldr     R0, [FP, #-24]
-	add     R10, R10, R0
-	mov     R0, R10
+	mov     R9, R0
+	add     R9, R9, #2
+	ldr     R4, [FP, #-24]
+	add     R9, R9, R4
+	mov     R0, R9
 	b       .L1
 .L1:
 NOP

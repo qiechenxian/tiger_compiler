@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/04_func_defn.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/04_func_defn.sy"
 	.data
 	.comm   a, 4, 4
 	.text
@@ -10,11 +10,11 @@ func:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #4
-	ldr     R10, [FP, #4]
-	sub     R10, R10, #1
-	str     R10, [FP, #4]
-	ldr     R10, [FP, #4]
-	mov     R0, R10
+	ldr     R9, [FP, #4]
+	sub     R9, R9, #1
+	str     R9, [FP, #4]
+	ldr     R9, [FP, #4]
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP
@@ -29,19 +29,19 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #8
-	ldr     R10, =a
-	mov     R1, #10
-	str     R1, [R10]
-	add     R1, FP, #-8
-# 	mov     R1, R1
-	ldr     R2, =a
-	ldr     R2, [R2]
-	str     R2, [SP]
+	ldr     R4, =a
+	mov     R9, #10
+	str     R9, [R4]
+	add     R9, FP, #-8
+# 	mov     R9, R9
+	ldr     R8, =a
+	ldr     R8, [R8]
+	str     R8, [SP]
 	bl      func
-	mov     R10, R0
-	str     R10, [R1]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R8, R0
+	str     R8, [R9]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L1
 .L1:
 NOP

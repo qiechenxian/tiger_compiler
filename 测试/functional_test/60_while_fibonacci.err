@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/60_while_fibonacci.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/60_while_fibonacci.sy"
 	.data
 	.comm   n, 4, 4
 	.text
@@ -10,52 +10,52 @@ fib:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #16
-	mov     R10, #0
-	str     R10, [FP, #-8]
-	mov     R10, #1
-	str     R10, [FP, #-12]
-	ldr     R0, [FP, #4]
-	mov     R10, #0
-	cmp     R0, R10
+	mov     R9, #0
+	str     R9, [FP, #-8]
+	mov     R9, #1
+	str     R9, [FP, #-12]
+	ldr     R4, [FP, #4]
+	mov     R9, #0
+	cmp     R4, R9
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     R0, [FP, #4]
-	mov     R10, #1
-	cmp     R0, R10
+	ldr     R4, [FP, #4]
+	mov     R9, #1
+	cmp     R4, R9
 	beq     .L2
 	b       .L3
 .L3:
 .L5:
-	ldr     R0, [FP, #4]
-	mov     R10, #1
-	cmp     R0, R10
+	ldr     R4, [FP, #4]
+	mov     R9, #1
+	cmp     R4, R9
 	bgt     .L6
 	b       .L4
 .L4:
-	ldr     R10, [FP, #-16]
-	mov     R0, R10
+	ldr     R9, [FP, #-16]
+	mov     R0, R9
 	b       .L7
 .L0:
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L1
 .L2:
-	mov     R10, #1
-	mov     R0, R10
+	mov     R9, #1
+	mov     R0, R9
 	b       .L3
 .L6:
-	ldr     R0, [FP, #-8]
-	ldr     R10, [FP, #-12]
-	add     R10, R0, R10
-	str     R10, [FP, #-16]
-	ldr     R10, [FP, #-12]
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-16]
-	str     R10, [FP, #-12]
-	ldr     R10, [FP, #4]
-	sub     R10, R10, #1
-	str     R10, [FP, #4]
+	ldr     R4, [FP, #-8]
+	ldr     R9, [FP, #-12]
+	add     R9, R4, R9
+	str     R9, [FP, #-16]
+	ldr     R9, [FP, #-12]
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-16]
+	str     R9, [FP, #-12]
+	ldr     R9, [FP, #4]
+	sub     R9, R9, #1
+	str     R9, [FP, #4]
 	b       .L5
 .L7:
 NOP
@@ -75,19 +75,19 @@ main:
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R1, R0
-	ldr     R10, =n
-	str     R1, [R10]
-	add     R1, FP, #-8
-# 	mov     R1, R1
-	ldr     R2, =n
-	ldr     R2, [R2]
-	str     R2, [SP]
+	mov     R9, R0
+	ldr     R4, =n
+	str     R9, [R4]
+	add     R9, FP, #-8
+# 	mov     R9, R9
+	ldr     R8, =n
+	ldr     R8, [R8]
+	str     R8, [SP]
 	bl      fib
-	mov     R10, R0
-	str     R10, [R1]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R8, R0
+	str     R8, [R9]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L8
 .L8:
 NOP

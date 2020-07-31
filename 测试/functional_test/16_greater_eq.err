@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/16_greater_eq.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/16_greater_eq.sy"
 	.data
 	.global a
 	.align  2
@@ -30,28 +30,28 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #8
-	mov     R10, #0
-	str     R10, [FP, #-8]
+	mov     R9, #0
+	str     R9, [FP, #-8]
 .L1:
-	ldr     R10, =s
-	ldr     R9, [FP, #-8]
-	mov     R0, #4
-	mul     R0, R9, R0
-	add     R10, R10, R0
-	ldr     R9, [R10]
-	ldr     R10, =a
-	ldr     R10, [R10]
-	cmp     R9, R10
+	ldr     R9, =s
+	ldr     R8, [FP, #-8]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R8, [R9]
+	ldr     R9, =a
+	ldr     R9, [R9]
+	cmp     R8, R9
 	bge     .L2
 	b       .L0
 .L0:
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L3
 .L2:
-	ldr     R10, [FP, #-8]
-	add     R10, R10, #1
-	str     R10, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #1
+	str     R9, [FP, #-8]
 	b       .L1
 .L3:
 NOP

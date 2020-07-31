@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/11_while.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/11_while.sy"
 	.data
 	.comm   a, 4, 4
 	.comm   b, 4, 4
@@ -11,37 +11,37 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #4
-	ldr     R0, =b
-	mov     R10, #0
-	str     R10, [R0]
-	ldr     R0, =a
-	mov     R10, #3
-	str     R10, [R0]
+	ldr     R4, =b
+	mov     R9, #0
+	str     R9, [R4]
+	ldr     R4, =a
+	mov     R9, #3
+	str     R9, [R4]
 .L1:
-	ldr     R10, =a
-	ldr     R10, [R10]
-	mov     R0, #0
-	cmp     R10, R0
+	ldr     R9, =a
+	ldr     R9, [R9]
+	mov     R4, #0
+	cmp     R9, R4
 	bgt     .L2
 	b       .L0
 .L0:
-	ldr     R10, =b
-	ldr     R10, [R10]
-	mov     R0, R10
+	ldr     R9, =b
+	ldr     R9, [R9]
+	mov     R0, R9
 	b       .L3
 .L2:
-	ldr     R0, =b
-	ldr     R10, =b
-	ldr     R9, [R10]
-	ldr     R10, =a
-	ldr     R10, [R10]
-	add     R10, R9, R10
-	str     R10, [R0]
-	ldr     R0, =a
-	ldr     R10, =a
-	ldr     R10, [R10]
-	sub     R10, R10, #1
-	str     R10, [R0]
+	ldr     R4, =b
+	ldr     R9, =b
+	ldr     R8, [R9]
+	ldr     R9, =a
+	ldr     R9, [R9]
+	add     R9, R8, R9
+	str     R9, [R4]
+	ldr     R4, =a
+	ldr     R9, =a
+	ldr     R9, [R9]
+	sub     R9, R9, #1
+	str     R9, [R4]
 	b       .L1
 .L3:
 NOP

@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/18_cal_prio.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/18_cal_prio.sy"
 	.data
 	.comm   a, 4, 4
 	.comm   b, 4, 4
@@ -17,36 +17,36 @@ main:
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R1, R0
-	ldr     R10, =a
-	str     R1, [R10]
+	mov     R9, R0
+	ldr     R4, =a
+	str     R9, [R4]
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R1, R0
-	ldr     R10, =b
-	str     R1, [R10]
+	mov     R9, R0
+	ldr     R4, =b
+	str     R9, [R4]
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R10, R0
-	ldr     R0, =c
-	str     R10, [R0]
-	ldr     R10, =a
-	ldr     R0, [R10]
-	ldr     R10, =b
-	ldr     R9, [R10]
-	ldr     R10, =c
-	ldr     R10, [R10]
-	mul     R10, R9, R10
-	add     R10, R0, R10
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R9, R0
+	ldr     R4, =c
+	str     R9, [R4]
+	ldr     R9, =a
+	ldr     R9, [R9]
+	ldr     R4, =b
+	ldr     R4, [R4]
+	ldr     R8, =c
+	ldr     R8, [R8]
+	mul     R4, R4, R8
+	add     R9, R9, R4
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP

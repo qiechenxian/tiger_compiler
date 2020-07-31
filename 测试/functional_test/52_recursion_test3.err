@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/52_recursion_test3.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/52_recursion_test3.sy"
 	.data
 	.comm   a, 4, 4
 	.comm   r, 4, 4
@@ -11,36 +11,36 @@ fac:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #4
-	ldr     R10, [FP, #4]
-	mov     R1, #2
-	cmp     R10, R1
+	ldr     R4, [FP, #4]
+	mov     R9, #2
+	cmp     R4, R9
 	blt     .L0
 	b       .L1
 .L1:
-	ldr     R2, =a
-	ldr     R1, [FP, #4]
-	sub     R1, R1, #1
-	str     R1, [R2]
-	ldr     R1, =a
-	ldr     R1, [R1]
-	str     R1, [SP]
+	ldr     R8, =a
+	ldr     R9, [FP, #4]
+	sub     R9, R9, #1
+	str     R9, [R8]
+	ldr     R9, =a
+	ldr     R9, [R9]
+	str     R9, [SP]
 	bl      fac
-	mov     R10, R0
-	ldr     R0, =r
-	str     R10, [R0]
+	mov     R9, R0
+	ldr     R4, =r
+	str     R9, [R4]
 	ldr     R9, =r
-	ldr     R10, [FP, #4]
-	ldr     R0, =r
-	ldr     R0, [R0]
-	mul     R10, R10, R0
-	str     R10, [R9]
-	ldr     R10, =r
-	ldr     R10, [R10]
-	mov     R0, R10
+	ldr     R5, [FP, #4]
+	ldr     R4, =r
+	ldr     R4, [R4]
+	mul     R4, R5, R4
+	str     R4, [R9]
+	ldr     R9, =r
+	ldr     R9, [R9]
+	mov     R0, R9
 	b       .L2
 .L0:
-	mov     R10, #1
-	mov     R0, R10
+	mov     R9, #1
+	mov     R0, R9
 	b       .L1
 .L2:
 NOP
@@ -55,10 +55,10 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #8
-	mov     R1, #5
-	str     R1, [FP, #-8]
-	ldr     R1, [FP, #-8]
-	str     R1, [SP]
+	mov     R9, #5
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	str     R9, [SP]
 	bl      fac
 # 	mov     R0, R0
 	b       .L3

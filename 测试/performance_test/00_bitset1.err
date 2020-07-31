@@ -1,2 +1,637 @@
-compiler_2020: malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)' failed.
-Aborted (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/performance_test/00_bitset1.sy"
+	.data
+	.global seed
+	.align  2
+	.type   seed, %object
+	.size   seed, 4
+seed:
+	.word   19971231
+	.word   19981013
+	.word   1000000007
+	.global staticvalue
+	.align  2
+	.type   staticvalue, %object
+	.size   staticvalue, 4
+staticvalue:
+	.word   0
+	.global a
+	.align  2
+	.type   a, %object
+	.size   a, 4
+a:
+	.space  40000
+	.text
+	.align  2
+	.global set
+	.type   set, %function
+set:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #140
+	mov     R9, #0
+	str     R9, [FP, #-132]
+	mov     R9, #0
+	str     R9, [FP, #-128]
+	mov     R9, #0
+	str     R9, [FP, #-124]
+	mov     R9, #0
+	str     R9, [FP, #-120]
+	mov     R9, #0
+	str     R9, [FP, #-116]
+	mov     R9, #0
+	str     R9, [FP, #-112]
+	mov     R9, #0
+	str     R9, [FP, #-108]
+	mov     R9, #0
+	str     R9, [FP, #-104]
+	mov     R9, #0
+	str     R9, [FP, #-100]
+	mov     R9, #0
+	str     R9, [FP, #-96]
+	mov     R9, #0
+	str     R9, [FP, #-92]
+	mov     R9, #0
+	str     R9, [FP, #-88]
+	mov     R9, #0
+	str     R9, [FP, #-84]
+	mov     R9, #0
+	str     R9, [FP, #-80]
+	mov     R9, #0
+	str     R9, [FP, #-76]
+	mov     R9, #0
+	str     R9, [FP, #-72]
+	mov     R9, #0
+	str     R9, [FP, #-68]
+	mov     R9, #0
+	str     R9, [FP, #-64]
+	mov     R9, #0
+	str     R9, [FP, #-60]
+	mov     R9, #0
+	str     R9, [FP, #-56]
+	mov     R9, #0
+	str     R9, [FP, #-52]
+	mov     R9, #0
+	str     R9, [FP, #-48]
+	mov     R9, #0
+	str     R9, [FP, #-44]
+	mov     R9, #0
+	str     R9, [FP, #-40]
+	mov     R9, #0
+	str     R9, [FP, #-36]
+	mov     R9, #0
+	str     R9, [FP, #-32]
+	mov     R9, #0
+	str     R9, [FP, #-28]
+	mov     R9, #0
+	str     R9, [FP, #-24]
+	mov     R9, #0
+	str     R9, [FP, #-20]
+	mov     R9, #0
+	str     R9, [FP, #-16]
+	mov     R9, #0
+	str     R9, [FP, #-12]
+	add     R4, FP, #-132
+	mov     R8, #0
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R9, R4, R5
+	mov     R4, #1
+	str     R4, [R9]
+	add     R4, FP, #-132
+	mov     R8, #1
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R5, R4, R5
+	add     R4, FP, #-132
+	mov     R6, #0
+	mov     R9, #4
+	mul     R9, R6, R9
+	add     R9, R4, R9
+	ldr     R8, [R9]
+	mov     R9, #2
+	mul     R9, R8, R9
+	str     R9, [R5]
+	add     R5, FP, #-132
+	mov     R9, #2
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	add     R7, FP, #-132
+	mov     R9, #1
+	mov     R8, #4
+	mul     R9, R9, R8
+	add     R4, R7, R9
+	ldr     R4, [R4]
+	mov     R9, #2
+	mul     R9, R4, R9
+	str     R9, [R5]
+	add     R4, FP, #-132
+	mov     R8, #3
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R5, R4, R5
+	add     R4, FP, #-132
+	mov     R6, #2
+	mov     R9, #4
+	mul     R9, R6, R9
+	add     R9, R4, R9
+	ldr     R8, [R9]
+	mov     R9, #2
+	mul     R9, R8, R9
+	str     R9, [R5]
+	add     R5, FP, #-132
+	mov     R9, #4
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	add     R7, FP, #-132
+	mov     R9, #3
+	mov     R8, #4
+	mul     R9, R9, R8
+	add     R4, R7, R9
+	ldr     R4, [R4]
+	mov     R9, #2
+	mul     R9, R4, R9
+	str     R9, [R5]
+	add     R4, FP, #-132
+	mov     R8, #5
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R5, R4, R5
+	add     R4, FP, #-132
+	mov     R6, #4
+	mov     R9, #4
+	mul     R9, R6, R9
+	add     R9, R4, R9
+	ldr     R8, [R9]
+	mov     R9, #2
+	mul     R9, R8, R9
+	str     R9, [R5]
+	add     R5, FP, #-132
+	mov     R9, #6
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	add     R7, FP, #-132
+	mov     R9, #5
+	mov     R8, #4
+	mul     R9, R9, R8
+	add     R4, R7, R9
+	ldr     R4, [R4]
+	mov     R9, #2
+	mul     R9, R4, R9
+	str     R9, [R5]
+	add     R4, FP, #-132
+	mov     R8, #7
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R5, R4, R5
+	add     R4, FP, #-132
+	mov     R6, #6
+	mov     R9, #4
+	mul     R9, R6, R9
+	add     R9, R4, R9
+	ldr     R8, [R9]
+	mov     R9, #2
+	mul     R9, R8, R9
+	str     R9, [R5]
+	add     R5, FP, #-132
+	mov     R9, #8
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	add     R7, FP, #-132
+	mov     R9, #7
+	mov     R8, #4
+	mul     R9, R9, R8
+	add     R4, R7, R9
+	ldr     R4, [R4]
+	mov     R9, #2
+	mul     R9, R4, R9
+	str     R9, [R5]
+	add     R4, FP, #-132
+	mov     R8, #9
+	mov     R9, #4
+	mul     R5, R8, R9
+	add     R5, R4, R5
+	add     R4, FP, #-132
+	mov     R6, #8
+	mov     R9, #4
+	mul     R9, R6, R9
+	add     R9, R4, R9
+	ldr     R8, [R9]
+	mov     R9, #2
+	mul     R9, R8, R9
+	str     R9, [R5]
+	add     R5, FP, #-132
+	mov     R9, #10
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	add     R7, FP, #-132
+	mov     R9, #9
+	mov     R8, #4
+	mul     R9, R9, R8
+	add     R4, R7, R9
+	ldr     R4, [R4]
+	mov     R9, #2
+	mul     R9, R4, R9
+	str     R9, [R5]
+	mov     R9, #10
+	str     R9, [FP, #-136]
+.L1:
+	ldr     R4, [FP, #-136]
+	mov     R9, #30
+	cmp     R4, R9
+	blt     .L2
+	b       .L0
+.L0:
+	mov     R9, #0
+	str     R9, [FP, #-140]
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R4, #10000
+	cmp     R9, R4
+	bge     .L3
+	b       .L4
+.L4:
+	add     R8, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R7, #4
+	mul     R9, R9, R7
+	add     R9, R8, R9
+	ldr     R5, [R9]
+	add     R8, FP, #-132
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R8, R9
+	ldr     R4, [R4]
+	mov     R0, R5
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R4, #2
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	ldr     R4, [FP, #12]
+	cmp     R9, R4
+	bne     .L13
+	b       .L14
+.L14:
+	add     R8, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R7, #4
+	mul     R9, R9, R7
+	add     R8, R8, R9
+	add     R7, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R7, R9
+	ldr     R4, [R4]
+	ldr     R9, [FP, #-140]
+	add     R9, R4, R9
+	str     R9, [R8]
+	mov     R9, #0
+	mov     R0, R9
+	b       .L20
+.L2:
+	ldr     R9, [FP, #-136]
+	add     R9, R9, #1
+	str     R9, [FP, #-136]
+	add     R5, FP, #-132
+	ldr     R9, [FP, #-136]
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R5, R5, R9
+	add     R9, FP, #-132
+	ldr     R8, [FP, #-136]
+	sub     R4, R8, #1
+	mov     R6, #4
+	mul     R4, R4, R6
+	add     R4, R9, R4
+	ldr     R9, [R4]
+	mov     R8, #2
+	mul     R9, R9, R8
+	str     R9, [R5]
+	b       .L1
+.L3:
+	mov     R9, #0
+	mov     R0, R9
+	b       .L4
+.L13:
+	add     R8, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R7, #4
+	mul     R9, R9, R7
+	add     R9, R8, R9
+	ldr     R5, [R9]
+	add     R8, FP, #-132
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R8, R9
+	ldr     R4, [R4]
+	mov     R0, R5
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R4, #2
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R4, #0
+	cmp     R9, R4
+	beq     .L7
+	b       .L8
+.L8:
+	add     R8, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R4, #4
+	mul     R4, R9, R4
+	add     R9, R8, R4
+	ldr     R5, [R9]
+	add     R8, FP, #-132
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R8, R9
+	ldr     R4, [R4]
+	mov     R0, R5
+	mov     R1, R4
+	bl      __aeabi_idiv
+	mov     R9, R0
+	mov     R4, #2
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R4, #1
+	cmp     R9, R4
+	beq     .L11
+	b       .L12
+.L12:
+	b       .L14
+.L7:
+	ldr     R4, [FP, #12]
+	mov     R9, #1
+	cmp     R4, R9
+	beq     .L5
+	b       .L6
+.L6:
+	b       .L8
+.L5:
+	add     R8, FP, #-132
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R7, #4
+	mul     R9, R9, R7
+	add     R9, R8, R9
+	ldr     R9, [R9]
+	str     R9, [FP, #-140]
+	b       .L6
+.L11:
+	ldr     R4, [FP, #12]
+	mov     R9, #0
+	cmp     R4, R9
+	beq     .L9
+	b       .L10
+.L10:
+	b       .L12
+.L9:
+	ldr     R5, [FP, #-140]
+	add     R8, FP, #-132
+	ldr     R9, [FP, #8]
+	mov     R4, #30
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R8, R9
+	ldr     R4, [R4]
+	sub     R9, R5, R4
+	str     R9, [FP, #-140]
+	b       .L10
+.L20:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   set, .-set
+	.align  2
+	.global rand
+	.type   rand, %function
+rand:
+	str     fp, [sp, #-4]!
+	add     FP, SP, #0
+	sub     SP, SP, #4
+	ldr     R8, =staticvalue
+	ldr     R4, =staticvalue
+	ldr     R9, [R4]
+	ldr     R5, =seed
+	mov     R7, #0
+	mov     R4, #4
+	mul     R4, R7, R4
+	add     R4, R5, R4
+	ldr     R4, [R4]
+	mul     R7, R9, R4
+	ldr     R5, =seed
+	mov     R9, #1
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R9, R5, R9
+	ldr     R9, [R9]
+	add     R9, R7, R9
+	str     R9, [R8]
+	ldr     R5, =staticvalue
+	ldr     R4, =staticvalue
+	ldr     R9, [R4]
+	ldr     R7, =seed
+	mov     R4, #2
+	mov     R6, #4
+	mul     R4, R4, R6
+	add     R8, R7, R4
+	ldr     R4, [R8]
+	mov     R0, R9
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R9, R1
+	str     R9, [R5]
+	ldr     R9, =staticvalue
+	ldr     R4, [R9]
+	mov     R9, #0
+	cmp     R4, R9
+	blt     .L15
+	b       .L16
+.L16:
+	ldr     R9, =staticvalue
+	ldr     R9, [R9]
+	mov     R0, R9
+	b       .L21
+.L15:
+	ldr     R8, =staticvalue
+	ldr     R9, =seed
+	mov     R5, #2
+	mov     R4, #4
+	mul     R7, R5, R4
+	add     R9, R9, R7
+	ldr     R4, [R9]
+	ldr     R9, =staticvalue
+	ldr     R9, [R9]
+	add     R9, R4, R9
+	str     R9, [R8]
+	b       .L16
+.L21:
+NOP
+	sub     sp, fp, #0
+	ldr     fp, [sp], #4
+	bx      lr
+	.size   rand, .-rand
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #28
+	add     R9, FP, #-8
+# 	mov     R9, R9
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R8, R0
+	str     R8, [R9]
+	bl      getint
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R9, R0
+	ldr     R4, =staticvalue
+	str     R9, [R4]
+	bl      starttime
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+.L18:
+	ldr     R9, [FP, #-8]
+	mov     R4, #0
+	cmp     R9, R4
+	bgt     .L19
+	b       .L17
+.L17:
+	bl      stoptime
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R9, #10000
+	str     r0, [SP, #4]
+	ldr     r0, [R9]
+	ldr     R4, =a
+	str     r1, [SP, #0]
+	ldr     r1, [R4]
+	bl      putarray
+	ldr     r0, [SP, #4]
+	ldr     r1, [SP, #0]
+	ldr     r2, [SP, #-4]
+	ldr     r3, [SP, #-8]
+	mov     R9, #0
+	mov     R0, R9
+	b       .L22
+.L19:
+	ldr     R9, [FP, #-8]
+	sub     R9, R9, #1
+	str     R9, [FP, #-8]
+	add     R9, FP, #-16
+# 	mov     R9, R9
+	bl      rand
+	mov     R8, R0
+	mov     R4, #300000
+	mov     R0, R8
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R8, R1
+	str     R8, [R9]
+	add     R9, FP, #-12
+# 	mov     R9, R9
+	bl      rand
+	mov     R8, R0
+	mov     R4, #2
+	mov     R0, R8
+	mov     R1, R4
+	bl      __aeabi_idivmod
+	mov     R8, R1
+	str     R8, [R9]
+	ldr     R9, =a
+	str     R9, [SP]
+	ldr     R8, [FP, #-16]
+	str     R8, [SP, #4]
+	ldr     R4, [FP, #-12]
+	str     R4, [SP, #8]
+	bl      set
+	b       .L18
+.L22:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

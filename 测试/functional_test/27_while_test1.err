@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/27_while_test1.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/27_while_test1.sy"
 	.data
 	.text
 	.align  2
@@ -9,39 +9,39 @@ doubleWhile:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #12
-	mov     R10, #5
-	str     R10, [FP, #-8]
-	mov     R10, #7
-	str     R10, [FP, #-12]
+	mov     R9, #5
+	str     R9, [FP, #-8]
+	mov     R9, #7
+	str     R9, [FP, #-12]
 .L1:
-	ldr     R0, [FP, #-8]
-	mov     R10, #100
-	cmp     R0, R10
+	ldr     R4, [FP, #-8]
+	mov     R9, #100
+	cmp     R4, R9
 	blt     .L5
 	b       .L0
 .L0:
-	ldr     R10, [FP, #-12]
-	mov     R0, R10
+	ldr     R9, [FP, #-12]
+	mov     R0, R9
 	b       .L6
 .L5:
-	ldr     R10, [FP, #-8]
-	add     R10, R10, #30
-	str     R10, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #30
+	str     R9, [FP, #-8]
 .L3:
-	ldr     R0, [FP, #-12]
-	mov     R10, #100
-	cmp     R0, R10
+	ldr     R4, [FP, #-12]
+	mov     R9, #100
+	cmp     R4, R9
 	blt     .L4
 	b       .L2
 .L2:
-	ldr     R10, [FP, #-12]
-	sub     R10, R10, #100
-	str     R10, [FP, #-12]
+	ldr     R9, [FP, #-12]
+	sub     R9, R9, #100
+	str     R9, [FP, #-12]
 	b       .L1
 .L4:
-	ldr     R10, [FP, #-12]
-	add     R10, R10, #6
-	str     R10, [FP, #-12]
+	ldr     R9, [FP, #-12]
+	add     R9, R9, #6
+	str     R9, [FP, #-12]
 	b       .L3
 .L6:
 NOP

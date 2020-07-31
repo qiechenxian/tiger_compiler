@@ -1,2 +1,84 @@
-compiler_2020: malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)' failed.
-Aborted (core dumped)
+	.arch   armv7-a
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/64_alpha_count.sy"
+	.data
+	.text
+	.align  2
+	.global main
+	.type   main, %function
+main:
+	stmfd   sp!, {fp, lr}
+	add     FP, SP, #4
+	sub     SP, SP, #2020
+	mov     R9, #0
+	str     R9, [FP, #-2016]
+	mov     R9, #0
+	str     R9, [FP, #-2012]
+	mov     R9, #0
+	str     R9, [FP, #-2008]
+.L1:
+	ldr     R9, [FP, #-2008]
+	mov     R4, #10
+	cmp     R9, R4
+	bne     .L7
+	b       .L0
+.L0:
+	ldr     R9, [FP, #-2016]
+	str     r0, [SP, #0]
+	ldr     r0, [R9]
+	bl      putint
+	ldr     r0, [SP, #0]
+	ldr     r1, [SP, #-4]
+	ldr     r2, [SP, #-8]
+	ldr     r3, [SP, #-12]
+	mov     R9, #0
+	mov     R0, R9
+	b       .L8
+.L7:
+	add     R9, FP, #-2008
+# 	mov     R9, R9
+	bl      getch
+	ldr     r0, [SP, #-4]
+	ldr     r1, [SP, #-8]
+	ldr     r2, [SP, #-12]
+	ldr     r3, [SP, #-16]
+	mov     R8, R0
+	str     R8, [R9]
+	ldr     R4, [FP, #-2008]
+	mov     R9, #40
+	cmp     R4, R9
+	bgt     .L4
+	b       .L2
+.L2:
+	ldr     R4, [FP, #-2008]
+	mov     R9, #91
+	cmp     R4, R9
+	blt     .L4
+	b       .L6
+.L6:
+	ldr     R9, [FP, #-2012]
+	add     R9, R9, #1
+	str     R9, [FP, #-2012]
+	b       .L1
+.L4:
+	ldr     R4, [FP, #-2008]
+	mov     R9, #96
+	cmp     R4, R9
+	bgt     .L5
+	b       .L3
+.L3:
+	ldr     R4, [FP, #-2008]
+	mov     R9, #123
+	cmp     R4, R9
+	bge     .L6
+	b       .L5
+.L5:
+	ldr     R9, [FP, #-2016]
+	add     R9, R9, #1
+	str     R9, [FP, #-2016]
+	b       .L6
+.L8:
+NOP
+	sub     sp, fp, #4
+	ldmfd   sp!, {fp, lr}
+	bx      lr
+	.size   main, .-main

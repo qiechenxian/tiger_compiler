@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/15_array_test3.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/15_array_test3.sy"
 	.data
 	.global a
 	.align  2
@@ -20,51 +20,51 @@ func:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #16
-	mov     R10, #0
-	str     R10, [FP, #-8]
-	mov     R10, #0
-	str     R10, [FP, #-12]
-	mov     R10, #0
-	str     R10, [FP, #-16]
+	mov     R9, #0
+	str     R9, [FP, #-8]
+	mov     R9, #0
+	str     R9, [FP, #-12]
+	mov     R9, #0
+	str     R9, [FP, #-16]
 .L1:
-	ldr     R10, [FP, #-8]
-	mov     R0, #5
-	cmp     R10, R0
+	ldr     R9, [FP, #-8]
+	mov     R4, #5
+	cmp     R9, R4
 	blt     .L5
 	b       .L0
 .L0:
-	ldr     R10, [FP, #-16]
-	mov     R0, R10
+	ldr     R9, [FP, #-16]
+	mov     R0, R9
 	b       .L6
 .L5:
 .L3:
-	ldr     R10, [FP, #-12]
-	mov     R0, #5
-	cmp     R10, R0
+	ldr     R9, [FP, #-12]
+	mov     R4, #5
+	cmp     R9, R4
 	blt     .L4
 	b       .L2
 .L2:
-	ldr     R10, [FP, #-8]
-	add     R10, R10, #1
-	str     R10, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #1
+	str     R9, [FP, #-8]
 	b       .L1
 .L4:
-	ldr     R10, [FP, #-16]
-	add     R0, FP, #4
-	ldr     R1, [FP, #-8]
+	ldr     R5, [FP, #-16]
+	add     R4, FP, #4
+	ldr     R6, [FP, #-8]
 	mov     R9, #20
-	mul     R9, R1, R9
-	add     R0, R0, R9
-	ldr     R1, [FP, #-12]
+	mul     R9, R6, R9
+	add     R4, R4, R9
+	ldr     R6, [FP, #-12]
 	mov     R9, #4
-	mul     R9, R1, R9
-	add     R0, R0, R9
-	ldr     R0, [R0]
-	add     R10, R10, R0
-	str     R10, [FP, #-16]
-	ldr     R10, [FP, #-12]
-	add     R10, R10, #1
-	str     R10, [FP, #-12]
+	mul     R9, R6, R9
+	add     R9, R4, R9
+	ldr     R4, [R9]
+	add     R9, R5, R4
+	str     R9, [FP, #-16]
+	ldr     R9, [FP, #-12]
+	add     R9, R9, #1
+	str     R9, [FP, #-12]
 	b       .L3
 .L6:
 NOP
@@ -79,19 +79,19 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #8
-	ldr     R1, =a
-	str     R1, [SP]
+	ldr     R9, =a
+	str     R9, [SP]
 	bl      func
-	mov     R10, R0
+	mov     R9, R0
 	str     r0, [SP, #0]
-	ldr     r0, [R10]
+	ldr     r0, [R9]
 	bl      putint
 	ldr     r0, [SP, #0]
 	ldr     r1, [SP, #-4]
 	ldr     r2, [SP, #-8]
 	ldr     r3, [SP, #-12]
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L7
 .L7:
 NOP

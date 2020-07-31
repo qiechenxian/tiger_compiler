@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/09_void_func.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/09_void_func.sy"
 	.data
 	.comm   a, 4, 4
 	.comm   b, 4, 4
@@ -12,11 +12,11 @@ add:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #4
-	ldr     R1, =c
-	ldr     R10, [FP, #4]
-	ldr     R0, [FP, #8]
-	add     R10, R10, R0
-	str     R10, [R1]
+	ldr     R5, =c
+	ldr     R9, [FP, #4]
+	ldr     R4, [FP, #8]
+	add     R9, R9, R4
+	str     R9, [R5]
 	b       .L0
 .L0:
 NOP
@@ -31,22 +31,22 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #12
-	ldr     R0, =a
-	mov     R10, #3
-	str     R10, [R0]
-	ldr     R0, =b
-	mov     R10, #2
-	str     R10, [R0]
-	ldr     R10, =a
-	ldr     R10, [R10]
-	str     R10, [SP]
-	ldr     R0, =b
-	ldr     R0, [R0]
-	str     R0, [SP, #4]
+	ldr     R4, =a
+	mov     R9, #3
+	str     R9, [R4]
+	ldr     R4, =b
+	mov     R9, #2
+	str     R9, [R4]
+	ldr     R9, =a
+	ldr     R9, [R9]
+	str     R9, [SP]
+	ldr     R4, =b
+	ldr     R4, [R4]
+	str     R4, [SP, #4]
 	bl      add
-	ldr     R10, =c
-	ldr     R10, [R10]
-	mov     R0, R10
+	ldr     R9, =c
+	ldr     R9, [R9]
+	mov     R0, R9
 	b       .L1
 .L1:
 NOP

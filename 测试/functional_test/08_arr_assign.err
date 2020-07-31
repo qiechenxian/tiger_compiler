@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/08_arr_assign.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/08_arr_assign.sy"
 	.data
 	.comm   a, 40, 4
 	.text
@@ -10,15 +10,15 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #4
-	ldr     R1, =a
-	mov     R10, #0
-	mov     R0, #4
-	mul     R10, R10, R0
-	add     R0, R1, R10
-	mov     R10, #1
-	str     R10, [R0]
-	mov     R10, #0
-	mov     R0, R10
+	ldr     R5, =a
+	mov     R9, #0
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R5, R9
+	mov     R9, #1
+	str     R9, [R4]
+	mov     R9, #0
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP

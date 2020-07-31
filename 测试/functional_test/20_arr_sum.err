@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/20_arr_sum.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/20_arr_sum.sy"
 	.data
 	.comm   a, 20, 4
 	.text
@@ -11,97 +11,97 @@ main:
 	add     FP, SP, #4
 	sub     SP, SP, #12
 	ldr     R9, =a
-	mov     R1, #0
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-# 	mov     R1, R1
+	mov     R8, #0
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+# 	mov     R9, R9
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R2, R0
-	str     R2, [R1]
+	mov     R8, R0
+	str     R8, [R9]
 	ldr     R9, =a
-	mov     R1, #1
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-# 	mov     R1, R1
+	mov     R4, #1
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R9, R9, R4
+# 	mov     R9, R9
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R2, R0
-	str     R2, [R1]
+	mov     R8, R0
+	str     R8, [R9]
 	ldr     R9, =a
-	mov     R1, #2
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-# 	mov     R1, R1
+	mov     R8, #2
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+# 	mov     R9, R9
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R2, R0
-	str     R2, [R1]
+	mov     R8, R0
+	str     R8, [R9]
 	ldr     R9, =a
-	mov     R1, #3
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-# 	mov     R1, R1
+	mov     R4, #3
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R9, R9, R4
+# 	mov     R9, R9
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R2, R0
-	str     R2, [R1]
+	mov     R8, R0
+	str     R8, [R9]
 	ldr     R9, =a
-	mov     R1, #4
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-# 	mov     R1, R1
+	mov     R8, #4
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+# 	mov     R9, R9
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R10, R0
-	str     R10, [R1]
-	mov     R10, #4
-	str     R10, [FP, #-8]
-	mov     R10, #0
-	str     R10, [FP, #-12]
+	mov     R8, R0
+	str     R8, [R9]
+	mov     R9, #4
+	str     R9, [FP, #-8]
+	mov     R9, #0
+	str     R9, [FP, #-12]
 .L1:
-	ldr     R0, [FP, #-8]
-	mov     R10, #1
-	cmp     R0, R10
+	ldr     R9, [FP, #-8]
+	mov     R4, #1
+	cmp     R9, R4
 	bgt     .L2
 	b       .L0
 .L0:
-	ldr     R10, [FP, #-12]
-	mov     R0, R10
+	ldr     R9, [FP, #-12]
+	mov     R0, R9
 	b       .L3
 .L2:
-	ldr     R8, [FP, #-12]
-	ldr     R10, =a
+	ldr     R4, [FP, #-12]
+	ldr     R8, =a
+	ldr     R5, [FP, #-8]
+	mov     R9, #4
+	mul     R9, R5, R9
+	add     R9, R8, R9
+	ldr     R9, [R9]
+	add     R9, R4, R9
+	str     R9, [FP, #-12]
 	ldr     R9, [FP, #-8]
-	mov     R0, #4
-	mul     R0, R9, R0
-	add     R10, R10, R0
-	ldr     R10, [R10]
-	add     R10, R8, R10
-	str     R10, [FP, #-12]
-	ldr     R10, [FP, #-8]
-	sub     R10, R10, #1
-	str     R10, [FP, #-8]
+	sub     R9, R9, #1
+	str     R9, [FP, #-8]
 	b       .L1
 .L3:
 NOP

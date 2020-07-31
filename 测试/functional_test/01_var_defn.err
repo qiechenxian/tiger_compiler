@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/01_var_defn.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/01_var_defn.sy"
 	.data
 	.comm   a, 4, 4
 	.text
@@ -10,11 +10,11 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #4
-	ldr     R0, =a
-	mov     R10, #10
-	str     R10, [R0]
-	mov     R10, #0
-	mov     R0, R10
+	ldr     R4, =a
+	mov     R9, #10
+	str     R9, [R4]
+	mov     R9, #0
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP

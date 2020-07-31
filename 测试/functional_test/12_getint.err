@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/12_getint.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/12_getint.sy"
 	.data
 	.text
 	.align  2
@@ -9,17 +9,17 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #8
-	add     R1, FP, #-8
-# 	mov     R1, R1
+	add     R9, FP, #-8
+# 	mov     R9, R9
 	bl      getint
 	ldr     r0, [SP, #-4]
 	ldr     r1, [SP, #-8]
 	ldr     r2, [SP, #-12]
 	ldr     r3, [SP, #-16]
-	mov     R10, R0
-	str     R10, [R1]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R8, R0
+	str     R8, [R9]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP

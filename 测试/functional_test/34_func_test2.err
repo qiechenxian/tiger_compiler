@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/34_func_test2.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/34_func_test2.sy"
 	.data
 	.text
 	.align  2
@@ -9,10 +9,10 @@ func1:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #8
-	mov     R10, #1
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R9, #1
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP
@@ -27,10 +27,10 @@ func2:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #8
-	mov     R10, #2
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R9, #2
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L1
 .L1:
 NOP
@@ -45,10 +45,10 @@ func3:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #8
-	mov     R10, #4
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R9, #4
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L2
 .L2:
 NOP
@@ -63,18 +63,18 @@ func4:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #16
-	mov     R10, #8
-	str     R10, [FP, #-12]
-	ldr     R10, [FP, #-12]
-	str     R10, [FP, #-8]
-	mov     R10, #16
-	str     R10, [FP, #-16]
-	ldr     R10, [FP, #-8]
-	ldr     R0, [FP, #-16]
-	add     R10, R10, R0
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	mov     R9, #8
+	str     R9, [FP, #-12]
+	ldr     R9, [FP, #-12]
+	str     R9, [FP, #-8]
+	mov     R9, #16
+	str     R9, [FP, #-16]
+	ldr     R9, [FP, #-8]
+	ldr     R4, [FP, #-16]
+	add     R9, R9, R4
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L3
 .L3:
 NOP
@@ -89,33 +89,33 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #16
-	mov     R1, #32
-	str     R1, [FP, #-8]
-	mov     R1, #32
-	str     R1, [FP, #-12]
-	mov     R1, #32
-	str     R1, [FP, #-16]
+	mov     R9, #32
+	str     R9, [FP, #-8]
+	mov     R9, #32
+	str     R9, [FP, #-12]
+	mov     R9, #32
+	str     R9, [FP, #-16]
 	bl      func1
-	mov     R1, R0
-# 	mov     R1, R1
+	mov     R9, R0
+# 	mov     R9, R9
 	bl      func2
-	mov     R2, R0
-	add     R1, R1, R2
-# 	mov     R1, R1
+	mov     R8, R0
+	add     R9, R9, R8
+# 	mov     R9, R9
 	bl      func3
-	mov     R2, R0
-	add     R1, R1, R2
-# 	mov     R1, R1
+	mov     R8, R0
+	add     R9, R9, R8
+# 	mov     R9, R9
 	bl      func4
-	mov     R10, R0
-	add     R10, R1, R10
-	ldr     R0, [FP, #-8]
-	add     R10, R10, R0
-	ldr     R0, [FP, #-12]
-	add     R10, R10, R0
-	ldr     R0, [FP, #-16]
-	add     R10, R10, R0
-	mov     R0, R10
+	mov     R8, R0
+	add     R9, R9, R8
+	ldr     R4, [FP, #-8]
+	add     R9, R9, R4
+	ldr     R4, [FP, #-12]
+	add     R9, R9, R4
+	ldr     R4, [FP, #-16]
+	add     R9, R9, R4
+	mov     R0, R9
 	b       .L4
 .L4:
 NOP

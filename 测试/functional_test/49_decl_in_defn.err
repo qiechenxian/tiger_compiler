@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/49_decl_in_defn.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/49_decl_in_defn.sy"
 	.data
 	.text
 	.align  2
@@ -9,18 +9,18 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #16
-	mov     R10, #12
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
+	mov     R9, #12
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
 	str     r0, [SP, #0]
-	ldr     r0, [R10]
+	ldr     r0, [R9]
 	bl      putint
 	ldr     r0, [SP, #0]
 	ldr     r1, [SP, #-4]
 	ldr     r2, [SP, #-8]
 	ldr     r3, [SP, #-12]
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L0
 .L0:
 NOP

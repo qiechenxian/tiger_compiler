@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/51_recursion_test2.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/51_recursion_test2.sy"
 	.data
 	.text
 	.align  2
@@ -9,43 +9,43 @@ fib:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #12
-	ldr     R10, [FP, #4]
-	mov     R1, #0
-	cmp     R10, R1
+	ldr     R4, [FP, #4]
+	mov     R9, #0
+	cmp     R4, R9
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     R10, [FP, #4]
-	mov     R1, #1
-	cmp     R10, R1
+	ldr     R4, [FP, #4]
+	mov     R9, #1
+	cmp     R4, R9
 	beq     .L2
 	b       .L3
 .L3:
-	ldr     R1, [FP, #4]
-	sub     R1, R1, #1
-	str     R1, [FP, #-8]
-	ldr     R1, [FP, #4]
-	sub     R1, R1, #2
-	str     R1, [FP, #-12]
-	ldr     R1, [FP, #-8]
-	str     R1, [SP]
+	ldr     R9, [FP, #4]
+	sub     R9, R9, #1
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #4]
+	sub     R9, R9, #2
+	str     R9, [FP, #-12]
+	ldr     R9, [FP, #-8]
+	str     R9, [SP]
 	bl      fib
-	mov     R1, R0
-# 	mov     R1, R1
-	ldr     R2, [FP, #-12]
-	str     R2, [SP]
+	mov     R9, R0
+# 	mov     R9, R9
+	ldr     R8, [FP, #-12]
+	str     R8, [SP]
 	bl      fib
-	mov     R10, R0
-	add     R10, R1, R10
-	mov     R0, R10
+	mov     R8, R0
+	add     R9, R9, R8
+	mov     R0, R9
 	b       .L4
 .L0:
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L1
 .L2:
-	mov     R10, #1
-	mov     R0, R10
+	mov     R9, #1
+	mov     R0, R9
 	b       .L3
 .L4:
 NOP
@@ -60,10 +60,10 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #8
-	mov     R1, #10
-	str     R1, [FP, #-8]
-	ldr     R1, [FP, #-8]
-	str     R1, [SP]
+	mov     R9, #10
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	str     R9, [SP]
 	bl      fib
 # 	mov     R0, R0
 	b       .L5

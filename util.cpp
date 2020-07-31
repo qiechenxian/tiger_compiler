@@ -5,7 +5,7 @@
 #include "util.h"
 
 void* checked_malloc(unsigned len){
-    void* p = malloc(len);
+    void* p = malloc(len+20);
     assert(p);
     return p;
 }

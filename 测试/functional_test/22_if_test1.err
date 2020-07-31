@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/22_if_test1.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/22_if_test1.sy"
 	.data
 	.text
 	.align  2
@@ -9,25 +9,25 @@ ifElse:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #8
-	mov     R10, #5
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #-8]
-	mov     R0, #5
-	cmp     R10, R0
+	mov     R9, #5
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R4, #5
+	cmp     R9, R4
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     R10, [FP, #-8]
-	mov     R0, #2
-	mul     R10, R10, R0
-	str     R10, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	mov     R4, #2
+	mul     R9, R9, R4
+	str     R9, [FP, #-8]
 .L2:
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L3
 .L0:
-	mov     R10, #25
-	str     R10, [FP, #-8]
+	mov     R9, #25
+	str     R9, [FP, #-8]
 	b       .L2
 .L3:
 NOP

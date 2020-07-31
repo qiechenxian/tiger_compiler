@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/55_sort_test3.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/55_sort_test3.sy"
 	.data
 	.comm   n, 4, 4
 	.text
@@ -10,165 +10,165 @@ QuickSort:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #20
-	ldr     R10, [FP, #8]
-	ldr     R1, [FP, #12]
-	cmp     R10, R1
+	ldr     R4, [FP, #8]
+	ldr     R9, [FP, #12]
+	cmp     R4, R9
 	blt     .L15
 	b       .L16
 .L16:
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L20
 .L15:
-	ldr     R1, [FP, #8]
-	str     R1, [FP, #-8]
-	ldr     R1, [FP, #12]
-	str     R1, [FP, #-12]
+	ldr     R9, [FP, #8]
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #12]
+	str     R9, [FP, #-12]
 	add     R9, FP, #4
-	ldr     R1, [FP, #8]
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R1, R9, R1
-	ldr     R1, [R1]
-	str     R1, [FP, #-16]
+	ldr     R8, [FP, #8]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R9, [R9]
+	str     R9, [FP, #-16]
 .L1:
-	ldr     R10, [FP, #-8]
-	ldr     R1, [FP, #-12]
-	cmp     R10, R1
+	ldr     R9, [FP, #-8]
+	ldr     R4, [FP, #-12]
+	cmp     R9, R4
 	blt     .L14
 	b       .L0
 .L0:
 	add     R9, FP, #4
-	ldr     R1, [FP, #-8]
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R2, R9, R1
-	add     R1, FP, #-16
-# 	ldr      R1, [R1]
-	str     R2, [R1]
-	ldr     R1, [FP, #-8]
-	sub     R1, R1, #1
-	str     R1, [FP, #-20]
-	add     R1, FP, #-20
-# 	mov     R1, R1
-	add     R2, FP, #4
-	str     R2, [SP]
-	ldr     R3, [FP, #8]
-	str     R3, [SP, #4]
-	ldr     R10, [FP, #-20]
-	str     R10, [SP, #8]
+	ldr     R4, [FP, #-8]
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R8, R9, R4
+	add     R9, FP, #-16
+# 	ldr      R9, [R9]
+	str     R8, [R9]
+	ldr     R9, [FP, #-8]
+	sub     R9, R9, #1
+	str     R9, [FP, #-20]
+	add     R8, FP, #-20
+# 	mov     R8, R8
+	add     R7, FP, #4
+	str     R7, [SP]
+	ldr     R4, [FP, #8]
+	str     R4, [SP, #4]
+	ldr     R9, [FP, #-20]
+	str     R9, [SP, #8]
 	bl      QuickSort
-	mov     R2, R0
-	str     R2, [R1]
-	ldr     R1, [FP, #-8]
-	add     R1, R1, #1
-	str     R1, [FP, #-20]
-	add     R1, FP, #-20
-# 	mov     R1, R1
-	add     R3, FP, #4
-	str     R3, [SP]
-	ldr     R2, [FP, #-20]
-	str     R2, [SP, #4]
-	ldr     R10, [FP, #12]
-	str     R10, [SP, #8]
+	mov     R9, R0
+	str     R9, [R8]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #1
+	str     R9, [FP, #-20]
+	add     R8, FP, #-20
+# 	mov     R8, R8
+	add     R7, FP, #4
+	str     R7, [SP]
+	ldr     R4, [FP, #-20]
+	str     R4, [SP, #4]
+	ldr     R9, [FP, #12]
+	str     R9, [SP, #8]
 	bl      QuickSort
-	mov     R2, R0
-	str     R2, [R1]
+	mov     R9, R0
+	str     R9, [R8]
 	b       .L16
 .L14:
 .L4:
-	ldr     R1, [FP, #-8]
-	ldr     R10, [FP, #-12]
-	cmp     R1, R10
+	ldr     R9, [FP, #-8]
+	ldr     R4, [FP, #-12]
+	cmp     R9, R4
 	blt     .L5
 	b       .L2
 .L2:
-	add     R1, FP, #4
-	ldr     R2, [FP, #-12]
-	mov     R10, #4
-	mul     R10, R2, R10
-	add     R1, R1, R10
-	ldr     R2, [R1]
-	ldr     R1, [FP, #-16]
-	sub     R1, R1, #1
-	cmp     R2, R1
+	add     R9, FP, #4
+	ldr     R4, [FP, #-12]
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R9, R9, R4
+	ldr     R4, [R9]
+	ldr     R5, [FP, #-16]
+	sub     R9, R5, #1
+	cmp     R4, R9
 	bgt     .L5
 	b       .L3
 .L3:
-	ldr     R1, [FP, #-8]
-	ldr     R10, [FP, #-12]
-	cmp     R1, R10
+	ldr     R4, [FP, #-8]
+	ldr     R9, [FP, #-12]
+	cmp     R4, R9
 	blt     .L6
 	b       .L7
 .L7:
 .L10:
-	ldr     R1, [FP, #-8]
-	ldr     R10, [FP, #-12]
-	cmp     R1, R10
+	ldr     R4, [FP, #-8]
+	ldr     R9, [FP, #-12]
+	cmp     R4, R9
 	blt     .L11
 	b       .L8
 .L8:
-	add     R1, FP, #4
-	ldr     R2, [FP, #-8]
-	mov     R10, #4
-	mul     R10, R2, R10
-	add     R1, R1, R10
-	ldr     R10, [R1]
-	ldr     R1, [FP, #-16]
-	cmp     R10, R1
+	add     R9, FP, #4
+	ldr     R8, [FP, #-8]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R4, [R9]
+	ldr     R9, [FP, #-16]
+	cmp     R4, R9
 	blt     .L11
 	b       .L9
 .L9:
-	ldr     R10, [FP, #-8]
-	ldr     R1, [FP, #-12]
-	cmp     R10, R1
+	ldr     R4, [FP, #-8]
+	ldr     R9, [FP, #-12]
+	cmp     R4, R9
 	blt     .L12
 	b       .L13
 .L13:
 	b       .L1
 .L5:
-	ldr     R1, [FP, #-12]
-	sub     R1, R1, #1
-	str     R1, [FP, #-12]
+	ldr     R9, [FP, #-12]
+	sub     R9, R9, #1
+	str     R9, [FP, #-12]
 	b       .L4
 .L6:
 	add     R9, FP, #4
-	ldr     R1, [FP, #-8]
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R3, R9, R1
-	add     R1, FP, #4
-	ldr     R2, [FP, #-12]
-	mov     R10, #4
-	mul     R10, R2, R10
-	add     R1, R1, R10
-# 	ldr      R1, [R1]
-	str     R3, [R1]
-	ldr     R1, [FP, #-8]
-	add     R1, R1, #1
-	str     R1, [FP, #-8]
+	ldr     R8, [FP, #-8]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R8, R9, R4
+	add     R5, FP, #4
+	ldr     R9, [FP, #-12]
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R5, R9
+# 	ldr      R4, [R4]
+	str     R8, [R4]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #1
+	str     R9, [FP, #-8]
 	b       .L7
 .L11:
-	ldr     R1, [FP, #-8]
-	add     R1, R1, #1
-	str     R1, [FP, #-8]
+	ldr     R9, [FP, #-8]
+	add     R9, R9, #1
+	str     R9, [FP, #-8]
 	b       .L10
 .L12:
-	add     R1, FP, #4
-	ldr     R2, [FP, #-12]
-	mov     R10, #4
-	mul     R10, R2, R10
-	add     R2, R1, R10
-	add     R3, FP, #4
-	ldr     R10, [FP, #-8]
-	mov     R1, #4
-	mul     R10, R10, R1
-	add     R1, R3, R10
-# 	ldr      R1, [R1]
-	str     R2, [R1]
-	ldr     R1, [FP, #-12]
-	sub     R1, R1, #1
-	str     R1, [FP, #-12]
+	add     R9, FP, #4
+	ldr     R8, [FP, #-12]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R8, R9, R4
+	add     R5, FP, #4
+	ldr     R9, [FP, #-8]
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R4, R5, R9
+# 	ldr      R4, [R4]
+	str     R8, [R4]
+	ldr     R9, [FP, #-12]
+	sub     R9, R9, #1
+	str     R9, [FP, #-12]
 	b       .L13
 .L20:
 NOP
@@ -183,134 +183,134 @@ main:
 	stmfd   sp!, {fp, lr}
 	add     FP, SP, #4
 	sub     SP, SP, #60
-	ldr     R10, =n
-	mov     R1, #10
-	str     R1, [R10]
+	ldr     R4, =n
+	mov     R9, #10
+	str     R9, [R4]
 	add     R9, FP, #-44
-	mov     R1, #0
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #4
-	str     R1, [R10]
+	mov     R8, #0
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #4
+	str     R4, [R9]
 	add     R9, FP, #-44
-	mov     R1, #1
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #3
-	str     R1, [R10]
+	mov     R4, #1
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #3
+	str     R9, [R4]
 	add     R9, FP, #-44
-	mov     R1, #2
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #9
-	str     R1, [R10]
+	mov     R8, #2
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #9
+	str     R4, [R9]
 	add     R9, FP, #-44
-	mov     R1, #3
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #2
-	str     R1, [R10]
+	mov     R4, #3
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #2
+	str     R9, [R4]
 	add     R9, FP, #-44
-	mov     R1, #4
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #0
-	str     R1, [R10]
+	mov     R8, #4
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #0
+	str     R4, [R9]
 	add     R9, FP, #-44
-	mov     R1, #5
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #1
-	str     R1, [R10]
+	mov     R4, #5
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #1
+	str     R9, [R4]
 	add     R9, FP, #-44
-	mov     R1, #6
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #6
-	str     R1, [R10]
+	mov     R8, #6
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #6
+	str     R4, [R9]
 	add     R9, FP, #-44
-	mov     R1, #7
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #5
-	str     R1, [R10]
+	mov     R4, #7
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #5
+	str     R9, [R4]
 	add     R9, FP, #-44
-	mov     R1, #8
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #7
-	str     R1, [R10]
+	mov     R8, #8
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #7
+	str     R4, [R9]
 	add     R9, FP, #-44
-	mov     R1, #9
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #8
-	str     R1, [R10]
-	mov     R1, #0
-	str     R1, [FP, #-48]
-	mov     R1, #9
-	str     R1, [FP, #-52]
-	add     R1, FP, #-48
-# 	mov     R1, R1
-	add     R3, FP, #-44
-	str     R3, [SP]
-	ldr     R2, [FP, #-48]
-	str     R2, [SP, #4]
-	ldr     R10, [FP, #-52]
-	str     R10, [SP, #8]
+	mov     R4, #9
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #8
+	str     R9, [R4]
+	mov     R9, #0
+	str     R9, [FP, #-48]
+	mov     R9, #9
+	str     R9, [FP, #-52]
+	add     R8, FP, #-48
+# 	mov     R8, R8
+	add     R7, FP, #-44
+	str     R7, [SP]
+	ldr     R4, [FP, #-48]
+	str     R4, [SP, #4]
+	ldr     R9, [FP, #-52]
+	str     R9, [SP, #8]
 	bl      QuickSort
-	mov     R10, R0
-	str     R10, [R1]
+	mov     R9, R0
+	str     R9, [R8]
 .L18:
-	ldr     R10, [FP, #-48]
-	ldr     R0, =n
-	ldr     R0, [R0]
-	cmp     R10, R0
+	ldr     R8, [FP, #-48]
+	ldr     R9, =n
+	ldr     R9, [R9]
+	cmp     R8, R9
 	blt     .L19
 	b       .L17
 .L17:
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L21
 .L19:
-	add     R1, FP, #-44
-	ldr     R10, [FP, #-48]
-	mov     R0, #4
-	mul     R10, R10, R0
-	add     R10, R1, R10
-	ldr     R10, [R10]
-	str     R10, [FP, #-56]
-	ldr     R10, [FP, #-56]
+	add     R9, FP, #-44
+	ldr     R8, [FP, #-48]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R9, [R9]
+	str     R9, [FP, #-56]
+	ldr     R9, [FP, #-56]
 	str     r0, [SP, #0]
-	ldr     r0, [R10]
+	ldr     r0, [R9]
 	bl      putint
 	ldr     r0, [SP, #0]
 	ldr     r1, [SP, #-4]
 	ldr     r2, [SP, #-8]
 	ldr     r3, [SP, #-12]
-	mov     R10, #10
-	str     R10, [FP, #-56]
-	ldr     R10, [FP, #-56]
+	mov     R9, #10
+	str     R9, [FP, #-56]
+	ldr     R9, [FP, #-56]
 	str     r0, [SP, #0]
-	ldr     r0, [R10]
+	ldr     r0, [R9]
 	bl      putch
 	ldr     r0, [SP, #0]
 	ldr     r1, [SP, #-4]
 	ldr     r2, [SP, #-8]
 	ldr     r3, [SP, #-12]
-	ldr     R10, [FP, #-48]
-	add     R10, R10, #1
-	str     R10, [FP, #-48]
+	ldr     R9, [FP, #-48]
+	add     R9, R9, #1
+	str     R9, [FP, #-48]
 	b       .L18
 .L21:
 NOP

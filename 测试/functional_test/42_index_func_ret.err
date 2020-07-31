@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/42_index_func_ret.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/42_index_func_ret.sy"
 	.data
 	.text
 	.align  2
@@ -9,45 +9,45 @@ _getMaxOfAll:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #8
-	mov     R10, #-999999
-	str     R10, [FP, #-8]
-	ldr     R10, [FP, #8]
-	sub     R10, R10, #1
-	str     R10, [FP, #8]
+	mov     R9, #-999999
+	str     R9, [FP, #-8]
+	ldr     R9, [FP, #8]
+	sub     R9, R9, #1
+	str     R9, [FP, #8]
 .L1:
-	ldr     R10, [FP, #8]
-	mov     R0, #-1
-	cmp     R10, R0
+	ldr     R9, [FP, #8]
+	mov     R4, #-1
+	cmp     R9, R4
 	bgt     .L4
 	b       .L0
 .L0:
-	ldr     R10, [FP, #-8]
-	mov     R0, R10
+	ldr     R9, [FP, #-8]
+	mov     R0, R9
 	b       .L5
 .L4:
-	add     R10, FP, #4
-	ldr     R9, [FP, #8]
-	mov     R0, #4
-	mul     R0, R9, R0
-	add     R10, R10, R0
-	ldr     R0, [R10]
-	ldr     R10, [FP, #-8]
-	cmp     R0, R10
+	add     R9, FP, #4
+	ldr     R8, [FP, #8]
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	ldr     R4, [R9]
+	ldr     R9, [FP, #-8]
+	cmp     R4, R9
 	bgt     .L2
 	b       .L3
 .L3:
-	ldr     R10, [FP, #8]
-	sub     R10, R10, #1
-	str     R10, [FP, #8]
+	ldr     R9, [FP, #8]
+	sub     R9, R9, #1
+	str     R9, [FP, #8]
 	b       .L1
 .L2:
-	add     R1, FP, #4
-	ldr     R10, [FP, #8]
-	mov     R0, #4
-	mul     R10, R10, R0
-	add     R10, R1, R10
-	ldr     R10, [R10]
-	str     R10, [FP, #-8]
+	add     R5, FP, #4
+	ldr     R9, [FP, #8]
+	mov     R4, #4
+	mul     R9, R9, R4
+	add     R9, R5, R9
+	ldr     R9, [R9]
+	str     R9, [FP, #-8]
 	b       .L3
 .L5:
 NOP
@@ -63,51 +63,51 @@ main:
 	add     FP, SP, #4
 	sub     SP, SP, #24
 	add     R9, FP, #-16
-	mov     R1, #0
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #-2
-	str     R1, [R10]
+	mov     R8, #0
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #-2
+	str     R4, [R9]
 	add     R9, FP, #-16
-	mov     R1, #1
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #2
-	str     R1, [R10]
+	mov     R4, #1
+	mov     R8, #4
+	mul     R4, R4, R8
+	add     R4, R9, R4
+	mov     R9, #2
+	str     R9, [R4]
 	add     R9, FP, #-16
-	mov     R1, #2
-	mov     R10, #4
-	mul     R1, R1, R10
-	add     R10, R9, R1
-	mov     R1, #-7
-	str     R1, [R10]
-	add     R1, FP, #-20
-# 	mov     R1, R1
-	add     R2, FP, #-16
-# 	mov     R2, R2
-	add     R10, FP, #-16
-	str     R10, [SP]
-	mov     R3, #3
-	str     R3, [SP, #4]
+	mov     R8, #2
+	mov     R4, #4
+	mul     R4, R8, R4
+	add     R9, R9, R4
+	mov     R4, #-7
+	str     R4, [R9]
+	add     R9, FP, #-20
+# 	mov     R9, R9
+	add     R8, FP, #-16
+# 	mov     R8, R8
+	add     R4, FP, #-16
+	str     R4, [SP]
+	mov     R7, #3
+	str     R7, [SP, #4]
 	bl      _getMaxOfAll
-	mov     R10, R0
-	mov     R0, #4
-	mul     R10, R10, R0
-	add     R10, R2, R10
-# 	ldr      R10, [R10]
-	str     R1, [R10]
-	ldr     R10, [FP, #-20]
+	mov     R7, R0
+	mov     R4, #4
+	mul     R7, R7, R4
+	add     R8, R8, R7
+# 	ldr      R8, [R8]
+	str     R9, [R8]
+	ldr     R9, [FP, #-20]
 	str     r0, [SP, #0]
-	ldr     r0, [R10]
+	ldr     r0, [R9]
 	bl      putint
 	ldr     r0, [SP, #0]
 	ldr     r1, [SP, #-4]
 	ldr     r2, [SP, #-8]
 	ldr     r3, [SP, #-12]
-	mov     R10, #0
-	mov     R0, R10
+	mov     R9, #0
+	mov     R0, R9
 	b       .L6
 .L6:
 NOP

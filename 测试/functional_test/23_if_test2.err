@@ -1,5 +1,5 @@
 	.arch   armv7-a
-	.file   "/mnt/e/workspace_clion/compiler_2020/sysyruntimelibrary-master/functional_test/23_if_test2.sy"
+	.file   "/mnt/e/workspace_clion/compiler_2020/测试/functional_test/23_if_test2.sy"
 	.data
 	.text
 	.align  2
@@ -9,38 +9,38 @@ ifElseElseIf:
 	str     fp, [sp, #-4]!
 	add     FP, SP, #0
 	sub     SP, SP, #12
-	mov     R10, #66
-	str     R10, [FP, #-8]
-	mov     R10, #8923
-	str     R10, [FP, #-12]
-	ldr     R0, [FP, #-8]
-	mov     R10, #5
-	cmp     R0, R10
+	mov     R9, #66
+	str     R9, [FP, #-8]
+	mov     R9, #8923
+	str     R9, [FP, #-12]
+	ldr     R4, [FP, #-8]
+	mov     R9, #5
+	cmp     R4, R9
 	beq     .L3
 	b       .L4
 .L4:
-	ldr     R0, [FP, #-8]
-	mov     R10, #10
-	cmp     R0, R10
+	ldr     R4, [FP, #-8]
+	mov     R9, #10
+	cmp     R4, R9
 	beq     .L0
 	b       .L1
 .L1:
-	ldr     R0, [FP, #-8]
-	mov     R10, #2
-	mul     R10, R0, R10
-	str     R10, [FP, #-12]
+	ldr     R4, [FP, #-8]
+	mov     R9, #2
+	mul     R9, R4, R9
+	str     R9, [FP, #-12]
 .L2:
 .L5:
-	ldr     R10, [FP, #-12]
-	mov     R0, R10
+	ldr     R9, [FP, #-12]
+	mov     R0, R9
 	b       .L6
 .L3:
-	mov     R10, #25
-	str     R10, [FP, #-12]
+	mov     R9, #25
+	str     R9, [FP, #-12]
 	b       .L5
 .L0:
-	mov     R10, #42
-	str     R10, [FP, #-12]
+	mov     R9, #42
+	str     R9, [FP, #-12]
 	b       .L2
 .L6:
 NOP
