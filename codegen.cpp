@@ -167,24 +167,26 @@ static Temp_temp munchExp(T_exp e) {
 //                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
 //                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 return r;
-            } else if (e->u.BINOP.op == T_sub && e->u.BINOP.left->kind == T_exp_::T_CONST) {
-                /* BINOP(MINUS,e1,CONST(i)) 已检查 (是否不存在这种情况）*/
-                T_exp e1 = e->u.BINOP.right;
-                int i = e->u.BINOP.left->u.CONST;
-                Temp_temp r = Temp_newTemp();
-                if (i < 200) {
-                    sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
-                } else {
-                    sprintf(inst, "\tldr     'd0, =%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                    sprintf(inst2,"\tsub     'd0, 's0, 'd0\n");
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
-                }
-//                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
-//                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
-                return r;
-            } else if (e->u.BINOP.op == T_add) {
+            }
+//            else if (e->u.BINOP.op == T_sub && e->u.BINOP.left->kind == T_exp_::T_CONST) {
+//                /* BINOP(MINUS,CONST(i),e1) 已检查 (是否不存在这种情况）*/
+//                T_exp e1 = e->u.BINOP.right;
+//                int i = e->u.BINOP.left->u.CONST;
+//                Temp_temp r = Temp_newTemp();
+//                if (i < 200&&i>=-200) {
+//                    sprintf(inst, "\tsub     'd0, #%d, 's0\n", i);
+//                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+//                } else {
+//                    sprintf(inst, "\tldr     'd0, =%d\n", i);
+//                    emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+//                    sprintf(inst2,"\tsub     'd0, 's0, 'd0\n");
+//                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+//                }
+////                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
+////                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+//                return r;
+//            }
+            else if (e->u.BINOP.op == T_add) {
                 /* BINOP(PLUS,e1,e2) 已检查*/
                 T_exp e1 = e->u.BINOP.left, e2 = e->u.BINOP.right;
                 Temp_temp r = Temp_newTemp();
