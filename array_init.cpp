@@ -11,7 +11,7 @@ static A_exp getOneValue(A_arrayInitList init_list) {
      * paddingInit的辅助函数
      */
     if (init_list->tail){
-        EM_warning(init_list->tail->head->pos, "excess elements in array initializer");
+//        EM_warning(init_list->tail->head->pos, "excess elements in array initializer");
     }
     if (init_list->head->kind == A_initNode_::A_nestedInit){
         return getOneValue(init_list->head->u.nested);
@@ -58,7 +58,7 @@ static void paddingInit(A_exp* exp_array, int len, const int* suffix_size, A_arr
             return;
         }
     }
-    EM_warning(init_list->head->pos, "excess elements in array initializer");
+//    EM_warning(init_list->head->pos, "excess elements in array initializer");
 }
 
 INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_list){

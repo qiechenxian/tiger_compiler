@@ -183,7 +183,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 char buf[128];
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
-                sprintf(buf, "LDR 'd0 ['s1,#%d] # spilled\n", F_accessOffset(local));
+                sprintf(buf, "\tldr     'd0 ['s0, #%d] # spilled\n", F_accessOffset(local));
                 //sprintf(buf, "movl %d(`s0), `d0  # spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), L(temp, NULL), L(F_FP(), NULL), NULL), rewriteList);
@@ -195,7 +195,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 char buf[128];
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
-                sprintf(buf, "STR  's0, ['s1,#%d]  # spilled\n", F_accessOffset(local));
+                sprintf(buf, "\tstr     's0, ['s1, #%d]  # spilled\n", F_accessOffset(local));
                 //sprintf(buf, "movl `s0, %d(`s1)  # spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), NULL, L(temp, L(F_FP(), NULL)), NULL), rewriteList);

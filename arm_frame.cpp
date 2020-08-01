@@ -493,7 +493,8 @@ static int getSpace(F_frame frame)
     if (frame->callee_max_args > 0)
         callee_space = frame->callee_max_args;
 
-    return local_space + callee_space + frame->temp_space;
+//    return local_space + callee_space + frame->temp_space;
+    return local_space + frame->temp_space;
 }
 
 /*
@@ -540,7 +541,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr = head_inst_ptr->tail;
 
 
-    int space = getSpace(frame);// todo 此处还应有要保护寄存器空间
+    int space = getSpace(frame);
     if (space>0){
         if (space < 200){
             char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
