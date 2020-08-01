@@ -565,11 +565,15 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         case A_stm_::A_ifStm:{
             struct expty test{}, body{}, elseBody{};
             test = transExp(venv, tenv, s->u.ifStm.test,l_break,l_continue);
+            int callee_args = test.callee_args;
             if (test.ty->kind != TY_ty_::TY_int){
                 EM_error(s->u.ifStm.test->pos, "integer required");
             }
             body = transStm(frame, venv, tenv, s->u.ifStm.body,l_break,l_continue);
-            int callee_args = body.callee_args;
+            if (callee_args < body.callee_args){
+                callee_args = body.callee_args;
+            }
+
             if (s->u.ifStm.elseBody){
                 elseBody = transStm(frame, venv, tenv, s->u.ifStm.elseBody,l_break,l_continue);
                 if (elseBody.callee_args > callee_args)
@@ -585,6 +589,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         }
         case A_stm_::A_whileStm:{
             struct expty test = transExp(venv, tenv, s->u.whileStm.test,l_break,l_continue);
+            int callee_args = test.callee_args;
             if (test.ty->kind != TY_ty_::TY_int){
                 EM_error(s->u.whileStm.test->pos, "integer required");
             }
@@ -592,7 +597,9 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             Tr_exp w_init=Tr_initialExp();
             struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,w_done,w_init);//trans之前应生成while的break与continue  label
             expty expty_msg = Expty(Tr_while(test.exp,body.exp,w_done,w_init), body.ty);
-            expty_msg.callee_args = body.callee_args;
+            if (body.callee_args > callee_args)
+                callee_args = body.callee_args;
+            expty_msg.callee_args = callee_args;
             return expty_msg;
         }
         case A_stm_::A_blockStm:{
