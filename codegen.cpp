@@ -296,10 +296,10 @@ static void munchStm(T_stm s) {
     char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    char *inst_r0 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    char *inst_r1 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    char *inst_r2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    char *inst_r3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+//    char *inst_r0 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+//    char *inst_r1 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+//    char *inst_r2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+//    char *inst_r3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     switch (s->kind) {
         case T_stm_::T_MOVE: {
             T_exp dst = s->u.MOVE.dst, src = s->u.MOVE.src;
@@ -511,6 +511,8 @@ static void munchStm(T_stm s) {
                 Temp_labelList jumps = s->u.JUMP.jumps;
                 sprintf(inst, "\tb       %s\n", Temp_labelString(lab));
                 emit(AS_Oper(inst, NULL, NULL, AS_Targets(jumps)));
+                sprintf(inst2,"\t.LTORG\n");
+                emit(AS_Oper(inst2,NULL,NULL,NULL));
             } else {
                 /* JUMP(e) */
                 T_exp e1 = s->u.JUMP.exp;
@@ -561,6 +563,10 @@ static void munchStm(T_stm s) {
 
             sprintf(inst3, "\tb       %s\n", Temp_labelString(jf));
             emit(AS_Oper(inst3, NULL, NULL, AS_Targets(Temp_LabelList(jf, NULL))));
+
+            char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+            sprintf(inst4,"\t.LTORG\n");
+            emit(AS_Oper(inst4,NULL,NULL,NULL));
             break;
         }
         default: {
