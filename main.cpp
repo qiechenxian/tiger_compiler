@@ -33,7 +33,10 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
     stmList = C_traceSchedule(C_basicBlocks(stmList,frame));
 //    printcannoList(stderr, stmList);
 
+
     iList = F_codegen(frame, stmList);
+
+    iList = F_procEntryExit2(iList);
     //fprintf(outfile,"%s",iList->tail->head->u.LABEL.assem);
     struct RA_result ra=RA_regAlloc(frame,iList);
     iList=ra.il;
@@ -79,7 +82,7 @@ static void doGlobal(FILE *outfile, F_fragList fragList){
         } else if (frag->kind == F_frag_::F_stringFrag){
             fprintf(outfile, "\t.section\t.rodata\n");
             fprintf(outfile, "%s:\n", S_getName(frag->u.stringg.label));
-            fprintf(outfile, "\t.ascii  \"%s\\000\"", frag->u.stringg.str);
+            fprintf(outfile, "\t.ascii  \"%s\\000\"\n", frag->u.stringg.str);
 //            fprintf(outfile, "\n");
         }
     }
