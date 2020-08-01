@@ -843,6 +843,9 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     }
                     expty expty_msg = Expty(Tr_binop(op,left.exp,right.exp), TY_Int());
                     expty_msg.callee_args = callee_args;
+                    if (op == A_mod || op == A_div){
+                        expty_msg.callee_args = 2;
+                    }
                     return expty_msg;
                 }
                 case A_eq:
