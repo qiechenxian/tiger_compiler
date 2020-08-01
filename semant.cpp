@@ -662,14 +662,18 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
                         "expression not of expected type %s",
                         TY_toString(var.ty));
             }
-            return Expty(Tr_assign(var.exp,exp.exp), TY_Void());
+            expty expty_msg = Expty(Tr_assign(var.exp,exp.exp), TY_Void());
+            expty_msg.callee_args = exp.callee_args;
+            return expty_msg;
         }
         case A_stm_::A_returnStm:{//todo translate  now translate it as put result in rv reg
             if (!s->u.returnStm){
                 return Expty(Tr_nopExp(), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
-            return Expty(Tr_return(returnTy.exp,frame), returnTy.ty);
+            expty expty_msg = Expty(Tr_return(returnTy.exp,frame), returnTy.ty);
+            expty_msg.callee_args = returnTy.callee_args;
+            return expty_msg;
         }
         case A_stm_::A_switchStm:{//not required in grammer
             struct expty key = transExp(venv, tenv, s->u.switchStm.exp,l_break,l_continue);
@@ -784,8 +788,12 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             struct expty left = transExp(venv, tenv, a->u.opExp.left,l_break,l_continue);
             struct expty right{};
 
+            int callee_args = left.callee_args;
+
             if (op != A_not) {
                 right = transExp(venv, tenv, a->u.opExp.right,l_break,l_continue);
+                if (callee_args < right.callee_args)
+                    callee_args = right.callee_args;
 
                 if (a->u.opExp.left->kind == A_exp_::A_intExp
                 && a->u.opExp.right->kind == A_exp_::A_intExp){
@@ -796,6 +804,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     a->kind = A_exp_::A_intExp;
                     expty expty_msg = Expty(Tr_intExp(a->u.intExp), TY_Int());
                     expty_msg.isConst = true;
+                    expty_msg.callee_args = callee_args;
 //                    free(temp_left);
 //                    free(temp_right);
                     return expty_msg;
@@ -807,6 +816,7 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                     a->kind = A_exp_::A_intExp;
                     expty expty_msg = Expty(Tr_intExp(a->u.intExp), TY_Int());
                     expty_msg.isConst = true;
+                    expty_msg.callee_args = callee_args;
 //                    free(temp_right);
                     return expty_msg;
                     /// 此处会造成内存泄漏，泄漏对象：temp_left所指对象
@@ -828,17 +838,21 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                                  "%s expression given for RHS, expected int",
                                  TY_toString(right.ty));
                     }
-                    return Expty(Tr_binop(op,left.exp,right.exp), TY_Int());
+                    expty expty_msg = Expty(Tr_binop(op,left.exp,right.exp), TY_Int());
+                    expty_msg.callee_args = callee_args;
+                    return expty_msg;
                 }
                 case A_eq:
                 case A_ne:{
+                    expty expty_msg = Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    expty_msg.callee_args = callee_args;
                     if (left.ty->kind == TY_ty_::TY_int){
                         if (is_equal_ty(left.ty, right.ty))
-                            return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                            return expty_msg;
                     }
                     else if (left.ty->kind == TY_ty_::TY_char){
                         if (is_equal_ty(left.ty, right.ty))
-                            return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                            return expty_msg;
                     }
                     else if (left.ty->kind == TY_ty_::TY_array){
                         if (right.ty->kind!=TY_ty_::TY_array  )
@@ -874,12 +888,22 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                                  "unexpected %s expression in comparison",
                                  TY_toString(right.ty));
                     }
-                    return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    expty expty_msg = Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    expty_msg.callee_args = callee_args;
+                    return expty_msg;
                 }
 
-                case A_not:return Expty(Tr_relop(op, nullptr,right.exp), TY_Int());
+                case A_not:{
+                    expty expty_msg = Expty(Tr_relop(op, nullptr,right.exp), TY_Int());
+                    expty_msg.callee_args = callee_args;
+                    return expty_msg;
+                }
                 case A_and:
-                case A_or:return Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                case A_or:{
+                    expty expty_msg = Expty(Tr_relop(op,left.exp,right.exp), TY_Int());
+                    expty_msg.callee_args = callee_args;
+                    return expty_msg;
+                }
                 default:
                     assert(0);
             }
