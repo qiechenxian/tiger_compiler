@@ -1,4 +1,4 @@
-cc:=g++ --std=c++14
+cc:=g++ --std=c++14 -Wall
 
 complier: main.o util.o errormsg.o table.o symbol.o ast.o lex.yy.o SysY.tab.o \
 	types.o env.o temp.o tree.o arm_frame.o translate.o semant.o prast.o tree.o ast.o \
