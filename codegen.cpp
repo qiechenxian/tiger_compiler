@@ -282,6 +282,13 @@ static Temp_temp munchExp(T_exp e) {
     }
 }
 
+static char *funcName(c_string labelString) {
+    if (strcmp(labelString, "putf") == 0){
+        return (char*)"printf";
+    }
+    return labelString;
+}
+
 /*
  * 使用的指令包括
  */
@@ -319,9 +326,9 @@ static void munchStm(T_stm s) {
                     Temp_temp r = Temp_newTemp();
                     Temp_temp r1 = munchExp(e1);
                     Temp_temp r2 = munchExp(e2);
-                    sprintf(inst, "\tldr      'd0, ['s0]\n");
-                    emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
-                    sprintf(inst2, "\tstr     's0, ['s1]\n");
+                    sprintf(inst, "\tldr     'd0, ['s0]\n");
+                    emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
+                    sprintf(inst2, "\tstr     's1, ['s0]\n");
                     emit(AS_Oper(inst2, NULL, L(r1, L(r, NULL)), NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_CONST) {
                     /* MOVE(MEM(CONST(i)), e1) */
@@ -454,7 +461,8 @@ static void munchStm(T_stm s) {
                     Temp_tempList l = munchArgs(special_tag, 0, args);
                     Temp_tempList calldefs = NULL; // TODO
                     // 函数调用？
-                    sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
+//                    sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
+                    sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
                     emit(AS_Oper(inst, calldefs, l, AS_Targets(Temp_LabelList(lab, NULL))));
                     //if (special_tag == true) {
                     //    count_func_param = count_func_param - 2;
