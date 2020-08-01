@@ -520,23 +520,25 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
 
-        recover_offset = 0;
+//        recover_offset = 0;
+        recover_offset = (0 + 6) * word_size;
     } else {
         char *inst = (char *) "\tstmfd   sp!, {fp, lr}\n";
         head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
 
-        recover_offset = 1 * word_size;
+        recover_offset = (1 + 6) * word_size;
     }
+
+    // todo 优化
+    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r9}\n", NULL, NULL, NULL),NULL);
+    head_inst_ptr = head_inst_ptr->tail;
 
     char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
     head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, Temp_TempList(F_FP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
-    // todo 优化
-    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r9}\n", NULL, NULL, NULL),NULL);
-    head_inst_ptr = head_inst_ptr->tail;
 
     int space = getSpace(frame);// todo 此处还应有要保护寄存器空间
     if (space>0){
@@ -562,12 +564,17 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr->tail = body->tail;
 
     /** 函数出口指令 */
-    tail_inst_list = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
-    tail_inst_ptr = tail_inst_list;
+//    tail_inst_list = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
+//    tail_inst_ptr = tail_inst_list;
 
     inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
-    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+//    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+//    tail_inst_ptr = tail_inst_ptr->tail;
+    tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+    tail_inst_ptr = tail_inst_list;
+
+    tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
     tail_inst_ptr = tail_inst_ptr->tail;
 
 
