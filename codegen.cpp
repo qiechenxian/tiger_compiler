@@ -326,9 +326,9 @@ static void munchStm(T_stm s) {
                     Temp_temp r = Temp_newTemp();
                     Temp_temp r1 = munchExp(e1);
                     Temp_temp r2 = munchExp(e2);
-                    sprintf(inst, "\tldr      'd0, ['s0]\n");
-                    emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
-                    sprintf(inst2, "\tstr     's0, ['s1]\n");
+                    sprintf(inst, "\tldr     'd0, ['s0]\n");
+                    emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
+                    sprintf(inst2, "\tstr     's1, ['s0]\n");
                     emit(AS_Oper(inst2, NULL, L(r1, L(r, NULL)), NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_CONST) {
                     /* MOVE(MEM(CONST(i)), e1) */
