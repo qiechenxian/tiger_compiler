@@ -31,8 +31,7 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList,frame));
-//    printcannoList(stderr, stmList);
-
+    printcannoList(stderr, stmList);
 
     iList = F_codegen(frame, stmList);
 
@@ -141,7 +140,7 @@ int main(int argc, char **argv) {
 //    fprintf(stderr, "\n");
 
     frags = SEM_transProgram(venv, tenv, absyn_root);
-
+    printStmList(stderr, frags);
 //    fprintf(stderr, "\nafter semantic ast:\n");
 //    pr_decList(stderr, absyn_root, 0);
 //    fprintf(stderr, "\nsemantic check finish !\n");
