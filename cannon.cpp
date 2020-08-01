@@ -237,10 +237,7 @@ static void trace(T_stmList list)
             trace(trues);
         }
         else {
-            Temp_label falses = Temp_newLabel();
-            last->tail->head = T_Cjump(s->u.CJUMP.op, s->u.CJUMP.left,
-                                       s->u.CJUMP.right, s->u.CJUMP.trues, falses);
-            last->tail->tail = T_StmList(T_Label(falses), getNext());
+            last->tail->tail = getNext();
         }
     }
     else {printf("error from trace ");assert(0);}
@@ -267,7 +264,7 @@ T_stmList C_traceSchedule(struct C_block b)
     global_block = b;
 
     for (sList=global_block.stmLists; sList; sList=sList->tail) {
-        S_enter(block_env, sList->head->head->u.LABEL, sList->head);//
+        S_enter(block_env, sList->head->head->u.LABEL, sList->head);
     }
     return getNext();
 }

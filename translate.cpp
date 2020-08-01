@@ -372,10 +372,13 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
                     right->u.cx.stm=cond;
                 }
                 Temp_label trues_and= Temp_newLabel();
+                //Temp_label success_and= Temp_newLabel();
+                //T_stm temp_stm=T_Seq(left->u.cx.stm,T_Seq(T_Label(trues_and),T_Seq(right->u.cx.stm,T_Label(success_and))));
                 T_stm temp_stm=T_Seq(left->u.cx.stm,T_Seq(T_Label(trues_and),right->u.cx.stm));
                 if(left->kind==Tr_exp_::Tr_cx&&right->kind==Tr_exp_::Tr_cx)
                 {
                     doPatch(left->u.cx.trues,trues_and);
+                    //doPatch(right->u.cx.trues,success_and);
                     patchList and_trues= right->u.cx.trues;
                     patchList and_falses= connect_PatchList(left->u.cx.falses,right->u.cx.falses);
                     return Tr_Cx(and_trues,and_falses,temp_stm);
@@ -411,10 +414,14 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
                 right->u.cx.stm=cond;
             }
             Temp_label falses_or= Temp_newLabel();
+            //Temp_label trues_or= Temp_newLabel();
+            //T_stm temp_stm=T_Seq(left->u.cx.stm,T_Seq(T_Label(falses_or),T_Seq(right->u.cx.stm,T_Label(trues_or))));
             T_stm temp_stm=T_Seq(left->u.cx.stm,T_Seq(T_Label(falses_or),right->u.cx.stm));
             if(left->kind==Tr_exp_::Tr_cx&&right->kind==Tr_exp_::Tr_cx)
             {
                 doPatch(left->u.cx.falses,falses_or);
+                //doPatch(left->u.cx.trues,trues_or);
+                //doPatch(right->u.cx.trues,trues_or);
                 patchList or_trues= connect_PatchList(left->u.cx.trues,right->u.cx.trues);
                 patchList or_falses= right->u.cx.falses;
                 return Tr_Cx(or_trues,or_falses,temp_stm);
