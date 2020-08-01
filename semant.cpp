@@ -699,6 +699,9 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
 
 
 static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,Tr_exp l_continue){
+    if (not a){
+        return Expty(Tr_nopExp(), TY_Int());
+    }
     switch (a->kind) {
         case A_exp_::A_varExp:{
             expty var = transVar(venv, tenv, a->u.varExp,l_break,l_continue);
