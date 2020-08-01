@@ -149,7 +149,7 @@ bool Temp_equal(Temp_tempList ta, Temp_tempList tb) {
 
     for (; ta; ta = ta->tail) {
         t = ta->head;
-        Temp_enter(m, t, "e");
+        Temp_enter(m, t, (char *)"e");
         ++ca;
     }
 
@@ -172,7 +172,7 @@ Temp_tempList Temp_union(Temp_tempList ta, Temp_tempList tb) {
     for (; ta; ta = ta->tail) {
         t = ta->head;
         if (Temp_look(m, t) == NULL) {
-            Temp_enter(m, t, "u");
+            Temp_enter(m, t, (char *)"u");
             tl = Temp_TempList(t, tl);
         }
     }
@@ -180,7 +180,7 @@ Temp_tempList Temp_union(Temp_tempList ta, Temp_tempList tb) {
     for (; tb; tb = tb->tail) {
         t = tb->head;
         if (Temp_look(m, t) == NULL) {
-            Temp_enter(m, t, "u");
+            Temp_enter(m, t, (char *)"u");
             tl = Temp_TempList(t, tl);
         }
     }
@@ -195,7 +195,7 @@ Temp_tempList Temp_intersect(Temp_tempList ta, Temp_tempList tb) {
 
     for (; ta; ta = ta->tail) {
         t = ta->head;
-        Temp_enter(m, t, "i");
+        Temp_enter(m, t, (char *)"i");
     }
 
     for (; tb; tb = tb->tail) {
@@ -215,7 +215,7 @@ Temp_tempList Temp_minus(Temp_tempList ta, Temp_tempList tb) {
 
     for (; tb; tb = tb->tail) {
         t = tb->head;
-        Temp_enter(m, t, "m");
+        Temp_enter(m, t, (char *)"m");
     }
 
     for (; ta; ta = ta->tail) {

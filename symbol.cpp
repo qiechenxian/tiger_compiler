@@ -48,7 +48,7 @@ void* S_look(S_table t, S_symbol sym){
     return TAB_look((TAB_table) t, sym);
 }
 
-static struct S_symbol_ mark_sym = {"<mark>", 0};
+static struct S_symbol_ mark_sym = {(char *)"<mark>", 0};
 void S_beginScope(S_table t){
     S_enter(t, &mark_sym, NULL);
 }

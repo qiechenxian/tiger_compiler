@@ -1744,7 +1744,7 @@ yyreduce:
 
 /* Line 1464 of yacc.c  */
 #line 152 ".\\SysY.y"
-    {(yyval.sym) = S_Symbol("int");;}
+    {(yyval.sym) = S_Symbol((char *)"int");;}
     break;
 
   case 13:
@@ -1943,7 +1943,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 236 ".\\SysY.y"
     {
-        (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (6)].sym), (A_fieldList)U_reverseList((yyvsp[(4) - (6)].fieldList)), S_Symbol("void"), (yyvsp[(6) - (6)].stm));
+        (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (6)].sym), (A_fieldList)U_reverseList((yyvsp[(4) - (6)].fieldList)), S_Symbol((char *)"void"), (yyvsp[(6) - (6)].stm));
     ;}
     break;
 
@@ -1952,7 +1952,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 239 ".\\SysY.y"
     {
-        (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (5)].sym), NULL, S_Symbol("void"), (yyvsp[(5) - (5)].stm));
+        (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (5)].sym), NULL, S_Symbol((char *)"void"), (yyvsp[(5) - (5)].stm));
     ;}
     break;
 
@@ -2516,7 +2516,7 @@ yyerrlab:
 	  }
 	else
 	  {
-	    yyerror (YY_("syntax error"));
+	    yyerror (YY_((char *)"syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -2637,7 +2637,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_("memory exhausted"));
+  yyerror (YY_((char *)"memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif

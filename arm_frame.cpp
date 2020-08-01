@@ -31,17 +31,17 @@ static Temp_tempList specialregs = NULL;
 // 初始化
 void F_initRegisters(void) {
 
-    r0 = Temp_new_special("R0");
-    r1 = Temp_new_special("R1");
-    r2 = Temp_new_special("R2");
-    r3 = Temp_new_special("R3");
-    r4 = Temp_new_special("R4");
-    r5 = Temp_new_special("R5");
-    r6 = Temp_new_special("R6");
-    r7 = Temp_new_special("R7");
-    r8 = Temp_new_special("R8");
-    r9 = Temp_new_special("R9");
-    r10 = Temp_new_special("R10");
+    r0 = Temp_new_special((char*)"R0");
+    r1 = Temp_new_special((char*)"R1");
+    r2 = Temp_new_special((char*)"R2");
+    r3 = Temp_new_special((char*)"R3");
+    r4 = Temp_new_special((char*)"R4");
+    r5 = Temp_new_special((char*)"R5");
+    r6 = Temp_new_special((char*)"R6");
+    r7 = Temp_new_special((char*)"R7");
+    r8 = Temp_new_special((char*)"R8");
+    r9 = Temp_new_special((char*)"R9");
+    r10 = Temp_new_special((char*)"R10");
 
 //    fp = Temp_new_special("11111FP");
 //    sp = Temp_new_special("SP");
@@ -61,23 +61,23 @@ void F_initRegisters(void) {
 Temp_map F_initialRegisters(F_frame f){
     Temp_map m=Temp_empty();
 
-    Temp_enter(m, fp, "FP");
-    Temp_enter(m, sp, "SP");
-    Temp_enter(m, lr, "LR");
-//    Temp_enter(m, ip, "IP");
-//    Temp_enter(m, pc, "PC");
+    Temp_enter(m, fp, (char*)"FP");
+    Temp_enter(m, sp, (char*)"SP");
+    Temp_enter(m, lr, (char*)"LR");
+//    Temp_enter(m, ip, (char*)"IP");
+//    Temp_enter(m, pc, (char*)"PC");
 
-    Temp_enter(m, r0, "R0");
-    Temp_enter(m, r1, "R1");
-    Temp_enter(m, r2, "R2");
-    Temp_enter(m, r3, "R3");
-    Temp_enter(m, r4, "R4");
-    Temp_enter(m, r5, "R5");
-    Temp_enter(m, r6, "R6");
-    Temp_enter(m, r7, "R7");
-    Temp_enter(m, r8, "R8");
-    Temp_enter(m, r9, "R9");
-    Temp_enter(m, r10, "R10");
+    Temp_enter(m, r0, (char*)"R0");
+    Temp_enter(m, r1, (char*)"R1");
+    Temp_enter(m, r2, (char*)"R2");
+    Temp_enter(m, r3, (char*)"R3");
+    Temp_enter(m, r4, (char*)"R4");
+    Temp_enter(m, r5, (char*)"R5");
+    Temp_enter(m, r6, (char*)"R6");
+    Temp_enter(m, r7, (char*)"R7");
+    Temp_enter(m, r8, (char*)"R8");
+    Temp_enter(m, r9, (char*)"R9");
+    Temp_enter(m, r10, (char*)"R10");
     return m;
 }
 Temp_temp F_FP()//取帧指针
@@ -476,7 +476,7 @@ AS_instrList F_procEntryExit2(AS_instrList body) {
                                    Temp_TempList(F_LR(),
                                                  Temp_TempList(F_SP(), calleeSaves)));
     return AS_splice(body, AS_InstrList(
-            AS_Oper("", nullptr, returnSink, nullptr), nullptr));
+            AS_Oper((char*)"", nullptr, returnSink, nullptr), nullptr));
 }
 
 static int getSpace(F_frame frame)
