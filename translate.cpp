@@ -269,8 +269,11 @@ Tr_exp Tr_intExp(int int_value)
 {
     return Tr_Ex(T_Const(int_value));
 }
-
-
+//以下为转换为中间代码
+Tr_exp Tr_Ex_cover(F_access var_access)
+{
+    return Tr_Ex(F_fp_address(var_access,0));
+}
 
 //以下为转换为中间代码
 Tr_exp Tr_simpleVar(Tr_access acc)

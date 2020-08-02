@@ -417,6 +417,12 @@ T_exp F_expWithIndex(F_access acc, T_exp framePtr, int index)
 {
     return T_Mem(T_Binop(T_add, framePtr, T_Const(get_word_size() * index + acc->u.offset)));
 }
+T_exp F_fp_address(F_access acc,int index)
+{
+    Temp_temp get_fp=F_FP();
+    T_exp framePtr=T_Temp(get_fp);
+    return T_Binop(T_add, framePtr, T_Const(get_word_size() * index + acc->u.offset));
+}
 
 int get_word_size() {
     return F_WORD_SIZE;
@@ -610,3 +616,7 @@ Temp_label get_done_label(F_frame f_frame)
 }
 
 Temp_map F_tempMap = nullptr;
+int get_offset(F_access g_access)
+{
+    return g_access->u.offset;
+}

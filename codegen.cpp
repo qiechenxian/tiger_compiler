@@ -29,7 +29,7 @@ bool Sys_lib_fuc_test(Temp_label lab) {
            || strcmp("getarray", Temp_labelString(lab)) == 0 || strcmp("putint", Temp_labelString(lab)) == 0
            || strcmp("putch", Temp_labelString(lab)) == 0 || strcmp("putarray", Temp_labelString(lab)) == 0
            || strcmp("putf", Temp_labelString(lab)) == 0 || strcmp("starttime", Temp_labelString(lab)) == 0
-           || strcmp("stoptime", Temp_labelString(lab)) == 0;
+           || strcmp("stoptime", Temp_labelString(lab)) == 0||strcmp("memset@plt", Temp_labelString(lab)) == 0;
 }
 
 // 用于表达式的匹配，每种情形的从句将匹配一个瓦片

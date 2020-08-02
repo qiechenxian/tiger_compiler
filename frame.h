@@ -83,5 +83,6 @@ T_stm F_procEntryExit1(F_frame frame, T_stm stm);
 AS_instrList F_procEntryExit2(AS_instrList body);
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
 Temp_label get_done_label(F_frame f_frame);
-
+int get_offset(F_access g_access);
+T_exp F_fp_address(F_access acc,int index);
 #endif //COMPILER_LOYX_FRAME_H

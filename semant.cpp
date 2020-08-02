@@ -304,6 +304,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
                 init_list_tr->array_length=init_list->total_size;
                 init_list_tr->array=(Tr_exp*)checked_malloc(init_list->total_size*sizeof(Tr_exp));
+                //printf("%d",init_list->total_size);
                 for(int i=0;i < init_list->total_size;i++)
                 {
                     struct expty temp=transExp(venv,tenv,init_list->array[i],l_break,l_continue);;
@@ -338,13 +339,21 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                      */
                     arrayEntry->u.var.cValues = E_ArrayValue(init_list);
                     S_enter(venv, d->u.array.id, arrayEntry);
-                    return Tr_init_array(var_access, init_list_tr); // todo 优化项：当常数数组只有常量访问时，无需初始化
+                    Tr_expList call_memset_param=Tr_ExpList();
+                    Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
+                    Tr_expList_append(call_memset_param,Tr_intExp(0));
+                    Tr_expList_append(call_memset_param,Tr_intExp(init_list->total_size*4));
+                    return Tr_seq(Tr_func_call(Temp_namedLabel("memset@plt"),call_memset_param),Tr_init_array(var_access, init_list_tr));// todo 优化项：当常数数组只有常量访问时，无需初始化
                 } else{
                     /**
                      * 非常量数组初值处理
                      */
                     S_enter(venv, d->u.array.id, arrayEntry);
-                    return Tr_init_array(var_access, init_list_tr);
+                    Tr_expList call_memset_param=Tr_ExpList();
+                    Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
+                    Tr_expList_append(call_memset_param,Tr_intExp(0));
+                    Tr_expList_append(call_memset_param,Tr_intExp(init_list->total_size*4));
+                    return Tr_seq(Tr_func_call(Temp_namedLabel("memset@plt"),call_memset_param),Tr_init_array(var_access, init_list_tr));
                 }
             }
 
@@ -384,7 +393,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 }
 
                 S_enter(venv, d->u.array.id, arrayEntry);
-                return Tr_init_array(var_access, init_list_tr);
+                Tr_expList call_memset_param=Tr_ExpList();
+                Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
+                Tr_expList_append(call_memset_param,Tr_intExp(0));
+                Tr_expList_append(call_memset_param,Tr_intExp(null_init->total_size*4));
+                return Tr_seq(Tr_func_call(Temp_namedLabel("memset@plt"),call_memset_param),Tr_init_array(var_access, init_list_tr));
             }
 
             S_enter(venv, d->u.array.id, arrayEntry);

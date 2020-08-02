@@ -79,4 +79,5 @@ Tr_exp  Tr_add_fuc_head_label(Tr_exp returnValue,Temp_label fun_label);
 Tr_exp Tr_StringExp(c_string content);
 void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals);
 Tr_exp Tr_Nx(T_stm stm);
+Tr_exp Tr_Ex_cover(F_access var_access);
 #endif //COMPILER_LOYX_TRANSLATE_H
