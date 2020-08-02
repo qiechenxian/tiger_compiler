@@ -144,7 +144,7 @@ static void solveLiveness(struct Live_graph *lg,
         // Spill Cost
         for (t = defuse; t; t = t->tail) {
             Temp_temp ti = t->head;
-            long spills = (long long)Temp_lookPtr(spillCost, ti);
+            long long spills = (long long)Temp_lookPtr(spillCost, ti);
             ++spills;
             Temp_enterPtr(spillCost, ti, (void*)spills);
         }
@@ -226,7 +226,7 @@ static void solveLiveness3(struct Live_graph *lg,
         // Spill Cost
         for (tl = defuse; tl; tl = tl->tail) {
             Temp_temp ti = tl->head;
-            long spills = (long long)Temp_lookPtr(spillCost, ti);
+            long long spills = (long long)Temp_lookPtr(spillCost, ti);
             ++spills;
             Temp_enterPtr(spillCost, ti, (void*)spills);
         }
