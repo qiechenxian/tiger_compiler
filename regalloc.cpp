@@ -125,19 +125,19 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
 
 struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 //your code here.
-    struct RA_result ret;//返回图着色结果
+    struct RA_result ret;
     bool ra_finished = false;
 
     G_graph flow;
-    struct Live_graph live;//活跃分析
+    struct Live_graph live;
     Temp_map initial;
-    struct COL_result col;//图着色
+    struct COL_result col;
     AS_instrList rewriteList;
     int tryNum = 0;
     while (++tryNum < 7) {
-        flow = FG_AssemFlowGraph(il, f);//构建控制流图
+        flow = FG_AssemFlowGraph(il, f);
 //        G_show(stderr, G_nodes(flow), printInst);
-        live = Live_liveness(flow);//对控制流图进行活跃分析
+        live = Live_liveness(flow);
 //        G_show(stderr, G_nodes(live.graph), printTemp);
         initial = F_initialRegisters(f);
 

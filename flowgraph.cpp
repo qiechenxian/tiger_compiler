@@ -51,7 +51,7 @@ static G_node findLabeledNode(Temp_label lab, G_nodeList nl, Temp_labelList ll) 
 
 G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
     //your code here.
-    G_graph g = G_Graph();//包含一个整型信息，两个节点链表
+    G_graph g = G_Graph();
     G_nodeList nl = NULL, jumpnl = NULL;
     Temp_labelList ll = NULL, jl = NULL, last_lbl = NULL;
     G_node n = NULL, last_n = NULL, jump_n = NULL;
@@ -61,18 +61,18 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
     for (; il; il = il->tail) {
         inst = il->head;
         if (inst->kind != AS_instr_::I_LABEL) {
-            n = G_Node(g, (void *) inst);//在图g中生成新的节点
+            n = G_Node(g, (void *) inst);
 
             if (last_inst) {
                 if (last_inst->kind == AS_instr_::I_LABEL) {
                     nl = G_NodeList(n, nl);
-                    ll = Temp_LabelList(last_inst->u.LABEL.label, ll);//记录label
+                    ll = Temp_LabelList(last_inst->u.LABEL.label, ll);
                     if (last_nonlbl_inst) {
                         G_addEdge(last_n, n);
                     }
                 } else if (last_inst->kind == AS_instr_::I_OPER && last_inst->u.OPER.jumps != NULL) {
                     // add edge for conditional jumps
-                    if (strstr(last_inst->u.OPER.assem, "b ") == NULL) {//如果遇到无条件跳转不添加边
+                    if (strstr(last_inst->u.OPER.assem, "jmp") != last_inst->u.OPER.assem) {
                         G_addEdge(last_n, n);
                     }
                 } else {
@@ -87,10 +87,10 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
             last_n = n;
             last_nonlbl_inst = inst;
         }
-        last_inst = inst;//记录上一条指令
+        last_inst = inst;
     }
     // Handle jump instructions
-    for (; jumpnl; jumpnl = jumpnl->tail) {//jumpnl记录了所有跳转命令node  ll记录了所有label 而nl记录了ll中label之后接着的命令节点
+    for (; jumpnl; jumpnl = jumpnl->tail) {
         n = jumpnl->head;
         inst = (AS_instr) G_nodeInfo(n);
         for (jl = inst->u.OPER.jumps->labels; jl; jl = jl->tail) {

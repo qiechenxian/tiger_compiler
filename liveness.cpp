@@ -72,23 +72,21 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
 
     // Loop
     while (flag) {
-        for (fl = G_nodes(flow); fl; fl = fl->tail) {//fl用于遍历flow结点
+        for (fl = G_nodes(flow); fl; fl = fl->tail) {
             n = fl->head;
             li = lookupLiveMap(in, n);
             lo = lookupLiveMap(out, n);
             enterLiveMap(last_in, n, li);
             enterLiveMap(last_out, n, lo);
 
-            ci = tempUnion(FG_use(n), tempMinus(lo, FG_def(n)));//返回ci=FG_use(n)+out(n)-FG_def(n)
-            //入口活跃=use(n)+out(n)-def(n)
+            ci = tempUnion(FG_use(n), tempMinus(lo, FG_def(n)));
             co = NULL;
-            for (sl = G_succ(n); sl; sl = sl->tail) {//G_succ(n)取n的后继结点表（控制流里的）
+            for (sl = G_succ(n); sl; sl = sl->tail) {
                 sn = sl->head;
-                co = tempUnion(co, lookupLiveMap(in, sn));//返回co=c0+lookup(in)
-                //出口活跃=后继节点的入口活跃之和
+                co = tempUnion(co, lookupLiveMap(in, sn));
             }
-            enterLiveMap(in, n, ci);//in中放入节点n，值为ci为当前入口活跃temp
-            enterLiveMap(out, n, co);//out中放入节点n，值为co为当前出口活跃temp
+            enterLiveMap(in, n, ci);
+            enterLiveMap(out, n, co);
         }
 
         flag = false;
@@ -103,7 +101,7 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
                 flag = true;
                 break;
             }
-        }//直到到达不动点前都要继续执行
+        }
     }
 }
 
@@ -134,7 +132,7 @@ static void solveLiveness(struct Live_graph *lg,
     for (fl = G_nodes(flow); fl; fl = fl->tail) {
         n = fl->head;
         inst = FG_inst(n);
-        tout = lookupLiveMap(out, n);//n的出口活跃节点
+        tout = lookupLiveMap(out, n);
         tdef = FG_def(n);
         tuse = FG_use(n);
 
@@ -157,8 +155,10 @@ static void solveLiveness(struct Live_graph *lg,
                 ml = instUnion(ml, IL(inst, NULL));
                 Temp_enterPtr(moveList, t, (void*)ml);
             }
+
             worklistMoves = instUnion(worklistMoves, IL(inst, NULL));
         }
+
         // Traverse defined vars
         for (t = tout; t; t = t->tail) {
             ndef = findOrCreateNode(t->head, g, tab);
@@ -321,12 +321,12 @@ static void solveLiveness2(struct Live_graph *lg,
     lg->moves = ml;
 }
 
-struct Live_graph Live_liveness(G_graph flow) {//生成冲突图和节点偶对表
+struct Live_graph Live_liveness(G_graph flow) {
     //your code here.
 
     // Construct liveness graph
     G_table in = G_empty(), out = G_empty();
-    getLiveMap(flow, in, out);//得到各个节点的出入口活跃信息
+    getLiveMap(flow, in, out);
 
     // Construct interference graph
     struct Live_graph lg;
