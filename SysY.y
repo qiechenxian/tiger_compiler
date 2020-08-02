@@ -149,7 +149,7 @@ ConstDefList:
     ;
 
 BType:
-    INT {$$ = S_Symbol("int");}
+    INT {$$ = S_Symbol((char *)"int");}
     ;
 
 ConstDef:
@@ -234,10 +234,10 @@ InitValList:
 
 FuncDef:
     VOID Ident L_PARENTHESIS FuncFParams R_PARENTHESIS Block {
-        $$ = A_FunctionDec(A_POS(@$), $2, (A_fieldList)U_reverseList($4), S_Symbol("void"), $6);
+        $$ = A_FunctionDec(A_POS(@$), $2, (A_fieldList)U_reverseList($4), S_Symbol((char *)"void"), $6);
     }
     | VOID Ident L_PARENTHESIS R_PARENTHESIS Block {
-        $$ = A_FunctionDec(A_POS(@$), $2, NULL, S_Symbol("void"), $5);
+        $$ = A_FunctionDec(A_POS(@$), $2, NULL, S_Symbol((char *)"void"), $5);
     }
     | BType Ident L_PARENTHESIS FuncFParams R_PARENTHESIS Block {
         $$ = A_FunctionDec(A_POS(@$), $2, (A_fieldList)U_reverseList($4), $1, $6);

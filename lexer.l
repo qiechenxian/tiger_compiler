@@ -85,7 +85,7 @@ string \"[^"]*\"
 
 <INITIAL>[ \t]+ { /* space */ ADJ; }
 <INITIAL>(\n|\r|\n\r)+ {yycolumn = 1;EM_clear_buf();}
-<INITIAL>. { /* error */ yyerror("lex: invalid character"); }
+<INITIAL>. { /* error */ yyerror((char *)"lex: invalid character"); }
 
 %%
 

@@ -59,7 +59,7 @@ AS_instrList F_codegen(F_frame f, T_stmList stmList) {
         munchStm(stmList1->head);
     }
     if (last && last->head->kind == AS_instr_::I_LABEL) {
-        emit(AS_Oper("NOP\n", NULL, NULL, NULL));
+        emit(AS_Oper((char *)"NOP\n", NULL, NULL, NULL));
     }
     list = iList;
     last = NULL;
@@ -221,7 +221,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__aeabi_idiv", r, r1, r2);//todo 确认是否需要修改
+                call_lib((char *)"__aeabi_idiv", r, r1, r2);//todo 确认是否需要修改
                 //emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
             } else if (e->u.BINOP.op == T_mod) {
@@ -231,7 +231,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib("__aeabi_idivmod", r, r1, r2);//todo 确认是否需要修改
+                call_lib((char *)"__aeabi_idivmod", r, r1, r2);//todo 确认是否需要修改
                 return r;
             } else {
                 EM_error(0, "codegen not munch exp when kind is T_BINOP.");
@@ -280,6 +280,9 @@ static Temp_temp munchExp(T_exp e) {
             assert(0);
         }
     }
+
+    // FIXME
+    return NULL;
 }
 
 static char *funcName(c_string labelString) {
@@ -666,6 +669,9 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
             //sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
         }
     }
+
+    // FIXME
+    return nullptr;
 }
 
 /*

@@ -156,5 +156,8 @@ T_relOp T_not_op(T_relOp op)//T_lt, T_le, T_gt, T_ge, T_eq, T_ne,T_not,T_and, T_
         case T_gt:return T_le;
         case T_eq:return T_ne;
         case T_ne:return T_eq;
+        default: //永远不应该被执行
+            assert(0);
+            return T_eq;
     }
 }

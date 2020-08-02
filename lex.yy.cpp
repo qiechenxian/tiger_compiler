@@ -1128,7 +1128,7 @@ YY_RULE_SETUP
 case 51:
 YY_RULE_SETUP
 #line 88 ".\\lexer.l"
-{ /* error */ yyerror("lex: invalid character"); }
+{ /* error */ yyerror((char *)"lex: invalid character"); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP

@@ -17,6 +17,32 @@ struct COL_result {
     AS_instrList coalescedMoves;
     Temp_tempList coalescedNodes;
     G_table alias;
+    ~COL_result(){
+//        if(coloring!=NULL){
+//            delete coloring;
+//            coloring = NULL;
+//        }
+//        if(colored!=NULL){
+//            delete colored;
+//            colored = NULL;
+//        }
+//        if(spills!=NULL){
+//            delete spills;
+//            spills = NULL;
+//        }
+//        if(coalescedMoves!=NULL){
+//            delete coalescedMoves;
+//            coalescedMoves = NULL;
+//        }
+//        if(coalescedNodes!=NULL){
+//            delete coalescedNodes;
+//            coalescedNodes = NULL;
+//        }
+//        if(alias!=NULL){
+//            delete alias;
+//            alias = NULL;
+//        }
+    }
 };
 
 // 冲突图 ; 预着色 ; 寄存器列表;
