@@ -231,6 +231,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     }
 
     ret.coloring = col.coloring;
+    //delete col;
     ret.il = il;
 
 // Temp_tempList precolored = NULL;

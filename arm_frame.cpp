@@ -555,7 +555,8 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
             head_inst_ptr = head_inst_ptr->tail;
 
             char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-            sprintf(frame_space, "\tsub     'd0, 's0, r4\n", space * word_size);
+            int tmp_wsize = space * word_size;
+            sprintf(frame_space, "\tsub     'd0, 's0, r4\n");
             head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
             head_inst_ptr = head_inst_ptr->tail;
         }
