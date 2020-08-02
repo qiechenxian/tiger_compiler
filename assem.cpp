@@ -74,6 +74,7 @@ AS_instrList AS_instrUnion(AS_instrList ta, AS_instrList tb) {
             tl = AS_InstrList(t, tl);
         }
     }
+    free(m);
 
     return tl;
 }
@@ -94,7 +95,7 @@ AS_instrList AS_instrMinus(AS_instrList ta, AS_instrList tb) {
             tl = AS_InstrList(t, tl);
         }
     }
-
+    free(m);
     return tl;
 }
 
@@ -114,7 +115,7 @@ AS_instrList AS_instrIntersect(AS_instrList ta, AS_instrList tb) {
             tl = AS_InstrList(t, tl);
         }
     }
-
+    free(m);
     return tl;
 }
 
