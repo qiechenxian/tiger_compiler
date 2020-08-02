@@ -45,6 +45,7 @@ typedef struct Tr_INIT_initList_ *Tr_INIT_initList;
 struct Tr_INIT_initList_{
     Tr_exp* array;
     int array_length;
+    int* init_offset;
 };
 /** expList 相关操作 */
 Tr_expList Tr_ExpList(); /// return an empty expList

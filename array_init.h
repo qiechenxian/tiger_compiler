@@ -24,10 +24,12 @@
 #define COMPILER_2020_ARRAY_INIT_H
 
 #include "ast.h"
+#include <vector>
+#include <utility>
 
 typedef struct INIT_initList_ *INIT_initList;
 struct INIT_initList_{
-    A_exp* array;
+    std::vector<std::pair<int, A_exp>> array;
     int* suffix_size;
     int total_size;
 };

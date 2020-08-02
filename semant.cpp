@@ -302,14 +302,17 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                 //将init_list中的A_EXP转换为中间代码形式并保存
                 auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-                init_list_tr->array_length=init_list->total_size;
-                init_list_tr->array=(Tr_exp*)checked_malloc(init_list->total_size*sizeof(Tr_exp));
-                //printf("%d",init_list->total_size);
-                for(int i=0;i < init_list->total_size;i++)
-                {
-                    struct expty temp=transExp(venv,tenv,init_list->array[i],l_break,l_continue);;
-                    init_list_tr->array[i]=temp.exp;
+                init_list_tr->array_length=init_list->array.size();
+                init_list_tr->array=(Tr_exp*)checked_malloc(init_list_tr->array_length*sizeof(Tr_exp));
+                init_list_tr->init_offset=(int*)checked_malloc(init_list_tr->array_length*sizeof(int));
+                int cnt = 0;
+                for (auto & iter : init_list->array){
+                    struct expty temp = transExp(venv, tenv, iter.second, l_break, l_continue);
+                    init_list_tr->array[cnt] = temp.exp;
+                    init_list_tr->init_offset[cnt] = iter.first;
+                    cnt++;
                 }
+                assert(cnt == init_list_tr->array_length);
 
                 if (not frame){
                     /// 全局数组的frag处理
@@ -383,21 +386,22 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
                 arrayEntry->u.var.cValues = E_ArrayValue(null_init);
 
-                auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-                init_list_tr->array_length=null_init->total_size;
-                init_list_tr->array=(Tr_exp*)checked_malloc((null_init->total_size+5)*sizeof(Tr_exp));
-                for(int i=0;i < null_init->total_size;i++)
-                {
-                    struct expty temp=transExp(venv,tenv,null_init->array[i],l_break,l_continue);;
-                    init_list_tr->array[i]=temp.exp;
-                }
+//                auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
+//                init_list_tr->array_length=null_init->total_size;
+//                init_list_tr->array=(Tr_exp*)checked_malloc((null_init->total_size+5)*sizeof(Tr_exp));
+//                for(int i=0;i < null_init->total_size;i++)
+//                {
+//                    struct expty temp=transExp(venv,tenv,null_init->array[i],l_break,l_continue);;
+//                    init_list_tr->array[i]=temp.exp;
+//                }
 
                 S_enter(venv, d->u.array.id, arrayEntry);
                 Tr_expList call_memset_param=Tr_ExpList();
                 Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
                 Tr_expList_append(call_memset_param,Tr_intExp(0));
                 Tr_expList_append(call_memset_param,Tr_intExp(null_init->total_size*4));
-                return Tr_seq(Tr_func_call(Temp_namedLabel("memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
+//                return Tr_seq(Tr_func_call(Temp_namedLabel("memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
+                return Tr_func_call(Temp_namedLabel("memset"),call_memset_param);
             }
 
             S_enter(venv, d->u.array.id, arrayEntry);

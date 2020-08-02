@@ -518,13 +518,14 @@ Tr_exp Tr_init_array(Tr_access base, Tr_INIT_initList init_info)
 {
     T_exp frame_ptr = T_Temp(F_FP());
     int array_length=init_info->array_length;
-    T_stm init_var = T_Move(F_expWithIndex(base, frame_ptr, 0), Tr_unEx(init_info->array[0]));
+    T_stm init_var = T_Move(F_expWithIndex(base, frame_ptr, init_info->init_offset[0]),
+                            Tr_unEx(init_info->array[0]));
 
     for(int i=1;i<array_length;i++)
     {
         init_var = T_Seq(
                 init_var,
-                T_Move(F_expWithIndex(base, frame_ptr, i), Tr_unEx(init_info->array[i]))
+                T_Move(F_expWithIndex(base, frame_ptr, init_info->init_offset[i]), Tr_unEx(init_info->array[i]))
                 );
     }
     return Tr_Nx(init_var);
