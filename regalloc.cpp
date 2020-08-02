@@ -131,7 +131,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     G_graph flow;
     struct Live_graph live;
     Temp_map initial;
-    struct COL_result col;
+    struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
     AS_instrList rewriteList;
     int tryNum = 0;
     while (++tryNum < 7) {
@@ -231,6 +231,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     }
 
     ret.coloring = col.coloring;
+    //free(col);
     //delete col;
     ret.il = il;
 
