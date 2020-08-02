@@ -160,7 +160,7 @@ bool Temp_equal(Temp_tempList ta, Temp_tempList tb) {
         }
         ++cb;
     }
-
+    free(m);
     return (ca == cb);
 }
 
@@ -184,7 +184,7 @@ Temp_tempList Temp_union(Temp_tempList ta, Temp_tempList tb) {
             tl = Temp_TempList(t, tl);
         }
     }
-
+    free(m);
     return tl;
 }
 
@@ -205,6 +205,7 @@ Temp_tempList Temp_intersect(Temp_tempList ta, Temp_tempList tb) {
         }
     }
 
+    free(m);
     return tl;
 }
 
@@ -224,7 +225,7 @@ Temp_tempList Temp_minus(Temp_tempList ta, Temp_tempList tb) {
             tl = Temp_TempList(t, tl);
         }
     }
-
+    free(m);
     return tl;
 }
 
