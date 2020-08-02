@@ -19,27 +19,27 @@ struct COL_result {
     G_table alias;
     ~COL_result(){
 //        if(coloring!=NULL){
-//            delete coloring;
+//            delete []coloring;
 //            coloring = NULL;
 //        }
 //        if(colored!=NULL){
-//            delete colored;
+//            delete []colored;
 //            colored = NULL;
 //        }
 //        if(spills!=NULL){
-//            delete spills;
+//            delete []spills;
 //            spills = NULL;
 //        }
 //        if(coalescedMoves!=NULL){
-//            delete coalescedMoves;
+//            delete []coalescedMoves;
 //            coalescedMoves = NULL;
 //        }
 //        if(coalescedNodes!=NULL){
-//            delete coalescedNodes;
+//            delete []coalescedNodes;
 //            coalescedNodes = NULL;
 //        }
-//        if(alias!=NULL){
-//            delete alias;
+//        if(alias!=NULL) {
+//            delete []alias;
 //            alias = NULL;
 //        }
     }

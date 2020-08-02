@@ -83,16 +83,32 @@ static Temp_temp munchExp(T_exp e) {
                     T_exp e1 = mem->u.BINOP.left;
                     int i = mem->u.BINOP.right->u.CONST;
                     Temp_temp r = Temp_newTemp();
-                    sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    if(i< 200&& i> -200){
+                        sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
+                        emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    }
+                    else{
+                        sprintf(inst,"\tldr     'd0,=%d\n",i);
+                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+                        sprintf(inst2, "\tldr     'd0, ['s0, 'd0]\n");
+                        emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                    }
                     return r;
                 } else if (mem->u.BINOP.op == T_add && mem->u.BINOP.left->kind == T_exp_::T_CONST) {
                     /* MEM(BINOP(PLUS,CONST(i),e1)) 已检查*/
                     T_exp e1 = mem->u.BINOP.right;
                     int i = mem->u.BINOP.left->u.CONST;
                     Temp_temp r = Temp_newTemp();
-                    sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    if(i< 200&& i> -200){
+                        sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
+                        emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    }
+                    else{
+                        sprintf(inst,"\tldr     'd0,=%d\n",i);
+                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+                        sprintf(inst2, "\tldr     'd0, ['s0, 'd0]\n");
+                        emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                    }
                     return r;
                 } else {
                     /* MEM(e1) 已检查*/
@@ -317,16 +333,34 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,e1,CONST(i))),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
-                    sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
-                    emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
+                    if(i < 200 && i>-200){
+                        sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
+                        emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
+                    }
+                    else{
+                        Temp_temp r1 = Temp_newTemp();
+                        sprintf(inst, "\tldr     'd0, =%d\n", i);
+                        emit(AS_Oper(inst, L(r1,NULL), NULL, NULL));
+                        sprintf(inst2, "\tstr     's0, ['s1, 's2]\n");
+                        emit(AS_Oper(inst2, NULL, L(munchExp(e2), L(munchExp(e1) , L(r1,NULL))), NULL));
+                    }
                 } else if (dst->u.MEM->kind == T_exp_::T_BINOP
                            && dst->u.MEM->u.BINOP.op == T_add
                            && dst->u.MEM->u.BINOP.left->kind == T_exp_::T_CONST) {
                     /* MOVE(MEM(BINOP(PLUS,CONST(i),e1)),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
-                    sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
-                    emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
+                    if(i < 200 && i>-200){
+                        sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
+                        emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
+                    }
+                    else{
+                        Temp_temp r1 = Temp_newTemp();
+                        sprintf(inst, "\tldr     'd0, =%d\n", i);
+                        emit(AS_Oper(inst, L(r1,NULL), NULL, NULL));
+                        sprintf(inst2, "\tstr     's0, ['s1, 's2]\n");
+                        emit(AS_Oper(inst2, NULL, L(munchExp(e2), L(munchExp(e1) , L(r1,NULL))), NULL));
+                    }
                 } else if (src->kind == T_exp_::T_MEM) {
                     /* MOVE(MEM(e1), MEM(e2)) */
                     T_exp e1 = dst->u.MEM, e2 = src->u.MEM;
@@ -433,7 +467,7 @@ static void munchStm(T_stm s) {
                 Temp_temp temp = Temp_newTemp();
                 sprintf(inst, "\tldr 'd0, =%s\n", Temp_labelString(lab));
                 emit(AS_Oper(inst, L(temp, NULL), NULL, NULL));
-                sprintf(inst2, "\tstr 's0, ['d0]\n", Temp_labelString(lab));
+                sprintf(inst2, "\tstr 's0, ['d0]\n");
                 emit(AS_Oper(inst2, L(temp, NULL), L(munchExp(e1), NULL), NULL));
             } else {
                 assert(0);
