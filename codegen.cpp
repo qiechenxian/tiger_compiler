@@ -285,6 +285,10 @@ static Temp_temp munchExp(T_exp e) {
 static char *funcName(c_string labelString) {
     if (strcmp(labelString, "putf") == 0){
         return (char*)"printf";
+    } else if (strcmp(labelString, "starttime") == 0){
+        return (char*)"_sysy_starttime";
+    } else if (strcmp(labelString, "stoptime") == 0){
+        return (char*)"_sysy_stoptime";
     }
     return labelString;
 }
