@@ -148,8 +148,8 @@ int main(int argc, char **argv) {
 //    printStmList(stderr, frags);
 
     //输出汇编指令的路径,应更改为文件名
-//    FILE *outfile=fopen(OUTPUT_FILE, "w");
-    FILE *outfile = stdout;
+    FILE *outfile=fopen(OUTPUT_FILE, "w");
+//    FILE *outfile = stdout;
     doGlobal(outfile, frags);
     fprintf(outfile, "\t.text\n");
     for (; frags; frags = frags->tail) {
