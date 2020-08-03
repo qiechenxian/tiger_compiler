@@ -313,7 +313,7 @@ static Temp_temp munchExp(T_exp e) {
             int i = e->u.CONST;
             Temp_temp r = Temp_newTemp();
             if(constExpr(i)){
-                sprintf(inst, "\tmov     'd0, =%d\n", i);
+                sprintf(inst, "\tmov     'd0, #%d\n", i);
                 emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
             }
             else{
