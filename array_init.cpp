@@ -114,7 +114,7 @@ A_exp getFromVec(vector<intExpPair> &array, int index){
         if (index == iter.first){
             return iter.second;
         }
-        else if (index > iter.first){
+        else if (index < iter.first){
             return A_IntExp(nullptr, 0);
         }
     }
