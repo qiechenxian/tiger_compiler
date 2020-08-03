@@ -105,6 +105,13 @@ bool constExpr(int num)
     return __constExpr(num) || __constExpr(-num);
 }
 
+bool limit_4096(int num){
+    if(num>=-4096 && num <= 4095){
+        return true;
+    }
+    return false;
+}
+
 /*
  * 使用的指令包括
  * MOV ADD SUB CMP AND ORR B BL LDR STR
@@ -121,7 +128,7 @@ static Temp_temp munchExp(T_exp e) {
                     T_exp e1 = mem->u.BINOP.left;
                     int i = mem->u.BINOP.right->u.CONST;
                     Temp_temp r = Temp_newTemp();
-                    if(constExpr(i)){
+                    if(limit_4096(i)){
                         sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
                         emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                     }
@@ -137,7 +144,7 @@ static Temp_temp munchExp(T_exp e) {
                     T_exp e1 = mem->u.BINOP.right;
                     int i = mem->u.BINOP.left->u.CONST;
                     Temp_temp r = Temp_newTemp();
-                    if(constExpr(i)){
+                    if(limit_4096(i)){
                         sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
                         emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                     }
@@ -161,7 +168,7 @@ static Temp_temp munchExp(T_exp e) {
                 int i = mem->u.CONST;
                 Temp_temp r = Temp_newTemp();
                 //无0寄存器怎么表示0+const?
-                if(constExpr(i)){
+                if(limit_4096(i)){
                     sprintf(inst, "\tldr     'd0, [#%d]\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                 }
@@ -305,8 +312,14 @@ static Temp_temp munchExp(T_exp e) {
             /* CONST(i) 已检查*/
             int i = e->u.CONST;
             Temp_temp r = Temp_newTemp();
-            sprintf(inst, "\tldr     'd0, =%d\n", i);
-            emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+            if(constExpr(i)){
+                sprintf(inst, "\tmov     'd0, =%d\n", i);
+                emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+            }
+            else{
+                sprintf(inst, "\tldr     'd0, =%d\n", i);
+                emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+            }
             return r;
         }
         case T_exp_::T_TEMP: {
@@ -380,7 +393,7 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,e1,CONST(i))),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
-                    if(constExpr(i)){
+                    if(limit_4096(i)){
                         sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
                         emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                     }
@@ -397,7 +410,7 @@ static void munchStm(T_stm s) {
                     /* MOVE(MEM(BINOP(PLUS,CONST(i),e1)),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
-                    if(constExpr(i)){
+                    if(limit_4096(i)){
                         sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
                         emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                     }
@@ -423,7 +436,7 @@ static void munchStm(T_stm s) {
                     T_exp e1 = src;
                     int i = dst->u.MEM->u.CONST;
                     //TODO 无0寄存器怎么表示0+const?
-                    if(constExpr(i)){
+                    if(limit_4096(i)){
                         sprintf(inst, "\tstr     's0, [#%d]\n", i);
                         emit(AS_Oper(inst, NULL, L(munchExp(e1), NULL), NULL));
                     }
