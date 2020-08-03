@@ -620,3 +620,10 @@ int get_offset(F_access g_access)
 {
     return g_access->u.offset;
 }
+
+void F_setMemArgs(F_frame frame)
+{
+    if (3 > frame->callee_max_args){
+        frame->callee_max_args = 3;
+    }
+}

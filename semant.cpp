@@ -336,6 +336,8 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     return Tr_nopExp();
                 }
 
+                F_setMemArgs(frame);
+
                 if (d->u.array.isConst){
                     /**
                      * 常量数组初值处理

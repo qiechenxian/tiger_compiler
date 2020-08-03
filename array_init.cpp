@@ -156,8 +156,8 @@ U_pairList INIT_shrinkInitList(INIT_initList init_list){
             tail_ptr = shrink_array;
         } else{
             tail_ptr->tail = U_PairList(pair, nullptr);
+            tail_ptr = tail_ptr->tail;
         }
-        tail_ptr = tail_ptr->tail;
     }
     return shrink_array;
 }

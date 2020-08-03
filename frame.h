@@ -22,6 +22,7 @@ struct F_accessList_{F_access head; F_accessList tail;};
 static F_accessList F_AccessList(F_access head, F_accessList tail);
 
 int F_accessOffset(F_access a);
+void F_setMemArgs(F_frame frame);
 Temp_temp F_accessReg(F_access a);
 
 void F_setFrameCalleeArgs(F_frame frame, int callee_args);
