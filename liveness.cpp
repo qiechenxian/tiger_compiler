@@ -104,8 +104,11 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
                 flag = true;
                 break;
             }
-        }
+        }//直到到达不动点前都要继续执行
+
     }
+    free(last_in);
+    free(last_out);
 }
 
 static G_node findOrCreateNode(Temp_temp t, G_graph g, TAB_table tab) {
