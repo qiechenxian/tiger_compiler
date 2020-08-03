@@ -176,7 +176,7 @@ static Temp_temp munchExp(T_exp e) {
                     Temp_temp r1 = Temp_newTemp();
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
-                    sprintf(inst2, "\tldr     'd0, ['d1]\n", i);
+                    sprintf(inst2, "\tldr     'd0, ['d1]\n");
                     emit(AS_Oper(inst2, L(r, L(r1,NULL)), NULL, NULL));
                 }
                 return r;
@@ -477,7 +477,7 @@ static void munchStm(T_stm s) {
                         Temp_tempList calldefs = NULL; // TODO
                         //TODO 函数调用测试能否正确传参
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
-                        emit(AS_Oper(inst, L(F_LR(), calldefs), l, AS_Targets(Temp_LabelList(lab, NULL))));
+                        emit(AS_Oper(inst, L(F_LR(), calldefs), NULL, AS_Targets(Temp_LabelList(lab, NULL))));
                        // if (special_tag == true) {
                        //     count_func_param = count_func_param - 2;
                        //     if (count_func_param >= 0) {
@@ -573,7 +573,8 @@ static void munchStm(T_stm s) {
                     // 函数调用？
 //                    sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
-                    emit(AS_Oper(inst, calldefs, l, AS_Targets(Temp_LabelList(lab, NULL))));
+                    // 函数对应对于变量活跃性分析的时候，参数前面已经设置到栈中，与bl指令无关
+                    emit(AS_Oper(inst, calldefs, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
                     //if (special_tag == true) {
                     //    count_func_param = count_func_param - 2;
                     //    if (count_func_param >= 0) {

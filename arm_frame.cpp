@@ -31,28 +31,31 @@ static Temp_tempList specialregs = NULL;
 // 初始化
 void F_initRegisters(void) {
 
-    r0 = Temp_new_special((char*)"R0");
-    r1 = Temp_new_special((char*)"R1");
-    r2 = Temp_new_special((char*)"R2");
-    r3 = Temp_new_special((char*)"R3");
-    r4 = Temp_new_special((char*)"R4");
-    r5 = Temp_new_special((char*)"R5");
-    r6 = Temp_new_special((char*)"R6");
-    r7 = Temp_new_special((char*)"R7");
-    r8 = Temp_new_special((char*)"R8");
-    r9 = Temp_new_special((char*)"R9");
-    r10 = Temp_new_special((char*)"R10");
+    r0 = Temp_new_special((char*)"R0", 0);
+    r1 = Temp_new_special((char*)"R1", 1);
+    r2 = Temp_new_special((char*)"R2", 2);
+    r3 = Temp_new_special((char*)"R3", 3);
+    r4 = Temp_new_special((char*)"R4", 4);
+    r5 = Temp_new_special((char*)"R5", 5);
+    r6 = Temp_new_special((char*)"R6", 6);
+    r7 = Temp_new_special((char*)"R7", 7);
+    r8 = Temp_new_special((char*)"R8", 8);
+    r9 = Temp_new_special((char*)"R9", 9);
+    r10 = Temp_new_special((char*)"R10", 10);
 
-//    fp = Temp_new_special("11111FP");
-//    sp = Temp_new_special("SP");
-//    ip = Temp_new_special("IP");
-//    lr = Temp_new_special("LR");
-//    pc = Temp_new_special("PC");
+#if 1
+    fp = Temp_new_special((char*)"FP", 11);
+    sp = Temp_new_special((char*)"SP", 12);
+    ip = Temp_new_special((char*)"IP", 13);
+    lr = Temp_new_special((char*)"LR", 14);
+    pc = Temp_new_special((char*)"PC", 15);
+#else
     fp = Temp_newTemp();
     sp = Temp_newTemp();
     ip = Temp_newTemp();
     lr = Temp_newTemp();
     pc = Temp_newTemp();
+#endif
 
     specialregs = Temp_TempList(fp,
                                 Temp_TempList(sp,
@@ -114,9 +117,7 @@ Temp_temp F_IP()//取栈指针
 Temp_temp F_PC() //取pc
 {
     if (pc == nullptr) {
-        char save[5];
-        sprintf(save, "%s", "PC");
-        pc = Temp_new_special(save);
+        F_initRegisters();
     }
     return pc;
 }
@@ -126,11 +127,6 @@ Temp_temp F_LR() {
         F_initRegisters();
     }
     return lr;
-}
-
-Temp_temp F_R(c_string save) {
-    fr = Temp_new_special(save);
-    return fr;
 }
 
 Temp_temp F_ZERO(void) {
@@ -478,9 +474,15 @@ static Temp_tempList returnSink = nullptr;
 AS_instrList F_procEntryExit2(AS_instrList body) {
     Temp_tempList calleeSaves = nullptr;
     if (!returnSink)
-        returnSink = Temp_TempList(F_ZERO(),
+#if 1
+        returnSink = Temp_TempList(F_LR(),
+                                  Temp_TempList(F_SP(), calleeSaves));
+#else
+    returnSink = Temp_TempList(F_ZERO(),
                                    Temp_TempList(F_LR(),
                                                  Temp_TempList(F_SP(), calleeSaves)));
+#endif
+
     return AS_splice(body, AS_InstrList(
             AS_Oper((char*)"", nullptr, returnSink, nullptr), nullptr));
 }

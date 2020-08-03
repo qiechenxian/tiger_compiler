@@ -638,10 +638,6 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         Temp_temp w;
         c_string color;
 
-        int *it = (int *) t;
-        if (*it == 119) {
-            color = NULL;
-        }
         for (; adjs; adjs = adjs->tail) {
 
             nw = adjs->head;

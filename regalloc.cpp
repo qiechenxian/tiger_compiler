@@ -134,11 +134,20 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
     AS_instrList rewriteList;
     int tryNum = 0;
-    while (++tryNum < 3) {
+    const int maxTryNum = 3;
+    while (tryNum ++ < maxTryNum) {
         flow = FG_AssemFlowGraph(il, f);
-//        G_show(stderr, G_nodes(flow), printInst);
+
+#if 0
+        G_show(stderr, G_nodes(flow), printInst);
+#endif
+
         live = Live_liveness(flow);
-//        G_show(stderr, G_nodes(live.graph), printTemp);
+
+#if 0
+        G_show(stderr, G_nodes(live.graph), printTemp);
+#endif
+
         initial = F_initialRegisters(f);
 
         col = COL_color(live.graph, initial, F_registers(),
@@ -151,8 +160,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         Temp_tempList spilled = col.spills;
         rewriteList = NULL;
 
-// Assign locals in memory
-//TODO 好像是动态分配，
+        // Assign locals in memory
         Temp_tempList tl;
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
@@ -161,30 +169,32 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             TAB_enter(spilledLocal, tl->head, local);
         }
 
-// Rewrite instructions
+        // Rewrite instructions
         for (; il; il = il->tail) {
             AS_instr inst = il->head;
+
             Temp_tempList useSpilled = tempIntersect(
                     aliased(inst_use(inst), live.graph, col.alias, col.coalescedNodes),
                     spilled);
             Temp_tempList defSpilled = tempIntersect(
                     aliased(inst_def(inst), live.graph, col.alias, col.coalescedNodes),
                     spilled);
-            Temp_tempList tempSpilled = tempUnion(useSpilled, defSpilled);
 
-// Skip unspilled instructions
-// 跳过未溢出的指令
-            if (tempSpilled == NULL) {
+            // Skip unspilled instructions
+            // 跳过未溢出的指令
+            if ((useSpilled == NULL) && (defSpilled == NULL)) {
                 rewriteList = AS_InstrList(inst, rewriteList);
                 continue;
             }
 
             for (tl = useSpilled; tl; tl = tl->tail) {
                 char buf[128];
+
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
+
                 sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
-                //sprintf(buf, "movl %d(`s0), `d0  # spilled\n", F_accessOffset(local));
+
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), L(temp, NULL), L(F_FP(), NULL), NULL), rewriteList);
             }
@@ -193,10 +203,12 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
             for (tl = defSpilled; tl; tl = tl->tail) {
                 char buf[128];
+
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
+
                 sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
-                //sprintf(buf, "movl `s0, %d(`s1)  # spilled\n", F_accessOffset(local));
+
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), NULL, L(temp, L(F_FP(), NULL)), NULL), rewriteList);
             }

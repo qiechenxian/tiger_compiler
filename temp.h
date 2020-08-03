@@ -44,5 +44,5 @@ void Temp_enterPtr(Temp_map m, Temp_temp t, void *ptr);
 void* Temp_lookPtr(Temp_map m, Temp_temp t);
 
 Temp_map Temp_name(void);
-Temp_temp Temp_new_special(c_string s);
+Temp_temp Temp_new_special(c_string s, int num);
 #endif //COMPILER_LOYX_TEMP_H
