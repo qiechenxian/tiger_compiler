@@ -331,7 +331,8 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
     } else{
         frame->isLeaf = callee_args == -1;
     }
-    frame->callee_max_args = callee_args;
+    if (callee_args > frame->callee_max_args)
+        frame->callee_max_args = callee_args;
 }
 
 F_frame F_newFrame(Temp_label name, U_boolList formals) {
@@ -501,8 +502,8 @@ static int getSpace(F_frame frame)
     if (frame->callee_max_args > 0)
         callee_space = frame->callee_max_args;
 
-//    return local_space + callee_space + frame->temp_space;
-    return local_space + frame->temp_space;
+    return local_space + callee_space + frame->temp_space;
+//    return local_space + frame->temp_space;
 }
 
 /*

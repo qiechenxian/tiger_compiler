@@ -438,6 +438,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     EM_error(d->pos, "type error: %s given, expected %s for expression",
                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
+                if (frame){
+                    int callee_args = -1;
+                    if (e.callee_args > callee_args)
+                        F_setFrameCalleeArgs(frame, e.callee_args);
+                }
 
                 if (d->u.var.isConst){
                     /**
