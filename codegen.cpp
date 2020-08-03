@@ -389,7 +389,7 @@ static void doCallerReg(int args, int type){
         }else{
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
             sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), NULL), NULL));
+            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), F_callersaves()), NULL));
         }
     }
 }
@@ -412,6 +412,12 @@ static void munchStm(T_stm s) {
                 if (dst->u.MEM->kind == T_exp_::T_BINOP
                     && dst->u.MEM->u.BINOP.op == T_add
                     && dst->u.MEM->u.BINOP.right->kind == T_exp_::T_CONST) {
+//                    T_exp e1 = dst->u.MEM, e2 = src;
+//                    Temp_temp r1 = munchExp(e1);
+//                    Temp_temp r2 = munchExp(e2);
+//                    sprintf(inst, "\tstr     's0, ['s1]\n");
+//                    emit(AS_Oper(inst, NULL, L(r2, L(r1, NULL)), NULL));
+
                     /* MOVE(MEM(BINOP(PLUS,e1,CONST(i))),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
@@ -794,8 +800,8 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 //    sprintf(inst, "\tstmfd   sp!, {r0-r1}\n");//保护现场
 //    emit(AS_Oper(inst, NULL, NULL, NULL));
 
-    Temp_temp* callerReg = F_getCallerArray();
-    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
+//    Temp_temp* callerReg = F_getCallerArray();
+//    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
     doCallerReg(2, CALL_SAVE);
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
@@ -813,10 +819,12 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
         emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves())));
+//        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves()), NULL));
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
         emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves())));
+//        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves()), NULL));
     } else {
         assert("error from call_lib in codegen.cpp ");
     }
