@@ -178,16 +178,16 @@ Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return /*Temp_TempList(r0,
+    return Temp_TempList(r0,
             Temp_TempList(r1,
                     Temp_TempList(r2,
-                            Temp_TempList(r3,*/
+                            Temp_TempList(r3,
                                     Temp_TempList(r4,
                                             Temp_TempList(r5,
                                                     Temp_TempList(r6,
                                                             Temp_TempList(r7,
                                                                     Temp_TempList(r8,
-                                                                            Temp_TempList(r9,NULL))))));//))));
+                                                                            Temp_TempList(r9,NULL))))))))));
 }
 
 //TODO 调用者保护寄存器
@@ -195,8 +195,29 @@ Temp_tempList F_callersaves(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return Temp_TempList(NULL, NULL);
+    return Temp_TempList(r0, Temp_TempList(r1, Temp_TempList(r2, Temp_TempList(r3, NULL))));
 }
+
+Temp_temp* callerArray = nullptr;
+
+Temp_temp* F_getCallerArray()
+{
+    if (not callerArray){
+        callerArray = (Temp_temp*)checked_malloc(5*sizeof(Temp_temp));
+        callerArray[0] = F_R0();
+        callerArray[1] = F_R1();
+        callerArray[2] = F_R2();
+        callerArray[3] = F_R3();
+    }
+    return callerArray;
+}
+
+Temp_temp F_getCallerArrayByIndex(int index)
+{
+    Temp_temp* array = F_getCallerArray();
+    return array[index];
+}
+
 
 //TODO
 Temp_tempList F_calleesaves(void) {
@@ -342,7 +363,8 @@ F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 6+1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    f->local_count = 6+1+4; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    /// 4是为保存r0-r3预留的空间
     f->locals = nullptr;
     f->isLeaf = true;
     f->temp_space = 0;
