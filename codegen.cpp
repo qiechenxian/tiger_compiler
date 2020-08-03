@@ -378,8 +378,9 @@ static char *funcName(c_string labelString) {
 static void doCallerReg(int args, int type){
     int word_size = get_word_size();
     Temp_temp* callerArray = F_getCallerArray();
-    if (args > 4)
-        args = 4;
+//    if (args > 4)
+//        args = 4;
+    args = 4;
     for (int i = 0; i < args; i++){
         if (type == CALL_SAVE){
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
@@ -502,9 +503,9 @@ static void munchStm(T_stm s) {
                         //TODO 函数调用测试能否正确传参
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
                         emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
-                        doCallerReg(args_count, CALL_LOAD);
                         sprintf(inst2, "\tmov     'd0, 's0\n");
                         emit(AS_Move(inst2, L(t, NULL), L(F_RV(), F_callersaves())));
+                        doCallerReg(args_count, CALL_LOAD);
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
                         T_exp e1 = src->u.CALL.fun;
@@ -799,11 +800,11 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
-    emit(AS_Move(inst2, L(F_R0(), NULL), L(reg1, caller2List)));
+    emit(AS_Move(inst2, L(F_R0(), NULL), L(reg1, F_callersaves())));
 
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst3, "\tmov     'd0, 's0\n");//传递操作数reg2->r1
-    emit(AS_Move(inst3, L(F_R1(), NULL), L(reg2, caller2List)));
+    emit(AS_Move(inst3, L(F_R1(), NULL), L(reg2, F_callersaves())));
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
