@@ -81,6 +81,18 @@ static Tr_exp Tr_Ex(T_exp exp){
     ex->u.ex = exp;
     return ex;
 }
+
+static Tr_exp Tr_Temp(Temp_temp temp){
+    T_exp p = (T_exp)checked_malloc(sizeof *p);
+    p->kind = T_exp_::T_TEMP;
+    p->u.TEMP = temp;
+
+    Tr_exp ex = (Tr_exp)checked_malloc(sizeof(*ex));
+    ex->kind = Tr_exp_::Tr_ex;
+    ex->u.ex = p;
+    return ex;
+}
+
 Tr_exp Tr_Nx(T_stm stm){
     Tr_exp nx = (Tr_exp)checked_malloc(sizeof(*nx));
     nx->kind = Tr_exp_::Tr_nx;
@@ -293,9 +305,20 @@ Tr_exp Tr_simpleVarNoMem(Tr_access acc)
  * @return 不为T_MEM的翻译
  */
 {
-    T_exp acc_with_mem = F_Exp(acc, T_Temp(F_FP()));
-    assert(acc_with_mem->kind == T_exp_::T_MEM);
-    return Tr_Ex(acc_with_mem->u.MEM);
+    T_exp acc_temp;
+
+    if(F_accessIsReg(acc)) {
+        acc_temp = F_Exp(acc, NULL);
+    } else {
+        acc_temp = F_Exp(acc, T_Temp(F_FP()));
+    }
+
+    if(acc_temp->kind == T_exp_::T_TEMP) {
+        return Tr_Temp(acc_temp->u.TEMP);
+    }
+
+    assert(acc_temp->kind == T_exp_::T_MEM);
+    return Tr_Ex(acc_temp->u.MEM);
 }
 
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
