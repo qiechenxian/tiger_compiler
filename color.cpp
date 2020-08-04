@@ -426,7 +426,7 @@ static void combine(Temp_temp u, Temp_temp v) {
 }
 
 //合并，进行保守的合并，（第三步）
-static void coalesce() {
+static void coalesce() {//错误注释语句信息的定位
     if (c.worklistMoves == NULL) {
         return;
     }
