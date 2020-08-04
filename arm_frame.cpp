@@ -247,9 +247,10 @@ static F_access InFrame(int offset) {
     return fa;
 }
 
-static F_access InReg(Temp_temp reg) {
+static F_access InReg(Temp_temp reg,int temp) {
     F_access fa = (F_access) checked_malloc(sizeof(*fa));
     fa->kind = F_access_::inReg;
+    fa->u.offset=temp;
     fa->u.reg = reg;
     return fa;
 }
@@ -357,9 +358,9 @@ F_accessList F_getFormals(F_frame frame) {
 }
 
 int F_accessOffset(F_access a) {
-    if (a->kind != F_access_::inFrame) {
-        EM_error(0, "Offset of a reg access is invalid");
-    }
+//    if (a->kind != F_access_::inFrame) {
+//        EM_error(0, "Offset of a reg access is invalid");
+//    }
 
     return a->u.offset;
 }
@@ -374,12 +375,14 @@ Temp_temp F_accessReg(F_access a) {
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
-    if (escape) {
+    if (0) {
         F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
         frame->locals = F_AccessList(access, frame->locals);
         return access;
     } else {
-        return InReg(Temp_newTemp());
+        F_access access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
+        frame->locals = F_AccessList(access, frame->locals);
+        return access;
     }
 }
 

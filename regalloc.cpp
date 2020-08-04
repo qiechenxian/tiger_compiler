@@ -134,7 +134,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
     AS_instrList rewriteList;
     int tryNum = 0;
-    const int maxTryNum = 3;
+    const int maxTryNum = 2;
     while (tryNum ++ < maxTryNum) {
         flow = FG_AssemFlowGraph(il, f);
 
