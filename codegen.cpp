@@ -112,6 +112,17 @@ bool limit_4096(int num){
     return false;
 }
 
+static int getShiftTime(int aConst) {
+    int times = 1;
+    for (int cp = 2; cp<=aConst; cp = cp<<1){
+        if (aConst == cp){
+            return times;
+        }
+        times ++;
+    }
+    return 0;
+}
+
 /*
  * 使用的指令包括
  * MOV ADD SUB CMP AND ORR B BL LDR STR
@@ -278,8 +289,52 @@ static Temp_temp munchExp(T_exp e) {
                 /* BINOP(MUL,e1,e2) 已检查*/
                 T_exp e1 = e->u.BINOP.left, e2 = e->u.BINOP.right;
                 Temp_temp r = Temp_newTemp();
-                Temp_temp r1 = munchExp(e1);
-                Temp_temp r2 = munchExp(e2);
+                /// 前端保证不会同时有两个const
+                Temp_temp r1 = nullptr;
+                Temp_temp r2 = nullptr;
+                if (e1->kind == T_exp_::T_CONST){
+                    r2 = munchExp(e2);
+                    if (e1->u.CONST == 0){
+                        sprintf(inst, "\tmov     'd0, #0\n");
+                        emit(AS_Move(inst, L(r, NULL), NULL));
+                        return r;
+                    } else if (e1->u.CONST == 1){
+                        sprintf(inst, "\tmov     'd0, 's0\n");
+                        emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
+                        return r;
+                    }
+
+                    int lshift = getShiftTime(e1->u.CONST);
+                    if (lshift){
+                        sprintf(inst, "\tlsls    'd0, 's0, #%d\n", lshift);
+                        emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
+                        return r;
+                    }
+                }
+                if (e2->kind == T_exp_::T_CONST){
+                    r1 = munchExp(e1);
+                    if (e2->u.CONST == 0){
+                        sprintf(inst, "\tmov     'd0, #0\n");
+                        emit(AS_Move(inst, L(r, NULL), NULL));
+                        return r;
+                    } else if (e2->u.CONST == 1){
+                        sprintf(inst, "\tmov     'd0, 's0\n");
+                        emit(AS_Move(inst, L(r, NULL), L(r1, NULL)));
+                        return r;
+                    }
+
+                    int lshift = getShiftTime(e2->u.CONST);
+                    if (lshift){
+                        sprintf(inst, "\tlsls    'd0, 's0, #%d\n", lshift);
+                        emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
+                        return r;
+                    }
+                }
+
+                if (not r1)
+                    r1 = munchExp(e1);
+                if (not r2)
+                    r2 = munchExp(e2);
                 sprintf(inst, "\tmul     'd0, 's0, 's1\n");
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
