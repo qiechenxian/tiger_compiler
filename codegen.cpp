@@ -295,8 +295,8 @@ static Temp_temp munchExp(T_exp e) {
                 if (e1->kind == T_exp_::T_CONST){
                     r2 = munchExp(e2);
                     if (e1->u.CONST == 0){
-                        sprintf(inst, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
+                        sprintf(inst, "\tmov     'd0, #0\n");
+                        emit(AS_Move(inst, L(r, NULL), NULL));
                         return r;
                     }
 
@@ -310,8 +310,8 @@ static Temp_temp munchExp(T_exp e) {
                 if (e2->kind == T_exp_::T_CONST){
                     r1 = munchExp(e1);
                     if (e2->u.CONST == 0){
-                        sprintf(inst, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst, L(r, NULL), L(r1, NULL)));
+                        sprintf(inst, "\tmov     'd0, 0\n");
+                        emit(AS_Move(inst, L(r, NULL), NULL));
                         return r;
                     }
 
