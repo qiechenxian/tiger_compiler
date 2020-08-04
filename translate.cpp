@@ -299,6 +299,21 @@ Tr_exp Tr_simpleVarNoMem(Tr_access acc)
 
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 {
+    T_exp offset_exp = Tr_unEx(offset);
+    if (offset_exp->kind == T_exp_::T_CONST){
+        T_exp base_exp = Tr_unEx(base);
+        if (base_exp->kind == T_exp_::T_MEM){
+            base_exp = base_exp->u.MEM;
+        }
+        assert(base_exp->kind == T_exp_::T_BINOP);
+        assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+        return Tr_Ex(T_Mem(
+                T_Binop(
+                        T_add, base_exp->u.BINOP.left,
+                        T_Const(base_exp->u.BINOP.right->u.CONST+offset_exp->u.CONST * dimension * get_word_size())
+                        )
+                ));
+    }
     return Tr_Ex(T_Mem(
             T_Binop(T_add,Tr_unEx(base),
                     T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size()*dimension))
@@ -307,6 +322,19 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 
 Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
 {
+    T_exp offset_exp = Tr_unEx(offset);
+    if (offset_exp->kind == T_exp_::T_CONST){
+        T_exp base_exp = Tr_unEx(base);
+        if (base_exp->kind == T_exp_::T_MEM){
+            base_exp = base_exp->u.MEM;
+        }
+        assert(base_exp->kind == T_exp_::T_BINOP);
+        assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+        return Tr_Ex(T_Binop(
+                T_add, base_exp->u.BINOP.left,
+                T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
+                ));
+    }
     return Tr_Ex(T_Binop(
             T_add,
             Tr_unEx(base),
