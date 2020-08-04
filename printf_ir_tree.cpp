@@ -22,42 +22,42 @@ static void indent(FILE *out, int d) {
     for (i = 0; i <= d; i++) fprintf(out," ");
 }
 
-            static char bin_oper[][12] = {
-                    "T_add", "T_sub", "T_mul", "T_div",
-                    "T_lshift", "T_rshift", "T_arshift",
-                    "T_xor", "T_mod"};
+static char bin_oper[][12] = {
+        "T_add", "T_sub", "T_mul", "T_div",
+        "T_lshift", "T_rshift", "T_arshift",
+        "T_xor", "T_mod"};
 
-            static char rel_oper[][12] = {
-                    "T_lt", "T_le", "T_gt", "T_ge", "T_eq", "T_ne", "T_not", "T_and", "T_or"};
+static char rel_oper[][12] = {
+        "T_lt", "T_le", "T_gt", "T_ge", "T_eq", "T_ne", "T_not", "T_and", "T_or"};
 
-            static void pr_stm(FILE *out, T_stm stm, int d) {
-                if (stm == nullptr) {
-                    fprintf(out, "nullptr");
-                    return;
-                }
-                switch (stm->kind) {
-                    case T_stm_::T_SEQ:
-                        indent(out, d);
-                        fprintf(out, "SEQ(\n");
-                        pr_stm(out, stm->u.SEQ.left, d + 1);
-                        fprintf(out, ",\n");
-                        pr_stm(out, stm->u.SEQ.right, d + 1);
-                        fprintf(out, ")");
-                        break;
-                    case T_stm_::T_LABEL:
-                        indent(out, d);
-                        fprintf(out, "LABEL %s", S_name(stm->u.LABEL));
-                        break;
-                    case T_stm_::T_JUMP:
-                        indent(out, d);
-                        fprintf(out, "JUMP(\n");
-                        pr_tree_exp(out, stm->u.JUMP.exp, d + 1);
-                        fprintf(out, ")");
-                        break;
-                    case T_stm_::T_CJUMP:
-                        indent(out, d);
-                        fprintf(out, "CJUMP(%s,\n", rel_oper[stm->u.CJUMP.op]);
-                        pr_tree_exp(out, stm->u.CJUMP.left, d + 1);
+static void pr_stm(FILE *out, T_stm stm, int d) {
+    if (stm == nullptr) {
+        fprintf(out, "nullptr");
+        return;
+    }
+    switch (stm->kind) {
+        case T_stm_::T_SEQ:
+            indent(out, d);
+            fprintf(out, "SEQ(\n");
+            pr_stm(out, stm->u.SEQ.left, d + 1);
+            fprintf(out, ",\n");
+            pr_stm(out, stm->u.SEQ.right, d + 1);
+            fprintf(out, ")");
+            break;
+        case T_stm_::T_LABEL:
+            indent(out, d);
+            fprintf(out, "LABEL %s", S_name(stm->u.LABEL));
+            break;
+        case T_stm_::T_JUMP:
+            indent(out, d);
+            fprintf(out, "JUMP(\n");
+            pr_tree_exp(out, stm->u.JUMP.exp, d + 1);
+            fprintf(out, ")");
+            break;
+        case T_stm_::T_CJUMP:
+            indent(out, d);
+            fprintf(out, "CJUMP(%s,\n", rel_oper[stm->u.CJUMP.op]);
+            pr_tree_exp(out, stm->u.CJUMP.left, d + 1);
             fprintf(out, ",\n");
             pr_tree_exp(out, stm->u.CJUMP.right, d + 1);
             fprintf(out, ",\n");
@@ -79,6 +79,13 @@ static void indent(FILE *out, int d) {
             fprintf(out, "EXP(\n");
             pr_tree_exp(out, stm->u.EXP, d + 1);
             fprintf(out, ")");
+            break;
+        case T_stm_::T_STMFD:
+        case T_stm_::T_LDMFD:
+        default:
+
+            // TODO 支持操作
+            fprintf(out, "not support\n");
             break;
     }
 }
@@ -130,8 +137,14 @@ static void pr_tree_exp(FILE *out, T_exp exp, int d) {
                 pr_tree_exp(out, args->head, d + 2);
             }
             fprintf(out, ")");
-            break;
         }
+            break;
+
+        case T_exp_::T_RELOP:
+        default:
+            fprintf(out, "not support\n");
+            break;
+
     } /* end of switch */
 }
 
