@@ -137,7 +137,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     while (++tryNum < 7) {
         flow = FG_AssemFlowGraph(il, f);
 
-#if 0
+#if 1
         G_show(stderr, G_nodes(flow), printInst);
 #endif
 

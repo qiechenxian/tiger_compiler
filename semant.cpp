@@ -420,7 +420,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             }
             Tr_access var_access;
             if (frame){
-                var_access = Tr_allocLocal(frame, true, 1);
+                var_access = Tr_allocLocal(frame, false, 1);
             }
             else{
                 var_access = Tr_allocGlobal(d->u.var.id);

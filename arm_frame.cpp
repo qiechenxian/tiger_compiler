@@ -380,6 +380,7 @@ F_accessList F_getFormals(F_frame frame) {
 
 int F_accessOffset(F_access a) {
     if (a->kind != F_access_::inFrame) {
+        return a->u.offset;
         EM_error(0, "Offset of a reg access is invalid");
     }
 
@@ -395,8 +396,8 @@ Temp_temp F_accessReg(F_access a) {
 }
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
-    frame->local_count += size;
     if (escape) {
+        frame->local_count += size;
         F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
         frame->locals = F_AccessList(access, frame->locals);
         return access;
