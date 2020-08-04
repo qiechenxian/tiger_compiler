@@ -30,7 +30,7 @@ struct ctx {
     G_table alias;//当传送指令(u,v)被合并，并且v放入已合并节点集合，则alias(v)=u
     G_table degree;//每个节点当前度数的数组
 
-    int K;//颜色数目
+    int K;//颜色数目，可用的寄存器个数
 };
 
 static COL_ctx c;
@@ -254,7 +254,7 @@ static bool moveRelated(Temp_temp t) {
 }
 
 //有可能合并的传送指令集合准备
-static void makeWorkList() {
+static void makeWorkList() {//低度数的传送无关表，一般来说当一个变量的冲突便小于K，K为当前使用的寄存器个个数
     Temp_tempList tl;
     for (tl = c.initial; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
@@ -367,9 +367,9 @@ static G_node getAlias(G_node n) {
     }
 }
 
-//简化（第二步）
+//简化（第二步）第一步的冲突图构建由solve_liveness解决
 static void simplify() {
-    if (c.simplifyWorklist == NULL) {
+    if (c.simplifyWorklist == NULL) {//c.simplifyWorklist低度数的传送无关的节点表
         return;
     }
 
@@ -558,7 +558,7 @@ static void colorMain() {
     makeWorkList();
     do {
         if (c.simplifyWorklist != NULL) {
-            simplify();
+            simplify();//简化过程
         } else if (c.worklistMoves != NULL) {
             coalesce();
         } else if (c.freezeWorklist != NULL) {
@@ -618,7 +618,7 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         }
         c.initial = L(node2Temp(nl->head), c.initial);////c.initial临时寄存器集合，既没有预着色也没有处理
     }
-    colorMain();
+    colorMain();//开始着色
 
     // for (nl = nodes; nl; nl = nl->tail) {
     //   if (Temp_look(precolored, node2Temp(nl->head))) {
