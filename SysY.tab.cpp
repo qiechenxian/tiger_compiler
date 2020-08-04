@@ -99,6 +99,7 @@
 #include "errormsg.h"
 #include "ast.h"
 #include "symbol.h"
+#include "string.h"
 
 extern int yylex();
 extern int yylineno;
@@ -113,7 +114,7 @@ void yyerror(char*);
 
 
 /* Line 189 of yacc.c  */
-#line 117 "SysY.tab.cpp"
+#line 118 "SysY.tab.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -190,7 +191,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 44 ".\\SysY.y"
+#line 45 ".\\SysY.y"
 
     int integer;
     char* string;
@@ -211,7 +212,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 215 "SysY.tab.cpp"
+#line 216 "SysY.tab.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -236,7 +237,7 @@ typedef struct YYLTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 240 "SysY.tab.cpp"
+#line 241 "SysY.tab.cpp"
 
 #ifdef short
 # undef short
@@ -566,17 +567,17 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   123,   123,   127,   128,   129,   130,   134,   135,   139,
-     145,   148,   152,   156,   159,   165,   168,   172,   173,   179,
-     182,   185,   188,   194,   198,   199,   203,   204,   205,   208,
-     214,   215,   221,   224,   227,   230,   236,   239,   242,   245,
-     251,   252,   256,   257,   261,   262,   264,   268,   269,   273,
-     274,   275,   276,   280,   281,   282,   283,   284,   285,   286,
-     287,   288,   289,   290,   294,   295,   299,   300,   304,   308,
-     309,   313,   314,   318,   319,   323,   324,   328,   329,   330,
-     331,   335,   336,   340,   341,   345,   346,   347,   351,   352,
-     353,   357,   361,   362,   366,   367,   371,   372,   375,   378,
-     384,   385,   386,   387,   391,   395,   399
+       0,   124,   124,   128,   129,   130,   131,   135,   136,   140,
+     146,   149,   153,   157,   160,   166,   169,   173,   174,   180,
+     183,   186,   189,   195,   199,   200,   204,   205,   206,   209,
+     215,   216,   222,   225,   228,   231,   237,   240,   243,   246,
+     252,   253,   257,   258,   262,   263,   265,   269,   270,   274,
+     275,   276,   277,   281,   282,   283,   284,   285,   286,   287,
+     288,   289,   290,   291,   295,   296,   300,   301,   305,   309,
+     310,   314,   315,   319,   320,   324,   325,   329,   330,   331,
+     332,   336,   337,   341,   342,   346,   347,   348,   352,   353,
+     354,   358,   362,   363,   367,   368,   372,   373,   376,   384,
+     390,   391,   392,   393,   397,   401,   405
 };
 #endif
 
@@ -1669,56 +1670,56 @@ yyreduce:
         case 2:
 
 /* Line 1464 of yacc.c  */
-#line 123 ".\\SysY.y"
+#line 124 ".\\SysY.y"
     {absyn_root = (A_decList)U_reverseList((yyvsp[(1) - (1)].decList));;}
     break;
 
   case 3:
 
 /* Line 1464 of yacc.c  */
-#line 127 ".\\SysY.y"
+#line 128 ".\\SysY.y"
     {(yyval.decList) = A_castDecList((yyvsp[(2) - (2)].decList), (yyvsp[(1) - (2)].decList));;}
     break;
 
   case 4:
 
 /* Line 1464 of yacc.c  */
-#line 128 ".\\SysY.y"
+#line 129 ".\\SysY.y"
     {(yyval.decList) = A_DecList((yyvsp[(2) - (2)].dec), (yyvsp[(1) - (2)].decList));;}
     break;
 
   case 5:
 
 /* Line 1464 of yacc.c  */
-#line 129 ".\\SysY.y"
+#line 130 ".\\SysY.y"
     {(yyval.decList) = (yyvsp[(1) - (1)].decList);;}
     break;
 
   case 6:
 
 /* Line 1464 of yacc.c  */
-#line 130 ".\\SysY.y"
+#line 131 ".\\SysY.y"
     {(yyval.decList) = A_DecList((yyvsp[(1) - (1)].dec), NULL);;}
     break;
 
   case 7:
 
 /* Line 1464 of yacc.c  */
-#line 134 ".\\SysY.y"
+#line 135 ".\\SysY.y"
     {(yyval.decList) = (yyvsp[(1) - (1)].decList);;}
     break;
 
   case 8:
 
 /* Line 1464 of yacc.c  */
-#line 135 ".\\SysY.y"
+#line 136 ".\\SysY.y"
     {(yyval.decList) = (yyvsp[(1) - (1)].decList);;}
     break;
 
   case 9:
 
 /* Line 1464 of yacc.c  */
-#line 139 ".\\SysY.y"
+#line 140 ".\\SysY.y"
     {
         (yyval.decList) = A_conform((yyvsp[(3) - (4)].decList), (yyvsp[(2) - (4)].sym));
     ;}
@@ -1727,7 +1728,7 @@ yyreduce:
   case 10:
 
 /* Line 1464 of yacc.c  */
-#line 145 ".\\SysY.y"
+#line 146 ".\\SysY.y"
     {
         (yyval.decList) = A_DecList((yyvsp[(3) - (3)].dec), (yyvsp[(1) - (3)].decList));
     ;}
@@ -1736,21 +1737,21 @@ yyreduce:
   case 11:
 
 /* Line 1464 of yacc.c  */
-#line 148 ".\\SysY.y"
+#line 149 ".\\SysY.y"
     {(yyval.decList) = A_DecList((yyvsp[(1) - (1)].dec), NULL);;}
     break;
 
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 152 ".\\SysY.y"
+#line 153 ".\\SysY.y"
     {(yyval.sym) = S_Symbol((char *)"int");;}
     break;
 
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 156 ".\\SysY.y"
+#line 157 ".\\SysY.y"
     {
         (yyval.dec) = A_VariableDec(A_POS((yyloc)), NULL, (yyvsp[(1) - (3)].sym), (yyvsp[(3) - (3)].exp), true);
     ;}
@@ -1759,7 +1760,7 @@ yyreduce:
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 159 ".\\SysY.y"
+#line 160 ".\\SysY.y"
     {
         (yyval.dec) = A_ArrayDec(A_POS((yyloc)), NULL, (yyvsp[(1) - (4)].sym), (A_expList)U_reverseList((yyvsp[(2) - (4)].expList)), (yyvsp[(4) - (4)].arrayInitList), true);
     ;}
@@ -1768,7 +1769,7 @@ yyreduce:
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 165 ".\\SysY.y"
+#line 166 ".\\SysY.y"
     {
         (yyval.expList) = A_ExpList((yyvsp[(3) - (4)].exp), (yyvsp[(1) - (4)].expList));
     ;}
@@ -1777,21 +1778,21 @@ yyreduce:
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 168 ".\\SysY.y"
+#line 169 ".\\SysY.y"
     {(yyval.expList) = A_ExpList((yyvsp[(2) - (3)].exp), NULL);;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 172 ".\\SysY.y"
+#line 173 ".\\SysY.y"
     {(yyval.arrayInitList) = (A_arrayInitList)U_reverseList((yyvsp[(2) - (3)].arrayInitList));;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 173 ".\\SysY.y"
+#line 174 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_SingleInit(A_POS((yyloc)), A_IntExp(A_POS((yyloc)), 0)), NULL);
     ;}
@@ -1800,7 +1801,7 @@ yyreduce:
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 179 ".\\SysY.y"
+#line 180 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_NestedInit(A_POS((yylsp[(3) - (3)])), (yyvsp[(3) - (3)].arrayInitList)), (yyvsp[(1) - (3)].arrayInitList));
     ;}
@@ -1809,7 +1810,7 @@ yyreduce:
   case 20:
 
 /* Line 1464 of yacc.c  */
-#line 182 ".\\SysY.y"
+#line 183 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_SingleInit(A_POS((yylsp[(1) - (3)])), (yyvsp[(3) - (3)].exp)), (yyvsp[(1) - (3)].arrayInitList));
     ;}
@@ -1818,7 +1819,7 @@ yyreduce:
   case 21:
 
 /* Line 1464 of yacc.c  */
-#line 185 ".\\SysY.y"
+#line 186 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_NestedInit(A_POS((yylsp[(1) - (1)])), (yyvsp[(1) - (1)].arrayInitList)), NULL);
     ;}
@@ -1827,7 +1828,7 @@ yyreduce:
   case 22:
 
 /* Line 1464 of yacc.c  */
-#line 188 ".\\SysY.y"
+#line 189 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_SingleInit(A_POS((yylsp[(1) - (1)])), (yyvsp[(1) - (1)].exp)), NULL);
     ;}
@@ -1836,42 +1837,42 @@ yyreduce:
   case 23:
 
 /* Line 1464 of yacc.c  */
-#line 194 ".\\SysY.y"
+#line 195 ".\\SysY.y"
     {(yyval.decList) = A_conform((yyvsp[(2) - (3)].decList), (yyvsp[(1) - (3)].sym));;}
     break;
 
   case 24:
 
 /* Line 1464 of yacc.c  */
-#line 198 ".\\SysY.y"
+#line 199 ".\\SysY.y"
     {(yyval.decList) = A_DecList((yyvsp[(3) - (3)].dec), (yyvsp[(1) - (3)].decList));;}
     break;
 
   case 25:
 
 /* Line 1464 of yacc.c  */
-#line 199 ".\\SysY.y"
+#line 200 ".\\SysY.y"
     {(yyval.decList) = A_DecList((yyvsp[(1) - (1)].dec), NULL);;}
     break;
 
   case 26:
 
 /* Line 1464 of yacc.c  */
-#line 203 ".\\SysY.y"
+#line 204 ".\\SysY.y"
     {(yyval.dec) = A_VariableDec(A_POS((yyloc)), NULL, (yyvsp[(1) - (1)].sym), NULL, false);;}
     break;
 
   case 27:
 
 /* Line 1464 of yacc.c  */
-#line 204 ".\\SysY.y"
+#line 205 ".\\SysY.y"
     {(yyval.dec) = A_VariableDec(A_POS((yyloc)), NULL, (yyvsp[(1) - (3)].sym), (yyvsp[(3) - (3)].exp), false);;}
     break;
 
   case 28:
 
 /* Line 1464 of yacc.c  */
-#line 205 ".\\SysY.y"
+#line 206 ".\\SysY.y"
     {
         (yyval.dec) = A_ArrayDec(A_POS((yyloc)), NULL, (yyvsp[(1) - (2)].sym), (A_expList)U_reverseList((yyvsp[(2) - (2)].expList)), NULL, false);
     ;}
@@ -1880,7 +1881,7 @@ yyreduce:
   case 29:
 
 /* Line 1464 of yacc.c  */
-#line 208 ".\\SysY.y"
+#line 209 ".\\SysY.y"
     {
         (yyval.dec) = A_ArrayDec(A_POS((yyloc)), NULL, (yyvsp[(1) - (4)].sym), (A_expList)U_reverseList((yyvsp[(2) - (4)].expList)), (yyvsp[(4) - (4)].arrayInitList), false);
     ;}
@@ -1889,14 +1890,14 @@ yyreduce:
   case 30:
 
 /* Line 1464 of yacc.c  */
-#line 214 ".\\SysY.y"
+#line 215 ".\\SysY.y"
     {(yyval.arrayInitList) = (A_arrayInitList)U_reverseList((yyvsp[(2) - (3)].arrayInitList));;}
     break;
 
   case 31:
 
 /* Line 1464 of yacc.c  */
-#line 215 ".\\SysY.y"
+#line 216 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_SingleInit(A_POS((yyloc)), A_IntExp(A_POS((yyloc)), 0)), NULL);
     ;}
@@ -1905,7 +1906,7 @@ yyreduce:
   case 32:
 
 /* Line 1464 of yacc.c  */
-#line 221 ".\\SysY.y"
+#line 222 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_SingleInit(A_POS((yylsp[(3) - (3)])), (yyvsp[(3) - (3)].exp)), (yyvsp[(1) - (3)].arrayInitList));
     ;}
@@ -1914,7 +1915,7 @@ yyreduce:
   case 33:
 
 /* Line 1464 of yacc.c  */
-#line 224 ".\\SysY.y"
+#line 225 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_NestedInit(A_POS((yylsp[(3) - (3)])), (yyvsp[(3) - (3)].arrayInitList)), (yyvsp[(1) - (3)].arrayInitList));
     ;}
@@ -1923,7 +1924,7 @@ yyreduce:
   case 34:
 
 /* Line 1464 of yacc.c  */
-#line 227 ".\\SysY.y"
+#line 228 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_SingleInit(A_POS((yylsp[(1) - (1)])), (yyvsp[(1) - (1)].exp)), NULL);
     ;}
@@ -1932,7 +1933,7 @@ yyreduce:
   case 35:
 
 /* Line 1464 of yacc.c  */
-#line 230 ".\\SysY.y"
+#line 231 ".\\SysY.y"
     {
         (yyval.arrayInitList) = A_ArrayInitList(A_NestedInit(A_POS((yylsp[(1) - (1)])), (yyvsp[(1) - (1)].arrayInitList)), NULL);
     ;}
@@ -1941,7 +1942,7 @@ yyreduce:
   case 36:
 
 /* Line 1464 of yacc.c  */
-#line 236 ".\\SysY.y"
+#line 237 ".\\SysY.y"
     {
         (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (6)].sym), (A_fieldList)U_reverseList((yyvsp[(4) - (6)].fieldList)), S_Symbol((char *)"void"), (yyvsp[(6) - (6)].stm));
     ;}
@@ -1950,7 +1951,7 @@ yyreduce:
   case 37:
 
 /* Line 1464 of yacc.c  */
-#line 239 ".\\SysY.y"
+#line 240 ".\\SysY.y"
     {
         (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (5)].sym), NULL, S_Symbol((char *)"void"), (yyvsp[(5) - (5)].stm));
     ;}
@@ -1959,7 +1960,7 @@ yyreduce:
   case 38:
 
 /* Line 1464 of yacc.c  */
-#line 242 ".\\SysY.y"
+#line 243 ".\\SysY.y"
     {
         (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (6)].sym), (A_fieldList)U_reverseList((yyvsp[(4) - (6)].fieldList)), (yyvsp[(1) - (6)].sym), (yyvsp[(6) - (6)].stm));
     ;}
@@ -1968,7 +1969,7 @@ yyreduce:
   case 39:
 
 /* Line 1464 of yacc.c  */
-#line 245 ".\\SysY.y"
+#line 246 ".\\SysY.y"
     {
         (yyval.dec) = A_FunctionDec(A_POS((yyloc)), (yyvsp[(2) - (5)].sym), NULL, (yyvsp[(1) - (5)].sym), (yyvsp[(5) - (5)].stm));
     ;}
@@ -1977,406 +1978,406 @@ yyreduce:
   case 40:
 
 /* Line 1464 of yacc.c  */
-#line 251 ".\\SysY.y"
+#line 252 ".\\SysY.y"
     {(yyval.fieldList) = A_FieldList((yyvsp[(3) - (3)].field), (yyvsp[(1) - (3)].fieldList));;}
     break;
 
   case 41:
 
 /* Line 1464 of yacc.c  */
-#line 252 ".\\SysY.y"
+#line 253 ".\\SysY.y"
     {(yyval.fieldList) = A_FieldList((yyvsp[(1) - (1)].field), NULL);;}
     break;
 
   case 42:
 
 /* Line 1464 of yacc.c  */
-#line 256 ".\\SysY.y"
+#line 257 ".\\SysY.y"
     {(yyval.field) = A_Field(A_POS((yyloc)), (yyvsp[(2) - (2)].sym), (yyvsp[(1) - (2)].sym), NULL);;}
     break;
 
   case 43:
 
 /* Line 1464 of yacc.c  */
-#line 257 ".\\SysY.y"
+#line 258 ".\\SysY.y"
     {(yyval.field) = A_Field(A_POS((yyloc)), (yyvsp[(2) - (3)].sym), (yyvsp[(1) - (3)].sym), (A_expList)U_reverseList((yyvsp[(3) - (3)].expList)));;}
     break;
 
   case 44:
 
 /* Line 1464 of yacc.c  */
-#line 261 ".\\SysY.y"
+#line 262 ".\\SysY.y"
     {(yyval.expList) = A_ExpList((yyvsp[(3) - (4)].exp), (yyvsp[(1) - (4)].expList));;}
     break;
 
   case 45:
 
 /* Line 1464 of yacc.c  */
-#line 262 ".\\SysY.y"
+#line 263 ".\\SysY.y"
     {(yyval.expList) = A_ExpList(A_IntExp(A_POS((yyloc)), 0), NULL);;}
     break;
 
   case 46:
 
 /* Line 1464 of yacc.c  */
-#line 264 ".\\SysY.y"
+#line 265 ".\\SysY.y"
     {(yyval.expList) = A_ExpList((yyvsp[(2) - (3)].exp), NULL);;}
     break;
 
   case 47:
 
 /* Line 1464 of yacc.c  */
-#line 268 ".\\SysY.y"
+#line 269 ".\\SysY.y"
     {(yyval.stm) = A_BlockStm(A_POS((yyloc)), (A_comStmList)U_reverseList((yyvsp[(2) - (3)].comStmList)));;}
     break;
 
   case 48:
 
 /* Line 1464 of yacc.c  */
-#line 269 ".\\SysY.y"
+#line 270 ".\\SysY.y"
     {(yyval.stm) = A_BlockStm(A_POS((yyloc)),NULL);;}
     break;
 
   case 49:
 
 /* Line 1464 of yacc.c  */
-#line 273 ".\\SysY.y"
+#line 274 ".\\SysY.y"
     {(yyval.comStmList) = A_ComStmList(A_ComStm((yyvsp[(2) - (2)].decList), NULL), (yyvsp[(1) - (2)].comStmList));;}
     break;
 
   case 50:
 
 /* Line 1464 of yacc.c  */
-#line 274 ".\\SysY.y"
+#line 275 ".\\SysY.y"
     {(yyval.comStmList) = A_ComStmList(A_ComStm(NULL, (yyvsp[(2) - (2)].stm)), (yyvsp[(1) - (2)].comStmList));;}
     break;
 
   case 51:
 
 /* Line 1464 of yacc.c  */
-#line 275 ".\\SysY.y"
+#line 276 ".\\SysY.y"
     {(yyval.comStmList) = A_ComStmList(A_ComStm((yyvsp[(1) - (1)].decList), NULL), NULL);;}
     break;
 
   case 52:
 
 /* Line 1464 of yacc.c  */
-#line 276 ".\\SysY.y"
+#line 277 ".\\SysY.y"
     {(yyval.comStmList) = A_ComStmList(A_ComStm(NULL, (yyvsp[(1) - (1)].stm)), NULL);;}
     break;
 
   case 53:
 
 /* Line 1464 of yacc.c  */
-#line 280 ".\\SysY.y"
+#line 281 ".\\SysY.y"
     {(yyval.stm) = A_AssignStm(A_POS((yyloc)), (yyvsp[(1) - (4)].var), (yyvsp[(3) - (4)].exp));;}
     break;
 
   case 54:
 
 /* Line 1464 of yacc.c  */
-#line 281 ".\\SysY.y"
+#line 282 ".\\SysY.y"
     {(yyval.stm) = A_ExpStm(A_POS((yyloc)), (yyvsp[(1) - (2)].exp));;}
     break;
 
   case 55:
 
 /* Line 1464 of yacc.c  */
-#line 282 ".\\SysY.y"
+#line 283 ".\\SysY.y"
     {(yyval.stm) = A_ExpStm(A_POS((yyloc)),NULL);;}
     break;
 
   case 56:
 
 /* Line 1464 of yacc.c  */
-#line 283 ".\\SysY.y"
+#line 284 ".\\SysY.y"
     {(yyval.stm) = (yyvsp[(1) - (1)].stm);;}
     break;
 
   case 57:
 
 /* Line 1464 of yacc.c  */
-#line 284 ".\\SysY.y"
+#line 285 ".\\SysY.y"
     {(yyval.stm) = A_IfStm(A_POS((yyloc)), (yyvsp[(3) - (5)].exp), (yyvsp[(5) - (5)].stm), NULL);;}
     break;
 
   case 58:
 
 /* Line 1464 of yacc.c  */
-#line 285 ".\\SysY.y"
+#line 286 ".\\SysY.y"
     {(yyval.stm) = A_IfStm(A_POS((yyloc)), (yyvsp[(3) - (7)].exp), (yyvsp[(5) - (7)].stm), (yyvsp[(7) - (7)].stm));;}
     break;
 
   case 59:
 
 /* Line 1464 of yacc.c  */
-#line 286 ".\\SysY.y"
+#line 287 ".\\SysY.y"
     {(yyval.stm) = A_WhileStm(A_POS((yyloc)), (yyvsp[(3) - (5)].exp), (yyvsp[(5) - (5)].stm));;}
     break;
 
   case 60:
 
 /* Line 1464 of yacc.c  */
-#line 287 ".\\SysY.y"
+#line 288 ".\\SysY.y"
     {(yyval.stm) = A_BreakStm(A_POS((yyloc)));;}
     break;
 
   case 61:
 
 /* Line 1464 of yacc.c  */
-#line 288 ".\\SysY.y"
+#line 289 ".\\SysY.y"
     {(yyval.stm) = A_ContinueStm(A_POS((yyloc)));;}
     break;
 
   case 62:
 
 /* Line 1464 of yacc.c  */
-#line 289 ".\\SysY.y"
+#line 290 ".\\SysY.y"
     {(yyval.stm) = A_ReturnStm(A_POS((yyloc)), (yyvsp[(2) - (3)].exp));;}
     break;
 
   case 63:
 
 /* Line 1464 of yacc.c  */
-#line 290 ".\\SysY.y"
+#line 291 ".\\SysY.y"
     {(yyval.stm) = A_ReturnStm(A_POS((yyloc)), NULL);;}
     break;
 
   case 64:
 
 /* Line 1464 of yacc.c  */
-#line 294 ".\\SysY.y"
+#line 295 ".\\SysY.y"
     {(yyval.expList) = A_ExpList((yyvsp[(3) - (3)].exp), (yyvsp[(1) - (3)].expList));;}
     break;
 
   case 65:
 
 /* Line 1464 of yacc.c  */
-#line 295 ".\\SysY.y"
+#line 296 ".\\SysY.y"
     {(yyval.expList) = A_ExpList((yyvsp[(1) - (1)].exp), NULL);;}
     break;
 
   case 66:
 
 /* Line 1464 of yacc.c  */
-#line 299 ".\\SysY.y"
+#line 300 ".\\SysY.y"
     {(yyval.var) = A_SimpleVar(A_POS((yylsp[(1) - (1)])), (yyvsp[(1) - (1)].sym));;}
     break;
 
   case 67:
 
 /* Line 1464 of yacc.c  */
-#line 300 ".\\SysY.y"
+#line 301 ".\\SysY.y"
     {(yyval.var) = A_ArrayVar(A_POS((yylsp[(1) - (4)])), (yyvsp[(1) - (4)].var), (yyvsp[(3) - (4)].exp));;}
     break;
 
   case 68:
 
 /* Line 1464 of yacc.c  */
-#line 304 ".\\SysY.y"
+#line 305 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 69:
 
 /* Line 1464 of yacc.c  */
-#line 308 ".\\SysY.y"
+#line 309 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 70:
 
 /* Line 1464 of yacc.c  */
-#line 309 ".\\SysY.y"
+#line 310 ".\\SysY.y"
     {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), A_or, (yyvsp[(3) - (3)].exp));}
     break;
 
   case 71:
 
 /* Line 1464 of yacc.c  */
-#line 313 ".\\SysY.y"
+#line 314 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 72:
 
 /* Line 1464 of yacc.c  */
-#line 314 ".\\SysY.y"
+#line 315 ".\\SysY.y"
     {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), A_and, (yyvsp[(3) - (3)].exp));}
     break;
 
   case 73:
 
 /* Line 1464 of yacc.c  */
-#line 318 ".\\SysY.y"
+#line 319 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 74:
 
 /* Line 1464 of yacc.c  */
-#line 319 ".\\SysY.y"
+#line 320 ".\\SysY.y"
     {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 75:
 
 /* Line 1464 of yacc.c  */
-#line 323 ".\\SysY.y"
+#line 324 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 76:
 
 /* Line 1464 of yacc.c  */
-#line 324 ".\\SysY.y"
+#line 325 ".\\SysY.y"
     {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 77:
 
 /* Line 1464 of yacc.c  */
-#line 328 ".\\SysY.y"
+#line 329 ".\\SysY.y"
     {(yyval.binOp) = A_lt;;}
     break;
 
   case 78:
 
 /* Line 1464 of yacc.c  */
-#line 329 ".\\SysY.y"
+#line 330 ".\\SysY.y"
     {(yyval.binOp) = A_le;;}
     break;
 
   case 79:
 
 /* Line 1464 of yacc.c  */
-#line 330 ".\\SysY.y"
+#line 331 ".\\SysY.y"
     {(yyval.binOp) = A_gt;;}
     break;
 
   case 80:
 
 /* Line 1464 of yacc.c  */
-#line 331 ".\\SysY.y"
+#line 332 ".\\SysY.y"
     {(yyval.binOp) = A_ge;;}
     break;
 
   case 81:
 
 /* Line 1464 of yacc.c  */
-#line 335 ".\\SysY.y"
+#line 336 ".\\SysY.y"
     {(yyval.binOp) = A_eq;;}
     break;
 
   case 82:
 
 /* Line 1464 of yacc.c  */
-#line 336 ".\\SysY.y"
+#line 337 ".\\SysY.y"
     {(yyval.binOp) = A_ne;;}
     break;
 
   case 83:
 
 /* Line 1464 of yacc.c  */
-#line 340 ".\\SysY.y"
+#line 341 ".\\SysY.y"
     {(yyval.binOp) = A_add;;}
     break;
 
   case 84:
 
 /* Line 1464 of yacc.c  */
-#line 341 ".\\SysY.y"
+#line 342 ".\\SysY.y"
     {(yyval.binOp) = A_sub;;}
     break;
 
   case 85:
 
 /* Line 1464 of yacc.c  */
-#line 345 ".\\SysY.y"
+#line 346 ".\\SysY.y"
     {(yyval.binOp) = A_mul;;}
     break;
 
   case 86:
 
 /* Line 1464 of yacc.c  */
-#line 346 ".\\SysY.y"
+#line 347 ".\\SysY.y"
     {(yyval.binOp) = A_div;;}
     break;
 
   case 87:
 
 /* Line 1464 of yacc.c  */
-#line 347 ".\\SysY.y"
+#line 348 ".\\SysY.y"
     {(yyval.binOp) = A_mod;;}
     break;
 
   case 88:
 
 /* Line 1464 of yacc.c  */
-#line 351 ".\\SysY.y"
+#line 352 ".\\SysY.y"
     {(yyval.binOp) = A_add;;}
     break;
 
   case 89:
 
 /* Line 1464 of yacc.c  */
-#line 352 ".\\SysY.y"
+#line 353 ".\\SysY.y"
     {(yyval.binOp) = A_sub;;}
     break;
 
   case 90:
 
 /* Line 1464 of yacc.c  */
-#line 353 ".\\SysY.y"
+#line 354 ".\\SysY.y"
     {(yyval.binOp) = A_not;;}
     break;
 
   case 91:
 
 /* Line 1464 of yacc.c  */
-#line 357 ".\\SysY.y"
+#line 358 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 92:
 
 /* Line 1464 of yacc.c  */
-#line 361 ".\\SysY.y"
+#line 362 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 93:
 
 /* Line 1464 of yacc.c  */
-#line 362 ".\\SysY.y"
+#line 363 ".\\SysY.y"
     {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 94:
 
 /* Line 1464 of yacc.c  */
-#line 366 ".\\SysY.y"
+#line 367 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 95:
 
 /* Line 1464 of yacc.c  */
-#line 367 ".\\SysY.y"
+#line 368 ".\\SysY.y"
     {(yyval.exp) = A_OpExp(A_POS((yyloc)), (yyvsp[(1) - (3)].exp), (yyvsp[(2) - (3)].binOp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 96:
 
 /* Line 1464 of yacc.c  */
-#line 371 ".\\SysY.y"
+#line 372 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);}
     break;
 
   case 97:
 
 /* Line 1464 of yacc.c  */
-#line 372 ".\\SysY.y"
+#line 373 ".\\SysY.y"
     {
         (yyval.exp) = A_CallExp(A_POS((yyloc)), (yyvsp[(1) - (4)].sym), (A_expList)U_reverseList((yyvsp[(3) - (4)].expList)));
     ;}
@@ -2385,16 +2386,21 @@ yyreduce:
   case 98:
 
 /* Line 1464 of yacc.c  */
-#line 375 ".\\SysY.y"
+#line 376 ".\\SysY.y"
     {
-        (yyval.exp) = A_CallExp(A_POS((yyloc)), (yyvsp[(1) - (3)].sym), NULL);
+        if (strcmp(S_getName((yyvsp[(1) - (3)].sym)), "starttime")==0||
+            strcmp(S_getName((yyvsp[(1) - (3)].sym)), "stoptime")==0){
+            (yyval.exp) = A_CallExp(A_POS((yyloc)), (yyvsp[(1) - (3)].sym), A_ExpList(A_IntExp(A_POS((yyloc)), yylineno), NULL));
+        }else{
+            (yyval.exp) = A_CallExp(A_POS((yyloc)), (yyvsp[(1) - (3)].sym), NULL);
+        }
     ;}
     break;
 
   case 99:
 
 /* Line 1464 of yacc.c  */
-#line 378 ".\\SysY.y"
+#line 384 ".\\SysY.y"
     {
         (yyval.exp) = A_OpExp(A_POS((yyloc)), A_IntExp(A_POS((yyloc)),0), (yyvsp[(1) - (2)].binOp), (yyvsp[(2) - (2)].exp))
     ;}
@@ -2403,56 +2409,56 @@ yyreduce:
   case 100:
 
 /* Line 1464 of yacc.c  */
-#line 384 ".\\SysY.y"
+#line 390 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(2) - (3)].exp);}
     break;
 
   case 101:
 
 /* Line 1464 of yacc.c  */
-#line 385 ".\\SysY.y"
+#line 391 ".\\SysY.y"
     {(yyval.exp) = A_VarExp(A_POS((yyloc)), (yyvsp[(1) - (1)].var));;}
     break;
 
   case 102:
 
 /* Line 1464 of yacc.c  */
-#line 386 ".\\SysY.y"
+#line 392 ".\\SysY.y"
     {(yyval.exp) = A_IntExp(A_POS((yyloc)), (yyvsp[(1) - (1)].integer));;}
     break;
 
   case 103:
 
 /* Line 1464 of yacc.c  */
-#line 387 ".\\SysY.y"
+#line 393 ".\\SysY.y"
     {(yyval.exp) = A_StringExp(A_POS((yyloc)), (yyvsp[(1) - (1)].string));;}
     break;
 
   case 104:
 
 /* Line 1464 of yacc.c  */
-#line 391 ".\\SysY.y"
+#line 397 ".\\SysY.y"
     {(yyval.exp) = (yyvsp[(1) - (1)].exp);;}
     break;
 
   case 105:
 
 /* Line 1464 of yacc.c  */
-#line 395 ".\\SysY.y"
+#line 401 ".\\SysY.y"
     {(yyval.integer) = (yyvsp[(1) - (1)].integer);;}
     break;
 
   case 106:
 
 /* Line 1464 of yacc.c  */
-#line 399 ".\\SysY.y"
+#line 405 ".\\SysY.y"
     {(yyval.sym) = S_Symbol((yyvsp[(1) - (1)].string));;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 2456 "SysY.tab.cpp"
+#line 2462 "SysY.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2516,7 +2522,7 @@ yyerrlab:
 	  }
 	else
 	  {
-	    yyerror (YY_((char *)"syntax error"));
+	    yyerror (YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -2637,7 +2643,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_((char *)"memory exhausted"));
+  yyerror (YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -2671,7 +2677,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 402 ".\\SysY.y"
+#line 408 ".\\SysY.y"
 
 
 void yyerror(char* msg){

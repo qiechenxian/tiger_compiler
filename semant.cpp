@@ -544,23 +544,26 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 S_enter(venv, formalIter->head->id, arg_entry);
                 argsCL = argsCL->tail;
             }
-                //func entrace port
-                T_stm func_entrace_port= nullptr;
-                T_Stmfd(T_ExpList(T_Temp(F_FP()),T_ExpList(T_Temp(F_SP()),T_ExpList(T_Temp(F_LR()),T_ExpList(T_Temp(F_PC()), nullptr)))));
-                /// trans body
-            struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body,l_break,l_continue);
+
+            //func entrace port
+            T_stm func_entrace_port = nullptr;
+            T_Stmfd(T_ExpList(T_Temp(F_FP()), T_ExpList(T_Temp(F_SP()), T_ExpList(T_Temp(F_LR()),
+                                                                                  T_ExpList(T_Temp(F_PC()),
+                                                                                            nullptr)))));
+            /// trans body
+            struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body, l_break, l_continue);
             F_setFrameCalleeArgs(fun_frame, returnValue.callee_args);
-            returnValue.exp =Tr_add_fuc_head_label(returnValue.exp,fun_label);
-                /// 检查返回值
-            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)){
+            returnValue.exp = Tr_add_fuc_head_label(returnValue.exp, fun_label);
+            /// 检查返回值
+            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)) {
                 EM_error(d->u.function.body->pos,
-                        "incorrect return type %s, expected %s",
-                        TY_toString(returnValue.ty),
-                        TY_toString(funEntry->u.fun.result)
-                        );
+                         "incorrect return type %s, expected %s",
+                         TY_toString(returnValue.ty),
+                         TY_toString(funEntry->u.fun.result)
+                );
             }
-                /// 检查main函数是否有参数，返回值是否为int
-            if (d->u.function.id == S_Symbol((char *)"main")){
+            /// 检查main函数是否有参数，返回值是否为int
+            if (d->u.function.id == S_Symbol((char *) "main")) {
                 if (d->u.function.params != nullptr)
                     EM_warning(d->pos, "main function should have no args");
                 if (!is_equal_ty(returnValue.ty, TY_Int()))

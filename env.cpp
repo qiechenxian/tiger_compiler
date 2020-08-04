@@ -87,11 +87,13 @@ S_table E_base_valueEntry(S_table tenv){
     S_enter(t, S_Symbol((char*)"putf"), funEntry);
 
     /// (8) void starttime()
-    funEntry = E_FunEntry(Temp_namedLabel((char*)"starttime"), nullptr, TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"starttime"),
+                          TY_TyList(TY_Int(), nullptr), TY_Void());
     S_enter(t, S_Symbol((char*)"starttime"), funEntry);
 
     /// (9) void stoptime()
-    funEntry = E_FunEntry(Temp_namedLabel((char*)"stoptime"), nullptr, TY_Void());
+    funEntry = E_FunEntry(Temp_namedLabel((char*)"stoptime"),
+                          TY_TyList(TY_Int(), nullptr), TY_Void());
     S_enter(t, S_Symbol((char*)"stoptime"), funEntry);
 
     return t;

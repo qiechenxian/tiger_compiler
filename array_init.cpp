@@ -103,6 +103,9 @@ INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_lis
         exp_vector.emplace_back(total_len, A_IntExp(nullptr, 0));
     }
     sort(exp_vector.begin(), exp_vector.end(), pairCmp);
+    if (exp_vector.end()->first != total_len){
+        exp_vector.emplace_back(total_len, A_IntExp(nullptr, 0));
+    }
     init_list->array = exp_vector;
     init_list->suffix_size = suffix_size;
     init_list->total_size = suffix_size[0] * temp[0];
