@@ -262,11 +262,11 @@ static void makeWorkList() {//低度数的传送无关表，一般来说当一�
         c.initial = tempMinus(c.initial, L(t, NULL));
 
         if (G_degree(n) >= c.K) {
-            c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));
+            c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));//高读书的节点表
         } else if (moveRelated(t)) {
-            c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));
+            c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));//低度树的传送有关节点
         } else {
-            c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
+            c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));//低度数的传送无关节点
         }
     }
 }
