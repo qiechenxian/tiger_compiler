@@ -412,12 +412,6 @@ static void munchStm(T_stm s) {
                 if (dst->u.MEM->kind == T_exp_::T_BINOP
                     && dst->u.MEM->u.BINOP.op == T_add
                     && dst->u.MEM->u.BINOP.right->kind == T_exp_::T_CONST) {
-//                    T_exp e1 = dst->u.MEM, e2 = src;
-//                    Temp_temp r1 = munchExp(e1);
-//                    Temp_temp r2 = munchExp(e2);
-//                    sprintf(inst, "\tstr     's0, ['s1]\n");
-//                    emit(AS_Oper(inst, NULL, L(r2, L(r1, NULL)), NULL));
-
                     /* MOVE(MEM(BINOP(PLUS,e1,CONST(i))),e2) */
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
@@ -749,9 +743,6 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                 case 0: {
                     //sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count) * get_word_size());//s0预着色为r0  s1预着色为sp
                     //emit(AS_Oper(str, NULL, L(F_R0(), L(F_SP(), NULL)), NULL));
-//                    Temp_temp save = Temp_newTemp();
-//                    sprintf(str, "\tmov     'd0, 's0\n");
-//                    emit(AS_Move(str, L(save, NULL), L(F_R0(), F_callersaves())));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
                     emit(AS_Move(inst, L(F_R0(), NULL),L(r, F_callersaves())));

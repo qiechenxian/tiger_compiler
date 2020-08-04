@@ -348,7 +348,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
                     Tr_expList_append(call_memset_param,Tr_intExp(0));
                     Tr_expList_append(call_memset_param,Tr_intExp(init_list->total_size*4));
-                    return Tr_seq(Tr_func_call(Temp_namedLabel("memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));// todo 优化项：当常数数组只有常量访问时，无需初始化
+                    return Tr_seq(Tr_func_call(Temp_namedLabel((char *)"memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));// todo 优化项：当常数数组只有常量访问时，无需初始化
                 } else{
                     /**
                      * 非常量数组初值处理
@@ -358,7 +358,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
                     Tr_expList_append(call_memset_param,Tr_intExp(0));
                     Tr_expList_append(call_memset_param,Tr_intExp(init_list->total_size*4));
-                    return Tr_seq(Tr_func_call(Temp_namedLabel("memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
+                    return Tr_seq(Tr_func_call(Temp_namedLabel((char *)"memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
                 }
             }
 
@@ -403,7 +403,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 Tr_expList_append(call_memset_param,Tr_intExp(0));
                 Tr_expList_append(call_memset_param,Tr_intExp(null_init->total_size*4));
 //                return Tr_seq(Tr_func_call(Temp_namedLabel("memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
-                return Tr_func_call(Temp_namedLabel("memset"),call_memset_param);
+                return Tr_func_call(Temp_namedLabel((char *)"memset"),call_memset_param);
             }
 
             S_enter(venv, d->u.array.id, arrayEntry);
@@ -437,6 +437,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 if (!is_equal_ty(type, e.ty)) {
                     EM_error(d->pos, "type error: %s given, expected %s for expression",
                             TY_toString(e.ty),S_getName(d->u.var.type));
+                }
+                if (frame){
+                    int callee_args = -1;
+                    if (e.callee_args > callee_args)
+                        F_setFrameCalleeArgs(frame, e.callee_args);
                 }
 
                 if (d->u.var.isConst){

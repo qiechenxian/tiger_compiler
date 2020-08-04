@@ -22,9 +22,9 @@ Temp_temp Temp_newTemp() {
     return p;
 }
 
-Temp_temp Temp_new_special(c_string s) {
+Temp_temp Temp_new_special(c_string s, int num) {
     Temp_temp p = (Temp_temp) checked_malloc(sizeof(*p));
-
+    p->num = num;
     {
         char temp_inform[16];
         sprintf(temp_inform, "%s", s);
