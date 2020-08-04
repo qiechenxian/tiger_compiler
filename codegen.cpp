@@ -496,7 +496,8 @@ static void munchStm(T_stm s) {
                                 temp_args = temp_args->tail;
                             }
                         }
-                        doCallerReg(args_count, CALL_SAVE);
+                        if (special_tag)
+                            doCallerReg(args_count, CALL_SAVE);
                         Temp_tempList l = munchArgs(special_tag, 0, args);
                         Temp_tempList calldefs = F_callersaves();
 //                        Temp_tempList calldefs = NULL;
@@ -505,7 +506,8 @@ static void munchStm(T_stm s) {
                         emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
                         sprintf(inst2, "\tmov     'd0, 's0\n");
                         emit(AS_Move(inst2, L(t, NULL), L(F_RV(), F_callersaves())));
-                        doCallerReg(args_count, CALL_LOAD);
+                        if (special_tag)
+                            doCallerReg(args_count, CALL_LOAD);
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
                         T_exp e1 = src->u.CALL.fun;
@@ -572,14 +574,16 @@ static void munchStm(T_stm s) {
                             temp_args = temp_args->tail;
                         }
                     }
-                    doCallerReg(args_count, CALL_SAVE);
+                    if (special_tag)
+                        doCallerReg(args_count, CALL_SAVE);
                     Temp_tempList l = munchArgs(special_tag, 0, args);
                     Temp_tempList calldefs = F_callersaves();
                     // 函数调用？
 //                    sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
                     emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
-                    doCallerReg(args_count, CALL_LOAD);
+                    if (special_tag)
+                        doCallerReg(args_count, CALL_LOAD);
                     //if (special_tag == true) {
                     //    count_func_param = count_func_param - 2;
                     //    if (count_func_param >= 0) {
