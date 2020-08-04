@@ -86,7 +86,7 @@ static G_node temp2Node(Temp_temp t) {
     if (t == NULL) return NULL;
     G_nodeList nodes = G_nodes(c.nodes);
     G_nodeList p;
-    for (p = nodes; p != NULL; p = p->tail)
+    for (p = nodes; p != NULL; p = p->tail)//遍历冲突图节点
         if (Live_gtemp(p->head) == t) return p->head;
     return NULL;
 }
@@ -245,7 +245,7 @@ static void addEdge(G_node nu, G_node nv) {
 static AS_instrList nodeMoves(Temp_temp t) {
     AS_instrList ml = (AS_instrList) Temp_lookPtr(c.moveList, t);
     //ml 相交（还未做好合并准备的指令+有可能合并的传送指令集合）
-    return instIntersect(ml, instUnion(c.activeMoves, c.worklistMoves));
+    return instIntersect(ml, instUnion(c.activeMoves, c.worklistMoves));//返回交集结果
 }
 
 //是否还有与temp相关的move指令？
@@ -262,9 +262,9 @@ static void makeWorkList() {//低度数的传送无关表，一般来说当一�
         c.initial = tempMinus(c.initial, L(t, NULL));
 
         if (G_degree(n) >= c.K) {
-            c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));//高读书的节点表
+            c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));//高读数的节点表
         } else if (moveRelated(t)) {
-            c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));//低度树的传送有关节点
+            c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));//低度数的传送有关节点
         } else {
             c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));//低度数的传送无关节点
         }
@@ -372,7 +372,7 @@ static void simplify() {
     if (c.simplifyWorklist == NULL) {//c.simplifyWorklist低度数的传送无关的节点表
         return;
     }
-
+//每次一个的从途中删除低度数的传送无关节点
     Temp_temp t = c.simplifyWorklist->head;
     G_node n = temp2Node(t);
     c.simplifyWorklist = c.simplifyWorklist->tail;
@@ -556,7 +556,10 @@ static void selectSpill() {
 
 static void colorMain() {
     makeWorkList();
-    do {
+//    c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));//高读数的节点表
+//c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));//低度数的传送有关节点
+//c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));//低度数的传送无关节点
+do {
         if (c.simplifyWorklist != NULL) {
             simplify();//简化过程
         } else if (c.worklistMoves != NULL) {
