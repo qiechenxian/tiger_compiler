@@ -66,7 +66,7 @@ static void doGlobal(FILE *outfile, F_fragList fragList){
             fprintf(outfile, "\t.global %s\n", name);
             fprintf(outfile, "\t.align  2\n");
             fprintf(outfile, "\t.type   %s, %%object\n", name);
-            fprintf(outfile, "\t.size   %s, %d\n", name, word_size);
+            fprintf(outfile, "\t.size   %s, %d\n", name, size);
             fprintf(outfile, "%s:\n", name);
             U_pairList init_iter = frag->u.global.init_values;
             for (; init_iter; init_iter = init_iter->tail){

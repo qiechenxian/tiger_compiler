@@ -29,6 +29,7 @@
 #include "errormsg.h"
 #include "ast.h"
 #include "symbol.h"
+#include "string.h"
 
 extern int yylex();
 extern int yylineno;
@@ -373,7 +374,12 @@ UnaryExp:
         $$ = A_CallExp(A_POS(@$), $1, (A_expList)U_reverseList($3));
     }
     | Ident L_PARENTHESIS R_PARENTHESIS{
-        $$ = A_CallExp(A_POS(@$), $1, NULL);
+        if (strcmp(S_getName($1), "starttime")==0||
+            strcmp(S_getName($1), "stoptime")==0){
+            $$ = A_CallExp(A_POS(@$), $1, A_ExpList(A_IntExp(A_POS(@$), yylineno), NULL));
+        }else{
+            $$ = A_CallExp(A_POS(@$), $1, NULL);
+        }
     }
     | UnaryOp UnaryExp {
         $$ = A_OpExp(A_POS(@$), A_IntExp(A_POS(@$),0), $1, $2)
