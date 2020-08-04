@@ -574,7 +574,7 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
                             AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
     struct COL_result ret;
 
-    c.precolored = initial;
+    c.precolored = initial;//预着色节点map
     c.initial = NULL;
     c.simplifyWorklist = NULL;
     c.freezeWorklist = NULL;
@@ -587,36 +587,36 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     c.coalescedMoves = NULL;
     c.constrainedMoves = NULL;
     c.frozenMoves = NULL;
-    c.worklistMoves = worklistMoves;
+    c.worklistMoves = worklistMoves;//所有的mov命令表
     c.activeMoves = NULL;
 
-    c.spillCost = spillCost;
-    c.moveList = moveList;
+    c.spillCost = spillCost;//temp------所有命令中defuse中含有temp的总和
+    c.moveList = moveList;//所有move命令构成的列表
     c.degree = G_empty();
     c.alias = G_empty();
-    c.nodes = ig;
+    c.nodes = ig;//冲突图
 
-    c.K = tempCount(regs);
+    c.K = tempCount(regs);//可用的寄存器个数
 
 
-    Temp_map precolored = initial;
-    Temp_map colors = Temp_layerMap(Temp_empty(), initial);
+    Temp_map precolored = initial;//预着色表
+    Temp_map colors = Temp_layerMap(Temp_empty(), initial);//将一个空表与与着色表连接
     Temp_tempList spilledNodes = NULL, coloredNodes = NULL;
-    G_nodeList nodes = G_nodes(ig);
+    G_nodeList nodes = G_nodes(ig);//冲突图首结点，冲突图中对应节点信息为temp的指针
     G_nodeList temps = NULL;
 
     G_nodeList nl;
-    for (nl = nodes; nl; nl = nl->tail) {
+    for (nl = nodes; nl; nl = nl->tail) {//遍历冲突图
 
-        long degree = G_degree(nl->head);
+        long degree = G_degree(nl->head);//degree为冲突边个数
 
-        G_enter(c.degree, nl->head, (void *) degree);
+        G_enter(c.degree, nl->head, (void *) degree);//c.degree为每个节点当前度数的数组
 
-        if (Temp_look(precolored, node2Temp(nl->head))) {
-            G_enter(c.degree, nl->head, (void *) 999);
+        if (Temp_look(precolored, node2Temp(nl->head))) {//node2Temp返回temp指针，指向命令中的temp位置
+            G_enter(c.degree, nl->head, (void *) 999);//预着色节点的度数设置为999
             continue;
         }
-        c.initial = L(node2Temp(nl->head), c.initial);
+        c.initial = L(node2Temp(nl->head), c.initial);////c.initial临时寄存器集合，既没有预着色也没有处理
     }
     colorMain();
 
