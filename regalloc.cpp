@@ -134,7 +134,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
     AS_instrList rewriteList;
     int tryNum = 0;
-    const int maxTryNum = 2;
+    const int maxTryNum = 2;//遍历一遍
     while (tryNum ++ < maxTryNum) {
         flow = FG_AssemFlowGraph(il, f);
 
@@ -192,11 +192,41 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
-
-                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
-
+                int local_offset=look_for_f_offset(temp,f);
+                if(local_offset==-999)
+                {
+                    sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
+                }
+                else
+                {
+                    sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", local_offset);
+                }
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), L(temp, NULL), L(F_FP(), NULL), NULL), rewriteList);
+                        AS_Oper(String(buf), L(F_R9(), NULL), L(F_FP(), NULL), NULL), rewriteList);
+                //ldr是放在inst use前面,替换inst src列表
+                if(inst->kind==AS_instr_::I_MOVE)
+                {
+                    Temp_tempList replace_list=inst->u.MOVE.src;
+                    if(replace_list!=NULL)
+                    {
+                        for(;replace_list;replace_list=replace_list->tail)
+                        {
+                            replace_list->head=F_R9();
+                        }
+                    }
+                }
+                else if(inst->kind==AS_instr_::I_OPER)
+                {
+                    Temp_tempList replace_list=inst->u.OPER.src;
+                    if(replace_list!=NULL)
+                    {
+                        for(;replace_list;replace_list=replace_list->tail)
+                        {
+                            replace_list->head=F_R9();
+                        }
+                    }
+                }
+
             }
 
             rewriteList = AS_InstrList(inst, rewriteList);
@@ -206,11 +236,42 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
-
-                sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
-
+                int local_offset=look_for_f_offset(temp,f);
+                if(local_offset==-999)
+                {
+                    sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
+                }
+                else
+                {
+                    sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", local_offset);
+                }
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), NULL, L(temp, L(F_FP(), NULL)), NULL), rewriteList);
+                        AS_Oper(String(buf), NULL, L(F_R9(), L(F_FP(), NULL)), NULL), rewriteList);
+                //str是放在inst dfe后面,替换dst列表
+                if(inst->kind==AS_instr_::I_MOVE)
+                {
+
+                    Temp_tempList replace_list=inst->u.MOVE.dst;
+                    if(replace_list!=NULL)
+                    {
+                        for(;replace_list;replace_list=replace_list->tail)
+                        {
+                            replace_list->head=F_R9();
+                        }
+                    }
+                }
+                else if(inst->kind==AS_instr_::I_OPER)
+                {
+                    Temp_tempList replace_list=inst->u.OPER.dst;
+                    if(replace_list!=NULL)
+                    {
+                        for(;replace_list;replace_list=replace_list->tail)
+                        {
+                            replace_list->head=F_R9();
+                        }
+                    }
+                }
+
             }
         }
 

@@ -8,7 +8,7 @@ typedef struct ctx COL_ctx;
 
 //机器的所有数据结构，
 struct ctx {
-    G_graph nodes;//图
+    G_graph nodes;//冲突图
     Temp_map precolored;//机器寄存器集合，每个都事先分配颜色
     Temp_tempList initial;//临时寄存器集合，既没有预着色也没有处理
     Temp_tempList spillWorklist;//高度数的节点表
@@ -82,12 +82,12 @@ static Temp_temp tempHead(Temp_tempList temps) {
 }
 
 //temp to node
-static G_node temp2Node(Temp_temp t) {
+static G_node temp2Node(Temp_temp t) {//
     if (t == NULL) return NULL;
     G_nodeList nodes = G_nodes(c.nodes);
     G_nodeList p;
-    for (p = nodes; p != NULL; p = p->tail)
-        if (Live_gtemp(p->head) == t) return p->head;
+    for (p = nodes; p != NULL; p = p->tail)//遍历冲突图节点
+        if (Live_gtemp(p->head) == t) return p->head;//返回冲突图中的temp节点
     return NULL;
 }
 
@@ -254,12 +254,12 @@ static bool moveRelated(Temp_temp t) {
 }
 
 //有可能合并的传送指令集合准备
-static void makeWorkList() {//低度数的传送无关表，一般来说当一个变量的冲突便小于K，K为当前使用的寄存器个个数
+static void makeWorkList() {//低度数的传送无关表，一般来说当一个变量的冲突边小于K时其放入低度数的冲突无关表，K为当前使用的寄存器个个数
     Temp_tempList tl;
-    for (tl = c.initial; tl; tl = tl->tail) {
+    for (tl = c.initial; tl; tl = tl->tail) {//遍历预着色节点
         Temp_temp t = tl->head;
-        G_node n = temp2Node(t);
-        c.initial = tempMinus(c.initial, L(t, NULL));
+        G_node n = temp2Node(t);//在冲突图中查找预着色节点
+        c.initial = tempMinus(c.initial, L(t, NULL));//预着色节点表=预着色节点表-temp t
 
         if (G_degree(n) >= c.K) {
             c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));
@@ -268,6 +268,9 @@ static void makeWorkList() {//低度数的传送无关表，一般来说当一�
         } else {
             c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
         }
+//        Temp_tempList spillWorklist;//高度数的节点表
+//        Temp_tempList freezeWorklist;//低度数的传送有关的节点表
+//        Temp_tempList simplifyWorklist;//低度数的传送无关的节点表
     }
 }
 
@@ -613,7 +616,7 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         G_enter(c.degree, nl->head, (void *) degree);//c.degree为每个节点当前度数的数组
 
         if (Temp_look(precolored, node2Temp(nl->head))) {//node2Temp返回temp指针，指向命令中的temp位置
-            G_enter(c.degree, nl->head, (void *) 999);//预着色节点的度数设置为999
+            G_enter(c.degree, nl->head, (void *) 999);//冲突图中的预着色节点的度数设置为999
             continue;
         }
         c.initial = L(node2Temp(nl->head), c.initial);////c.initial临时寄存器集合，既没有预着色也没有处理

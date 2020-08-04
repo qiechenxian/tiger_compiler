@@ -67,7 +67,7 @@ Temp_temp F_R1();
 Temp_temp F_R2();
 Temp_temp F_R3();
 Temp_temp F_R(c_string save);
-
+Temp_temp F_R9();
 void F_initRegisters(void);
 Temp_map F_initialRegisters(F_frame f);
 Temp_tempList F_callersaves(void);
@@ -85,4 +85,5 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
 Temp_label get_done_label(F_frame f_frame);
 int get_offset(F_access g_access);
 T_exp F_fp_address(F_access acc,int index);
+int look_for_f_offset(Temp_temp temp,F_frame f);
 #endif //COMPILER_LOYX_FRAME_H

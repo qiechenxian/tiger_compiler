@@ -143,7 +143,13 @@ Temp_temp F_R0()
     }
     return r0;
 }
-
+Temp_temp F_R9()
+{
+    if (r9 == nullptr) {
+        F_initRegisters();
+    }
+    return r9;
+}
 Temp_temp F_R1()
 {
     if (r1 == nullptr){
@@ -174,16 +180,16 @@ Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return /*Temp_TempList(r0,
+    return Temp_TempList(r0,
             Temp_TempList(r1,
-                    Temp_TempList(r2,
-                            Temp_TempList(r3,*/
+                          Temp_TempList(r2,
+                            Temp_TempList(r3,
                                     Temp_TempList(r4,
                                             Temp_TempList(r5,
                                                     Temp_TempList(r6,
                                                             Temp_TempList(r7,
-                                                                    Temp_TempList(r8,
-                                                                            Temp_TempList(r9,NULL))))));//))));
+                                                                    Temp_TempList(r8,NULL)))))))));
+                                                                            //Temp_TempList(r9,NULL))))))))));
 }
 
 //TODO 调用者保护寄存器
@@ -232,7 +238,7 @@ struct F_frame_ {
 /** function prototype */
 static F_access InFrame(int offset);
 
-static F_access InReg(Temp_temp reg);
+static F_access InReg(Temp_temp reg,int temp);
 
 static F_accessList F_AccessList(F_access head, F_accessList tail);
 
@@ -307,9 +313,9 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     int args_inFrame_cnt = 1;
     for (U_boolList iter = formals; iter; iter = iter->tail) {
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K && (iter->head == false) && false) {//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
-            access = InReg(Temp_newTemp());
-            args_inReg_cnt++;
+        if (false) {//传参暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
+            //access = InReg(Temp_newTemp());
+            //args_inReg_cnt++;
         } else {
             access = InFrame(args_inFrame_cnt++ * F_WORD_SIZE);
         }
@@ -375,15 +381,15 @@ Temp_temp F_accessReg(F_access a) {
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
-    if (0) {
-        F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
-        frame->locals = F_AccessList(access, frame->locals);
-        return access;
-    } else {
+//    if (0) {
+//        F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
+//        frame->locals = F_AccessList(access, frame->locals);
+//        return access;
+//    } else {
         F_access access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
         frame->locals = F_AccessList(access, frame->locals);
         return access;
-    }
+    //}
 }
 
 F_access F_allocGlobal(S_symbol global) {
@@ -632,4 +638,17 @@ void F_setMemArgs(F_frame frame)
     if (3 > frame->callee_max_args){
         frame->callee_max_args = 3;
     }
+}
+int look_for_f_offset(Temp_temp temp,F_frame f)
+{
+    int number_temp=Temp_number(temp);
+    F_accessList temp_access=f->locals;
+    for(;temp_access;temp_access=temp_access->tail)
+    {
+        if(Temp_number(temp_access->head->u.reg)==number_temp)
+        {
+            return temp_access->head->u.offset;//返回局部变量offsset
+        }
+    }
+    return -999;//未找到返回-999
 }
