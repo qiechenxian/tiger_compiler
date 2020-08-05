@@ -113,14 +113,16 @@ static G_node getAlias(G_node n, G_table aliases, Temp_tempList coalescedNodes) 
 static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
                              G_table aliases, Temp_tempList cn) {
     Temp_tempList al = NULL;
+    Temp_tempList bl = NULL;
     for (; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
         G_node n = temp2Node(t, ig);
         G_node alias = getAlias(n, aliases, cn);
         t = node2Temp(n);
         al = L(t, al);
+        bl = L(node2Temp(alias), bl);
     }
-    return tempUnion(al, NULL);
+    return tempUnion(al, bl);
 }
 
 struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
@@ -137,15 +139,15 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     while (++tryNum < 7) {
         flow = FG_AssemFlowGraph(il, f);
 
-#if 1
+        #if 0
         G_show(stderr, G_nodes(flow), printInst);
-#endif
+        #endif
 
         live = Live_liveness(flow);
 
-#if 0
+        #if 1
         G_show(stderr, G_nodes(live.graph), printTemp);
-#endif
+        #endif
 
         initial = F_initialRegisters(f);
 
@@ -217,7 +219,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     }
 
     if (col.spills != NULL) {
-//        EM_error(0, "fail to allocate registers");
+        EM_error(0, "fail to allocate registers");
     }
 
     if (col.coalescedMoves != NULL) {

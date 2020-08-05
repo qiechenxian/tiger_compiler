@@ -540,8 +540,8 @@ static void selectSpill() {
     Temp_temp m = NULL;
     for (; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
-        long cost = (long long) Temp_lookPtr(c.spillCost, t);
-        long degree = (long long) G_look(c.degree, temp2Node(t));
+        auto cost = (long long) Temp_lookPtr(c.spillCost, t);
+        auto degree = (long long) G_look(c.degree, temp2Node(t));
         degree = (degree > 0) ? degree : 1;
         float priority = ((float) cost) / degree;
         if (priority < minSpillPriority) {
@@ -626,6 +626,8 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     //   }
     //   c.selectStack = L(node2Temp(nl->head), c.selectStack);
     // }
+
+    c.selectStack = Temp_reverseList(c.selectStack);
 
     while (c.selectStack != NULL) {
         Temp_temp t = c.selectStack->head; // pop
