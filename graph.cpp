@@ -31,6 +31,19 @@ G_graph G_Graph(void) {
     return g;
 }
 
+void G_Graph_free(G_graph graph)
+{
+    G_nodeList l = graph->mynodes;
+    G_nodeList nl;
+    for (; l;) {
+        nl = l;
+        l = l->tail;
+        free(nl);
+    }
+
+    free(graph);
+}
+
 G_nodeList G_NodeList(G_node head, G_nodeList tail) {
     G_nodeList n = (G_nodeList) checked_malloc(sizeof *n);
     n->head = head;
@@ -173,4 +186,9 @@ void G_enter(G_table t, G_node node, void *value) {
 
 void *G_look(G_table t, G_node node) {
     return TAB_look(t, node);
+}
+
+void G_free(G_table table)
+{
+    TAB_free(table);
 }

@@ -144,6 +144,8 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
         live = Live_liveness(flow);
 
+        G_Graph_free(flow);
+
 #if 0
         G_show(stderr, G_nodes(live.graph), printTemp);
 #endif
@@ -341,6 +343,8 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
         il = reverseInstrList(rewriteList);
     }
+
+    G_Graph_free(live.graph);
 
     if (col.spills != NULL) {
 //        EM_error(0, "fail to allocate registers");

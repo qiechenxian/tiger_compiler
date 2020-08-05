@@ -388,5 +388,8 @@ struct Live_graph Live_liveness(G_graph flow) {//生成冲突图和节点偶对�
     struct Live_graph lg;
     solveLiveness(&lg, flow, in, out);
 
+    G_free(in);
+    G_free(out);
+
     return lg;
 }

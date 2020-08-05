@@ -20,6 +20,8 @@ struct G_nodeList_ {
 /* 创建新的图 */
 G_graph G_Graph(void);
 
+void G_Graph_free(G_graph graph);
+
 /* 创建新的图节点 */
 G_node G_Node(G_graph g, void *info);
 
@@ -73,5 +75,7 @@ void G_enter(G_table t, G_node node, void *value);
 
 /* 在表t中查找node->value */
 void *G_look(G_table t, G_node node);
+
+void G_free(G_table table);
 
 #endif //COMPILER_GRAPH_H
