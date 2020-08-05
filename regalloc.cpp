@@ -134,7 +134,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
     AS_instrList rewriteList;
     int tryNum = 0;
-    const int maxTryNum = 2;//遍历一遍
+    const int maxTryNum = 1;//遍历一遍
     while (tryNum ++ < maxTryNum) {
         flow = FG_AssemFlowGraph(il, f);
 
@@ -211,7 +211,11 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                     {
                         for(;replace_list;replace_list=replace_list->tail)
                         {
-                            replace_list->head=F_R9();
+                            if(replace_list->head==temp)
+                            {
+                                replace_list->head=F_R9();
+                            }
+
                         }
                     }
                 }
@@ -222,7 +226,10 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                     {
                         for(;replace_list;replace_list=replace_list->tail)
                         {
-                            replace_list->head=F_R9();
+                            if(replace_list->head==temp)
+                            {
+                                replace_list->head=F_R9();
+                            }
                         }
                     }
                 }
@@ -256,7 +263,10 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                     {
                         for(;replace_list;replace_list=replace_list->tail)
                         {
-                            replace_list->head=F_R9();
+                            if(replace_list->head==temp)
+                            {
+                                replace_list->head=F_R9();
+                            }
                         }
                     }
                 }
@@ -267,7 +277,10 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                     {
                         for(;replace_list;replace_list=replace_list->tail)
                         {
-                            replace_list->head=F_R9();
+                            if(replace_list->head==temp)
+                            {
+                                replace_list->head=F_R9();
+                            }
                         }
                     }
                 }

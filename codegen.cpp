@@ -212,8 +212,8 @@ static Temp_temp munchExp(T_exp e) {
                 } else {
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                    sprintf(inst2,"\tadd     'd0, 's0, 'd0\n");
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                    sprintf(inst2,"\tadd     'd0, 's0, 's1\n");
+                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r,NULL)),NULL));
                 }
                 return r;
             } else if (e->u.BINOP.op == T_add && e->u.BINOP.left->kind == T_exp_::T_CONST) {
@@ -227,8 +227,8 @@ static Temp_temp munchExp(T_exp e) {
                 } else {
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                    sprintf(inst2,"\tadd     'd0, 's0, 'd0\n"); //??不懂
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                    sprintf(inst2,"\tadd     'd0, 's0, 's1\n"); //??不懂
+                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r,NULL)),NULL));
                 }
                 return r;
             } else if (e->u.BINOP.op == T_sub && e->u.BINOP.right->kind == T_exp_::T_CONST) {
@@ -242,8 +242,8 @@ static Temp_temp munchExp(T_exp e) {
                 } else {
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                    sprintf(inst2,"\tsub     'd0, 's0, 'd1\n");
-                    emit(AS_Oper(inst2,L(r,L(r,NULL)),L(munchExp(e1),NULL),NULL));
+                    sprintf(inst2,"\tsub     'd0, 's0, 's1\n");
+                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r,NULL)),NULL));
                 }
 //                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
 //                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
@@ -361,7 +361,7 @@ static Temp_temp munchExp(T_exp e) {
             Temp_temp r = Temp_newTemp();
             if(constExpr(i)){
                 sprintf(inst, "\tmov     'd0, #%d\n", i);
-                emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+                emit(AS_Oper(inst, L(r, NULL), NULL,NULL));
             }
             else{
                 sprintf(inst, "\tldr     'd0, =%d\n", i);
