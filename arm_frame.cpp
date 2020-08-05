@@ -404,15 +404,15 @@ Temp_temp F_accessReg(F_access a) {
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
-//    if (0) {
-//        F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
-//        frame->locals = F_AccessList(access, frame->locals);
-//        return access;
-//    } else {
-        F_access access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
-        frame->locals = F_AccessList(access, frame->locals);
-        return access;
-    //}
+#ifdef LOCAL_VAR_TEMP
+    F_access access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
+    frame->locals = F_AccessList(access, frame->locals);
+    return access;
+#else
+    F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
+    frame->locals = F_AccessList(access, frame->locals);
+    return access;
+#endif
 }
 
 F_access F_allocGlobal(S_symbol global) {

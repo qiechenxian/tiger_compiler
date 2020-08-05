@@ -166,7 +166,6 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         Temp_tempList tl, new_spilled = NULL;
         AS_instrList inst_move;
 
-
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
 
@@ -176,11 +175,16 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
             new_spilled = Temp_TempList(tl->head, new_spilled);
 
-            F_access local = look_for_f_offset(tl->head, f);
+            F_access local = NULL;
+#ifdef LOCAL_VAR_TEMP
+            local = look_for_f_offset(tl->head, f);
+#endif
             if(NULL == local) {
                 local = F_allocLocal(f, true, 1);
             }
             TAB_enter(spilledLocal, tl->head, local);
+
+            Temp_tempList inst_move_list = NULL, loop_move_temp;
 
             // 查看合并的Move指令是否包含有溢出的临时变量
             for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
@@ -188,12 +192,15 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 Temp_tempList src = inst_move->head->u.MOVE.src;
                 Temp_tempList dst = inst_move->head->u.MOVE.dst;
                 if(src->head == tl->head) {
-                    new_spilled = Temp_TempList(dst->head, new_spilled);
-                    TAB_enter(spilledLocal, dst->head, local);
+                    inst_move_list = Temp_TempList(dst->head, new_spilled);
                 } else if(dst->head == tl->head) {
-                    new_spilled = Temp_TempList(src->head, new_spilled);
-                    TAB_enter(spilledLocal, src->head, local);
+                    inst_move_list = Temp_TempList(src->head, new_spilled);
                 }
+            }
+
+            for (loop_move_temp = inst_move_list; loop_move_temp; loop_move_temp = loop_move_temp->tail) {
+                new_spilled = Temp_TempList(loop_move_temp->head, new_spilled);
+                TAB_enter(spilledLocal, loop_move_temp->head, local);
             }
         }
 
