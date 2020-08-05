@@ -8,7 +8,7 @@ typedef struct ctx COL_ctx;
 
 //机器的所有数据结构，
 struct ctx {
-    G_graph nodes;//图
+    G_graph nodes;//冲突图
     Temp_map precolored;//机器寄存器集合，每个都事先分配颜色
     Temp_tempList initial;//临时寄存器集合，既没有预着色也没有处理
     Temp_tempList spillWorklist;//高度数的节点表
@@ -30,7 +30,7 @@ struct ctx {
     G_table alias;//当传送指令(u,v)被合并，并且v放入已合并节点集合，则alias(v)=u
     G_table degree;//每个节点当前度数的数组
 
-    int K;//颜色数目
+    int K;//颜色数目，可用的寄存器个数
 };
 
 static COL_ctx c;
@@ -82,12 +82,12 @@ static Temp_temp tempHead(Temp_tempList temps) {
 }
 
 //temp to node
-static G_node temp2Node(Temp_temp t) {
+static G_node temp2Node(Temp_temp t) {//
     if (t == NULL) return NULL;
     G_nodeList nodes = G_nodes(c.nodes);
     G_nodeList p;
-    for (p = nodes; p != NULL; p = p->tail)
-        if (Live_gtemp(p->head) == t) return p->head;
+    for (p = nodes; p != NULL; p = p->tail)//遍历冲突图节点
+        if (Live_gtemp(p->head) == t) return p->head;//返回冲突图中的temp节点
     return NULL;
 }
 
@@ -254,12 +254,12 @@ static bool moveRelated(Temp_temp t) {
 }
 
 //有可能合并的传送指令集合准备
-static void makeWorkList() {
+static void makeWorkList() {//低度数的传送无关表，一般来说当一个变量的冲突边小于K时其放入低度数的冲突无关表，K为当前使用的寄存器个个数
     Temp_tempList tl;
-    for (tl = c.initial; tl; tl = tl->tail) {
+    for (tl = c.initial; tl; tl = tl->tail) {//遍历预着色节点
         Temp_temp t = tl->head;
-        G_node n = temp2Node(t);
-        c.initial = tempMinus(c.initial, L(t, NULL));
+        G_node n = temp2Node(t);//在冲突图中查找预着色节点
+        c.initial = tempMinus(c.initial, L(t, NULL));//预着色节点表=预着色节点表-temp t
 
         if (G_degree(n) >= c.K) {
             c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));
@@ -268,6 +268,9 @@ static void makeWorkList() {
         } else {
             c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
         }
+//        Temp_tempList spillWorklist;//高度数的节点表
+//        Temp_tempList freezeWorklist;//低度数的传送有关的节点表
+//        Temp_tempList simplifyWorklist;//低度数的传送无关的节点表
     }
 }
 
@@ -367,9 +370,9 @@ static G_node getAlias(G_node n) {
     }
 }
 
-//简化（第二步）
+//简化（第二步）第一步的冲突图构建由solve_liveness解决
 static void simplify() {
-    if (c.simplifyWorklist == NULL) {
+    if (c.simplifyWorklist == NULL) {//c.simplifyWorklist低度数的传送无关的节点表
         return;
     }
 
@@ -426,7 +429,7 @@ static void combine(Temp_temp u, Temp_temp v) {
 }
 
 //合并，进行保守的合并，（第三步）
-static void coalesce() {
+static void coalesce() {//错误注释语句信息的定位
     if (c.worklistMoves == NULL) {
         return;
     }
@@ -558,7 +561,7 @@ static void colorMain() {
     makeWorkList();
     do {
         if (c.simplifyWorklist != NULL) {
-            simplify();
+            simplify();//简化过程
         } else if (c.worklistMoves != NULL) {
             coalesce();
         } else if (c.freezeWorklist != NULL) {
@@ -574,7 +577,7 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
                             AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
     struct COL_result ret;
 
-    c.precolored = initial;
+    c.precolored = initial;//预着色节点map
     c.initial = NULL;
     c.simplifyWorklist = NULL;
     c.freezeWorklist = NULL;
@@ -587,38 +590,38 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     c.coalescedMoves = NULL;
     c.constrainedMoves = NULL;
     c.frozenMoves = NULL;
-    c.worklistMoves = worklistMoves;
+    c.worklistMoves = worklistMoves;//所有的mov命令表
     c.activeMoves = NULL;
 
-    c.spillCost = spillCost;
-    c.moveList = moveList;
+    c.spillCost = spillCost;//temp------所有命令中defuse中含有temp的总和
+    c.moveList = moveList;//所有move命令构成的列表
     c.degree = G_empty();
     c.alias = G_empty();
-    c.nodes = ig;
+    c.nodes = ig;//冲突图
 
-    c.K = tempCount(regs);
+    c.K = tempCount(regs);//可用的寄存器个数
 
 
-    Temp_map precolored = initial;
-    Temp_map colors = Temp_layerMap(Temp_empty(), initial);
+    Temp_map precolored = initial;//预着色表
+    Temp_map colors = Temp_layerMap(Temp_empty(), initial);//将一个空表与与着色表连接
     Temp_tempList spilledNodes = NULL, coloredNodes = NULL;
-    G_nodeList nodes = G_nodes(ig);
+    G_nodeList nodes = G_nodes(ig);//冲突图首结点，冲突图中对应节点信息为temp的指针
     G_nodeList temps = NULL;
 
     G_nodeList nl;
-    for (nl = nodes; nl; nl = nl->tail) {
+    for (nl = nodes; nl; nl = nl->tail) {//遍历冲突图
 
-        long degree = G_degree(nl->head);
+        long degree = G_degree(nl->head);//degree为冲突边个数
 
-        G_enter(c.degree, nl->head, (void *) degree);
+        G_enter(c.degree, nl->head, (void *) degree);//c.degree为每个节点当前度数的数组
 
-        if (Temp_look(precolored, node2Temp(nl->head))) {
-            G_enter(c.degree, nl->head, (void *) 999);
+        if (Temp_look(precolored, node2Temp(nl->head))) {//node2Temp返回temp指针，指向命令中的temp位置
+            G_enter(c.degree, nl->head, (void *) 999);//冲突图中的预着色节点的度数设置为999
             continue;
         }
-        c.initial = L(node2Temp(nl->head), c.initial);
+        c.initial = L(node2Temp(nl->head), c.initial);////c.initial临时寄存器集合，既没有预着色也没有处理
     }
-    colorMain();
+    colorMain();//开始着色
 
     // for (nl = nodes; nl; nl = nl->tail) {
     //   if (Temp_look(precolored, node2Temp(nl->head))) {

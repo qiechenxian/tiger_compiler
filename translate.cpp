@@ -4,6 +4,7 @@
 
 #include "translate.h"
 
+extern bool OptionalLeveL2; /// -O2选项的全局flag
 
 /**
  * typedefs
@@ -80,6 +81,18 @@ static Tr_exp Tr_Ex(T_exp exp){
     ex->u.ex = exp;
     return ex;
 }
+
+static Tr_exp Tr_Temp(Temp_temp temp){
+    T_exp p = (T_exp)checked_malloc(sizeof *p);
+    p->kind = T_exp_::T_TEMP;
+    p->u.TEMP = temp;
+
+    Tr_exp ex = (Tr_exp)checked_malloc(sizeof(*ex));
+    ex->kind = Tr_exp_::Tr_ex;
+    ex->u.ex = p;
+    return ex;
+}
+
 Tr_exp Tr_Nx(T_stm stm){
     Tr_exp nx = (Tr_exp)checked_malloc(sizeof(*nx));
     nx->kind = Tr_exp_::Tr_nx;
@@ -292,13 +305,57 @@ Tr_exp Tr_simpleVarNoMem(Tr_access acc)
  * @return 不为T_MEM的翻译
  */
 {
-    T_exp acc_with_mem = F_Exp(acc, T_Temp(F_FP()));
-    assert(acc_with_mem->kind == T_exp_::T_MEM);
-    return Tr_Ex(acc_with_mem->u.MEM);
+    T_exp acc_temp;
+
+    if(F_accessIsReg(acc)) {
+        acc_temp = F_Exp(acc, NULL);
+    } else {
+        acc_temp = F_Exp(acc, T_Temp(F_FP()));
+    }
+
+    if(acc_temp->kind == T_exp_::T_TEMP) {
+        return Tr_Temp(acc_temp->u.TEMP);
+    }
+
+    assert(acc_temp->kind == T_exp_::T_MEM);
+    return Tr_Ex(acc_temp->u.MEM);
 }
 
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 {
+    T_exp offset_exp = Tr_unEx(offset);
+    if (offset_exp->kind == T_exp_::T_CONST){
+        T_exp base_exp = Tr_unEx(base);
+
+        if (base_exp->kind == T_exp_::T_BINOP or
+        (base_exp->kind == T_exp_::T_MEM and
+        base_exp->u.MEM->kind == T_exp_::T_BINOP)){
+            if (base_exp->kind == T_exp_::T_MEM){
+                base_exp = base_exp->u.MEM;
+            }
+            assert(base_exp->kind == T_exp_::T_BINOP);
+            assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+            if (base_exp->u.BINOP.right->u.CONST < 0){
+                return Tr_Ex(T_Mem(
+                        T_Binop(
+                                T_add, base_exp->u.BINOP.left,
+                                T_Const(base_exp->u.BINOP.right->u.CONST+offset_exp->u.CONST * dimension * get_word_size())
+                        )
+                ));
+            } else{
+                return Tr_Ex(T_Mem(T_Binop(
+                        T_add, T_Mem(base_exp),
+                        T_Const(offset_exp->u.CONST * dimension * get_word_size())
+                )));
+            }
+
+        } else{
+            return Tr_Ex(T_Mem(T_Binop(
+                    T_add, base_exp,
+                    T_Const(offset_exp->u.CONST * dimension * get_word_size())
+                    )));
+        }
+    }
     return Tr_Ex(T_Mem(
             T_Binop(T_add,Tr_unEx(base),
                     T_Binop(T_mul, Tr_unEx(offset), T_Const(get_word_size()*dimension))
@@ -307,6 +364,35 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 
 Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
 {
+    T_exp offset_exp = Tr_unEx(offset);
+    if (offset_exp->kind == T_exp_::T_CONST){
+        T_exp base_exp = Tr_unEx(base);
+
+        if (base_exp->kind == T_exp_::T_BINOP or
+            (base_exp->kind == T_exp_::T_MEM and base_exp->u.MEM->kind == T_exp_::T_BINOP)){
+            if (base_exp->kind == T_exp_::T_MEM){
+                base_exp = base_exp->u.MEM;
+            }
+            assert(base_exp->kind == T_exp_::T_BINOP);
+            assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+            if (base_exp->u.BINOP.right->u.CONST < 0){
+                return Tr_Ex(T_Binop(
+                        T_add, base_exp->u.BINOP.left,
+                        T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
+                ));
+            } else{
+                return Tr_Ex(T_Binop(
+                        T_add, T_Mem(base_exp),
+                        T_Const(offset_exp->u.CONST*dimension*get_word_size())
+                ));
+            }
+        } else{
+            return Tr_Ex(T_Binop(
+                    T_add, base_exp,
+                    T_Const(offset_exp->u.CONST*dimension*get_word_size())
+                    ));
+        }
+    }
     return Tr_Ex(T_Binop(
             T_add,
             Tr_unEx(base),

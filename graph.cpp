@@ -5,6 +5,7 @@
 #include "util.h"
 #include "errormsg.h"
 #include "graph.h"
+#include "temp.h"
 
 
 struct G_graph_ {
@@ -17,6 +18,8 @@ struct G_node_ {
     int mykey;
     G_nodeList succs;
     G_nodeList preds;
+    Temp_tempList in;
+    Temp_tempList out;
     void *info;
 };
 
@@ -26,6 +29,19 @@ G_graph G_Graph(void) {
     g->mynodes = NULL;
     g->mylast = NULL;
     return g;
+}
+
+void G_Graph_free(G_graph graph)
+{
+    G_nodeList l = graph->mynodes;
+    G_nodeList nl;
+    for (; l;) {
+        nl = l;
+        l = l->tail;
+        free(nl);
+    }
+
+    free(graph);
 }
 
 G_nodeList G_NodeList(G_node head, G_nodeList tail) {
@@ -170,4 +186,9 @@ void G_enter(G_table t, G_node node, void *value) {
 
 void *G_look(G_table t, G_node node) {
     return TAB_look(t, node);
+}
+
+void G_free(G_table table)
+{
+    TAB_free(table);
 }

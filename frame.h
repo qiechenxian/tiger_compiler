@@ -20,10 +20,10 @@ typedef struct F_frame_* F_frame;
 typedef struct F_accessList_ *F_accessList;
 struct F_accessList_{F_access head; F_accessList tail;};
 static F_accessList F_AccessList(F_access head, F_accessList tail);
-
 int F_accessOffset(F_access a);
 void F_setMemArgs(F_frame frame);
 Temp_temp F_accessReg(F_access a);
+bool F_accessIsReg(F_access a);
 
 void F_setFrameCalleeArgs(F_frame frame, int callee_args);
 F_frame F_newFrame(Temp_label name, U_boolList formals);
@@ -69,8 +69,9 @@ Temp_temp F_R0();
 Temp_temp F_R1();
 Temp_temp F_R2();
 Temp_temp F_R3();
-Temp_temp F_R(c_string save);
-
+Temp_temp F_R8();
+Temp_temp F_R9();
+Temp_temp F_R10();
 void F_initRegisters(void);
 Temp_map F_initialRegisters(F_frame f);
 Temp_tempList F_callersaves(void);
@@ -88,4 +89,8 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
 Temp_label get_done_label(F_frame f_frame);
 int get_offset(F_access g_access);
 T_exp F_fp_address(F_access acc,int index);
+F_access look_for_f_offset(Temp_temp temp,F_frame f);
+
+//#define LOCAL_VAR_TEMP
+
 #endif //COMPILER_LOYX_FRAME_H

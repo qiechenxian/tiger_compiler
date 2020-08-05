@@ -93,6 +93,7 @@ extern FILE *yyout;
 extern char *yytext;
 
 extern int yyparse();
+bool OptionalLeveL2 = false; /// -O2选项的全局flag
 
 
 
@@ -110,9 +111,9 @@ int main(int argc, char **argv) {
                 break;
             case 'O':
                 if (*optarg == '2') {
-                    // todo O2
+                    OptionalLeveL2 = true;
                 } else {
-                    // todo O0
+                    OptionalLeveL2 = false;
                 }
                 break;
             default:

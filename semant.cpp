@@ -302,14 +302,15 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                 //将init_list中的A_EXP转换为中间代码形式并保存
                 auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-                init_list_tr->array_length=init_list->array.size();
+                init_list_tr->array_length=init_list->array.size()-1;
                 init_list_tr->array=(Tr_exp*)checked_malloc(init_list_tr->array_length*sizeof(Tr_exp));
                 init_list_tr->init_offset=(int*)checked_malloc(init_list_tr->array_length*sizeof(int));
                 int cnt = 0;
-                for (auto & iter : init_list->array){
-                    struct expty temp = transExp(venv, tenv, iter.second, l_break, l_continue);
+//                for (auto & iter : init_list->array){
+                for (auto iter = init_list->array.begin(); iter+1!=init_list->array.end(); iter++){
+                    struct expty temp = transExp(venv, tenv, iter->second, l_break, l_continue);
                     init_list_tr->array[cnt] = temp.exp;
-                    init_list_tr->init_offset[cnt] = iter.first;
+                    init_list_tr->init_offset[cnt] = iter->first;
                     cnt++;
                 }
                 assert(cnt == init_list_tr->array_length);
