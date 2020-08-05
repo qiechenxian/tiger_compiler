@@ -427,6 +427,28 @@ static char *funcName(c_string labelString) {
     return labelString;
 }
 
+#define CALL_SAVE 0
+#define CALL_LOAD 1
+
+static void doCallerReg(int args, int type){
+    int word_size = get_word_size();
+    Temp_temp* callerArray = F_getCallerArray();
+//    if (args > 4)
+//        args = 4;
+    args = 4;
+    for (int i = 0; i < args; i++){
+        if (type == CALL_SAVE){
+            char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
+            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, NULL, L(callerArray[i], L(F_FP(), NULL)), NULL));
+        }else{
+            char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
+            sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), F_callersaves()), NULL));
+        }
+    }
+}
+
 /*
  * 使用的指令包括
  */
@@ -518,6 +540,7 @@ static void munchStm(T_stm s) {
                         T_expList args = src->u.CALL.args;
                         T_expList temp_args = args;
                         args_count = 0;//用于计算参数个数，静态栈帧不能直接stmfd
+                        /// 提前分配一段保存空间
                         Temp_temp t = dst->u.TEMP;
                         bool special_tag = false;
                         count_func_param = 0;
@@ -528,35 +551,18 @@ static void munchStm(T_stm s) {
                                 temp_args = temp_args->tail;
                             }
                         }
+                        if (special_tag)
+                            doCallerReg(args_count, CALL_SAVE);
                         Temp_tempList l = munchArgs(special_tag, 0, args);
-                        Temp_tempList calldefs = NULL; // TODO
+                        Temp_tempList calldefs = F_callersaves();
+//                        Temp_tempList calldefs = NULL;
                         //TODO 函数调用测试能否正确传参
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
-                        emit(AS_Oper(inst, L(F_LR(), calldefs), NULL, AS_Targets(Temp_LabelList(lab, NULL))));
-                       // if (special_tag == true) {
-                       //     count_func_param = count_func_param - 2;
-                       //     if (count_func_param >= 0) {
-                       //         sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                       //         emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
-                       //     }
-                       //     count_func_param--;
-                       //     if (count_func_param >= 0) {
-                       //         sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                       //         emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
-                       //     }
-                       //     count_func_param--;
-                       //     if (count_func_param >= 0) {
-                       //         sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                       //         emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
-                       //     }
-                       //     count_func_param--;
-                       //     if (count_func_param >= 0) {
-                       //         sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                       //        emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
-                       //     }
-                       // }
+                        emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
                         sprintf(inst2, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst2, L(t, NULL), L(F_RV(), NULL)));
+                        emit(AS_Move(inst2, L(t, NULL), L(F_RV(), F_callersaves())));
+                        if (special_tag)
+                            doCallerReg(args_count, CALL_LOAD);
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
                         T_exp e1 = src->u.CALL.fun;
@@ -623,13 +629,16 @@ static void munchStm(T_stm s) {
                             temp_args = temp_args->tail;
                         }
                     }
+                    if (special_tag)
+                        doCallerReg(args_count, CALL_SAVE);
                     Temp_tempList l = munchArgs(special_tag, 0, args);
-                    Temp_tempList calldefs = NULL; // TODO
+                    Temp_tempList calldefs = F_callersaves();
                     // 函数调用？
 //                    sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
-                    // 函数对应对于变量活跃性分析的时候，参数前面已经设置到栈中，与bl指令无关
-                    emit(AS_Oper(inst, calldefs, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
+                    emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
+                    if (special_tag)
+                        doCallerReg(args_count, CALL_LOAD);
                     //if (special_tag == true) {
                     //    count_func_param = count_func_param - 2;
                     //    if (count_func_param >= 0) {
@@ -785,7 +794,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
             else
                 sprintf(inst, "\tstr     's0, ['s1]\n");
 
-            emit(AS_Oper(inst, NULL, L(r, L(F_SP(), NULL)), NULL));
+            emit(AS_Oper(inst, NULL, L(r, L(F_SP(), F_callersaves())), NULL));
             Temp_tempList old = munchArgs(true, i + 1, args->tail);
             return Temp_TempList(r, old);
         } else if (args_count >= 0) {
@@ -795,7 +804,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R0(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R0(), NULL), L(r, NULL)));
+                    emit(AS_Move(inst, L(F_R0(), NULL),L(r, F_callersaves())));
                     break;
                 }
                 case 1: {
@@ -803,7 +812,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R1(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R1(), NULL), L(r, NULL)));
+                    emit(AS_Move(inst, L(F_R1(), NULL), L(r, F_callersaves())));
                     break;
                 }
                 case 2: {
@@ -811,7 +820,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R2(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R2(), NULL), L(r, NULL)));
+                    emit(AS_Move(inst, L(F_R2(), NULL), L(r, F_callersaves())));
                     break;
                 }
                 case 3: {
@@ -819,7 +828,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R3(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R3(), NULL), L(r, NULL)));
+                    emit(AS_Move(inst, L(F_R3(), NULL), L(r, F_callersaves())));
                     break;
                 }
             }
@@ -841,13 +850,17 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 //    sprintf(inst, "\tstmfd   sp!, {r0-r1}\n");//保护现场
 //    emit(AS_Oper(inst, NULL, NULL, NULL));
 
+//    Temp_temp* callerReg = F_getCallerArray();
+//    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
+    doCallerReg(2, CALL_SAVE);
+
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
-    emit(AS_Move(inst2, L(F_R0(), NULL), L(reg1, NULL)));
+    emit(AS_Move(inst2, L(F_R0(), NULL), L(reg1, F_callersaves())));
 
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst3, "\tmov     'd0, 's0\n");//传递操作数reg2->r1
-    emit(AS_Move(inst3, L(F_R1(), NULL), L(reg2, NULL)));
+    emit(AS_Move(inst3, L(F_R1(), NULL), L(reg2, F_callersaves())));
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
@@ -855,14 +868,18 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     if (strcmp(fun, "__aeabi_idiv") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), NULL)));
+        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves())));
+//        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves()), NULL));
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), NULL)));
+        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves())));
+//        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves()), NULL));
     } else {
         assert("error from call_lib in codegen.cpp ");
     }
+
+    doCallerReg(2, CALL_LOAD);
 //    char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
 //    sprintf(inst6, "\tldmfd   sp!,{r0-r1}\n");//恢复现场
 //    emit(AS_Oper(inst6, NULL, NULL, NULL));
