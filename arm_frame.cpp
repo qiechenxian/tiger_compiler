@@ -371,6 +371,10 @@ int F_accessOffset(F_access a) {
     return a->u.offset;
 }
 
+bool F_accessIsReg(F_access a) {
+    return a->kind == F_access_::inReg;
+}
+
 Temp_temp F_accessReg(F_access a) {
     if (a->kind != F_access_::inReg) {
         EM_error(0, "Reg of a frame access is invalid");
