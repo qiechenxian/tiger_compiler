@@ -153,8 +153,12 @@ int look_for_tag(Temp_temp t_temp,tag_list list)
 {
     for(;list;list=list->tail)
     {
-
+        if(Temp_number(list->head->temp)==Temp_number(t_temp))
+        {
+            return list->head->tag_number;
+        }
     }
+    printf("not found tag");
 }
 struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 //your code here.
@@ -215,7 +219,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             }
             TAB_enter(spilledLocal, tl->head, local);
 
-            Temp_tempList inst_move_list = NULL, loop_move_temp;
+            tag_list inst_move_list = NULL, loop_move_temp;
             Temp_tempList tag_list2temp_list= change(new_spilled);
             // 查看合并的Move指令是否包含有溢出的临时变量
             for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
@@ -223,7 +227,10 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 Temp_tempList src = inst_move->head->u.MOVE.src;
                 Temp_tempList dst = inst_move->head->u.MOVE.dst;
                 if(src->head == tl->head) {
+                    int tag=look_for_tag(dst->head,new_spilled);
+                    tag_temp new_temp=new_tag_temp(dst->head,tag);
                     inst_move_list = Temp_TempList(dst->head, new_spilled);
+
                 } else if(dst->head == tl->head) {
                     inst_move_list = Temp_TempList(src->head, new_spilled);
                 }
