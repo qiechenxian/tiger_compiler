@@ -178,7 +178,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
             F_access local = look_for_f_offset(tl->head, f);
             if(NULL == local) {
-                local = F_allocLocal(f, true, get_word_size());
+                local = F_allocLocal(f, true, 1);
             }
             TAB_enter(spilledLocal, tl->head, local);
 
