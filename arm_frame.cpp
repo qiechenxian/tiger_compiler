@@ -181,9 +181,9 @@ Temp_tempList F_registers(void) {
                                     Temp_TempList(r4,
                                             Temp_TempList(r5,
                                                     Temp_TempList(r6,
-                                                            Temp_TempList(r7,
-                                                                    Temp_TempList(r8,
-                                                                            Temp_TempList(r9,NULL))))))))));
+                                                            Temp_TempList(r7,NULL))))))));
+                                                                    /*Temp_TempList(r8,
+                                                                            Temp_TempList(r9,NULL))))))))));*/
 }
 
 //TODO 调用者保护寄存器
@@ -253,7 +253,7 @@ struct F_frame_ {
 /** function prototype */
 static F_access InFrame(int offset);
 
-static F_access InReg(Temp_temp reg);
+static F_access InReg(Temp_temp reg,int offs);
 
 static F_accessList F_AccessList(F_access head, F_accessList tail);
 
@@ -268,9 +268,10 @@ static F_access InFrame(int offset) {
     return fa;
 }
 
-static F_access InReg(Temp_temp reg) {
+static F_access InReg(Temp_temp reg,int offs) {
     F_access fa = (F_access) checked_malloc(sizeof(*fa));
     fa->kind = F_access_::inReg;
+    fa->u.offset=offs;
     fa->u.reg = reg;
     return fa;
 }
@@ -328,8 +329,8 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     for (U_boolList iter = formals; iter; iter = iter->tail) {
         F_access access = nullptr;
         if (args_inReg_cnt <= F_K && (iter->head == false) && false) {//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
-            access = InReg(Temp_newTemp());
-            args_inReg_cnt++;
+            //access = InReg(Temp_newTemp(),);
+            //args_inReg_cnt++;
         } else {
             access = InFrame(args_inFrame_cnt++ * F_WORD_SIZE);
         }
@@ -402,7 +403,10 @@ F_access F_allocLocal(F_frame frame, bool escape, int size) {
         frame->locals = F_AccessList(access, frame->locals);
         return access;
     } else {
-        return InReg(Temp_newTemp());
+        frame->local_count += size;
+        F_access access = InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
+        frame->locals = F_AccessList(access, frame->locals);
+        return access;
     }
 }
 

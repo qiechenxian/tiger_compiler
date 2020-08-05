@@ -136,7 +136,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
     AS_instrList rewriteList;
     int tryNum = 0;
-    while (++tryNum < 7) {
+    while (++tryNum < 2) {
         flow = FG_AssemFlowGraph(il, f);
 
         #if 0
@@ -145,7 +145,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
         live = Live_liveness(flow);
 
-        #if 1
+        #if 0
         G_show(stderr, G_nodes(live.graph), printTemp);
         #endif
 
@@ -218,9 +218,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         il = reverseInstrList(rewriteList);
     }
 
-    if (col.spills != NULL) {
-        EM_error(0, "fail to allocate registers");
-    }
+
 
     if (col.coalescedMoves != NULL) {
         rewriteList = NULL;
