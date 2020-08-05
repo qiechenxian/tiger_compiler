@@ -124,7 +124,38 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
     }
     return tempUnion(al, bl);
 }
+tag_list add_tag_list(tag_temp tem,tag_list lis)
+{
+    tag_list new_l=(tag_list)checked_malloc(sizeof(*new_l));
+    new_l->head=tem;
+    new_l->number=lis->number++;
+    new_l->tail=lis;
+    return new_l;
+}
+tag_temp new_tag_temp(Temp_temp yyy,int number)
+{
+    tag_temp new_tag=(tag_temp)checked_malloc(sizeof(*new_tag));
+    new_tag->temp=yyy;
+    new_tag->tag_number=number;
+    return new_tag;
+}
+Temp_tempList change(tag_list list)
+{
+    Temp_tempList t_list=NULL;
+    tag_list temp_l=list;
+    for(;temp_l;temp_l=temp_l->tail)
+    {
+        t_list=Temp_TempList(temp_l->head->temp,t_list);
+    }
+    return t_list;
+}
+int look_for_tag(Temp_temp t_temp,tag_list list)
+{
+    for(;list;list=list->tail)
+    {
 
+    }
+}
 struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 //your code here.
     struct RA_result ret;
@@ -163,7 +194,8 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         rewriteList = NULL;
 
         // Assign locals in memory
-        Temp_tempList tl, new_spilled = NULL;
+        Temp_tempList tl;
+        tag_list new_spilled=NULL;
         AS_instrList inst_move;
 
         TAB_table spilledLocal = TAB_empty();
@@ -172,8 +204,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             if(NULL != TAB_look(spilledLocal, tl->head)) {
                 continue;
             }
-
-            new_spilled = Temp_TempList(tl->head, new_spilled);
+            new_spilled=add_tag_list(new_tag_temp(tl->head,Temp_number(tl->head)),new_spilled);
 
             F_access local = NULL;
 #ifdef LOCAL_VAR_TEMP
@@ -185,7 +216,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             TAB_enter(spilledLocal, tl->head, local);
 
             Temp_tempList inst_move_list = NULL, loop_move_temp;
-
+            Temp_tempList tag_list2temp_list= change(new_spilled);
             // 查看合并的Move指令是否包含有溢出的临时变量
             for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
 

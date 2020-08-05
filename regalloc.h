@@ -18,5 +18,16 @@ struct RA_result {
 
 struct RA_result RA_regAlloc(F_frame f, AS_instrList il);
 
+typedef struct tag_temp_* tag_temp;//temp中int记载合并头标号
+struct tag_temp_{
+    int tag_number;
+    Temp_temp temp;
+};
 
+typedef struct tag_list_* tag_list;//总数链表
+struct tag_list_{
+    int number;
+    tag_temp head;
+    tag_list tail;
+};
 #endif //COMPILER_BUG_CONSTEXP_REGALLOC_H
