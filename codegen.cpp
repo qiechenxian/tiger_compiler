@@ -298,6 +298,10 @@ static Temp_temp munchExp(T_exp e) {
                         sprintf(inst, "\tmov     'd0, #0\n");
                         emit(AS_Move(inst, L(r, NULL), NULL));
                         return r;
+                    } else if (e1->u.CONST == 1){
+                        sprintf(inst, "\tmov     'd0, 's0\n");
+                        emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
+                        return r;
                     }
 
                     int lshift = getShiftTime(e1->u.CONST);
@@ -310,8 +314,12 @@ static Temp_temp munchExp(T_exp e) {
                 if (e2->kind == T_exp_::T_CONST){
                     r1 = munchExp(e1);
                     if (e2->u.CONST == 0){
-                        sprintf(inst, "\tmov     'd0, 0\n");
+                        sprintf(inst, "\tmov     'd0, #0\n");
                         emit(AS_Move(inst, L(r, NULL), NULL));
+                        return r;
+                    } else if (e2->u.CONST == 1){
+                        sprintf(inst, "\tmov     'd0, 's0\n");
+                        emit(AS_Move(inst, L(r, NULL), L(r1, NULL)));
                         return r;
                     }
 

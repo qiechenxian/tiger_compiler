@@ -52,7 +52,7 @@ static void paddingInit(vector<intExpPair>& exp_array, int pos, int len, const i
 //                exp_array[index] = getOneValue(init_list->head->u.nested);
                 exp_array.emplace_back(pos, getOneValue(init_list->head->u.nested));
             } else{
-                paddingInit(exp_array/*+index*/, pos+index, stride,
+                paddingInit(exp_array/*+index*/, pos, stride,
                             suffix_size+sub_point, init_list->head->u.nested);
             }
             index += stride;

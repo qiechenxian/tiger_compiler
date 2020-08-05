@@ -328,18 +328,26 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
         T_exp base_exp = Tr_unEx(base);
 
         if (base_exp->kind == T_exp_::T_BINOP or
-        (base_exp->kind == T_exp_::T_MEM and base_exp->u.MEM->kind == T_exp_::T_BINOP)){
+        (base_exp->kind == T_exp_::T_MEM and
+        base_exp->u.MEM->kind == T_exp_::T_BINOP)){
             if (base_exp->kind == T_exp_::T_MEM){
                 base_exp = base_exp->u.MEM;
             }
             assert(base_exp->kind == T_exp_::T_BINOP);
             assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
-            return Tr_Ex(T_Mem(
-                    T_Binop(
-                            T_add, base_exp->u.BINOP.left,
-                            T_Const(base_exp->u.BINOP.right->u.CONST+offset_exp->u.CONST * dimension * get_word_size())
-                    )
-            ));
+            if (base_exp->u.BINOP.right->u.CONST < 0){
+                return Tr_Ex(T_Mem(
+                        T_Binop(
+                                T_add, base_exp->u.BINOP.left,
+                                T_Const(base_exp->u.BINOP.right->u.CONST+offset_exp->u.CONST * dimension * get_word_size())
+                        )
+                ));
+            } else{
+                return Tr_Ex(T_Mem(T_Binop(
+                        T_add, T_Mem(base_exp),
+                        T_Const(offset_exp->u.CONST * dimension * get_word_size())
+                )));
+            }
 
         } else{
             return Tr_Ex(T_Mem(T_Binop(
@@ -367,10 +375,17 @@ Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
             }
             assert(base_exp->kind == T_exp_::T_BINOP);
             assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
-            return Tr_Ex(T_Binop(
-                    T_add, base_exp->u.BINOP.left,
-                    T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
-            ));
+            if (base_exp->u.BINOP.right->u.CONST < 0){
+                return Tr_Ex(T_Binop(
+                        T_add, base_exp->u.BINOP.left,
+                        T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
+                ));
+            } else{
+                return Tr_Ex(T_Binop(
+                        T_add, T_Mem(base_exp),
+                        T_Const(offset_exp->u.CONST*dimension*get_word_size())
+                ));
+            }
         } else{
             return Tr_Ex(T_Binop(
                     T_add, base_exp,
