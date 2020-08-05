@@ -3,6 +3,10 @@
 //
 #include "regalloc.h"
 
+#include <vector>
+
+using namespace std;
+
 static void printTemp(void *t) {
     Temp_map m = Temp_name();
     fprintf(stderr, "node: %s\n", Temp_look(m, (Temp_temp) t));
@@ -184,21 +188,45 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             }
             TAB_enter(spilledLocal, tl->head, local);
 
-            Temp_tempList inst_move_list = NULL, loop_move_temp;
+            Temp_tempList temp_move_list = NULL, loop_move_temp;
 
-            // 查看合并的Move指令是否包含有溢出的临时变量
-            for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+            bool changed = true;
+            vector<Temp_temp> move_vector, new_move_vector;
+            move_vector.push_back(tl->head);
+            temp_move_list = Temp_TempList(tl->head, temp_move_list);
 
-                Temp_tempList src = inst_move->head->u.MOVE.src;
-                Temp_tempList dst = inst_move->head->u.MOVE.dst;
-                if(src->head == tl->head) {
-                    inst_move_list = Temp_TempList(dst->head, new_spilled);
-                } else if(dst->head == tl->head) {
-                    inst_move_list = Temp_TempList(src->head, new_spilled);
+            while(changed) {
+
+                for(Temp_temp temp : move_vector) {
+
+                    // 查看合并的Move指令是否包含有溢出的临时变量
+                    for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+
+                        Temp_tempList src = inst_move->head->u.MOVE.src;
+                        Temp_tempList dst = inst_move->head->u.MOVE.dst;
+                        Temp_tempList tempList = NULL;
+                        if(src->head == temp) {
+                            tempList = dst;
+                        } else if(dst->head == temp) {
+                            tempList = src;
+                        }
+
+                        if(tempList && (!Temp_inList(tempList->head, temp_move_list))) {
+                            new_move_vector.push_back(tempList->head);
+                            temp_move_list = Temp_TempList(tempList->head, temp_move_list);
+                        }
+                    }
+                }
+
+                if(new_move_vector.size() == 0) {
+                    changed = false;
+                } else {
+                    move_vector = new_move_vector;
+                    new_move_vector.clear();
                 }
             }
 
-            for (loop_move_temp = inst_move_list; loop_move_temp; loop_move_temp = loop_move_temp->tail) {
+            for (loop_move_temp = temp_move_list; loop_move_temp; loop_move_temp = loop_move_temp->tail) {
                 new_spilled = Temp_TempList(loop_move_temp->head, new_spilled);
                 TAB_enter(spilledLocal, loop_move_temp->head, local);
             }
@@ -250,17 +278,6 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
 
                 sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
-#if 0
-                int local_offset=look_for_f_offset(temp,f);
-                if(local_offset==-999)
-                {
-                    sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
-                }
-                else
-                {
-                    sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", local_offset);
-                }
-#endif
 
                 if(useSpilledNum == 1) {
                     tempReg = F_R8();
@@ -305,18 +322,6 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
                 sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
-
-#if 0
-                int local_offset=look_for_f_offset(temp,f);
-                if(local_offset==-999)
-                {
-                    sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
-                }
-                else
-                {
-                    sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", local_offset);
-                }
-#endif
 
                 tempReg = F_R8();
 

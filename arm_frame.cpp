@@ -202,7 +202,7 @@ Temp_tempList F_registers(void) {
     return Temp_TempList(r0,
             Temp_TempList(r1,
                     Temp_TempList(r2,
-                            Temp_TempList(r3,*/
+                            Temp_TempList(r3,
                                     Temp_TempList(r4,
                                             Temp_TempList(r5,
                                                     Temp_TempList(r6,
@@ -278,7 +278,7 @@ struct F_frame_ {
 /** function prototype */
 static F_access InFrame(int offset);
 
-static F_access InReg(Temp_temp reg);
+static F_access InReg(Temp_temp reg, int num);
 
 static F_accessList F_AccessList(F_access head, F_accessList tail);
 
@@ -353,8 +353,9 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     int args_inFrame_cnt = 1;
     for (U_boolList iter = formals; iter; iter = iter->tail) {
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K && (iter->head == false) && false) {//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
-            access = InReg(Temp_newTemp());
+        if (args_inReg_cnt <= F_K && (iter->head == false) && false) {
+            //暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
+            access = InReg(Temp_newTemp(), F_WORD_SIZE * (-frame->local_count));
             args_inReg_cnt++;
         } else {
             access = InFrame(args_inFrame_cnt++ * F_WORD_SIZE);
@@ -405,11 +406,16 @@ F_accessList F_getFormals(F_frame frame) {
 }
 
 int F_accessOffset(F_access a) {
+
     if (a->kind != F_access_::inFrame) {
-        EM_error(0, "Offset of a reg access is invalid");
+//        EM_error(0, "Offset of a reg access is invalid");
     }
 
     return a->u.offset;
+}
+
+bool F_accessIsReg(F_access a) {
+    return a->kind == F_access_::inReg;
 }
 
 Temp_temp F_accessReg(F_access a) {
@@ -422,13 +428,21 @@ Temp_temp F_accessReg(F_access a) {
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
-    if (escape) {
-        F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
+
+#ifdef LOCAL_VAR_TEMP
+    escape = false;
+#endif
+
+    F_access access;
+    if(escape) {
+        access = InFrame(F_WORD_SIZE * (-frame->local_count));
         frame->locals = F_AccessList(access, frame->locals);
-        return access;
     } else {
-        return InReg(Temp_newTemp());
+        access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
+        frame->locals = F_AccessList(access, frame->locals);
     }
+
+    return access;
 }
 
 F_access F_allocGlobal(S_symbol global) {
@@ -677,4 +691,18 @@ void F_setMemArgs(F_frame frame)
     if (3 > frame->callee_max_args){
         frame->callee_max_args = 3;
     }
+}
+
+F_access look_for_f_offset(Temp_temp temp,F_frame f)
+{
+    int number_temp=Temp_number(temp);
+    F_accessList temp_access=f->locals;
+    for(;temp_access;temp_access=temp_access->tail)
+    {
+        if(Temp_number(temp_access->head->u.reg)==number_temp)
+        {
+            return temp_access->head;
+        }
+    }
+    return NULL;
 }

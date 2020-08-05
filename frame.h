@@ -91,6 +91,6 @@ int get_offset(F_access g_access);
 T_exp F_fp_address(F_access acc,int index);
 F_access look_for_f_offset(Temp_temp temp,F_frame f);
 
-//#define LOCAL_VAR_TEMP
+#define LOCAL_VAR_TEMP
 
 #endif //COMPILER_LOYX_FRAME_H
