@@ -5,6 +5,7 @@
 #include "util.h"
 #include "errormsg.h"
 #include "graph.h"
+#include "temp.h"
 
 
 struct G_graph_ {
@@ -17,6 +18,8 @@ struct G_node_ {
     int mykey;
     G_nodeList succs;
     G_nodeList preds;
+    Temp_tempList in;
+    Temp_tempList out;
     void *info;
 };
 

@@ -161,24 +161,64 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         rewriteList = NULL;
 
         // Assign locals in memory
-        Temp_tempList tl;
+        Temp_tempList tl, new_spilled = NULL;
+        AS_instrList inst_move;
+
+
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
-            //TODO local的大小
-            F_access local = F_allocLocal(f, true, get_word_size());
+
+            if(NULL != TAB_look(spilledLocal, tl->head)) {
+                continue;
+            }
+
+            new_spilled = Temp_TempList(tl->head, new_spilled);
+
+            F_access local = look_for_f_offset(tl->head, f);
+            if(NULL == local) {
+                local = F_allocLocal(f, true, get_word_size());
+            }
             TAB_enter(spilledLocal, tl->head, local);
+
+            // 查看合并的Move指令是否包含有溢出的临时变量
+            for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+
+                Temp_tempList src = inst_move->head->u.MOVE.src;
+                Temp_tempList dst = inst_move->head->u.MOVE.dst;
+                if(src->head == tl->head) {
+                    new_spilled = Temp_TempList(dst->head, new_spilled);
+                    TAB_enter(spilledLocal, dst->head, local);
+                } else if(dst->head == tl->head) {
+                    new_spilled = Temp_TempList(src->head, new_spilled);
+                    TAB_enter(spilledLocal, src->head, local);
+                }
+            }
         }
 
         // Rewrite instructions
         for (; il; il = il->tail) {
             AS_instr inst = il->head;
 
+            // 查看合并的Move指令是否包含有溢出的临时变量
+            bool moveExist = false;
+            for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+                if(inst == inst_move->head) {
+                    moveExist = true;
+                    break;
+                }
+            }
+
+            if(moveExist) {
+                rewriteList = AS_InstrList(inst, rewriteList);
+                continue;
+            }
+
             Temp_tempList useSpilled = tempIntersect(
                     aliased(inst_use(inst), live.graph, col.alias, col.coalescedNodes),
-                    spilled);
+                    new_spilled);
             Temp_tempList defSpilled = tempIntersect(
                     aliased(inst_def(inst), live.graph, col.alias, col.coalescedNodes),
-                    spilled);
+                    new_spilled);
 
             // Skip unspilled instructions
             // 跳过未溢出的指令
@@ -187,11 +227,21 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 continue;
             }
 
+            int useSpilledNum = 0;
+
+            Temp_temp tempReg;
+
             for (tl = useSpilled; tl; tl = tl->tail) {
                 char buf[128];
 
                 Temp_temp temp = tl->head;
+
+                useSpilledNum ++;
+
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
+
+                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
+#if 0
                 int local_offset=look_for_f_offset(temp,f);
                 if(local_offset==-999)
                 {
@@ -201,35 +251,37 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 {
                     sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", local_offset);
                 }
+#endif
+
+                if(useSpilledNum == 1) {
+                    tempReg = F_R8();
+                } else if(useSpilledNum == 2) {
+                    tempReg = F_R9();
+                } else {
+                    tempReg = F_R10();
+                }
+
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), L(F_R9(), NULL), L(F_FP(), NULL), NULL), rewriteList);
+                        AS_Oper(String(buf), L(tempReg, NULL), L(F_FP(), NULL), NULL), rewriteList);
+
                 //ldr是放在inst use前面,替换inst src列表
                 if(inst->kind==AS_instr_::I_MOVE)
                 {
                     Temp_tempList replace_list=inst->u.MOVE.src;
-                    if(replace_list!=NULL)
+                    for(;replace_list;replace_list=replace_list->tail)
                     {
-                        for(;replace_list;replace_list=replace_list->tail)
-                        {
-                            if(replace_list->head==temp)
-                            {
-                                replace_list->head=F_R9();
-                            }
-
+                        if(replace_list->head == tl->head) {
+                            replace_list->head=tempReg;
                         }
                     }
                 }
                 else if(inst->kind==AS_instr_::I_OPER)
                 {
                     Temp_tempList replace_list=inst->u.OPER.src;
-                    if(replace_list!=NULL)
+                    for(;replace_list;replace_list=replace_list->tail)
                     {
-                        for(;replace_list;replace_list=replace_list->tail)
-                        {
-                            if(replace_list->head==temp)
-                            {
-                                replace_list->head=F_R9();
-                            }
+                        if(replace_list->head == tl->head) {
+                            replace_list->head=tempReg;
                         }
                     }
                 }
@@ -243,6 +295,9 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
                 Temp_temp temp = tl->head;
                 F_access local = (F_access) TAB_look(spilledLocal, temp);
+                sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
+
+#if 0
                 int local_offset=look_for_f_offset(temp,f);
                 if(local_offset==-999)
                 {
@@ -252,35 +307,31 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 {
                     sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", local_offset);
                 }
+#endif
+
+                tempReg = F_R8();
+
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), NULL, L(F_R9(), L(F_FP(), NULL)), NULL), rewriteList);
+                        AS_Oper(String(buf), NULL, L(tempReg, L(F_FP(), NULL)), NULL), rewriteList);
                 //str是放在inst dfe后面,替换dst列表
                 if(inst->kind==AS_instr_::I_MOVE)
                 {
 
                     Temp_tempList replace_list=inst->u.MOVE.dst;
-                    if(replace_list!=NULL)
+                    for(;replace_list;replace_list=replace_list->tail)
                     {
-                        for(;replace_list;replace_list=replace_list->tail)
-                        {
-                            if(replace_list->head==temp)
-                            {
-                                replace_list->head=F_R9();
-                            }
+                        if(replace_list->head == tl->head) {
+                            replace_list->head=tempReg;
                         }
                     }
                 }
                 else if(inst->kind==AS_instr_::I_OPER)
                 {
                     Temp_tempList replace_list=inst->u.OPER.dst;
-                    if(replace_list!=NULL)
+                    for(;replace_list;replace_list=replace_list->tail)
                     {
-                        for(;replace_list;replace_list=replace_list->tail)
-                        {
-                            if(replace_list->head==temp)
-                            {
-                                replace_list->head=F_R9();
-                            }
+                        if(replace_list->head == tl->head) {
+                            replace_list->head=tempReg;
                         }
                     }
                 }

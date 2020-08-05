@@ -143,6 +143,15 @@ Temp_temp F_R0()
     }
     return r0;
 }
+
+Temp_temp F_R8()
+{
+    if (r8 == nullptr) {
+        F_initRegisters();
+    }
+    return r8;
+}
+
 Temp_temp F_R9()
 {
     if (r9 == nullptr) {
@@ -150,6 +159,16 @@ Temp_temp F_R9()
     }
     return r9;
 }
+
+Temp_temp F_R10()
+{
+    if (r10 == nullptr) {
+        F_initRegisters();
+    }
+    return r10;
+}
+
+
 Temp_temp F_R1()
 {
     if (r1 == nullptr){
@@ -188,7 +207,7 @@ Temp_tempList F_registers(void) {
                                             Temp_TempList(r5,
                                                     Temp_TempList(r6,
                                                             Temp_TempList(r7,
-                                                                    Temp_TempList(r8,NULL)))))))));
+                                                                    NULL))))))));
                                                                             //Temp_TempList(r9,NULL))))))))));
 }
 
@@ -643,7 +662,8 @@ void F_setMemArgs(F_frame frame)
         frame->callee_max_args = 3;
     }
 }
-int look_for_f_offset(Temp_temp temp,F_frame f)
+
+F_access look_for_f_offset(Temp_temp temp,F_frame f)
 {
     int number_temp=Temp_number(temp);
     F_accessList temp_access=f->locals;
@@ -651,8 +671,8 @@ int look_for_f_offset(Temp_temp temp,F_frame f)
     {
         if(Temp_number(temp_access->head->u.reg)==number_temp)
         {
-            return temp_access->head->u.offset;//返回局部变量offsset
+            return temp_access->head;
         }
     }
-    return -999;//未找到返回-999
+    return NULL;
 }

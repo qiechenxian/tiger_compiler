@@ -62,6 +62,51 @@ static Temp_tempList lookupLiveMap(G_table t, G_node flownode) {
     return (Temp_tempList)G_look(t, flownode);
 }
 
+#if 0
+static G_table last_in = G_empty();
+static G_table last_out = G_empty();
+
+static bool translate(G_nodeList fl);
+static bool join(G_nodeList fl, G_table in, G_table out)
+{
+    G_nodeList sl;
+    G_node n, sn;
+    Temp_tempList ci, co, li, lo;
+
+    // 遍历所有的指令
+    for (; fl; fl = fl->tail) {//fl用于遍历flow结点
+        n = fl->head;
+
+        AS_instr inst = (AS_instr) G_nodeInfo(n);
+
+        li = lookupLiveMap(in, n);
+        lo = lookupLiveMap(out, n);
+
+        //入口活跃=use(n)+out(n)-def(n)
+
+        // 遍历后继基本块,计算B.out |= succ[j].in
+        co = NULL;
+        for (sl = G_succ(n); sl; sl = sl->tail) {
+            sn = sl->head;
+            co = tempUnion(co, lookupLiveMap(in, sn));
+        }
+
+        enterLiveMap(in, n, ci);//in中放入节点n，值为ci为当前入口活跃temp
+        enterLiveMap(out, n, co);//out中放入节点n，值为co为当前出口活跃temp
+
+
+        enterLiveMap(last_in, n, li);
+        enterLiveMap(last_out, n, lo);
+
+        ci = tempUnion(FG_use(n), tempMinus(lo, FG_def(n)));//返回ci=FG_use(n)+out(n)-FG_def(n)
+
+
+    }
+
+}
+#endif
+
+
 static void getLiveMap(G_graph flow, G_table in, G_table out) {
     G_nodeList fl, sl;
     G_node n, sn;
@@ -73,8 +118,15 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
     // Loop
     while (flag) {
 
-        for (fl =G_reverseNodes(G_nodes(flow)) ; fl; fl = fl->tail) {//fl用于遍历flow结点
+        // 当前基本块
+        fl = G_reverseNodes(G_nodes(flow));
+
+        // 遍历所有的指令
+        for (; fl; fl = fl->tail) {//fl用于遍历flow结点
             n = fl->head;
+
+            AS_instr inst = (AS_instr) G_nodeInfo(n);
+
             li = lookupLiveMap(in, n);
             lo = lookupLiveMap(out, n);
             enterLiveMap(last_in, n, li);
