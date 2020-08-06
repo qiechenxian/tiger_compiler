@@ -680,10 +680,18 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
     inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
-//    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-//    tail_inst_ptr = tail_inst_ptr->tail;
-    tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-    tail_inst_ptr = tail_inst_list;
+
+    if(strcmp(name, "main") == 0) {
+        tail_inst_list = AS_InstrList(AS_Oper((char *)"\tmov     r0, r8\n", NULL, NULL, NULL), NULL);
+        tail_inst_ptr = tail_inst_list;
+
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        tail_inst_ptr = tail_inst_ptr->tail;
+
+    } else {
+        tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        tail_inst_ptr = tail_inst_list;
+    }
 
     if(strcmp(name, "main") == 0) {
         tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
