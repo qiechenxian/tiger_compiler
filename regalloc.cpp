@@ -2,6 +2,7 @@
 // Created by zcjsh on 2020/7/28.
 //
 #include "regalloc.h"
+#include "temp.h"
 
 #include <vector>
 
@@ -122,7 +123,9 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
         G_node n = temp2Node(t, ig);
         G_node alias = getAlias(n, aliases, cn);
         t = node2Temp(n);
-        al = L(t, al);
+        if(t != NULL) {
+            al = L(t, al);
+        }
     }
     return tempUnion(al, NULL);
 }
@@ -169,6 +172,17 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         // Assign locals in memory
         Temp_tempList tl, new_spilled = NULL;
         AS_instrList inst_move;
+
+#if 0
+        // 查看合并的Move指令是否包含有溢出的临时变量
+        for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+
+            Temp_tempList src = inst_move->head->u.MOVE.src;
+            Temp_tempList dst = inst_move->head->u.MOVE.dst;
+
+            printf("Move %d:%d\n", dst->head->num, src->head->num);
+        }
+#endif
 
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
@@ -227,8 +241,10 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             }
 
             for (loop_move_temp = temp_move_list; loop_move_temp; loop_move_temp = loop_move_temp->tail) {
-                new_spilled = Temp_TempList(loop_move_temp->head, new_spilled);
-                TAB_enter(spilledLocal, loop_move_temp->head, local);
+                if(!Temp_inList(loop_move_temp->head, new_spilled)) {
+                    new_spilled = Temp_TempList(loop_move_temp->head, new_spilled);
+                    TAB_enter(spilledLocal, loop_move_temp->head, local);
+                }
             }
         }
 
@@ -264,20 +280,16 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 continue;
             }
 
-            int useSpilledNum = 0;
+            int useSpilledNum;
 
             Temp_temp tempReg;
 
-            for (tl = useSpilled; tl; tl = tl->tail) {
+            for (tl = useSpilled, useSpilledNum = 0; tl; tl = tl->tail) {
                 char buf[128];
 
                 Temp_temp temp = tl->head;
 
                 useSpilledNum ++;
-
-                F_access local = (F_access) TAB_look(spilledLocal, temp);
-
-                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
 
                 if(useSpilledNum == 1) {
                     tempReg = F_R8();
@@ -287,6 +299,9 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                     tempReg = F_R10();
                 }
 
+                F_access local = (F_access) TAB_look(spilledLocal, temp);
+
+                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), L(tempReg, NULL), L(F_FP(), NULL), NULL), rewriteList);
 
@@ -320,13 +335,13 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 char buf[128];
 
                 Temp_temp temp = tl->head;
-                F_access local = (F_access) TAB_look(spilledLocal, temp);
-                sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
 
                 tempReg = F_R8();
 
+                F_access local = (F_access) TAB_look(spilledLocal, temp);
+                sprintf(buf, "\tstr     's0, ['d0, #%d] \n#spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), NULL, L(tempReg, L(F_FP(), NULL)), NULL), rewriteList);
+                        AS_Oper(String(buf), L(F_FP(), NULL), L(tempReg, NULL),  NULL), rewriteList);
                 //str是放在inst dfe后面,替换dst列表
                 if(inst->kind==AS_instr_::I_MOVE)
                 {

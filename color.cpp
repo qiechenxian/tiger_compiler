@@ -659,6 +659,9 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         } else {
             coloredNodes = L(t, coloredNodes);
             Temp_enter(colors, t, color2Str(okColors->head, precolored));
+#if 0
+            printf("Color: %d -- %d\n", t->num, okColors->head->num);
+#endif
         }
     }
     Temp_tempList tl;
@@ -677,7 +680,9 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
 
     ret.spills = NULL;
     for (; c.spilledNodes; c.spilledNodes = c.spilledNodes->tail) {
-//        printf("spilled: %s\n", tempName(c.spilledNodes->head));
+#if 0
+        printf("spilled: %s\n", tempName(c.spilledNodes->head));
+#endif
         ret.spills = L(c.spilledNodes->head, ret.spills);
     }
 

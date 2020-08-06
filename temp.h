@@ -9,6 +9,11 @@
 #include "stdio.h"
 
 typedef struct Temp_temp_* Temp_temp;
+
+struct Temp_temp_ {
+    int num;
+};
+
 Temp_temp Temp_newTemp();
 
 typedef struct Temp_tempList_ *Temp_tempList;

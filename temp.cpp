@@ -5,10 +5,6 @@
 #include "temp.h"
 #include "table.h"
 
-struct Temp_temp_ {
-    int num;
-};
-
 static int temps = 100;
 
 Temp_temp Temp_newTemp() {

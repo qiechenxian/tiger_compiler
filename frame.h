@@ -69,6 +69,10 @@ Temp_temp F_R0();
 Temp_temp F_R1();
 Temp_temp F_R2();
 Temp_temp F_R3();
+Temp_temp F_R4();
+Temp_temp F_R5();
+Temp_temp F_R6();
+Temp_temp F_R7();
 Temp_temp F_R8();
 Temp_temp F_R9();
 Temp_temp F_R10();
@@ -91,6 +95,6 @@ int get_offset(F_access g_access);
 T_exp F_fp_address(F_access acc,int index);
 F_access look_for_f_offset(Temp_temp temp,F_frame f);
 
-//#define LOCAL_VAR_TEMP
+#define LOCAL_VAR_TEMP
 
 #endif //COMPILER_LOYX_FRAME_H

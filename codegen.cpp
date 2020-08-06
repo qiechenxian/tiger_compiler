@@ -24,12 +24,35 @@ Temp_tempList L(Temp_temp h, Temp_tempList t) {
     return Temp_TempList(h, t);
 }
 
-bool Sys_lib_fuc_test(Temp_label lab) {
-    return strcmp("getint", Temp_labelString(lab)) == 0 || strcmp("getch", Temp_labelString(lab)) == 0
-           || strcmp("getarray", Temp_labelString(lab)) == 0 || strcmp("putint", Temp_labelString(lab)) == 0
-           || strcmp("putch", Temp_labelString(lab)) == 0 || strcmp("putarray", Temp_labelString(lab)) == 0
-           || strcmp("putf", Temp_labelString(lab)) == 0 || strcmp("starttime", Temp_labelString(lab)) == 0
-           || strcmp("stoptime", Temp_labelString(lab)) == 0||strcmp("memset", Temp_labelString(lab)) == 0;
+// 检查是否是外部函数，若是外部函数则返回参数的个数
+void Sys_lib_fuc_test(Temp_label lab, bool &libFunc, int &saveStackRegCnt) {
+
+    libFunc = true;
+    saveStackRegCnt = -1;
+
+    if(strcmp("getint", Temp_labelString(lab)) == 0 ) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("getch", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("getarray", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("putint", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("putch", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("putarray", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 2;
+    } else if(strcmp("putf", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 4;
+    } else if(strcmp("starttime", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("stoptime", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 1;
+    } else if(strcmp("memset", Temp_labelString(lab)) == 0) {
+        saveStackRegCnt = 3;
+    } else {
+        libFunc = false;
+    }
 }
 
 // 用于表达式的匹配，每种情形的从句将匹配一个瓦片
@@ -144,10 +167,13 @@ static Temp_temp munchExp(T_exp e) {
                         emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                     }
                     else{
+                        Temp_temp r1 = Temp_newTemp();
+
                         sprintf(inst,"\tldr     'd0,=%d\n",i);
-                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                        sprintf(inst2, "\tldr     'd0, ['s0, 'd0]\n");
-                        emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                        emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+
+                        sprintf(inst2, "\tldr     'd0, ['s0, 's1]\n");
+                        emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
                     }
                     return r;
                 } else if (mem->u.BINOP.op == T_add && mem->u.BINOP.left->kind == T_exp_::T_CONST) {
@@ -160,10 +186,13 @@ static Temp_temp munchExp(T_exp e) {
                         emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                     }
                     else{
+                        Temp_temp r1 = Temp_newTemp();
+
                         sprintf(inst,"\tldr     'd0,=%d\n",i);
-                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
-                        sprintf(inst2, "\tldr     'd0, ['s0, 'd0]\n");
-                        emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),NULL),NULL));
+                        emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+
+                        sprintf(inst2, "\tldr     'd0, ['s0, 's1]\n");
+                        emit(AS_Oper(inst2,L(r,NULL), L(munchExp(e1),L(r1, NULL)),NULL));
                     }
                     return r;
                 } else {
@@ -184,11 +213,14 @@ static Temp_temp munchExp(T_exp e) {
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                 }
                 else{
+
                     Temp_temp r1 = Temp_newTemp();
+
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
-                    sprintf(inst2, "\tldr     'd0, ['d1]\n");
-                    emit(AS_Oper(inst2, L(r, L(r1,NULL)), NULL, NULL));
+
+                    sprintf(inst2, "\tldr     'd0, ['s0]\n");
+                    emit(AS_Oper(inst2, L(r, NULL), L(r1,NULL), NULL));
                 }
                 return r;
             } else {
@@ -210,10 +242,15 @@ static Temp_temp munchExp(T_exp e) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
+
+                    Temp_temp r1 = Temp_newTemp();
+
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+                    emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+
+
                     sprintf(inst2,"\tadd     'd0, 's0, 's1\n");
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r,NULL)),NULL));
+                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
                 }
                 return r;
             } else if (e->u.BINOP.op == T_add && e->u.BINOP.left->kind == T_exp_::T_CONST) {
@@ -225,10 +262,13 @@ static Temp_temp munchExp(T_exp e) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
+                    Temp_temp r1 = Temp_newTemp();
+
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+                    emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+
                     sprintf(inst2,"\tadd     'd0, 's0, 's1\n"); //??不懂
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r,NULL)),NULL));
+                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
                 }
                 return r;
             } else if (e->u.BINOP.op == T_sub && e->u.BINOP.right->kind == T_exp_::T_CONST) {
@@ -240,10 +280,13 @@ static Temp_temp munchExp(T_exp e) {
                     sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
                 } else {
+                    Temp_temp r1 = Temp_newTemp();
+
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+                    emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+
                     sprintf(inst2,"\tsub     'd0, 's0, 's1\n");
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r,NULL)),NULL));
+                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
                 }
 //                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
 //                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
@@ -432,21 +475,36 @@ static char *funcName(c_string labelString) {
 
 static void doCallerReg(int args, int type){
     int word_size = get_word_size();
+
     Temp_temp* callerArray = F_getCallerArray();
-//    if (args > 4)
-//        args = 4;
-    args = 4;
+
+    if (args > 4)
+        args = 4;
+
     for (int i = 0; i < args; i++){
         if (type == CALL_SAVE){
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
-            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, NULL, L(callerArray[i], L(F_FP(), NULL)), NULL));
+            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, L(F_FP(), NULL), L(callerArray[i], NULL), NULL));
         }else{
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
             sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
             emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), F_callersaves()), NULL));
         }
     }
+
+    for (int i = 4; i < 8; i++){
+        if (type == CALL_SAVE){
+            char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
+            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, L(F_FP(), NULL), L(callerArray[i], NULL), NULL));
+        }else{
+            char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
+            sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), F_callersaves()), NULL));
+        }
+    }
+
 }
 
 /*
@@ -471,15 +529,16 @@ static void munchStm(T_stm s) {
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
                     if(limit_4096(i)){
-                        sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
-                        emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
+                        sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i);
+                        emit(AS_Oper(inst, L(munchExp(e1), NULL), L(munchExp(e2), NULL), NULL));
                     }
                     else{
                         Temp_temp r1 = Temp_newTemp();
                         sprintf(inst, "\tldr     'd0, =%d\n", i);
                         emit(AS_Oper(inst, L(r1,NULL), NULL, NULL));
-                        sprintf(inst2, "\tstr     's0, ['s1, 's2]\n");
-                        emit(AS_Oper(inst2, NULL, L(munchExp(e2), L(munchExp(e1) , L(r1,NULL))), NULL));
+
+                        sprintf(inst2, "\tstr     's0, ['d0, 'd1]\n");
+                        emit(AS_Oper(inst2, L(munchExp(e1), L(r1,NULL)), L(munchExp(e2) ,NULL), NULL));
                     }
                 } else if (dst->u.MEM->kind == T_exp_::T_BINOP
                            && dst->u.MEM->u.BINOP.op == T_add
@@ -488,15 +547,16 @@ static void munchStm(T_stm s) {
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
                     if(limit_4096(i)){
-                        sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
-                        emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
+                        sprintf(inst, "\tstr     's0, ['d1, #%d]\n", i);
+                        emit(AS_Oper(inst, L(munchExp(e1), NULL), L(munchExp(e2), NULL), NULL));
                     }
                     else{
                         Temp_temp r1 = Temp_newTemp();
                         sprintf(inst, "\tldr     'd0, =%d\n", i);
                         emit(AS_Oper(inst, L(r1,NULL), NULL, NULL));
-                        sprintf(inst2, "\tstr     's0, ['s1, 's2]\n");
-                        emit(AS_Oper(inst2, NULL, L(munchExp(e2), L(munchExp(e1) , L(r1,NULL))), NULL));
+
+                        sprintf(inst2, "\tstr     's0, ['d0, 'd1]\n");
+                        emit(AS_Oper(inst2, L(munchExp(e1) , L(r1,NULL)), L(munchExp(e2), NULL), NULL));
                     }
                 } else if (src->kind == T_exp_::T_MEM) {
                     /* MOVE(MEM(e1), MEM(e2)) */
@@ -504,31 +564,33 @@ static void munchStm(T_stm s) {
                     Temp_temp r = Temp_newTemp();
                     Temp_temp r1 = munchExp(e1);
                     Temp_temp r2 = munchExp(e2);
+
                     sprintf(inst, "\tldr     'd0, ['s0]\n");
                     emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
-                    sprintf(inst2, "\tstr     's1, ['s0]\n");
-                    emit(AS_Oper(inst2, NULL, L(r1, L(r, NULL)), NULL));
+
+                    sprintf(inst2, "\tstr     's0, ['s1]\n");
+                    emit(AS_Oper(inst2, NULL, L(r1, L(r, NULL)),  NULL));
                 } else if (dst->u.MEM->kind == T_exp_::T_CONST) {
                     /* MOVE(MEM(CONST(i)), e1) */
                     T_exp e1 = src;
                     int i = dst->u.MEM->u.CONST;
                     //TODO 无0寄存器怎么表示0+const?
-                    if(limit_4096(i)){
-                        sprintf(inst, "\tstr     's0, [#%d]\n", i);
-                        emit(AS_Oper(inst, NULL, L(munchExp(e1), NULL), NULL));
-                    }
-                    else{
-                        Temp_temp r1 = Temp_newTemp();
-                        sprintf(inst, "\tldr     'd0, =%d\n", i);
-                        emit(AS_Oper(inst, L(r1,NULL), NULL, NULL));
-                        sprintf(inst2, "\tstr     's0, ['s1]\n");
-                        emit(AS_Oper(inst2, NULL,  L(munchExp(e1) , L(r1,NULL)), NULL));
-                    }
+
+                    Temp_temp r1 = Temp_newTemp();
+                    sprintf(inst, "\tldr     'd0, =%d\n", i);
+                    emit(AS_Oper(inst, L(r1,NULL), NULL, NULL));
+
+                    sprintf(inst2, "\tstr     's0, ['d0]\n");
+                    emit(AS_Oper(inst2, L(munchExp(e1),NULL), L(r1,NULL), NULL));
+
                 } else {
                     /* MOVE(MEM(e1), e2) */
                     T_exp e1 = dst->u.MEM, e2 = src;
                     Temp_temp r1 = munchExp(e1);
                     Temp_temp r2 = munchExp(e2);
+                    // 按照真实的操作来说，r2为源（Use），而[r1]应该为结果（define），
+                    // 实际的动作含义为把r2保存到r1所代表的内存中，实际上是指针操作，区别于
+                    // 一般的算术操作，它会改变r1所指向内存的值
                     sprintf(inst, "\tstr     's0, ['s1]\n");
                     emit(AS_Oper(inst, NULL, L(r2, L(r1, NULL)), NULL));
                 }
@@ -544,25 +606,37 @@ static void munchStm(T_stm s) {
                         Temp_temp t = dst->u.TEMP;
                         bool special_tag = false;
                         count_func_param = 0;
-                        special_tag = Sys_lib_fuc_test(lab);
+                        int need_args_count = 0;
+
+                        // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
+                        Sys_lib_fuc_test(lab, special_tag, need_args_count);
                         if (true == special_tag) {
-                            while (temp_args) {
+                            for (args_count = 0; temp_args; temp_args = temp_args->tail) {
                                 args_count++;
-                                temp_args = temp_args->tail;
                             }
-                        }
-                        if (special_tag)
+
+                            if((0 == args_count)) {
+                                args_count = 1;
+                            } else if(args_count > 4) {
+                                args_count = 4;
+                            }
+
                             doCallerReg(args_count, CALL_SAVE);
-                        Temp_tempList l = munchArgs(special_tag, 0, args);
-                        Temp_tempList calldefs = F_callersaves();
-//                        Temp_tempList calldefs = NULL;
-                        //TODO 函数调用测试能否正确传参
+                        }
+
+                        munchArgs(special_tag, 0, args);
+
+                        // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
                         emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
+
                         sprintf(inst2, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst2, L(t, NULL), L(F_RV(), F_callersaves())));
-                        if (special_tag)
+                        emit(AS_Move(inst2, L(t, NULL), L(F_R0(), F_callersaves())));
+
+                        // 恢复寄存器
+                        if (special_tag) {
                             doCallerReg(args_count, CALL_LOAD);
+                        }
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
                         T_exp e1 = src->u.CALL.fun;
@@ -622,48 +696,36 @@ static void munchStm(T_stm s) {
                     args_count = 0;//用于计算参数个数，静态栈帧不能直接stmfd
                     bool special_tag = false;
                     count_func_param = 0;
-                    special_tag = Sys_lib_fuc_test(lab);
+
+                    int need_args_count = 0;
+
+                    // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
+                    Sys_lib_fuc_test(lab, special_tag, need_args_count);
+
                     if (true == special_tag) {
-                        while (temp_args) {
+                        for (args_count = 0; temp_args; temp_args = temp_args->tail) {
                             args_count++;
-                            temp_args = temp_args->tail;
                         }
-                    }
-                    if (special_tag)
+
+                        if((0 == args_count)) {
+                            args_count = 1;
+                        } else if(args_count > 4) {
+                            args_count = 4;
+                        }
+
                         doCallerReg(args_count, CALL_SAVE);
-                    Temp_tempList l = munchArgs(special_tag, 0, args);
-                    Temp_tempList calldefs = F_callersaves();
-                    // 函数调用？
-//                    sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
+                    }
+
+
+                    munchArgs(special_tag, 0, args);
+
+                    // 函数调用
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
                     emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
+
                     if (special_tag)
                         doCallerReg(args_count, CALL_LOAD);
-                    //if (special_tag == true) {
-                    //    count_func_param = count_func_param - 2;
-                    //    if (count_func_param >= 0) {
-                    //        sprintf(inst_r0, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                    //        emit(AS_Oper(inst_r0, L(F_R0(), NULL), L(F_SP(), NULL), NULL));
-                    //    }
 
-                    //   count_func_param--;
-                    //    if (count_func_param >= 0) {
-                    //        sprintf(inst_r1, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                    //        emit(AS_Oper(inst_r1, L(F_R1(), NULL), L(F_SP(), NULL), NULL));
-                    //    }
-
-                    //    count_func_param--;
-                    //    if (count_func_param >= 0) {
-                    //        sprintf(inst_r2, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                    //        emit(AS_Oper(inst_r2, L(F_R2(), NULL), L(F_SP(), NULL), NULL));
-                    //    }
-
-                    //    count_func_param--;
-                    //    if (count_func_param >= 0) {
-                    //        sprintf(inst_r3, "\tldr     'd0, ['s0, #%d]\n", count_func_param * get_word_size());
-                    //        emit(AS_Oper(inst_r3, L(F_R3(), NULL), L(F_SP(), NULL), NULL));
-                    //    }
-                    //}
                 } else {
                     /* EXP(CALL(e,args)) */
                     T_exp e1 = call->u.CALL.fun;
@@ -701,12 +763,33 @@ static void munchStm(T_stm s) {
             T_relOp op = s->u.CJUMP.op;
             T_exp e1 = s->u.CJUMP.left;
             T_exp e2 = s->u.CJUMP.right;
-            Temp_temp r1 = munchExp(e1);
-            Temp_temp r2 = munchExp(e2);
             Temp_label jt = s->u.CJUMP.trues;
             Temp_label jf = s->u.CJUMP.falses;
-            sprintf(inst, "\tcmp     's0, 's1\n");
-            emit(AS_Oper(inst, NULL, L(r1, L(r2, NULL)), NULL));
+
+            if(e2->kind == T_exp_::T_CONST) {
+                int i = e2->u.CONST;
+
+                Temp_temp r1 = munchExp(e1);
+
+                if(constExpr(i)){
+                    sprintf(inst, "\tcmp     's0, #%d\n", i);
+                    emit(AS_Oper(inst, NULL, L(r1, NULL), NULL));\
+                } else{
+
+                    Temp_temp r = Temp_newTemp();
+                    sprintf(inst, "\tldr     'd0, =%d\n", i);
+                    emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
+
+                    sprintf(inst, "\tcmp     's0, 's1\n");
+                    emit(AS_Oper(inst, NULL, L(r1, L(r, NULL)), NULL));
+                }
+            } else {
+                Temp_temp r1 = munchExp(e1);
+                Temp_temp r2 = munchExp(e2);
+
+                sprintf(inst, "\tcmp     's0, 's1\n");
+                emit(AS_Oper(inst, NULL, L(r1, L(r2, NULL)), NULL));
+            }
 
             char *opcode;
             switch (op) {
@@ -772,11 +855,11 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
         char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
         Temp_temp r = munchExp(args->head);
         if (i)
-            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i * get_word_size());
+            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i * get_word_size());
         else
-            sprintf(inst, "\tstr     's0, ['s1]\n");
+            sprintf(inst, "\tstr     's0, ['d0]\n");
 
-        emit(AS_Oper(inst, NULL, L(r, L(F_SP(), NULL)), NULL));
+        emit(AS_Oper(inst, L(F_SP(), NULL), L(r, NULL), NULL));
 
         Temp_tempList old = munchArgs(false, i + 1, args->tail);
         return Temp_TempList(r, old);
@@ -790,11 +873,11 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
         Temp_temp r = munchExp(args->head);
         if (count_func_param > 4) {
             if (i - 4)
-                sprintf(inst, "\tstr     's0, ['s1, #%d]\n", (i - 4) * get_word_size());
+                sprintf(inst, "\tstr     's0, ['d0, #%d]\n", (i - 4) * get_word_size());
             else
-                sprintf(inst, "\tstr     's0, ['s1]\n");
+                sprintf(inst, "\tstr     's0, ['d0]\n");
 
-            emit(AS_Oper(inst, NULL, L(r, L(F_SP(), F_callersaves())), NULL));
+            emit(AS_Oper(inst, L(F_SP(), F_callersaves()), L(r, NULL), NULL));
             Temp_tempList old = munchArgs(true, i + 1, args->tail);
             return Temp_TempList(r, old);
         } else if (args_count >= 0) {
@@ -869,19 +952,14 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
         emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves())));
-//        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves()), NULL));
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
         emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves())));
-//        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves()), NULL));
     } else {
         assert("error from call_lib in codegen.cpp ");
     }
 
     doCallerReg(2, CALL_LOAD);
-//    char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-//    sprintf(inst6, "\tldmfd   sp!,{r0-r1}\n");//恢复现场
-//    emit(AS_Oper(inst6, NULL, NULL, NULL));
 }
 

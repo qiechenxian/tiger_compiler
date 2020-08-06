@@ -127,6 +127,22 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
 
             AS_instr inst = (AS_instr) G_nodeInfo(n);
 
+#if 0
+            if(inst->kind == AS_instr_::I_OPER && inst->u.OPER.dst != NULL) {
+                if(inst->u.OPER.dst->head->num == 283) {
+                    int a = 1;
+                }
+            }
+
+            if(inst->kind == AS_instr_::I_OPER) {
+                for(Temp_tempList tempList = inst->u.OPER.src; tempList; tempList = tempList->tail) {
+                    if(tempList->head->num == 283) {
+                        int b = 1;
+                    }
+                }
+            }
+#endif
+
             li = lookupLiveMap(in, n);
             lo = lookupLiveMap(out, n);
             enterLiveMap(last_in, n, li);
@@ -388,8 +404,8 @@ struct Live_graph Live_liveness(G_graph flow) {//生成冲突图和节点偶对�
     struct Live_graph lg;
     solveLiveness(&lg, flow, in, out);
 
-    G_free(in);
-    G_free(out);
+//    G_free(in);
+//    G_free(out);
 
     return lg;
 }
