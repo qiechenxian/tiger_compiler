@@ -425,7 +425,7 @@ F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 6+1+8; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    f->local_count = 8 + 1 + 8; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     /// 8是为保存r0-7预留的空间
     f->locals = nullptr;
     f->isLeaf = true;
@@ -637,7 +637,11 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     }
 
     // todo 优化
-    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r9}\n", NULL, NULL, NULL),NULL);
+    if(strcmp(name, "main") == 0) {
+        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7}\n", NULL, NULL, NULL),NULL);
+    } else {
+        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r0-r7}\n", NULL, NULL, NULL),NULL);
+    }
     head_inst_ptr = head_inst_ptr->tail;
 
     char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
@@ -681,7 +685,11 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
     tail_inst_ptr = tail_inst_list;
 
-    tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
+    if(strcmp(name, "main") == 0) {
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
+    } else {
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r0-r7}\n", NULL, NULL, NULL), NULL);
+    }
     tail_inst_ptr = tail_inst_ptr->tail;
 
 

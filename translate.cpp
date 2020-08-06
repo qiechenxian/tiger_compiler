@@ -722,7 +722,7 @@ Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame)
     T_exp tmp = T_Temp(rv);
     Temp_label f_temp_label=get_done_label(f_frame);
     T_stm jump=T_Jump(T_Name(f_temp_label),Temp_LabelList(f_temp_label,NULL));
-    return Tr_Nx(T_Seq(T_Move(tmp,Tr_unEx(ret_num)),T_Seq(T_Move(T_Temp(F_R0()), tmp),jump)));
+    return Tr_Nx(T_Seq(T_Move(tmp,Tr_unEx(ret_num)),T_Seq(T_Move(T_Temp(F_R8()), tmp),jump)));
 }
 //todo return jump label in chapter 12
 Tr_exp Tr_newlabel()

@@ -645,7 +645,11 @@ static void munchStm(T_stm s) {
                         emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
 
                         sprintf(inst2, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst2, L(t, NULL), L(F_R0(), F_callersaves())));
+                        if (special_tag) {
+                            emit(AS_Move(inst2, L(t, NULL), L(F_R0(), F_callersaves())));
+                        } else {
+                            emit(AS_Move(inst2, L(t, NULL), L(F_R8(), F_callersaves())));
+                        }
 
                         // 恢复寄存器
                         if (special_tag) {
@@ -969,7 +973,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves())));
+        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves())));
     } else {
         assert("error from call_lib in codegen.cpp ");
     }
