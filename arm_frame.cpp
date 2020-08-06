@@ -467,10 +467,6 @@ Temp_temp F_accessReg(F_access a) {
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
 
-#ifdef LOCAL_VAR_TEMP
-    escape = false;
-#endif
-
     F_access access;
     if(escape) {
         access = InFrame(F_WORD_SIZE * (-frame->local_count));

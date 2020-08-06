@@ -76,7 +76,9 @@ bool pairCmp(intExpPair a, intExpPair b){
 
 INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_list){
     auto init_list = (INIT_initList)checked_malloc(sizeof(INIT_initList_));
-    vector<intExpPair> exp_vector;
+    init_list->array.clear();
+
+    vector<intExpPair> & exp_vector = init_list->array;
 
     int len = 0, total_len=1;
     int temp[256];
@@ -106,7 +108,8 @@ INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_lis
     if (exp_vector.end()->first != total_len){
         exp_vector.emplace_back(total_len, A_IntExp(nullptr, 0));
     }
-    init_list->array = exp_vector;
+
+//    init_list->array = exp_vector;
     init_list->suffix_size = suffix_size;
     init_list->total_size = suffix_size[0] * temp[0];
     return init_list;
