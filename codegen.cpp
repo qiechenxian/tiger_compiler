@@ -162,18 +162,19 @@ static Temp_temp munchExp(T_exp e) {
                     T_exp e1 = mem->u.BINOP.left;
                     int i = mem->u.BINOP.right->u.CONST;
                     Temp_temp r = Temp_newTemp();
+                    Temp_temp r1 = munchExp(e1);
                     if(limit_4096(i)){
                         sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
-                        emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                        emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                     }
                     else{
-                        Temp_temp r1 = Temp_newTemp();
+                        Temp_temp r2 = Temp_newTemp();
 
                         sprintf(inst,"\tldr     'd0,=%d\n",i);
-                        emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+                        emit(AS_Oper(inst, L(r2, NULL), NULL, NULL));
 
                         sprintf(inst2, "\tldr     'd0, ['s0, 's1]\n");
-                        emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
+                        emit(AS_Oper(inst2,L(r,NULL),L(r1,L(r2,NULL)),NULL));
                     }
                     return r;
                 } else if (mem->u.BINOP.op == T_add && mem->u.BINOP.left->kind == T_exp_::T_CONST) {
@@ -181,26 +182,28 @@ static Temp_temp munchExp(T_exp e) {
                     T_exp e1 = mem->u.BINOP.right;
                     int i = mem->u.BINOP.left->u.CONST;
                     Temp_temp r = Temp_newTemp();
+                    Temp_temp r1 = munchExp(e1);
                     if(limit_4096(i)){
                         sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", i);
-                        emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                        emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                     }
                     else{
-                        Temp_temp r1 = Temp_newTemp();
+                        Temp_temp r2 = Temp_newTemp();
 
                         sprintf(inst,"\tldr     'd0,=%d\n",i);
-                        emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+                        emit(AS_Oper(inst, L(r2, NULL), NULL, NULL));
 
                         sprintf(inst2, "\tldr     'd0, ['s0, 's1]\n");
-                        emit(AS_Oper(inst2,L(r,NULL), L(munchExp(e1),L(r1, NULL)),NULL));
+                        emit(AS_Oper(inst2,L(r,NULL), L(r1,L(r2, NULL)),NULL));
                     }
                     return r;
                 } else {
                     /* MEM(e1) 已检查*/
                     T_exp e1 = mem;
                     Temp_temp r = Temp_newTemp();
+                    Temp_temp r1 = munchExp(e1);
                     sprintf(inst, "\tldr     'd0, ['s0]\n");
-                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                     return r;
                 }
             } else if (mem->kind == T_exp_::T_CONST) {
@@ -227,8 +230,9 @@ static Temp_temp munchExp(T_exp e) {
                 /* MEM(e1) 已检查*/
                 T_exp e1 = mem;
                 Temp_temp r = Temp_newTemp();
+                Temp_temp r1 = munchExp(e1);
                 sprintf(inst, "\tldr     'd0, ['s0]\n");
-                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                 return r;
             }
         }
@@ -349,7 +353,7 @@ static Temp_temp munchExp(T_exp e) {
 
                     int lshift = getShiftTime(e1->u.CONST);
                     if (lshift){
-                        sprintf(inst, "\tlsls    'd0, 's0, #%d\n", lshift);
+                        sprintf(inst, "\tlsl    'd0, 's0, #%d\n", lshift);
                         emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
                         return r;
                     }
@@ -368,7 +372,7 @@ static Temp_temp munchExp(T_exp e) {
 
                     int lshift = getShiftTime(e2->u.CONST);
                     if (lshift){
-                        sprintf(inst, "\tlsls    'd0, 's0, #%d\n", lshift);
+                        sprintf(inst, "\tlsl    'd0, 's0, #%d\n", lshift);
                         emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                         return r;
                     }
