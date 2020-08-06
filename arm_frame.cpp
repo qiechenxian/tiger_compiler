@@ -729,14 +729,14 @@ void F_setMemArgs(F_frame frame)
 
 F_access look_for_f_offset(Temp_temp temp,F_frame f)
 {
-    int number_temp=Temp_number(temp);
     F_accessList temp_access=f->locals;
-    for(;temp_access;temp_access=temp_access->tail)
-    {
-        if(Temp_number(temp_access->head->u.reg)==number_temp)
-        {
+
+    for(;temp_access;temp_access=temp_access->tail) {
+        if((temp_access->head->kind == F_access_::inReg) &&
+            Temp_number(temp_access->head->u.reg) == temp->num) {
             return temp_access->head;
         }
     }
+
     return NULL;
 }
