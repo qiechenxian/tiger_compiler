@@ -493,7 +493,7 @@ static void doCallerReg(int args, int type){
         }else{
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
             sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), F_callersaves()), NULL));
+            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), L(callerArray[i], NULL)), NULL));
         }
     }
 
@@ -505,7 +505,7 @@ static void doCallerReg(int args, int type){
         }else{
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
             sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), F_callersaves()), NULL));
+            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), L(callerArray[i], NULL)), NULL));
         }
     }
 
