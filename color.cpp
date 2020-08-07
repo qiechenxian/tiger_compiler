@@ -449,6 +449,7 @@ static void coalesce() {//错误注释语句信息的定位
         u = x;
         v = y;
     }
+
     G_node nu = temp2Node(u);
     G_node nv = temp2Node(v);
 
@@ -659,16 +660,22 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         } else {
             coloredNodes = L(t, coloredNodes);
             Temp_enter(colors, t, color2Str(okColors->head, precolored));
-#if 0
+#ifdef DEBUG_PRINT
             printf("Color: %d -- %d\n", t->num, okColors->head->num);
 #endif
         }
     }
+
     Temp_tempList tl;
     for (tl = c.coalescedNodes; tl; tl = tl->tail) {
         G_node alias = getAlias(temp2Node(tl->head));
-        c_string color = Temp_look(colors, node2Temp(alias));
-        Temp_enter(colors, tl->head, color);
+        c_string aliasColor = Temp_look(colors, node2Temp(alias));
+        c_string srcColor = Temp_look(colors, tl->head);
+        if(!aliasColor && srcColor) {
+            Temp_enter(colors, node2Temp(alias), srcColor);
+        } else if(aliasColor && !srcColor) {
+            Temp_enter(colors, tl->head, aliasColor);
+        }
     }
 
     ret.coloring = colors;
@@ -680,7 +687,7 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
 
     ret.spills = NULL;
     for (; c.spilledNodes; c.spilledNodes = c.spilledNodes->tail) {
-#if 0
+#ifdef DEBUG_PRINT
         printf("spilled: %s\n", tempName(c.spilledNodes->head));
 #endif
         ret.spills = L(c.spilledNodes->head, ret.spills);

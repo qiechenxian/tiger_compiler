@@ -200,7 +200,7 @@ static void solveLiveness(struct Live_graph *lg,
             ndef = findOrCreateNode(t->head, g, tab);
 
 #ifdef DEBUG_PRINT
-            printf("Var:%d--Node(%d)", t->head->num, ndef->mykey);
+            printf("Var:%d--", t->head->num);
 #endif
 
             // Add edges between output vars and defined var
@@ -209,7 +209,7 @@ static void solveLiveness(struct Live_graph *lg,
                 nedge = findOrCreateNode(tedge->head, g, tab);
 
 #ifdef DEBUG_PRINT
-                printf(":%d", nedge->mykey);
+                printf(":%d", ((Temp_temp)nedge->info)->num);
 #endif
 
                 // Skip if edge is added
