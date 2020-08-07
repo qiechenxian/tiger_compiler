@@ -317,37 +317,40 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r1 = nullptr;
                 Temp_temp r2 = nullptr;
                 if (e1->kind == T_exp_::T_CONST){
+                    int i = e1->u.CONST;
                     r2 = munchExp(e2);
-                    if (e1->u.CONST == 0){
+                    if (i == 0){
                         sprintf(inst, "\tmov     'd0, #0\n");
-                        emit(AS_Move(inst, L(r, NULL), NULL));
+                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                         return r;
-                    } else if (e1->u.CONST == 1){
+                    } else if (i == 1){
                         sprintf(inst, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst, L(r, NULL), L(r2, NULL)));
+                        emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
                         return r;
                     }
 
-                    int lshift = getShiftTime(e1->u.CONST);
+                    int lshift = getShiftTime(i);
                     if (lshift){
                         sprintf(inst, "\tlsl     'd0, 's0, #%d\n", lshift);
                         emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
                         return r;
                     }
                 }
+
                 if (e2->kind == T_exp_::T_CONST){
+                    int i = e2->u.CONST;
                     r1 = munchExp(e1);
-                    if (e2->u.CONST == 0){
+                    if (i == 0){
                         sprintf(inst, "\tmov     'd0, #0\n");
-                        emit(AS_Move(inst, L(r, NULL), NULL));
+                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                         return r;
-                    } else if (e2->u.CONST == 1){
+                    } else if (i == 1){
                         sprintf(inst, "\tmov     'd0, 's0\n");
-                        emit(AS_Move(inst, L(r, NULL), L(r1, NULL)));
+                        emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                         return r;
                     }
 
-                    int lshift = getShiftTime(e2->u.CONST);
+                    int lshift = getShiftTime(i);
                     if (lshift){
                         sprintf(inst, "\tlsl     'd0, 's0, #%d\n", lshift);
                         emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
@@ -355,10 +358,8 @@ static Temp_temp munchExp(T_exp e) {
                     }
                 }
 
-                if (not r1)
-                    r1 = munchExp(e1);
-                if (not r2)
-                    r2 = munchExp(e2);
+                if(nullptr == r1) r1 = munchExp(e1);
+                if(nullptr == r2) r2 = munchExp(e2);
                 sprintf(inst, "\tmul     'd0, 's0, 's1\n");
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
@@ -595,9 +596,9 @@ static void munchStm(T_stm s) {
                         sprintf(inst2, "\tmov     'd0, 's0\n");
 
                         if (special_tag) {
-                            emit(AS_Move(inst2, L(t, NULL), L(F_R0(), F_callersaves())));
+                            emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL));
                         } else {
-                            emit(AS_Move(inst2, L(t, NULL), L(F_R8(), F_callersaves())));
+                            emit(AS_Oper(inst2, L(t, NULL), L(F_R8(), F_callersaves()), NULL));
                         }
 
                         // 恢复寄存器
@@ -617,11 +618,26 @@ static void munchStm(T_stm s) {
                         assert(0);
                     }
                 } else {
-                    /* MOVE(TEMP(i),e2) */
+                    /* MOVE(TEMP(i),e1) */
                     T_exp e1 = src;
                     Temp_temp temp = dst->u.TEMP;
-                    sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(temp, NULL), L(munchExp(e1), NULL)));
+
+                    // src是常数
+                    if(e1->kind == T_exp_::T_CONST) {
+
+                        int i = e1->u.CONST;
+
+                        if(constExpr(i)){
+                            sprintf(inst, "\tmov     'd0, #%d\n", i);
+                            emit(AS_Oper(inst, L(temp, NULL), NULL, NULL));
+                        } else {
+                            sprintf(inst, "\tldr     'd0, =%d\n", i);
+                            emit(AS_Oper(inst, L(temp, NULL), NULL, NULL));
+                        }
+                    } else {
+                        sprintf(inst, "\tmov     'd0, 's0\n");
+                        emit(AS_Oper(inst, L(temp, NULL), L(munchExp(e1), NULL), NULL));
+                    }
                 }
             } else if (dst->kind == T_exp_::T_NAME) {
                 //存全局变量
@@ -846,7 +862,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R0(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R0(), NULL),L(r, F_callersaves())));
+                    emit(AS_Oper(inst, L(F_R0(), NULL), L(r, F_callersaves()), NULL));
                     break;
                 }
                 case 1: {
@@ -854,7 +870,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R1(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R1(), NULL), L(r, F_callersaves())));
+                    emit(AS_Oper(inst, L(F_R1(), NULL), L(r, F_callersaves()), NULL));
                     break;
                 }
                 case 2: {
@@ -862,7 +878,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R2(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R2(), NULL), L(r, F_callersaves())));
+                    emit(AS_Oper(inst, L(F_R2(), NULL), L(r, F_callersaves()), NULL));
                     break;
                 }
                 case 3: {
@@ -870,7 +886,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
                     //emit(AS_Oper(str, NULL, L(F_R3(), L(F_SP(), NULL)), NULL));
 
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(F_R3(), NULL), L(r, F_callersaves())));
+                    emit(AS_Oper(inst, L(F_R3(), NULL), L(r, F_callersaves()), NULL));
                     break;
                 }
             }
@@ -898,11 +914,11 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
-    emit(AS_Move(inst2, L(F_R0(), NULL), L(reg1, F_callersaves())));
+    emit(AS_Oper(inst2, L(F_R0(), NULL), L(reg1, F_callersaves()), NULL));
 
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst3, "\tmov     'd0, 's0\n");//传递操作数reg2->r1
-    emit(AS_Move(inst3, L(F_R1(), NULL), L(reg2, F_callersaves())));
+    emit(AS_Oper(inst3, L(F_R1(), NULL), L(reg2, F_callersaves()), NULL));
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
@@ -910,11 +926,11 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     if (strcmp(fun, "__aeabi_idiv") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves())));
+        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves()), NULL));
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Move(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves())));
+        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves()), NULL));
     } else {
         assert("error from call_lib in codegen.cpp ");
     }

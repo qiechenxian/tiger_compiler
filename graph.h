@@ -17,6 +17,14 @@ struct G_nodeList_ {
     G_nodeList tail;
 };
 
+struct G_node_ {
+    G_graph mygraph;
+    int mykey;
+    G_nodeList succs;
+    G_nodeList preds;
+    void *info;
+};
+
 /* 创建新的图 */
 G_graph G_Graph(void);
 

@@ -4,6 +4,10 @@
 
 #include "flowgraph.h"
 
+#include "vector"
+
+using namespace  std;
+
 Temp_tempList FG_def(G_node n) {
     AS_instr inst = (AS_instr) G_nodeInfo(n);
     switch (inst->kind) {
@@ -56,23 +60,43 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
     Temp_labelList ll = NULL, jl = NULL, last_lbl = NULL;
     G_node n = NULL, last_n = NULL, jump_n = NULL;
     AS_instr inst = NULL, last_inst = NULL, last_nonlbl_inst = NULL;
+    vector<Temp_label> labelList;
+    bool needStep = true;
 
     // Iterate and add instructions to graph
-    for (; il; il = il->tail) {
+    for (;il;) {
         inst = il->head;
+
+        needStep = true;
+
         if (inst->kind != AS_instr_::I_LABEL) {
+
             n = G_Node(g, (void *) inst);
+
+            bool label_added = true;
+            if(labelList.size()) {
+                for(Temp_label label : labelList) {
+                    nl = G_NodeList(n, nl);
+                    ll = Temp_LabelList(label, ll);
+                }
+                label_added = false;
+                labelList.clear();
+            }
 
             if (last_inst) {
                 if (last_inst->kind == AS_instr_::I_LABEL) {
-                    nl = G_NodeList(n, nl);
-                    ll = Temp_LabelList(last_inst->u.LABEL.label, ll);
+
+                    if(label_added) {
+                        nl = G_NodeList(n, nl);
+                        ll = Temp_LabelList(last_inst->u.LABEL.label, ll);
+                    }
+
                     if (last_nonlbl_inst) {
                         G_addEdge(last_n, n);
                     }
                 } else if (last_inst->kind == AS_instr_::I_OPER && last_inst->u.OPER.jumps != NULL) {
                     // add edge for conditional jumps
-                    if (strstr(last_inst->u.OPER.assem, "jmp") != last_inst->u.OPER.assem) {
+                    if (strstr(last_inst->u.OPER.assem, "b ") == 0 &&  strstr(last_inst->u.OPER.assem, "bl ") == 0) {
                         G_addEdge(last_n, n);
                     }
                 } else {
@@ -86,9 +110,40 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
 
             last_n = n;
             last_nonlbl_inst = inst;
+
+            last_inst = inst;
+
+        }  else  {
+
+            last_inst = inst;
+
+            bool multiLabel = false;
+            AS_instrList newil = il;
+            for (newil = newil->tail; newil; newil = newil->tail) {
+
+                if(newil->head->kind != AS_instr_::I_LABEL) {
+                    break;
+                }
+
+                multiLabel = true;
+
+                last_inst = newil->head;
+
+                labelList.push_back(newil->head->u.LABEL.label);
+            }
+
+            if(multiLabel) {
+                il = newil;
+                labelList.push_back(inst->u.LABEL.label);
+                needStep = false;
+            }
         }
-        last_inst = inst;
+
+        if(needStep) {
+            il = il->tail;
+        }
     }
+
     // Handle jump instructions
     for (; jumpnl; jumpnl = jumpnl->tail) {
         n = jumpnl->head;
@@ -102,6 +157,7 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
             }
         }
     }
+
     return g;
 }
 

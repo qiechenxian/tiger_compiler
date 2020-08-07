@@ -105,8 +105,28 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
                 break;
             }
         }//直到到达不动点前都要继续执行
-
     }
+
+#ifdef DEBUG_PRINT
+    for (fl = G_nodes(flow); fl; fl = fl->tail) {
+        n = fl->head;
+        li = lookupLiveMap(in, n);
+        lo = lookupLiveMap(out, n);
+
+        printf("In:%d--", n->mykey);
+        for(; li; li = li->tail) {
+            printf(":%d", li->head->num);
+        }
+        printf("\n");
+
+        printf("Out:%d--", n->mykey);
+        for(; lo; lo = lo->tail) {
+            printf(":%d", lo->head->num);
+        }
+        printf("\n");
+    }
+#endif
+
     free(last_in);
     free(last_out);
 }
@@ -137,18 +157,28 @@ static void solveLiveness(struct Live_graph *lg,
     // Traverse node
     for (fl = G_nodes(flow); fl; fl = fl->tail) {
         n = fl->head;
+
+        // 节点对应的指令
         inst = FG_inst(n);
-        tout = lookupLiveMap(out, n);//n的出口活跃节点
+
+        // 查询节点对应的出口活跃点
+        tout = lookupLiveMap(out, n);
+
+        // 获取该指令对应的源操作数和目的操作数
         tdef = FG_def(n);
         tuse = FG_use(n);
 
+        // 使用与定值合并
         Temp_tempList defuse = tempUnion(tuse, tdef);
 
         // Spill Cost
         for (t = defuse; t; t = t->tail) {
             Temp_temp ti = t->head;
+
+            // 计算变量溢出的代价
             long long spills = (long long)Temp_lookPtr(spillCost, ti);
             ++spills;
+
             Temp_enterPtr(spillCost, ti, (void*)spills);
         }
 
@@ -163,13 +193,24 @@ static void solveLiveness(struct Live_graph *lg,
             }
             worklistMoves = instUnion(worklistMoves, IL(inst, NULL));
         }
+
         // Traverse defined vars
         for (t = tout; t; t = t->tail) {
+
             ndef = findOrCreateNode(t->head, g, tab);
+
+#ifdef DEBUG_PRINT
+            printf("Var:%d--Node(%d)", t->head->num, ndef->mykey);
+#endif
 
             // Add edges between output vars and defined var
             for (tedge = tout; tedge; tedge = tedge->tail) {
+
                 nedge = findOrCreateNode(tedge->head, g, tab);
+
+#ifdef DEBUG_PRINT
+                printf(":%d", nedge->mykey);
+#endif
 
                 // Skip if edge is added
                 if (ndef == nedge || G_goesTo(ndef, nedge) || G_goesTo(nedge, ndef)) {
@@ -182,7 +223,11 @@ static void solveLiveness(struct Live_graph *lg,
                 }
 
                 G_addEdge(ndef, nedge);
+
             }
+#ifdef DEBUG_PRINT
+            printf("\n");
+#endif
         }
     }
 
