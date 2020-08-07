@@ -96,7 +96,7 @@ G_graph FG_AssemFlowGraph(AS_instrList il, F_frame f) {
                     }
                 } else if (last_inst->kind == AS_instr_::I_OPER && last_inst->u.OPER.jumps != NULL) {
                     // add edge for conditional jumps
-                    if (strstr(last_inst->u.OPER.assem, "b ") == 0 &&  strstr(last_inst->u.OPER.assem, "bl ") == 0) {
+                    if (strstr(last_inst->u.OPER.assem, "b ") == 0) {
                         G_addEdge(last_n, n);
                     }
                 } else {

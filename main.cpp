@@ -128,6 +128,11 @@ int main(int argc, char **argv) {
      * open the input file
      */
     yyin = fopen(INPUT_FILE, "r");
+    if(yyin == NULL) {
+        printf("Open file(%s) failed\n", INPUT_FILE);
+        return -1;
+    }
+
     yyout = stdout;
     FILE_NAME = INPUT_FILE; // todo refactor?
 
@@ -150,6 +155,11 @@ int main(int argc, char **argv) {
 
     //输出汇编指令的路径,应更改为文件名
     FILE *outfile=fopen(OUTPUT_FILE, "w");
+    if(outfile == NULL) {
+        printf("open file(%s) failed", OUTPUT_FILE);
+        return -1;
+    }
+
 //    FILE *outfile = stdout;
     doGlobal(outfile, frags);
     fprintf(outfile, "\t.text\n");
@@ -158,6 +168,7 @@ int main(int argc, char **argv) {
             doProc(outfile, frags->head->u.proc.frame, frags->head->u.proc.body);
         }
     }
+
     return 0;
 }
 
