@@ -123,9 +123,7 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
         G_node n = temp2Node(t, ig);
         G_node alias = getAlias(n, aliases, cn);
         t = node2Temp(n);
-        if(t != NULL) {
-            al = L(t, al);
-        }
+        al = L(t, al);
     }
     return tempUnion(al, NULL);
 }

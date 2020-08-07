@@ -24,35 +24,12 @@ Temp_tempList L(Temp_temp h, Temp_tempList t) {
     return Temp_TempList(h, t);
 }
 
-// 检查是否是外部函数，若是外部函数则返回参数的个数
-void Sys_lib_fuc_test(Temp_label lab, bool &libFunc, int &saveStackRegCnt) {
-
-    libFunc = true;
-    saveStackRegCnt = -1;
-
-    if(strcmp("getint", Temp_labelString(lab)) == 0 ) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("getch", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("getarray", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("putint", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("putch", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("putarray", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 2;
-    } else if(strcmp("putf", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 4;
-    } else if(strcmp("starttime", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("stoptime", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 1;
-    } else if(strcmp("memset", Temp_labelString(lab)) == 0) {
-        saveStackRegCnt = 3;
-    } else {
-        libFunc = false;
-    }
+bool Sys_lib_fuc_test(Temp_label lab) {
+    return strcmp("getint", Temp_labelString(lab)) == 0 || strcmp("getch", Temp_labelString(lab)) == 0
+           || strcmp("getarray", Temp_labelString(lab)) == 0 || strcmp("putint", Temp_labelString(lab)) == 0
+           || strcmp("putch", Temp_labelString(lab)) == 0 || strcmp("putarray", Temp_labelString(lab)) == 0
+           || strcmp("putf", Temp_labelString(lab)) == 0 || strcmp("starttime", Temp_labelString(lab)) == 0
+           || strcmp("stoptime", Temp_labelString(lab)) == 0||strcmp("memset", Temp_labelString(lab)) == 0;
 }
 
 // 用于表达式的匹配，每种情形的从句将匹配一个瓦片
@@ -416,7 +393,7 @@ static Temp_temp munchExp(T_exp e) {
             Temp_temp r = Temp_newTemp();
             if(constExpr(i)){
                 sprintf(inst, "\tmov     'd0, #%d\n", i);
-                emit(AS_Oper(inst, L(r, NULL), NULL,NULL));
+                emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
             }
             else{
                 sprintf(inst, "\tldr     'd0, =%d\n", i);
@@ -482,8 +459,8 @@ static void doCallerReg(int args, int type){
 
     Temp_temp* callerArray = F_getCallerArray();
 
-    if (args > 4)
-        args = 4;
+    // 强制前四个要入栈保存
+    args = 4;
 
     for (int i = 0; i < args; i++){
         if (type == CALL_SAVE){
@@ -496,19 +473,6 @@ static void doCallerReg(int args, int type){
             emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), L(callerArray[i], NULL)), NULL));
         }
     }
-
-    for (int i = 4; i < 8; i++){
-        if (type == CALL_SAVE){
-            char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
-            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(F_FP(), NULL), L(callerArray[i], NULL), NULL));
-        }else{
-            char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
-            sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), L(callerArray[i], NULL)), NULL));
-        }
-    }
-
 }
 
 /*
@@ -533,12 +497,7 @@ static void munchStm(T_stm s) {
                     T_exp e1 = dst->u.MEM->u.BINOP.left, e2 = src;
                     int i = dst->u.MEM->u.BINOP.right->u.CONST;
                     if(limit_4096(i)){
-                        if(i == 0) {
-                            sprintf(inst, "\tstr     's0, ['s1]\n");
-                        } else {
-                            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
-                        }
-
+                        sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
                         emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                     }
                     else{
@@ -556,12 +515,7 @@ static void munchStm(T_stm s) {
                     T_exp e1 = dst->u.MEM->u.BINOP.right, e2 = src;
                     int i = dst->u.MEM->u.BINOP.left->u.CONST;
                     if(limit_4096(i)){
-                        if(i ==0) {
-                            sprintf(inst, "\tstr     's0, ['s1]\n");
-                        } else {
-                            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
-                        }
-
+                        sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i);
                         emit(AS_Oper(inst, NULL, L(munchExp(e2), L(munchExp(e1), NULL)), NULL));
                     }
                     else{
@@ -620,19 +574,13 @@ static void munchStm(T_stm s) {
                         Temp_temp t = dst->u.TEMP;
                         bool special_tag = false;
                         count_func_param = 0;
-                        int need_args_count = 0;
 
-                        // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
-                        Sys_lib_fuc_test(lab, special_tag, need_args_count);
+                        // 检查是否是外部函数
+                        special_tag = Sys_lib_fuc_test(lab);
                         if (true == special_tag) {
-                            for (args_count = 0; temp_args; temp_args = temp_args->tail) {
-                                args_count++;
-                            }
 
-                            if((0 == args_count)) {
-                                args_count = 1;
-                            } else if(args_count > 4) {
-                                args_count = 4;
+                            for (; temp_args; temp_args = temp_args->tail) {
+                                args_count++;
                             }
 
                             doCallerReg(args_count, CALL_SAVE);
@@ -645,6 +593,7 @@ static void munchStm(T_stm s) {
                         emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
 
                         sprintf(inst2, "\tmov     'd0, 's0\n");
+
                         if (special_tag) {
                             emit(AS_Move(inst2, L(t, NULL), L(F_R0(), F_callersaves())));
                         } else {
@@ -715,20 +664,12 @@ static void munchStm(T_stm s) {
                     bool special_tag = false;
                     count_func_param = 0;
 
-                    int need_args_count = 0;
-
                     // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
-                    Sys_lib_fuc_test(lab, special_tag, need_args_count);
+                    special_tag = Sys_lib_fuc_test(lab);
 
                     if (true == special_tag) {
-                        for (args_count = 0; temp_args; temp_args = temp_args->tail) {
+                        for (; temp_args; temp_args = temp_args->tail) {
                             args_count++;
-                        }
-
-                        if((0 == args_count)) {
-                            args_count = 1;
-                        } else if(args_count > 4) {
-                            args_count = 4;
                         }
 
                         doCallerReg(args_count, CALL_SAVE);
@@ -873,11 +814,11 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
         char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
         Temp_temp r = munchExp(args->head);
         if (i)
-            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", i * get_word_size());
+            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i * get_word_size());
         else
-            sprintf(inst, "\tstr     's0, ['d0]\n");
+            sprintf(inst, "\tstr     's0, ['s1]\n");
 
-        emit(AS_Oper(inst, L(F_SP(), NULL), L(r, NULL), NULL));
+        emit(AS_Oper(inst, NULL, L(r, L(F_SP(), NULL)), NULL));
 
         Temp_tempList old = munchArgs(false, i + 1, args->tail);
         return Temp_TempList(r, old);
@@ -891,11 +832,11 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
         Temp_temp r = munchExp(args->head);
         if (count_func_param > 4) {
             if (i - 4)
-                sprintf(inst, "\tstr     's0, ['d0, #%d]\n", (i - 4) * get_word_size());
+                sprintf(inst, "\tstr     's0, ['s1, #%d]\n", (i - 4) * get_word_size());
             else
-                sprintf(inst, "\tstr     's0, ['d0]\n");
+                sprintf(inst, "\tstr     's0, ['s1]\n");
 
-            emit(AS_Oper(inst, L(F_SP(), F_callersaves()), L(r, NULL), NULL));
+            emit(AS_Oper(inst, NULL, L(r, L(F_SP(), NULL)), NULL));
             Temp_tempList old = munchArgs(true, i + 1, args->tail);
             return Temp_TempList(r, old);
         } else if (args_count >= 0) {
@@ -953,7 +894,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 
 //    Temp_temp* callerReg = F_getCallerArray();
 //    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
-    doCallerReg(2, CALL_SAVE);
+    doCallerReg(4, CALL_SAVE);
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
@@ -978,6 +919,6 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
         assert("error from call_lib in codegen.cpp ");
     }
 
-    doCallerReg(2, CALL_LOAD);
+    doCallerReg(4, CALL_LOAD);
 }
 

@@ -92,7 +92,7 @@ Temp_temp F_FP()//取帧指针
 }
 //TODO 取栈指针，为什么两个？
 Temp_temp F_RV(void){
-    if (fp == NULL) {
+    if (r0 == NULL) {
         F_initRegisters();
     }
     return r0;
@@ -421,15 +421,14 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
         frame->callee_max_args = callee_args;
 }
 
-#define STACK_PROTECT_REG_NUM_MAX 8
-#define MAIN_STACK_PROTECT_REG_NUM_MAX 4
+// R4~R7
+#define STACK_PROTECT_REG_NUM_MAX 4
 
 F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 6 + 1 + STACK_PROTECT_REG_NUM_MAX; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
-    /// 8是为保存r0-7预留的空间
+    f->local_count = STACK_PROTECT_REG_NUM_MAX + 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
     f->locals = nullptr;
     f->isLeaf = true;
     f->temp_space = 0;
@@ -630,21 +629,17 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         head_inst_ptr = head_inst_ptr->tail;
 
 //        recover_offset = 0;
-        recover_offset = (0 + STACK_PROTECT_REG_NUM_MAX) * word_size;
+        recover_offset = (0 + 6) * word_size;
     } else {
         char *inst = (char *) "\tstmfd   sp!, {fp, lr}\n";
         head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
 
-        recover_offset = (1 + MAIN_STACK_PROTECT_REG_NUM_MAX) * word_size;
+        recover_offset = (1 + 6) * word_size;
     }
 
     // todo 优化
-    if(!frame->isLeaf) {
-        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7}\n", NULL, NULL, NULL),NULL);
-    } else {
-        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r0-r7}\n", NULL, NULL, NULL),NULL);
-    }
+    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7}\n", NULL, NULL, NULL),NULL);
     head_inst_ptr = head_inst_ptr->tail;
 
     char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
@@ -678,9 +673,6 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_ptr->tail = body->tail;
 
     /** 函数出口指令 */
-//    tail_inst_list = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
-//    tail_inst_ptr = tail_inst_list;
-
     inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
 
@@ -696,11 +688,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         tail_inst_ptr = tail_inst_list;
     }
 
-    if(!frame->isLeaf) {
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
-    } else {
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r0-r7}\n", NULL, NULL, NULL), NULL);
-    }
+    tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
     tail_inst_ptr = tail_inst_ptr->tail;
 
 
@@ -752,7 +740,7 @@ F_access look_for_f_offset(Temp_temp temp,F_frame f)
 
     for(;temp_access;temp_access=temp_access->tail) {
         if((temp_access->head->kind == F_access_::inReg) &&
-            Temp_number(temp_access->head->u.reg) == temp->num) {
+            temp_access->head->u.reg->num == temp->num) {
             return temp_access->head;
         }
     }

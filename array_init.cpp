@@ -148,13 +148,26 @@ U_pairList INIT_shrinkInitList(INIT_initList init_list){
     U_pairList shrink_array = nullptr;
     U_pairList tail_ptr = shrink_array;
     int pre = 0;
+    int cnt = 1;
     for (auto & iter : init_list->array){
         int zeros = iter.first - pre - 1;
         pre = iter.first;
         U_intPair pair;
         if (zeros > 0){
             pair = U_IntPair(zeros, 0);
+            if (not shrink_array){
+                shrink_array = U_PairList(pair, nullptr);
+                tail_ptr = shrink_array;
+            } else{
+                tail_ptr->tail = U_PairList(pair, nullptr);
+                tail_ptr = tail_ptr->tail;
+            }
+            if (cnt == init_list->array.size())
+                break;
+            pair = U_IntPair(1, iter.second->u.intExp);
         } else{
+            if (cnt == init_list->array.size())
+                break;
             pair = U_IntPair(1, iter.second->u.intExp);
         }
         if (not shrink_array){
@@ -164,6 +177,7 @@ U_pairList INIT_shrinkInitList(INIT_initList init_list){
             tail_ptr->tail = U_PairList(pair, nullptr);
             tail_ptr = tail_ptr->tail;
         }
+        cnt++;
     }
     return shrink_array;
 }

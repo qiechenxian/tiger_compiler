@@ -18,8 +18,6 @@ struct G_node_ {
     int mykey;
     G_nodeList succs;
     G_nodeList preds;
-    Temp_tempList in;
-    Temp_tempList out;
     void *info;
 };
 

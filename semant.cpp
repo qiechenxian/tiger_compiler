@@ -707,7 +707,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         }
         case A_stm_::A_returnStm:{//todo translate  now translate it as put result in rv reg
             if (!s->u.returnStm){
-                return Expty(Tr_nopExp(), TY_Void());
+                return Expty(Tr_return_no_param(frame), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
             expty expty_msg = Expty(Tr_return(returnTy.exp,frame), returnTy.ty);

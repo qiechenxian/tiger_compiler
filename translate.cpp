@@ -323,6 +323,7 @@ Tr_exp Tr_simpleVarNoMem(Tr_access acc)
 
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 {
+    bool flag = false;
     T_exp offset_exp = Tr_unEx(offset);
     if (offset_exp->kind == T_exp_::T_CONST){
         T_exp base_exp = Tr_unEx(base);
@@ -331,6 +332,7 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
         (base_exp->kind == T_exp_::T_MEM and
         base_exp->u.MEM->kind == T_exp_::T_BINOP)){
             if (base_exp->kind == T_exp_::T_MEM){
+                flag = true;
                 base_exp = base_exp->u.MEM;
             }
             assert(base_exp->kind == T_exp_::T_BINOP);
@@ -343,8 +345,10 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
                         )
                 ));
             } else{
+                if (flag)
+                    base_exp = T_Mem(base_exp);
                 return Tr_Ex(T_Mem(T_Binop(
-                        T_add, T_Mem(base_exp),
+                        T_add, base_exp,
                         T_Const(offset_exp->u.CONST * dimension * get_word_size())
                 )));
             }
@@ -364,6 +368,7 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 
 Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
 {
+    bool flag = false;
     T_exp offset_exp = Tr_unEx(offset);
     if (offset_exp->kind == T_exp_::T_CONST){
         T_exp base_exp = Tr_unEx(base);
@@ -371,6 +376,7 @@ Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
         if (base_exp->kind == T_exp_::T_BINOP or
             (base_exp->kind == T_exp_::T_MEM and base_exp->u.MEM->kind == T_exp_::T_BINOP)){
             if (base_exp->kind == T_exp_::T_MEM){
+                flag = true;
                 base_exp = base_exp->u.MEM;
             }
             assert(base_exp->kind == T_exp_::T_BINOP);
@@ -381,8 +387,10 @@ Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
                         T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
                 ));
             } else{
+                if (flag)
+                    base_exp = T_Mem(base_exp);
                 return Tr_Ex(T_Binop(
-                        T_add, T_Mem(base_exp),
+                        T_add, base_exp,
                         T_Const(offset_exp->u.CONST*dimension*get_word_size())
                 ));
             }
@@ -716,14 +724,20 @@ void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals)//todo
 }
 Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame)
 {
-//    Temp_temp get_rv=F_RV();
-    Temp_temp rv = Temp_newTemp();
-//    T_exp tmp=T_Temp(get_rv);
-    T_exp tmp = T_Temp(rv);
-    Temp_label f_temp_label=get_done_label(f_frame);
-    T_stm jump=T_Jump(T_Name(f_temp_label),Temp_LabelList(f_temp_label,NULL));
-    return Tr_Nx(T_Seq(T_Move(tmp,Tr_unEx(ret_num)),T_Seq(T_Move(T_Temp(F_R8()), tmp),jump)));
+    T_exp tmp = T_Temp(F_R8());
+    Temp_label f_temp_label = get_done_label(f_frame);
+    T_stm jump = T_Jump(T_Name(f_temp_label), Temp_LabelList(f_temp_label, NULL));
+
+    return Tr_Nx(T_Seq(T_Move(tmp, Tr_unEx(ret_num)), jump));
 }
+
+Tr_exp Tr_return_no_param(F_frame f_frame)
+{
+    Temp_label f_temp_label = get_done_label(f_frame);
+    T_stm jump = T_Jump(T_Name(f_temp_label), Temp_LabelList(f_temp_label, NULL));
+    return Tr_Nx(jump);
+}
+
 //todo return jump label in chapter 12
 Tr_exp Tr_newlabel()
 {

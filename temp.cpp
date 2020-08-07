@@ -247,10 +247,7 @@ void* Temp_lookPtr(Temp_map m, Temp_temp t) {
 }
 
 
-int Temp_number(Temp_temp test)
-{
-    return test->num;
-}
+
 
 
 
