@@ -330,7 +330,7 @@ static Temp_temp munchExp(T_exp e) {
 
                     int lshift = getShiftTime(e1->u.CONST);
                     if (lshift){
-                        sprintf(inst, "\tlsl    'd0, 's0, #%d\n", lshift);
+                        sprintf(inst, "\tlsl     'd0, 's0, #%d\n", lshift);
                         emit(AS_Oper(inst, L(r, NULL), L(r2, NULL), NULL));
                         return r;
                     }
@@ -349,7 +349,7 @@ static Temp_temp munchExp(T_exp e) {
 
                     int lshift = getShiftTime(e2->u.CONST);
                     if (lshift){
-                        sprintf(inst, "\tlsl    'd0, 's0, #%d\n", lshift);
+                        sprintf(inst, "\tlsl     'd0, 's0, #%d\n", lshift);
                         emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                         return r;
                     }
@@ -465,12 +465,12 @@ static void doCallerReg(int args, int type){
     for (int i = 0; i < args; i++){
         if (type == CALL_SAVE){
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
-            sprintf(inst, "\tstr     's0, ['d0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(F_FP(), NULL), L(callerArray[i], NULL), NULL));
+            sprintf(inst, "\tstr     's0, ['s1, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, NULL, L(callerArray[i], L(F_FP(), NULL)), NULL));
         }else{
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
-            sprintf(inst, "\tldr     'd0, ['s0, #%d]\n", -i*word_size - 28 - 4);
-            emit(AS_Oper(inst, L(callerArray[i], NULL), L(F_FP(), L(callerArray[i], NULL)), NULL));
+            sprintf(inst, "\tldr     's0, ['s1, #%d]\n", -i*word_size - 28 - 4);
+            emit(AS_Oper(inst, NULL, L(callerArray[i], L(F_FP(), NULL)), NULL));
         }
     }
 }

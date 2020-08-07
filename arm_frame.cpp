@@ -422,7 +422,8 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
 }
 
 // R4~R7
-#define STACK_PROTECT_REG_NUM_MAX 4
+#define STACK_PROTECT_REG_NUM_MAX 8
+#define STACK_PROTECT_REG_NUM_MAX_MAIN 4
 
 F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
@@ -629,17 +630,21 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         head_inst_ptr = head_inst_ptr->tail;
 
 //        recover_offset = 0;
-        recover_offset = (0 + 6) * word_size;
+        recover_offset = (0 + STACK_PROTECT_REG_NUM_MAX) * word_size;
     } else {
         char *inst = (char *) "\tstmfd   sp!, {fp, lr}\n";
         head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         head_inst_ptr = head_inst_ptr->tail;
 
-        recover_offset = (1 + 6) * word_size;
+        recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX_MAIN) * word_size;
     }
 
     // todo 优化
-    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7}\n", NULL, NULL, NULL),NULL);
+    if (frame->isLeaf) {
+        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r0-r7}\n", NULL, NULL, NULL),NULL);
+    } else {
+        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7}\n", NULL, NULL, NULL),NULL);
+    }
     head_inst_ptr = head_inst_ptr->tail;
 
     char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
@@ -688,7 +693,11 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         tail_inst_ptr = tail_inst_list;
     }
 
-    tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
+    if (frame->isLeaf) {
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r0-r7}\n", NULL, NULL, NULL), NULL);
+    } else {
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
+    }
     tail_inst_ptr = tail_inst_ptr->tail;
 
 
