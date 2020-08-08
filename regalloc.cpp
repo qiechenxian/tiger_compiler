@@ -122,9 +122,13 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
         Temp_temp t = tl->head;
         G_node n = temp2Node(t, ig);
         G_node alias = getAlias(n, aliases, cn);
-        t = node2Temp(n);
+        Temp_temp alias_temp = node2Temp(alias);
+        if(alias_temp) {
+            al = L(t, al);
+        }
         al = L(t, al);
     }
+
     return tempUnion(al, NULL);
 }
 
@@ -171,7 +175,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
         Temp_tempList tl, new_spilled = NULL;
         AS_instrList inst_move;
 
-#if 0
+#ifdef DEBUG_PRINT
         // 查看合并的Move指令是否包含有溢出的临时变量
         for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
 

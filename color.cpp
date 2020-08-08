@@ -254,24 +254,37 @@ static bool moveRelated(Temp_temp t) {
 }
 
 //有可能合并的传送指令集合准备
-static void makeWorkList() {//低度数的传送无关表，一般来说当一个变量的冲突边小于K时其放入低度数的冲突无关表，K为当前使用的寄存器个个数
+static void makeWorkList() {
+
+    //低度数的传送无关表，一般来说当一个变量的冲突边小于K时其放入低度数的冲突无关表，K为当前使用的寄存器个个数
     Temp_tempList tl;
-    for (tl = c.initial; tl; tl = tl->tail) {//遍历预着色节点
+
+    // 遍历预着色节点
+    for (tl = c.initial; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
-        G_node n = temp2Node(t);//在冲突图中查找预着色节点
-        c.initial = tempMinus(c.initial, L(t, NULL));//预着色节点表=预着色节点表-temp t
+        G_node n = temp2Node(t);
+
+        //在冲突图中查找预着色节点
 
         if (G_degree(n) >= c.K) {
+#ifdef DEBUG_PRINT
+            printf("Init2Spill:%d\n", t->num);
+#endif
             c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));
         } else if (moveRelated(t)) {
             c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));
         } else {
+#ifdef DEBUG_PRINT
+            printf("Init2Simplify:%d\n", t->num);
+#endif
             c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
         }
 //        Temp_tempList spillWorklist;//高度数的节点表
 //        Temp_tempList freezeWorklist;//低度数的传送有关的节点表
 //        Temp_tempList simplifyWorklist;//低度数的传送无关的节点表
     }
+
+    c.initial = NULL;
 }
 
 //移除冲突
@@ -372,20 +385,39 @@ static G_node getAlias(G_node n) {
 
 //简化（第二步）第一步的冲突图构建由solve_liveness解决
 static void simplify() {
-    if (c.simplifyWorklist == NULL) {//c.simplifyWorklist低度数的传送无关的节点表
+
+    if (c.simplifyWorklist == NULL) {
+        //c.simplifyWorklist低度数的传送无关的节点表
         return;
     }
 
     Temp_temp t = c.simplifyWorklist->head;
     G_node n = temp2Node(t);
+
+#ifdef DEBUG_PRINT
+    printf("Simplify:%d\n", t->num);
+#endif
+
     c.simplifyWorklist = c.simplifyWorklist->tail;
 
-    c.selectStack = L(t, c.selectStack);  // push
+    // push
+    if(!Temp_inList(t, c.selectStack)) {
+        c.selectStack = L(t, c.selectStack);
+    } else {
+        int a = 1;
+    }
 
+    // 降低邻居节点的度数
     G_nodeList adjs = G_adj(n);
     for (; adjs; adjs = adjs->tail) {
         G_node m = adjs->head;
-        decrementDegree(m);
+
+        // 该节点从冲突图中去掉，不需要再做后面的降度功能
+        t = node2Temp(m);
+
+        if(!Temp_inList(t, c.selectStack)) {
+            decrementDegree(m);
+        }
     }
 }
 
@@ -553,13 +585,22 @@ static void selectSpill() {
             m = t;
         }
     }
-    c.spillWorklist = tempMinus(c.spillWorklist, L(m, NULL));
-    c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(m, NULL));
-    freezeMoves(m);
+
+    if(m != NULL) {
+        // 从溢出队列中移动到simpify队列中
+#ifdef DEBUG_PRINT
+        printf("Spill2Simplify:%d\n", m->num);
+#endif
+        c.spillWorklist = tempMinus(c.spillWorklist, L(m, NULL));
+        c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(m, NULL));
+        freezeMoves(m);
+    }
 }
 
 static void colorMain() {
+
     makeWorkList();
+
     do {
         if (c.simplifyWorklist != NULL) {
             simplify();//简化过程
@@ -600,8 +641,8 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     c.alias = G_empty();
     c.nodes = ig;//冲突图
 
-    c.K = tempCount(regs);//可用的寄存器个数
-
+    //可用的寄存器个数
+    c.K = tempCount(regs);
 
     Temp_map precolored = initial;//预着色表
     Temp_map colors = Temp_layerMap(Temp_empty(), initial);//将一个空表与与着色表连接
@@ -609,19 +650,33 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     G_nodeList nodes = G_nodes(ig);//冲突图首结点，冲突图中对应节点信息为temp的指针
     G_nodeList temps = NULL;
 
+    //遍历冲突图
     G_nodeList nl;
-    for (nl = nodes; nl; nl = nl->tail) {//遍历冲突图
+    for (nl = nodes; nl; nl = nl->tail) {
 
-        long degree = G_degree(nl->head);//degree为冲突边个数
+        // degree为冲突边个数
+        long degree = G_degree(nl->head);
 
-        G_enter(c.degree, nl->head, (void *) degree);//c.degree为每个节点当前度数的数组
-
-        if (Temp_look(precolored, node2Temp(nl->head))) {//node2Temp返回temp指针，指向命令中的temp位置
-            G_enter(c.degree, nl->head, (void *) 999);//冲突图中的预着色节点的度数设置为999
+        // node2Temp返回temp指针，指向命令中的temp位置
+        if (Temp_look(precolored, node2Temp(nl->head))) {
+            //冲突图中的预着色节点的度数设置为999
+            G_enter(c.degree, nl->head, (void *) 999);
             continue;
         }
-        c.initial = L(node2Temp(nl->head), c.initial);////c.initial临时寄存器集合，既没有预着色也没有处理
+
+        //c.degree为每个节点当前度数的数组
+        G_enter(c.degree, nl->head, (void *) degree);
+
+        //// c.initial临时寄存器集合，既没有预着色也没有处理
+        Temp_temp tn = node2Temp(nl->head);
+
+#ifdef DEBUG_PRINT
+        printf("NODE:%d\n", tn->num);
+#endif
+
+        c.initial = L(tn, c.initial);
     }
+
     colorMain();//开始着色
 
     // for (nl = nodes; nl; nl = nl->tail) {
