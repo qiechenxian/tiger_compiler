@@ -952,15 +952,19 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     if (strcmp(fun, "__aeabi_idiv") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R0(), F_callersaves()), NULL));
+        emit(AS_Oper(inst5, L(F_R8(), NULL), L(F_R0(), F_callersaves()), NULL));
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Oper(inst5, L(rsreg, NULL), L(F_R1(), F_callersaves()), NULL));
+        emit(AS_Oper(inst5, L(F_R8(), NULL), L(F_R1(), F_callersaves()), NULL));
     } else {
         assert("error from call_lib in codegen.cpp ");
     }
 
     doCallerReg(4, CALL_LOAD);
+
+    char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    sprintf(inst6, "\tmov     'd0, 's0\n");
+    emit(AS_Oper(inst6, L(rsreg, NULL), L(F_R8(), NULL), NULL));
 }
 
