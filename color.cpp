@@ -689,7 +689,9 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     //   c.selectStack = L(node2Temp(nl->head), c.selectStack);
     // }
 
+#if 0
     // selectStack保存有Move指令的多余临时变量，需要清除
+    // 这样处理有问题
     AS_instrList inst_move;
     for(inst_move = c.coalescedMoves; inst_move; inst_move = inst_move->tail) {
 
@@ -723,8 +725,8 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         if((dst != src_alias) && (Temp_inList(src_alias, c.selectStack) && Temp_inList(dst, c.selectStack))) {
             c.selectStack = Temp_minus(c.selectStack, L(src_alias, NULL));
         }
-
     }
+#endif
 
     while (c.selectStack != NULL) {
         Temp_temp t = c.selectStack->head; // pop
