@@ -305,6 +305,9 @@ static void removeAdj(G_node n) {
 }
 
 static void enableMoves(Temp_tempList tl) {
+
+    if(c.activeMoves == nullptr) return;
+
     for (; tl; tl = tl->tail) {
         AS_instrList il = nodeMoves(tl->head);
         for (; il; il = il->tail) {
@@ -685,6 +688,43 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     //   }
     //   c.selectStack = L(node2Temp(nl->head), c.selectStack);
     // }
+
+    // selectStack保存有Move指令的多余临时变量，需要清除
+    AS_instrList inst_move;
+    for(inst_move = c.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+
+        Temp_temp src = inst_move->head->u.MOVE.src->head;
+        Temp_temp dst = inst_move->head->u.MOVE.dst->head;
+
+        Temp_temp src_alias = node2Temp(getAlias(temp2Node(src)));
+        Temp_temp dst_alias = node2Temp(getAlias(temp2Node(dst)));
+
+        // 源和目的都在，则删除一个
+        if(Temp_inList(src, c.selectStack) && Temp_inList(dst, c.selectStack)) {
+            c.selectStack = Temp_minus(c.selectStack, L(src, NULL));
+        }
+
+        // 两个源都在，则删除一个
+        if((src != src_alias) && Temp_inList(src, c.selectStack) && Temp_inList(src_alias, c.selectStack)) {
+            c.selectStack = Temp_minus(c.selectStack, L(src, NULL));
+        }
+
+        // 两个目的都在，则删除一个
+        if((dst != dst_alias) && Temp_inList(dst, c.selectStack) && Temp_inList(dst_alias, c.selectStack)) {
+            c.selectStack = Temp_minus(c.selectStack, L(dst_alias, NULL));
+        }
+
+        // 源和目的都在，则删除一个
+        if((src != dst_alias) && (Temp_inList(src, c.selectStack) && Temp_inList(dst_alias, c.selectStack))) {
+            c.selectStack = Temp_minus(c.selectStack, L(src, NULL));
+        }
+
+        // 源和目的都在，则删除一个
+        if((dst != src_alias) && (Temp_inList(src_alias, c.selectStack) && Temp_inList(dst, c.selectStack))) {
+            c.selectStack = Temp_minus(c.selectStack, L(src_alias, NULL));
+        }
+
+    }
 
     while (c.selectStack != NULL) {
         Temp_temp t = c.selectStack->head; // pop
