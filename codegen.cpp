@@ -36,7 +36,7 @@ bool Sys_lib_fuc_test(Temp_label lab) {
 static Temp_temp munchExp(T_exp e);
 
 // 用于语句的匹配
-static void munchStm(T_stm s);
+static void munchStm(T_stm s, F_frame f);
 
 // 用于过程调用中参数传递到正确位置
 static Temp_tempList munchArgs(bool tag, int i, T_expList args);
@@ -56,7 +56,7 @@ AS_instrList F_codegen(F_frame f, T_stmList stmList) {
     AS_instrList list;
     T_stmList stmList1;
     for (stmList1 = stmList; stmList1; stmList1 = stmList1->tail) {
-        munchStm(stmList1->head);
+        munchStm(stmList1->head, f);
     }
     if (last && last->head->kind == AS_instr_::I_LABEL) {
         emit(AS_Oper((char *)"NOP\n", NULL, NULL, NULL));
@@ -481,7 +481,7 @@ static void doCallerReg(int args, int type){
 /*
  * 使用的指令包括
  */
-static void munchStm(T_stm s) {
+static void munchStm(T_stm s, F_frame f) {
     char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
@@ -578,6 +578,9 @@ static void munchStm(T_stm s) {
                         bool special_tag = false;
                         count_func_param = 0;
 
+                        Temp_map m = get_frame_precored_map(f);
+                        Temp_enter(m, t, (char*)"R8");
+
                         Temp_tempList useArgList = NULL;
                         Temp_temp returnVar = NULL;
 
@@ -606,14 +609,12 @@ static void munchStm(T_stm s) {
                         // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
 
-                        emit(AS_Oper(inst, L(returnVar, NULL), useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
+                        emit(AS_Oper(inst, NULL, useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
                         sprintf(inst2, "\tmov     'd0, 's0\n");
 
                         if (special_tag) {
                             emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL));
-                        } else {
-                            emit(AS_Oper(inst2, L(t, NULL), L(F_R8(), F_callersaves()), NULL));
                         }
 
                         // 恢复寄存器

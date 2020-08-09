@@ -682,12 +682,12 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
 
     colorMain();//开始着色
 
-    // for (nl = nodes; nl; nl = nl->tail) {
-    //   if (Temp_look(precolored, node2Temp(nl->head))) {
-    //     continue;
-    //   }
-    //   c.selectStack = L(node2Temp(nl->head), c.selectStack);
-    // }
+    for (nl = nodes; nl; nl = nl->tail) {
+        if (Temp_look(precolored, node2Temp(nl->head))) {
+            continue;
+        }
+        c.selectStack = L(node2Temp(nl->head), c.selectStack);
+    }
 
 #if 0
     // selectStack保存有Move指令的多余临时变量，需要清除

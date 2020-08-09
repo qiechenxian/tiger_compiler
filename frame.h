@@ -97,4 +97,6 @@ F_access look_for_f_offset(Temp_temp temp,F_frame f);
 
 #define LOCAL_VAR_TEMP
 
+Temp_map get_frame_precored_map(F_frame frame);
+
 #endif //COMPILER_LOYX_FRAME_H

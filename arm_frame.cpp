@@ -62,7 +62,7 @@ void F_initRegisters(void) {
                                               Temp_TempList(lr, NULL)));
 }
 Temp_map F_initialRegisters(F_frame f){
-    Temp_map m=Temp_empty();
+    Temp_map m = get_frame_precored_map(f);
 
     Temp_enter(m, fp, (char*)"FP");
     Temp_enter(m, sp, (char*)"SP");
@@ -81,6 +81,7 @@ Temp_map F_initialRegisters(F_frame f){
     Temp_enter(m, r8, (char*)"R8");
     Temp_enter(m, r9, (char*)"R9");
     Temp_enter(m, r10, (char*)"R10");
+
     return m;
 }
 Temp_temp F_FP()//取帧指针
@@ -307,6 +308,7 @@ struct F_frame_ {
     int callee_max_args;
     int temp_space;  /// todo 为寄存器分配后，保存临时变量空间预留的接口
     bool isLeaf;
+    Temp_map precoredMap;
 
     /** instructions required view shift*/
 };//添加局部变量域
@@ -435,11 +437,17 @@ F_frame F_newFrame(Temp_label name, U_boolList formals) {
     f->temp_space = 0;
     f->callee_max_args = -1;
     f->func_done_label=Temp_newLabel();
+    f->precoredMap = Temp_empty();;
     return f;
 }
 
 Temp_label F_getName(F_frame frame) {
     return frame->name;
+}
+
+Temp_map get_frame_precored_map(F_frame frame)
+{
+    return frame->precoredMap;
 }
 
 F_accessList F_getFormals(F_frame frame) {
