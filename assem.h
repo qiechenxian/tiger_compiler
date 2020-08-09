@@ -45,6 +45,7 @@ struct AS_instr_ {
             Temp_tempList dst, src;
         } MOVE;
     } u;
+    bool isDead;
 };
 
 AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j);

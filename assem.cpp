@@ -18,6 +18,7 @@ AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j) {
     p->u.OPER.dst = d;
     p->u.OPER.src = s;
     p->u.OPER.jumps = j;
+    p->isDead = false;
     return p;
 }
 
@@ -26,6 +27,7 @@ AS_instr AS_Label(c_string a, Temp_label label) {
     p->kind = AS_instr_::I_LABEL;
     p->u.LABEL.assem = a;
     p->u.LABEL.label = label;
+    p->isDead = false;
     return p;
 }
 
@@ -35,6 +37,7 @@ AS_instr AS_Move(c_string a, Temp_tempList d, Temp_tempList s) {
     p->u.MOVE.assem = a;
     p->u.MOVE.dst = d;
     p->u.MOVE.src = s;
+    p->isDead = false;
     return p;
 }
 
@@ -184,6 +187,12 @@ static void format(char *result, c_string assem, Temp_tempList dst, Temp_tempLis
 
 void AS_print(FILE *out, AS_instr i, Temp_map m) {
     char result[200];
+
+    // 死代码则跳过
+    if(i->isDead) {
+        return;
+    }
+
     switch (i->kind) {
         case AS_instr_::I_OPER:
             format(result, i->u.OPER.assem, i->u.OPER.dst, i->u.OPER.src, i->u.OPER.jumps, m);

@@ -80,7 +80,9 @@ static void getLiveMap(G_graph flow, G_table in, G_table out) {
             enterLiveMap(last_in, n, li);
             enterLiveMap(last_out, n, lo);
 
-            ci = tempUnion(FG_use(n), tempMinus(lo, FG_def(n)));//返回ci=FG_use(n)+out(n)-FG_def(n)
+            AS_instr inst = (AS_instr) G_nodeInfo(n);
+
+            ci = tempMinus( tempUnion(FG_use(n),lo), FG_def(n));//返回ci=FG_use(n)+out(n)-FG_def(n)
             //入口活跃=use(n)+out(n)-def(n)
             co = NULL;
             for (sl = G_succ(n); sl; sl = sl->tail) {//G_succ(n)取n的后继结点表（控制流里的）
@@ -192,6 +194,11 @@ static void solveLiveness(struct Live_graph *lg,
                 Temp_enterPtr(moveList, t, (void*)ml);
             }
             worklistMoves = instUnion(worklistMoves, IL(inst, NULL));
+        }
+
+        // 结果没有被使用，说明该指令需要删除
+        if(tdef != NULL && !Temp_inList(tdef->head, tout)) {
+            inst->isDead = true;
         }
 
         // Traverse defined vars
