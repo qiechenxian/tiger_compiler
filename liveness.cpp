@@ -197,8 +197,12 @@ static void solveLiveness(struct Live_graph *lg,
         }
 
         // 结果没有被使用，说明该指令需要删除
-        if(tdef != NULL && !Temp_inList(tdef->head, tout)) {
-            inst->isDead = true;
+        if(tdef != NULL && (!Temp_inList(tdef->head, tout))) {
+            // 若节点存在，则什么也不做
+            G_node ln = (G_node)TAB_look(tab, tdef->head);
+            if (ln == NULL && tdef->head->num >= 100) {
+                inst->isDead = true;
+            }
         }
 
         // Traverse defined vars
