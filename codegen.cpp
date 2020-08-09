@@ -229,7 +229,6 @@ static Temp_temp munchExp(T_exp e) {
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
 
-
                     sprintf(inst2,"\tadd     'd0, 's0, 's1\n");
                     emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
                 }
@@ -637,8 +636,8 @@ static void munchStm(T_stm s, F_frame f) {
                         sprintf(inst2, "\tmov     'd0, 's0\n");
                         emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL));
 #else
-                        sprintf(inst2, "\tmov     'd0, 's0\n");
-                        emit(AS_Oper(inst2, L(t, NULL), L(F_R8(), F_callersaves()), NULL));
+                        sprintf(inst3, "\tmov     'd0, 's0\n");
+                        emit(AS_Oper(inst3, L(t, NULL), L(F_R8(), F_callersaves()), NULL));
 #endif
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
@@ -781,8 +780,9 @@ static void munchStm(T_stm s, F_frame f) {
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
                     emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
 
-                    sprintf(inst, "\tcmp     's0, 's1\n");
-                    emit(AS_Oper(inst, NULL, L(r1, L(r, NULL)), NULL));
+                    char *ldr_inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
+                    sprintf(ldr_inst, "\tcmp     's0, 's1\n");
+                    emit(AS_Oper(ldr_inst, NULL, L(r1, L(r, NULL)), NULL));
                 }
             } else {
                 Temp_temp r1 = munchExp(e1);
