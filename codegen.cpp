@@ -461,11 +461,15 @@ static void doCallerReg(int args, int type){
     int word_size = get_word_size();
 
     Temp_temp* callerArray = F_getCallerArray();
-
-    // 强制前四个要入栈保存
+    int loop_start = 0;
     args = 4;
 
-    for (int i = 0; i < args; i++){
+    // 强制前四个要入栈保存
+#ifdef USE_R0_RETURN
+    loop_start = 1;
+#endif
+
+    for (int i = loop_start; i < args; i++){
         if (type == CALL_SAVE){
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
             sprintf(inst, "\tstr     's0, ['s1, #%d]\n", -i*word_size - 28 - 4);
@@ -578,9 +582,10 @@ static void munchStm(T_stm s, F_frame f) {
                         bool special_tag = false;
                         count_func_param = 0;
 
+#if 0
                         Temp_map m = get_frame_precored_map(f);
-                        Temp_enter(m, t, (char*)"R8");
-
+                        Temp_enter(m, t, (char*)"R9");
+#endif
                         Temp_tempList useArgList = NULL;
                         Temp_temp returnVar = NULL;
 
@@ -598,10 +603,17 @@ static void munchStm(T_stm s, F_frame f) {
                             for(int k = 0; k < args_count; k ++) {
                                 useArgList = L(callerArray[k], useArgList);
                             }
-
+#ifdef USE_R0_RETURN
+                            returnVar = t;
+#else
                             returnVar = F_R0();
+#endif
                         } else {
+#ifdef USE_R0_RETURN
+                            returnVar = t;
+#else
                             returnVar = F_R8();
+#endif
                         }
 
                         munchArgs(special_tag, 0, args);
@@ -609,14 +621,16 @@ static void munchStm(T_stm s, F_frame f) {
                         // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
 
-                        emit(AS_Oper(inst, NULL, useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
+                        emit(AS_Oper(inst, L(returnVar, NULL), useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
+#ifndef USE_R0_RETURN
                         sprintf(inst2, "\tmov     'd0, 's0\n");
-
                         if (special_tag) {
-                            emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL));
+                            emit(AS_Oper(inst2, L(t, NULL), L(returnVar, F_callersaves()), NULL));
+                        } else {
+                            emit(AS_Oper(inst2, L(t, NULL), L(returnVar, F_callersaves()), NULL));
                         }
-
+#endif
                         // 恢复寄存器
                         if (special_tag) {
                             doCallerReg(args_count, CALL_LOAD);

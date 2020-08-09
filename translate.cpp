@@ -724,7 +724,12 @@ void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals)//todo
 }
 Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame)
 {
-    T_exp tmp = T_Temp(F_R8());
+    Temp_temp ret_temp = F_R8();
+#ifdef USE_R0_RETURN
+    ret_temp = F_R0();
+#endif
+    T_exp tmp = T_Temp(ret_temp);
+
     Temp_label f_temp_label = get_done_label(f_frame);
     T_stm jump = T_Jump(T_Name(f_temp_label), Temp_LabelList(f_temp_label, NULL));
 

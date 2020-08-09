@@ -232,7 +232,18 @@ Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return Temp_TempList(r0,
+
+#ifdef USE_R0_RETURN
+    return Temp_TempList(r1,
+                         Temp_TempList(r2,
+                                       Temp_TempList(r3,
+                                                     Temp_TempList(r4,
+                                                                   Temp_TempList(r5,
+                                                                                 Temp_TempList(r6,
+                                                                                               Temp_TempList(r7,
+                                                                                                             NULL)))))));
+#else
+    return Temp_TempList(R0Reg,
             Temp_TempList(r1,
                     Temp_TempList(r2,
                             Temp_TempList(r3,
@@ -241,7 +252,7 @@ Temp_tempList F_registers(void) {
                                                     Temp_TempList(r6,
                                                             Temp_TempList(r7,
                                                                     NULL))))))));
-                                                                            //Temp_TempList(r9,NULL))))))))));
+#endif
 }
 
 //TODO 调用者保护寄存器
@@ -684,12 +695,16 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
 
     if (0 == strcmp(name, "main")) {
+#ifndef USE_R0_RETURN
         tail_inst_list = AS_InstrList(AS_Oper((char *)"\tmov     r0, r8\n", NULL, NULL, NULL), NULL);
         tail_inst_ptr = tail_inst_list;
 
         tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         tail_inst_ptr = tail_inst_ptr->tail;
-
+#else
+        tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+        tail_inst_ptr = tail_inst_list;
+#endif
     } else {
         tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
         tail_inst_ptr = tail_inst_list;
