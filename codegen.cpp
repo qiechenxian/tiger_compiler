@@ -238,36 +238,38 @@ static Temp_temp munchExp(T_exp e) {
                 /* BINOP(PLUS,CONST(i),e1) 已检查*/
                 T_exp e1 = e->u.BINOP.right;
                 int i = e->u.BINOP.left->u.CONST;
+                Temp_temp r1 = munchExp(e1);
                 Temp_temp r = Temp_newTemp();
                 if (constExpr(i)) {
                     sprintf(inst, "\tadd     'd0, 's0, #%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                 } else {
-                    Temp_temp r1 = Temp_newTemp();
+                    Temp_temp r2 = Temp_newTemp();
 
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
-                    emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+                    emit(AS_Oper(inst, L(r2, NULL), NULL, NULL));
 
                     sprintf(inst2,"\tadd     'd0, 's0, 's1\n"); //??不懂
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
+                    emit(AS_Oper(inst2,L(r,NULL),L(r1, L(r2,NULL)),NULL));
                 }
                 return r;
             } else if (e->u.BINOP.op == T_sub && e->u.BINOP.right->kind == T_exp_::T_CONST) {
                 /* BINOP(MINUS,e1,CONST(i)) 已检查*/
                 T_exp e1 = e->u.BINOP.left;
                 int i = e->u.BINOP.right->u.CONST;
+                Temp_temp r1 = munchExp(e1);
                 Temp_temp r = Temp_newTemp();
                 if (constExpr(i)) {
                     sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
-                    emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
+                    emit(AS_Oper(inst, L(r, NULL), L(r1, NULL), NULL));
                 } else {
-                    Temp_temp r1 = Temp_newTemp();
+                    Temp_temp r2 = Temp_newTemp();
 
                     sprintf(inst, "\tldr     'd0, =%d\n", i);
-                    emit(AS_Oper(inst, L(r1, NULL), NULL, NULL));
+                    emit(AS_Oper(inst, L(r2, NULL), NULL, NULL));
 
                     sprintf(inst2,"\tsub     'd0, 's0, 's1\n");
-                    emit(AS_Oper(inst2,L(r,NULL),L(munchExp(e1),L(r1,NULL)),NULL));
+                    emit(AS_Oper(inst2,L(r,NULL),L(r1,L(r2,NULL)),NULL));
                 }
 //                sprintf(inst, "\tsub     'd0, 's0, #%d\n", i);
 //                emit(AS_Oper(inst, L(r, NULL), L(munchExp(e1), NULL), NULL));
@@ -294,18 +296,18 @@ static Temp_temp munchExp(T_exp e) {
             else if (e->u.BINOP.op == T_add) {
                 /* BINOP(PLUS,e1,e2) 已检查*/
                 T_exp e1 = e->u.BINOP.left, e2 = e->u.BINOP.right;
-                Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
+                Temp_temp r = Temp_newTemp();
                 sprintf(inst, "\tadd     'd0, 's0, 's1\n");
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
             } else if (e->u.BINOP.op == T_sub) {
                 /* BINOP(MINUS,e1,e2) 已检查*/
                 T_exp e1 = e->u.BINOP.left, e2 = e->u.BINOP.right;
-                Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
+                Temp_temp r = Temp_newTemp();
                 sprintf(inst, "\tsub     'd0, 's0, 's1\n");
                 emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
                 return r;
@@ -316,12 +318,13 @@ static Temp_temp munchExp(T_exp e) {
                 /// 前端保证不会同时有两个const
                 Temp_temp r1 = nullptr;
                 Temp_temp r2 = nullptr;
+
                 if (e1->kind == T_exp_::T_CONST){
                     int i = e1->u.CONST;
                     r2 = munchExp(e2);
                     if (i == 0){
                         sprintf(inst, "\tmov     'd0, #0\n");
-                        emit(AS_Move(inst, L(r, NULL), NULL));
+                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                         return r;
                     } else if (i == 1){
                         sprintf(inst, "\tmov     'd0, 's0\n");
@@ -342,7 +345,7 @@ static Temp_temp munchExp(T_exp e) {
                     r1 = munchExp(e1);
                     if (i == 0){
                         sprintf(inst, "\tmov     'd0, #0\n");
-                        emit(AS_Move(inst, L(r, NULL), NULL));
+                        emit(AS_Oper(inst, L(r, NULL), NULL, NULL));
                         return r;
                     } else if (i == 1){
                         sprintf(inst, "\tmov     'd0, 's0\n");
@@ -371,8 +374,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib((char *)"__aeabi_idiv", r, r1, r2);//todo 确认是否需要修改
-                //emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
+                call_lib((char *)"__aeabi_idiv", r, r1, r2);
                 return r;
             } else if (e->u.BINOP.op == T_mod) {
                 /* BINOP(MOD,e1,e2) */
@@ -381,7 +383,7 @@ static Temp_temp munchExp(T_exp e) {
                 Temp_temp r = Temp_newTemp();
                 Temp_temp r1 = munchExp(e1);
                 Temp_temp r2 = munchExp(e2);
-                call_lib((char *)"__aeabi_idivmod", r, r1, r2);//todo 确认是否需要修改
+                call_lib((char *)"__aeabi_idivmod", r, r1, r2);
                 return r;
             } else {
                 EM_error(0, "codegen not munch exp when kind is T_BINOP.");
@@ -621,8 +623,9 @@ static void munchStm(T_stm s) {
                     /* MOVE(TEMP(i),e1) */
                     T_exp e1 = src;
                     Temp_temp temp = dst->u.TEMP;
+                    Temp_temp r1 = munchExp(e1);
                     sprintf(inst, "\tmov     'd0, 's0\n");
-                    emit(AS_Move(inst, L(temp, NULL), L(munchExp(e1), NULL)));
+                    emit(AS_Move(inst, L(temp, NULL), L(r1, NULL)));
                 }
             } else if (dst->kind == T_exp_::T_NAME) {
                 //存全局变量

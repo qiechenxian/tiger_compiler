@@ -213,7 +213,7 @@ static Temp_tempList adjacent(Temp_temp t) {
     G_nodeList adjn = G_adj(n);
     Temp_tempList adjs = NULL;
     for (; adjn; adjn = adjn->tail) {
-        adjs = L(node2Temp(n), adjs);
+        adjs = L(node2Temp(adjn->head), adjs);
     }
     //adj - （从图中删除的+已经合并的）
     adjs = tempMinus(adjs, tempUnion(c.selectStack, c.coalescedNodes));
@@ -272,6 +272,9 @@ static void makeWorkList() {
 #endif
             c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));
         } else if (moveRelated(t)) {
+#ifdef DEBUG_PRINT
+            printf("Init2Freeze:%d\n", t->num);
+#endif
             c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));
         } else {
 #ifdef DEBUG_PRINT
@@ -402,22 +405,19 @@ static void simplify() {
 
     // push
     if(!Temp_inList(t, c.selectStack)) {
-        c.selectStack = L(t, c.selectStack);
-    } else {
-        int a = 1;
+        // 查看别名是否在selectStack中，若在则不需要后续着色
+        G_node alias_node = getAlias(n);
+        Temp_temp alias_temp = node2Temp(alias_node);
+        if(!Temp_inList(alias_temp, c.selectStack)) {
+            c.selectStack = L(t, c.selectStack);
+        }
     }
 
     // 降低邻居节点的度数
     G_nodeList adjs = G_adj(n);
     for (; adjs; adjs = adjs->tail) {
         G_node m = adjs->head;
-
-        // 该节点从冲突图中去掉，不需要再做后面的降度功能
-        t = node2Temp(m);
-
-        if(!Temp_inList(t, c.selectStack)) {
-            decrementDegree(m);
-        }
+        decrementDegree(m);
     }
 }
 
@@ -721,17 +721,20 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
         }
     }
 
+#if 1
     Temp_tempList tl;
     for (tl = c.coalescedNodes; tl; tl = tl->tail) {
         G_node alias = getAlias(temp2Node(tl->head));
-        c_string aliasColor = Temp_look(colors, node2Temp(alias));
+        Temp_temp alias_temp = node2Temp(alias);
+        c_string aliasColor = Temp_look(colors, alias_temp);
         c_string srcColor = Temp_look(colors, tl->head);
         if(!aliasColor && srcColor) {
-            Temp_enter(colors, node2Temp(alias), srcColor);
+            Temp_enter(colors, alias_temp, srcColor);
         } else if(aliasColor && !srcColor) {
             Temp_enter(colors, tl->head, aliasColor);
         }
     }
+#endif
 
     ret.coloring = colors;
 
