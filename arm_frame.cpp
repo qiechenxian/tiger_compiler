@@ -438,12 +438,17 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
 // R4~R7
 #define STACK_PROTECT_REG_NUM_MAX 8
 #define STACK_PROTECT_REG_NUM_MAX_MAIN 4
+#ifdef USE_R0_RETURN
+#define CALL_LIB_PROTECED_REG_NUM 3
+#else
+#define CALL_LIB_PROTECED_REG_NUM 4
+#endif
 
 F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
     f->formals = makeFormalAccessList(f, formals);
-    f->local_count = STACK_PROTECT_REG_NUM_MAX + 1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    f->local_count = STACK_PROTECT_REG_NUM_MAX + 1 + CALL_LIB_PROTECED_REG_NUM;
     f->locals = nullptr;
     f->isLeaf = true;
     f->temp_space = 0;
@@ -489,7 +494,6 @@ Temp_temp F_accessReg(F_access a) {
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
-
     F_access access;
     if(escape) {
         access = InFrame(F_WORD_SIZE * (-frame->local_count));
