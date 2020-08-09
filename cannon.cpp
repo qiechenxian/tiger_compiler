@@ -130,11 +130,7 @@ static T_stm recoder(expRefList refList) {
         return T_Exp(T_Const(0));
     if ((*refList->head)->kind == T_exp_::T_CALL) {
         Temp_temp temp;
-#ifdef USE_R0_RETURN
-        temp = F_R0();
-#else
         temp = Temp_newTemp();
-#endif
         // 对call的规则
         *refList->head = T_Eseq
                 (T_Move(T_Temp(temp), *refList->head),T_Temp(temp));

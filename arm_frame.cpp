@@ -243,15 +243,16 @@ Temp_tempList F_registers(void) {
                                                                                                Temp_TempList(r7,
                                                                                                              NULL)))))));
 #else
-    return Temp_TempList(R0Reg,
-            Temp_TempList(r1,
-                    Temp_TempList(r2,
-                            Temp_TempList(r3,
-                                    Temp_TempList(r4,
-                                            Temp_TempList(r5,
-                                                    Temp_TempList(r6,
-                                                            Temp_TempList(r7,
-                                                                    NULL))))))));
+    return Temp_TempList(r0,
+                         Temp_TempList(r1,
+                                       Temp_TempList(r2,
+                                                     Temp_TempList(r3,
+                                                                   Temp_TempList(r4,
+                                                                                 Temp_TempList(r5,
+                                                                                               Temp_TempList(r6,
+                                                                                                             Temp_TempList(
+                                                                                                                     r7,
+                                                                                                                     NULL))))))));
 #endif
 }
 

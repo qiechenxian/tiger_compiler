@@ -604,13 +604,13 @@ static void munchStm(T_stm s, F_frame f) {
                                 useArgList = L(callerArray[k], useArgList);
                             }
 #ifdef USE_R0_RETURN
-                            returnVar = t;
+                            returnVar = F_R0();
 #else
                             returnVar = F_R0();
 #endif
                         } else {
 #ifdef USE_R0_RETURN
-                            returnVar = t;
+                            returnVar = F_R0();
 #else
                             returnVar = F_R8();
 #endif
@@ -624,17 +624,22 @@ static void munchStm(T_stm s, F_frame f) {
                         emit(AS_Oper(inst, L(returnVar, NULL), useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
 #ifndef USE_R0_RETURN
-                        sprintf(inst2, "\tmov     'd0, 's0\n");
                         if (special_tag) {
-                            emit(AS_Oper(inst2, L(t, NULL), L(returnVar, F_callersaves()), NULL));
-                        } else {
-                            emit(AS_Oper(inst2, L(t, NULL), L(returnVar, F_callersaves()), NULL));
+                            sprintf(inst2, "\tmov     'd0, 's0\n");
+                            emit(AS_Oper(inst2, L(F_R8(), NULL), L(F_R0(), F_callersaves()), NULL));
                         }
 #endif
                         // 恢复寄存器
                         if (special_tag) {
                             doCallerReg(args_count, CALL_LOAD);
                         }
+#ifdef USE_R0_RETURN
+                        sprintf(inst2, "\tmov     'd0, 's0\n");
+                        emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL));
+#else
+                        sprintf(inst2, "\tmov     'd0, 's0\n");
+                        emit(AS_Oper(inst2, L(t, NULL), L(F_R8(), F_callersaves()), NULL));
+#endif
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
                         T_exp e1 = src->u.CALL.fun;
