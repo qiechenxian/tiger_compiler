@@ -578,6 +578,9 @@ static void munchStm(T_stm s) {
                         bool special_tag = false;
                         count_func_param = 0;
 
+                        Temp_tempList useArgList = NULL;
+                        Temp_temp returnVar = NULL;
+
                         // 检查是否是外部函数
                         special_tag = Sys_lib_fuc_test(lab);
                         if (true == special_tag) {
@@ -587,13 +590,23 @@ static void munchStm(T_stm s) {
                             }
 
                             doCallerReg(args_count, CALL_SAVE);
+
+                            Temp_temp* callerArray = F_getCallerArray();
+                            for(int k = 0; k < args_count; k ++) {
+                                useArgList = L(callerArray[k], useArgList);
+                            }
+
+                            returnVar = F_R0();
+                        } else {
+                            returnVar = F_R8();
                         }
 
                         munchArgs(special_tag, 0, args);
 
                         // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
-                        emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
+
+                        emit(AS_Oper(inst, L(returnVar, NULL), useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
                         sprintf(inst2, "\tmov     'd0, 's0\n");
 
@@ -668,6 +681,8 @@ static void munchStm(T_stm s) {
                     bool special_tag = false;
                     count_func_param = 0;
 
+                    Temp_tempList useArgList = NULL;
+
                     // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
                     special_tag = Sys_lib_fuc_test(lab);
 
@@ -677,14 +692,17 @@ static void munchStm(T_stm s) {
                         }
 
                         doCallerReg(args_count, CALL_SAVE);
+                        Temp_temp* callerArray = F_getCallerArray();
+                        for(int k = 0; k < args_count; k ++) {
+                            useArgList = L(callerArray[k], useArgList);
+                        }
                     }
-
 
                     munchArgs(special_tag, 0, args);
 
                     // 函数调用
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
-                    emit(AS_Oper(inst, NULL, NULL, AS_Targets(Temp_LabelList(lab, NULL))));
+                    emit(AS_Oper(inst, NULL, useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
                     if (special_tag)
                         doCallerReg(args_count, CALL_LOAD);

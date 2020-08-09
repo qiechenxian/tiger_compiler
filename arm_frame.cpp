@@ -576,7 +576,8 @@ AS_instrList F_procEntryExit2(AS_instrList body) {
     if (!returnSink)
 #if 1
         returnSink = Temp_TempList(F_LR(),
-                                  Temp_TempList(F_SP(), calleeSaves));
+                        Temp_TempList(F_FP(),
+                           Temp_TempList(F_SP(), calleeSaves)));
 #else
     returnSink = Temp_TempList(F_ZERO(),
                                    Temp_TempList(F_LR(),
@@ -624,34 +625,27 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     /** 函数入口处的汇编指令 */
 
     int recover_offset;
-    if (frame->isLeaf) {
-        char *inst = (char *) "\tstr     fp, [sp, #-4]!\n";
-        head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        head_inst_ptr = head_inst_ptr->tail;
 
-//        recover_offset = 0;
-        recover_offset = (0 + STACK_PROTECT_REG_NUM_MAX) * word_size;
-    } else {
-        char *inst = (char *) "\tstmfd   sp!, {fp, lr}\n";
-        head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        head_inst_ptr = head_inst_ptr->tail;
+    char *inst;
 
+    if (0 == strcmp(name, "main")) {
         recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX_MAIN) * word_size;
+    } else {
+        recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX) * word_size;
     }
 
     // todo 优化
-    if (frame->isLeaf) {
-        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r0-r7}\n", NULL, NULL, NULL),NULL);
+    if (strcmp(name, "main")) {
+        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r0-r7, fp, lr}\n", NULL, NULL, NULL),NULL);
     } else {
-        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7}\n", NULL, NULL, NULL),NULL);
+        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7, fp, lr}\n", NULL, NULL, NULL),NULL);
     }
     head_inst_ptr = head_inst_ptr->tail;
 
-    char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
     head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, Temp_TempList(F_FP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
     head_inst_ptr = head_inst_ptr->tail;
-
 
     int space = getSpace(frame);
     if (space>0){
@@ -681,7 +675,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
 
-    if(!frame->isLeaf) {
+    if (0 == strcmp(name, "main")) {
         tail_inst_list = AS_InstrList(AS_Oper((char *)"\tmov     r0, r8\n", NULL, NULL, NULL), NULL);
         tail_inst_ptr = tail_inst_list;
 
@@ -693,23 +687,12 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
         tail_inst_ptr = tail_inst_list;
     }
 
-    if (frame->isLeaf) {
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r0-r7}\n", NULL, NULL, NULL), NULL);
+    if (strcmp(name, "main")) {
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r0-r7, fp, lr}\n", NULL, NULL, NULL), NULL);
     } else {
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7}\n", NULL, NULL, NULL), NULL);
+        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7, fp, lr}\n", NULL, NULL, NULL), NULL);
     }
     tail_inst_ptr = tail_inst_ptr->tail;
-
-
-    if (frame->isLeaf) {
-        inst = (char *) "\tldr     fp, [sp], #4\n";
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_ptr->tail;
-    } else {
-        inst = (char *) "\tldmfd   sp!, {fp, lr}\n";
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_ptr->tail;
-    }
 
     inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     sprintf(inst, "\tbx      lr\n");
