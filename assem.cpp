@@ -11,7 +11,7 @@ AS_targets AS_Targets(Temp_labelList labels) {
     return p;
 }
 
-AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j) {
+AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j, bool isMove) {
     AS_instr p = (AS_instr) checked_malloc(sizeof(*p));
     p->kind = AS_instr_::I_OPER;
     p->u.OPER.assem = a;
@@ -19,6 +19,7 @@ AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j) {
     p->u.OPER.src = s;
     p->u.OPER.jumps = j;
     p->isDead = false;
+    p->isMove = isMove;
     return p;
 }
 
@@ -28,6 +29,7 @@ AS_instr AS_Label(c_string a, Temp_label label) {
     p->u.LABEL.assem = a;
     p->u.LABEL.label = label;
     p->isDead = false;
+    p->isMove = false;
     return p;
 }
 
@@ -38,6 +40,7 @@ AS_instr AS_Move(c_string a, Temp_tempList d, Temp_tempList s) {
     p->u.MOVE.dst = d;
     p->u.MOVE.src = s;
     p->isDead = false;
+    p->isMove = true;
     return p;
 }
 
@@ -139,8 +142,22 @@ static Temp_label nthLabel(Temp_labelList list, int i) {
  * 格式化assem字符串，参数分别是dst，src，jumps
  * 最后一个参数用来确定临时变量需要如何处理
  */
-static void format(char *result, c_string assem, Temp_tempList dst, Temp_tempList src, AS_targets jumps, Temp_map m) {
+static void format(char *result, c_string assem, Temp_tempList dst, Temp_tempList src, AS_targets jumps, Temp_map m, bool isMove) {
 //    fprintf(stderr, "a format: assem=%s, dst=%p, src=%p\n", assem, dst, src);
+
+    // Move操作，但两者相同，则忽略
+    if(isMove && (src != NULL) && (dst != NULL)) {
+        c_string s = Temp_look(m, src->head);
+        c_string d = Temp_look(m, dst->head);
+
+        // 同样的操作字符串，则忽略
+        if(strcmp(s, d) == 0) {
+            // 设置为空串
+            result[0] = '\0';
+            return;
+        }
+    }
+
     char *p;
     int i = 0;
     for (p = assem; p && *p != '\0'; p++) {
@@ -195,20 +212,21 @@ void AS_print(FILE *out, AS_instr i, Temp_map m) {
 
     switch (i->kind) {
         case AS_instr_::I_OPER:
-            format(result, i->u.OPER.assem, i->u.OPER.dst, i->u.OPER.src, i->u.OPER.jumps, m);
-            fprintf(out, "%s", result);
+            format(result, i->u.OPER.assem, i->u.OPER.dst, i->u.OPER.src, i->u.OPER.jumps, m, i->isMove);
             break;
         case AS_instr_::I_LABEL:
-            format(result, i->u.LABEL.assem, NULL, NULL, NULL, m);
-            fprintf(out, "%s", result);
+            format(result, i->u.LABEL.assem, NULL, NULL, NULL, m, false);
             break;
         case AS_instr_::I_MOVE:
-            format(result, i->u.MOVE.assem, i->u.MOVE.dst, i->u.MOVE.src, NULL, m);
-            fprintf(out, "%s", result);
+            format(result, i->u.MOVE.assem, i->u.MOVE.dst, i->u.MOVE.src, NULL, m, true);
             break;
         default:
             EM_error(0, "not find As_instr kind");
             assert(0);
+    }
+
+    if(result[0] != '\0') {
+        fprintf(out, "%s", result);
     }
 }
 

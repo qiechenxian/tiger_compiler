@@ -46,9 +46,10 @@ struct AS_instr_ {
         } MOVE;
     } u;
     bool isDead;
+    bool isMove;
 };
 
-AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j);
+AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j, bool isMove = false);
 
 AS_instr AS_Label(c_string a, Temp_label label);
 

@@ -50,9 +50,9 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
 static void doGlobal(FILE *outfile, F_fragList fragList){
     int word_size = get_word_size();
-    fprintf(outfile, "\t.arch   armv7-a\n");
-    fprintf(outfile, "\t.file   \"%s\"\n", INPUT_FILE);
-    fprintf(outfile, "\t.data\n");
+    fprintf(outfile, ".arch   armv7-a\n");
+    fprintf(outfile, ".file   \"%s\"\n", INPUT_FILE);
+    fprintf(outfile, ".data\n");
     for (F_fragList iter = fragList; iter; iter = iter->tail){
         F_frag frag = iter->head;
         if (frag->kind == F_frag_::F_globalFrag){
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 
 //    FILE *outfile = stdout;
     doGlobal(outfile, frags);
-    fprintf(outfile, "\t.text\n");
+    fprintf(outfile, ".text\n");
     for (; frags; frags = frags->tail) {
         if (frags->head->kind == F_frag_::F_procFrag) {
             doProc(outfile, frags->head->u.proc.frame, frags->head->u.proc.body);

@@ -3,6 +3,7 @@
 //
 #include "frame.h"
 #include "assem.h"
+#include "temp.h"
 
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 4; /// 保存在Reg中参数的数量(待定)
@@ -635,104 +636,104 @@ static int getSpace(F_frame frame)
  */
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     const int INST_SIZE = 40;
-    AS_instrList head_inst_list, tail_inst_list;
-    AS_instrList head_inst_ptr, tail_inst_ptr;
+    AS_instrList head_inst_list = NULL, tail_inst_list = NULL;
+    AS_instrList temp_inst_list;
+    char * tempinst_buf;
     int word_size = get_word_size();
     char *name = Temp_labelString(frame->name);
 
-    /** 函数入口label*/
-    char *fun_label = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(fun_label, "%s:\n", name);
-    head_inst_list = AS_InstrList(AS_Label(fun_label, frame->name), NULL);
-    head_inst_ptr = head_inst_list;
-
-    /** 函数入口处的汇编指令 */
-
     int recover_offset;
-
-    char *inst;
-
     if (0 == strcmp(name, "main")) {
         recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX_MAIN) * word_size;
     } else {
         recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX) * word_size;
     }
 
-    // todo 优化
-    if (strcmp(name, "main")) {
-        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r0-r7, fp, lr}\n", NULL, NULL, NULL),NULL);
-    } else {
-        head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r7, fp, lr}\n", NULL, NULL, NULL),NULL);
-    }
-    head_inst_ptr = head_inst_ptr->tail;
+    /** 函数入口label*/
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    snprintf(tempinst_buf, INST_SIZE, "%s:\n", name);
+    temp_inst_list = AS_InstrList(AS_Label(tempinst_buf, frame->name), NULL);
+    head_inst_list = AS_splice(head_inst_list, temp_inst_list);
 
-    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
-    head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, Temp_TempList(F_FP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-    head_inst_ptr = head_inst_ptr->tail;
+    /** 函数入口处的汇编指令 */
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    if (strcmp(name, "main")) {
+        snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R0-R7, FP, LR}\n");
+    } else {
+        snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R4-R7, FP, LR}\n");
+    }
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL),NULL);
+    head_inst_list = AS_splice(head_inst_list, temp_inst_list);
+
+    // TODO recover_offset可能超过立即数的限制，需要先读都寄存器，然后再加法
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    sprintf(tempinst_buf, "\tadd     FP, SP, #%d\n", recover_offset);
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    head_inst_list = AS_splice(head_inst_list, temp_inst_list);
 
     int space = getSpace(frame);
-    if (space>0){
-        if (space < 200){
-            char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-            sprintf(frame_space, "\tsub     'd0, 's0, #%d\n", space * word_size);
-            head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-            head_inst_ptr = head_inst_ptr->tail;
-        } else{
-            char *temp = (char*)checked_malloc(sizeof(char ) * INST_SIZE);
-            sprintf(temp, "\tldr     r4, =%d\n", space * word_size);
-            head_inst_ptr->tail = AS_InstrList(AS_Oper(temp, NULL, NULL, NULL), NULL);
-            head_inst_ptr = head_inst_ptr->tail;
+    if (space > 0){
 
-            char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-            int tmp_wsize = space * word_size;
-            sprintf(frame_space, "\tsub     'd0, 's0, r4\n");
-            head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-            head_inst_ptr = head_inst_ptr->tail;
+        int tmp_wsize = space * word_size;
+
+        if (constExpr(tmp_wsize)){
+            tempinst_buf = (char*)checked_malloc(sizeof(char) * INST_SIZE);
+            snprintf(tempinst_buf, INST_SIZE, "\tsub     SP, SP, #%d\n", tmp_wsize);
+            temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+            head_inst_list = AS_splice(head_inst_list, temp_inst_list);
+        } else{
+            tempinst_buf = (char*)checked_malloc(sizeof(char ) * INST_SIZE);
+            snprintf(tempinst_buf, INST_SIZE, "\tldr     R4, =%d\n", tmp_wsize);
+            temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+            head_inst_list = AS_splice(head_inst_list, temp_inst_list);
+
+            tempinst_buf = (char*)checked_malloc(sizeof(char) * INST_SIZE);
+            sprintf(tempinst_buf, "\tsub     'SP, SP, R4\n");
+            temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+            head_inst_list = AS_splice(head_inst_list, temp_inst_list);
         }
     }
 
     /** 将函数入口指令和body指令连接 */
-    head_inst_ptr->tail = body->tail;
+    head_inst_list = AS_splice(head_inst_list, body->tail);
 
     /** 函数出口指令 */
-    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
-
-    if (0 == strcmp(name, "main")) {
 #ifndef USE_R0_RETURN
-        tail_inst_list = AS_InstrList(AS_Oper((char *)"\tmov     r0, r8\n", NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_list;
-
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_ptr->tail;
-#else
-        tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_list;
+    if (0 == strcmp(name, "main")) {
+        tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+        snprintf(tempinst_buf, INST_SIZE, (char *)"\tmov     R0, R9\n");
+        temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+        tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
+    }
 #endif
-    } else {
-        tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_list;
-    }
 
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    snprintf(tempinst_buf, INST_SIZE, "\tsub     SP, FP, #%d\n", recover_offset);
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
+
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     if (strcmp(name, "main")) {
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r0-r7, fp, lr}\n", NULL, NULL, NULL), NULL);
+        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R0-R7, FP, LR}\n");
     } else {
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r7, fp, lr}\n", NULL, NULL, NULL), NULL);
+        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R7, FP, LR}\n");
     }
-    tail_inst_ptr = tail_inst_ptr->tail;
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
 
-    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(inst, "\tbx      lr\n");
-    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    snprintf(tempinst_buf, INST_SIZE, "\tbx      LR\n");
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
 
     /** 连接上出口指令 */
     AS_instrList total_inst = AS_splice(head_inst_list, tail_inst_list);
 
     char *entry_meta = (char *) checked_malloc(sizeof(char) * INST_SIZE*3);
-    sprintf(entry_meta, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
+    snprintf(entry_meta, INST_SIZE*3, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
+
     char *exit_meta = (char *) checked_malloc(sizeof(char) * INST_SIZE*3);
-    sprintf(exit_meta, "\t.size   %s, .-%s", name, name);
+    snprintf(exit_meta, INST_SIZE*3, "\t.size   %s, .-%s", name, name);
 
     return AS_Proc(entry_meta, total_inst, exit_meta);
 }

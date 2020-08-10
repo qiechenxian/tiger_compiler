@@ -99,4 +99,6 @@ F_access look_for_f_offset(Temp_temp temp,F_frame f);
 
 Temp_map get_frame_precored_map(F_frame frame);
 
+bool constExpr(int num);
+
 #endif //COMPILER_LOYX_FRAME_H
