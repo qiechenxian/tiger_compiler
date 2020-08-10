@@ -121,10 +121,10 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
     for (; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
         G_node n = temp2Node(t, ig);
-        G_node alias = getAlias(n, aliases, cn);
-        Temp_temp alias_temp = node2Temp(alias);
-        if(alias_temp) {
-            al = L(t, al);
+        if(n != nullptr) {
+            G_node alias = getAlias(n, aliases, cn);
+            Temp_temp alias_temp = node2Temp(alias);
+            al = L(alias_temp, al);
         }
         al = L(t, al);
     }
@@ -221,6 +221,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                         Temp_tempList src = inst_move->head->u.MOVE.src;
                         Temp_tempList dst = inst_move->head->u.MOVE.dst;
                         Temp_tempList tempList = NULL;
+
                         if(src->head == temp) {
                             tempList = dst;
                         } else if(dst->head == temp) {
@@ -283,7 +284,7 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
             }
 
             int useSpilledNum;
-
+            Temp_tempList replace_list;
             Temp_temp tempReg;
 
             for (tl = useSpilled, useSpilledNum = 0; tl; tl = tl->tail) {
@@ -293,6 +294,9 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
                 useSpilledNum ++;
 
+                F_access local = (F_access) TAB_look(spilledLocal, temp);
+
+                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
                 if(useSpilledNum == 1) {
                     tempReg = F_R8();
                 } else if(useSpilledNum == 2) {
@@ -301,34 +305,23 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                     tempReg = F_R10();
                 }
 
-                F_access local = (F_access) TAB_look(spilledLocal, temp);
-
-                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
                         AS_Oper(String(buf), L(tempReg, NULL), L(F_FP(), NULL), NULL), rewriteList);
 
                 //ldr是放在inst use前面,替换inst src列表
-                if(inst->kind==AS_instr_::I_MOVE)
-                {
-                    Temp_tempList replace_list=inst->u.MOVE.src;
-                    for(;replace_list;replace_list=replace_list->tail)
-                    {
-                        if(replace_list->head == tl->head) {
-                            replace_list->head=tempReg;
-                        }
-                    }
-                }
-                else if(inst->kind==AS_instr_::I_OPER)
-                {
-                    Temp_tempList replace_list=inst->u.OPER.src;
-                    for(;replace_list;replace_list=replace_list->tail)
-                    {
-                        if(replace_list->head == tl->head) {
-                            replace_list->head=tempReg;
-                        }
-                    }
+                replace_list = nullptr;
+
+                if (inst->kind == AS_instr_::I_MOVE) {
+                    replace_list = inst->u.MOVE.src;
+                } else if (inst->kind == AS_instr_::I_OPER) {
+                    replace_list = inst->u.OPER.src;
                 }
 
+                for (; replace_list; replace_list = replace_list->tail) {
+                    if (replace_list->head == tl->head) {
+                        replace_list->head = tempReg;
+                    }
+                }
             }
 
             rewriteList = AS_InstrList(inst, rewriteList);
@@ -338,35 +331,28 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
                 Temp_temp temp = tl->head;
 
+                F_access local = (F_access) TAB_look(spilledLocal, temp);
+                sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
+
                 tempReg = F_R8();
 
-                F_access local = (F_access) TAB_look(spilledLocal, temp);
-                sprintf(buf, "\tstr     's0, ['d0, #%d] \n#spilled\n", F_accessOffset(local));
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), L(F_FP(), NULL), L(tempReg, NULL),  NULL), rewriteList);
+                        AS_Oper(String(buf), NULL, L(tempReg, L(F_FP(), NULL)), NULL), rewriteList);
+
                 //str是放在inst dfe后面,替换dst列表
-                if(inst->kind==AS_instr_::I_MOVE)
-                {
+                replace_list = nullptr;
 
-                    Temp_tempList replace_list=inst->u.MOVE.dst;
-                    for(;replace_list;replace_list=replace_list->tail)
-                    {
-                        if(replace_list->head == tl->head) {
-                            replace_list->head=tempReg;
-                        }
-                    }
-                }
-                else if(inst->kind==AS_instr_::I_OPER)
-                {
-                    Temp_tempList replace_list=inst->u.OPER.dst;
-                    for(;replace_list;replace_list=replace_list->tail)
-                    {
-                        if(replace_list->head == tl->head) {
-                            replace_list->head=tempReg;
-                        }
-                    }
+                if (inst->kind == AS_instr_::I_MOVE) {
+                    replace_list = inst->u.MOVE.dst;
+                } else if (inst->kind == AS_instr_::I_OPER) {
+                    replace_list = inst->u.OPER.dst;
                 }
 
+                for (; replace_list; replace_list = replace_list->tail) {
+                    if (replace_list->head == tl->head) {
+                        replace_list->head = tempReg;
+                    }
+                }
             }
         }
 
@@ -381,29 +367,23 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
 
     if (col.coalescedMoves != NULL) {
         rewriteList = NULL;
-        for (; il; il = il->tail) {
-            AS_instr inst = il->head;
+        for (rewriteList = il; rewriteList; rewriteList = rewriteList->tail) {
+            AS_instr inst = rewriteList->head;
 
-// Remove coalesced moves
-//溢出已经合并的指令
+            // Remove coalesced moves
             if (instIn(inst, col.coalescedMoves)) {
-                char buf[1024];
-                sprintf(buf, "# ");
-                strcat(buf, inst->u.OPER.assem);
-                inst->u.OPER.assem = String(buf);
-//continue;
+                inst->isDead = true;
             }
-
-            rewriteList = AS_InstrList(inst, rewriteList);
         }
-
-        il = reverseInstrList(rewriteList);
     }
 
     ret.coloring = col.coloring;
+
+    ret.il = il;
+
     //free(col);
     //delete col;
-    ret.il = il;
+
 
 // Temp_tempList precolored = NULL;
 // Temp_tempList initial = NULL;

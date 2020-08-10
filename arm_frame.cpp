@@ -688,7 +688,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
             head_inst_list = AS_splice(head_inst_list, temp_inst_list);
 
             tempinst_buf = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-            sprintf(tempinst_buf, "\tsub     'SP, SP, R4\n");
+            sprintf(tempinst_buf, "\tsub     SP, SP, R4\n");
             temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
             head_inst_list = AS_splice(head_inst_list, temp_inst_list);
         }
