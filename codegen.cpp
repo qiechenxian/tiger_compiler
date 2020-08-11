@@ -56,19 +56,31 @@ AS_instrList F_codegen(F_frame f, T_stmList stmList) {
     AS_instrList list;
     T_stmList stmList1;
 
+#ifdef FUNC_FORMAL_ARG_REG
     // 形参的前四个参数要把寄存器的值保存在栈中
-    Temp_temp* callerArray = F_getCallerArray();
-    F_accessList formalAccessList = F_getFormals(f);
-    for(int argCnt = 0;formalAccessList && (argCnt < 4); formalAccessList = formalAccessList->tail, argCnt ++) {
-        char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    T_stmList last_stmlist = stmList;
+    T_stmList func_label = stmList;
+    T_stmList body_list = stmList->tail;
 
-        sprintf(inst, "\tstr     's0, ['d0, #%d]\n", F_accessOffset(formalAccessList->head));
-        emit(AS_Oper(inst, L(F_FP(), NULL), L(callerArray[argCnt], NULL), NULL));
+    Temp_temp* callerArray = F_getCallerArray();
+    F_accessList formal_access_list = F_getFormals(f);
+    for(int argCnt = 0; formal_access_list && (argCnt < 4); formal_access_list = formal_access_list->tail, argCnt ++) {
+        Temp_temp temp = F_accessReg(formal_access_list->head);
+        T_stm temp_stm = T_Move(T_Temp(temp), T_Temp(callerArray[argCnt]));
+        T_stmList temp_stmlist = T_StmList(temp_stm, NULL);
+
+        last_stmlist->tail = temp_stmlist;
+        last_stmlist = temp_stmlist;
     }
 
-    for (stmList1 = stmList; stmList1; stmList1 = stmList1->tail) {
+    last_stmlist->tail = body_list;
+    stmList1 = func_label;
+#endif
+
+    for (; stmList1; stmList1 = stmList1->tail) {
         munchStm(stmList1->head, f);
     }
+
     if (last && last->head->kind == AS_instr_::I_LABEL) {
         emit(AS_Oper((char *)"NOP\n", NULL, NULL, NULL));
     }
@@ -637,7 +649,8 @@ static void munchStm(T_stm s, F_frame f) {
 
                         Temp_tempList new_args_temp = NULL;
                         for(T_expList arg_list = args; arg_list; arg_list = arg_list->tail) {
-                            Temp_temp r = munchExp(arg_list->head);
+                            Temp_temp r;
+                            r = munchExp(arg_list->head);
                             new_args_temp = L(r, new_args_temp);
                         }
 
@@ -981,6 +994,18 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 //    Temp_temp* callerReg = F_getCallerArray();
 //    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
 
+    bool divmod;
+    Temp_temp ret_reg;
+    if (strcmp(fun, "__aeabi_idiv") == 0) {
+        divmod = true;
+        ret_reg = F_R0();
+    } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
+        divmod = false;
+        ret_reg = F_R1();
+    } else {
+        assert("error from call_lib in codegen.cpp ");
+    }
+
 #ifndef FUNC_FORMAL_ARG_REG
     doCallerReg(4, CALL_SAVE);
     return_val = F_R9();
@@ -996,26 +1021,22 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
-    emit(AS_Oper(inst4, NULL, NULL, NULL));
+    emit(AS_Oper(inst4, L(ret_reg, NULL), L(reg1, L(reg2, NULL)), NULL));
 
 #ifndef FUNC_FORMAL_ARG_REG
-    if (strcmp(fun, "__aeabi_idiv") == 0) {
-        char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Oper(inst5, L(F_R9(), NULL), L(F_R0(), F_callersaves()), NULL, true));
-    } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
-        char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-        emit(AS_Oper(inst5, L(F_R9(), NULL), L(F_R1(), F_callersaves()), NULL, true));
-    } else {
-        assert("error from call_lib in codegen.cpp ");
-    }
+    char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
+    emit(AS_Oper(inst5, L(F_R9(), NULL), L(ret_reg, F_callersaves()), NULL, true));
 
     doCallerReg(4, CALL_LOAD);
 
     char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst6, "\tmov     'd0, 's0\n");
     emit(AS_Oper(inst6, L(rsreg, NULL), L(F_R9(), NULL), NULL, true));
+#else
+    char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
+    sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
+    emit(AS_Oper(inst5, L(rsreg, NULL), L(ret_reg, F_callersaves()), NULL, true));
 #endif
 }
 

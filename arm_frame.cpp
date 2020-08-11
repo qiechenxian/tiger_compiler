@@ -405,7 +405,7 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     int args_inFrame_cnt = 1;
     for (U_boolList iter = formals; iter; iter = iter->tail) {
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K && (iter->head == true)) {
+        if (args_inReg_cnt < F_K && (iter->head == true)) {
             //暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
             access = InReg(Temp_newTemp(), F_WORD_SIZE * (-frame->local_count));
             args_inReg_cnt++;
@@ -436,7 +436,11 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
 }
 
 // R4~R7
+#ifdef FUNC_FORMAL_ARG_REG
+#define STACK_PROTECT_REG_NUM_MAX 4
+#else
 #define STACK_PROTECT_REG_NUM_MAX 8
+#endif
 #define STACK_PROTECT_REG_NUM_MAX_MAIN 4
 #ifdef FUNC_FORMAL_ARG_REG
 #define CALL_LIB_PROTECED_REG_NUM 0
@@ -657,7 +661,11 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     /** 函数入口处的汇编指令 */
     tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     if (strcmp(name, "main")) {
+#ifdef FUNC_FORMAL_ARG_REG
+        snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R4-R7, FP, LR}\n");
+#else
         snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R0-R7, FP, LR}\n");
+#endif
     } else {
         snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R4-R7, FP, LR}\n");
     }
@@ -713,7 +721,11 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
 
     tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     if (strcmp(name, "main")) {
+#ifdef FUNC_FORMAL_ARG_REG
         snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R0-R7, FP, LR}\n");
+#else
+        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R7, FP, LR}\n");
+#endif
     } else {
         snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R7, FP, LR}\n");
     }
