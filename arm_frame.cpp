@@ -265,7 +265,6 @@ Temp_tempList F_callersaves(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return NULL;
     return Temp_TempList(r0, Temp_TempList(r1, Temp_TempList(r2, Temp_TempList(r3, NULL))));
 }
 

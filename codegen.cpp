@@ -662,7 +662,7 @@ static void munchStm(T_stm s, F_frame f) {
                         // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
 
-                        emit(AS_Oper(inst, L(returnVar, NULL), useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
+                        emit(AS_Oper(inst, NULL, F_callersaves(), AS_Targets(Temp_LabelList(lab, NULL))));
 
 #ifndef FUNC_FORMAL_ARG_REG
                         if (special_tag) {
@@ -679,7 +679,7 @@ static void munchStm(T_stm s, F_frame f) {
                         emit(AS_Oper(inst3, L(t, NULL), L(F_R9(), F_callersaves()), NULL, true));
 #else
                         sprintf(inst2, "\tmov     'd0, 's0\n");
-                        emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL, true));
+                        emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), NULL), NULL, true));
 #endif
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
@@ -780,7 +780,7 @@ static void munchStm(T_stm s, F_frame f) {
 
                     // 函数调用
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
-                    emit(AS_Oper(inst, NULL, useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
+                    emit(AS_Oper(inst, NULL, F_callersaves(), AS_Targets(Temp_LabelList(lab, NULL))));
 
 #ifndef FUNC_FORMAL_ARG_REG
                     if (special_tag) {
@@ -951,32 +951,32 @@ static Temp_tempList munchArgs(bool tag, int i, Temp_tempList args)
                     //sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count) * get_word_size());//s0预着色为r0  s1预着色为sp
                     //emit(AS_Oper(str, NULL, L(F_R0(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tmov     's0, 's1\n");
-                    emit(AS_Oper(inst, NULL, L(F_R0(), L(r, F_callersaves())), NULL, true));
+                    sprintf(inst, "\tmov     'd0, 's0\n");
+                    emit(AS_Oper(inst, L(F_R0(), NULL), L(r, NULL), NULL, true));
                     break;
                 }
                 case 1: {
                     //sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count) * get_word_size());//s0预着色为r1  s1预着色为sp
                     //emit(AS_Oper(str, NULL, L(F_R1(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tmov     's0, 's1\n");
-                    emit(AS_Oper(inst, NULL, L(F_R1(), L(r, F_callersaves())), NULL, true));
+                    sprintf(inst, "\tmov     'd0, 's0\n");
+                    emit(AS_Oper(inst, L(F_R1(), NULL), L(r, NULL), NULL, true));
                     break;
                 }
                 case 2: {
                     //sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count) * get_word_size());//s0预着色为r2  s1预着色为sp
                     //emit(AS_Oper(str, NULL, L(F_R2(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tmov     's0, 's1\n");
-                    emit(AS_Oper(inst, NULL, L(F_R2(), L(r, F_callersaves())), NULL, true));
+                    sprintf(inst, "\tmov     'd0, 's0\n");
+                    emit(AS_Oper(inst, L(F_R2(), NULL), L(r, NULL), NULL, true));
                     break;
                 }
                 case 3: {
                     //sprintf(str, "\tstr     's0, ['s1, #%d]\n", (--args_count) * get_word_size());//s0预着色为r3  s1预着色为sp
                     //emit(AS_Oper(str, NULL, L(F_R3(), L(F_SP(), NULL)), NULL));
 
-                    sprintf(inst, "\tmov     's0, 's1\n");
-                    emit(AS_Oper(inst, NULL, L(F_R3(), L(r, F_callersaves())), NULL, true));
+                    sprintf(inst, "\tmov     'd0, 's0\n");
+                    emit(AS_Oper(inst, L(F_R3(), NULL), L(r, NULL), NULL, true));
                     break;
                 }
             }
@@ -1001,13 +1001,10 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 //    Temp_temp* callerReg = F_getCallerArray();
 //    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
 
-    bool divmod;
     Temp_temp ret_reg;
     if (strcmp(fun, "__aeabi_idiv") == 0) {
-        divmod = true;
         ret_reg = F_R0();
     } else if (strcmp(fun, "__aeabi_idivmod") == 0) {
-        divmod = false;
         ret_reg = F_R1();
     } else {
         assert("error from call_lib in codegen.cpp ");
@@ -1019,16 +1016,16 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 #endif
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst2, "\tmov     's0, 's1\n");//传递操作数reg1->r0
-    emit(AS_Oper(inst2, NULL, L(F_R0(), L(reg1, F_callersaves())), NULL, true));
+    sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
+    emit(AS_Oper(inst2, L(F_R0(),NULL), L(reg1, NULL), NULL, true));
 
     char *inst3 = (char *) checked_malloc(sizeof(char) * INST_LEN);
-    sprintf(inst3, "\tmov     's0, 's1\n");//传递操作数reg2->r1
-    emit(AS_Oper(inst2, NULL, L(F_R1(), L(reg2, F_callersaves())), NULL, true));
+    sprintf(inst3, "\tmov     'd0, 's0\n");//传递操作数reg2->r1
+    emit(AS_Oper(inst2, L(F_R1(),NULL), L(reg2, NULL), NULL, true));
 
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
-    emit(AS_Oper(inst4, L(ret_reg, NULL), L(F_R0(), L(F_R1(), NULL)), NULL));
+    emit(AS_Oper(inst4, NULL, F_callersaves(), NULL));
 
 #ifndef FUNC_FORMAL_ARG_REG
     char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
@@ -1043,7 +1040,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 #else
     char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
-    emit(AS_Oper(inst5, L(rsreg, NULL), L(ret_reg, F_callersaves()), NULL, true));
+    emit(AS_Oper(inst5, L(rsreg, NULL), L(ret_reg, NULL), NULL, true));
 #endif
 }
 
