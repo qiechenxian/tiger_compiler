@@ -96,6 +96,7 @@ T_exp F_fp_address(F_access acc,int index);
 F_access look_for_f_offset(Temp_temp temp,F_frame f);
 
 #define LOCAL_VAR_TEMP
+#define USE_R0_RETURN
 
 Temp_map get_frame_precored_map(F_frame frame);
 

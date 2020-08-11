@@ -39,7 +39,7 @@ static Temp_temp munchExp(T_exp e);
 static void munchStm(T_stm s, F_frame f);
 
 // 用于过程调用中参数传递到正确位置
-static Temp_tempList munchArgs(bool tag, int i, T_expList args);
+static Temp_tempList munchArgs(bool tag, int i, Temp_tempList args);
 
 //调用者保存和恢复
 static void munchCallerSave();
@@ -479,11 +479,6 @@ static void doCallerReg(int args, int type){
     int loop_start = 0;
     args = 4;
 
-    // 强制前四个要入栈保存
-#ifdef USE_R0_RETURN
-    loop_start = 1;
-#endif
-
     for (int i = loop_start; i < args; i++){
         if (type == CALL_SAVE){
             char* inst = (char*)checked_malloc(sizeof(char)*INST_LEN);
@@ -604,6 +599,7 @@ static void munchStm(T_stm s, F_frame f) {
                         Temp_tempList useArgList = NULL;
                         Temp_temp returnVar = NULL;
 
+#ifndef USE_R0_RETURN
                         // 检查是否是外部函数
                         special_tag = Sys_lib_fuc_test(lab);
                         if (true == special_tag) {
@@ -618,20 +614,23 @@ static void munchStm(T_stm s, F_frame f) {
                             for(int k = 0; k < args_count; k ++) {
                                 useArgList = L(callerArray[k], useArgList);
                             }
-#ifdef USE_R0_RETURN
                             returnVar = F_R0();
-#else
-                            returnVar = F_R0();
-#endif
                         } else {
-#ifdef USE_R0_RETURN
-                            returnVar = F_R0();
-#else
                             returnVar = F_R9();
+                        }
+#else
+                        special_tag = true;
+                        useArgList = NULL;
+                        returnVar = F_R0();
 #endif
+
+                        Temp_tempList new_args_temp = NULL;
+                        for(T_expList arg_list = args; arg_list; arg_list = arg_list->tail) {
+                            Temp_temp r = munchExp(arg_list->head);
+                            new_args_temp = L(r, new_args_temp);
                         }
 
-                        munchArgs(special_tag, 0, args);
+                        munchArgs(special_tag, 0, new_args_temp);
 
                         // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
@@ -643,29 +642,30 @@ static void munchStm(T_stm s, F_frame f) {
                             sprintf(inst2, "\tmov     'd0, 's0\n");
                             emit(AS_Oper(inst2, L(F_R9(), NULL), L(F_R0(), F_callersaves()), NULL, true));
                         }
-#endif
+
                         // 恢复寄存器
                         if (special_tag) {
                             doCallerReg(args_count, CALL_LOAD);
                         }
-#ifdef USE_R0_RETURN
-                        sprintf(inst2, "\tmov     'd0, 's0\n");
-                        emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL, true));
-#else
+
                         sprintf(inst3, "\tmov     'd0, 's0\n");
                         emit(AS_Oper(inst3, L(t, NULL), L(F_R9(), F_callersaves()), NULL, true));
+#else
+                        sprintf(inst2, "\tmov     'd0, 's0\n");
+                        emit(AS_Oper(inst2, L(t, NULL), L(F_R0(), F_callersaves()), NULL, true));
 #endif
                     } else {
                         /* MOVE(TEMP(t),CALL(e1,args)) */
-                        T_exp e1 = src->u.CALL.fun;
-                        T_expList args = src->u.CALL.args;
-                        Temp_temp t = dst->u.TEMP;
-                        Temp_temp r1 = munchExp(e1);
-                        Temp_tempList l = munchArgs(false, 0, args);
-                        Temp_tempList calldefs = NULL; // TODO
-                        //TODO，此处未写，call(e1,args)节点含义不明
-                        EM_error(0, "call(e1,args)节点含义不明");
+                        EM_error(0, "call(e1,args) illegal");
                         assert(0);
+
+//                        T_exp e1 = src->u.CALL.fun;
+//                        T_expList args = src->u.CALL.args;
+//                        Temp_temp t = dst->u.TEMP;
+//                        Temp_temp r1 = munchExp(e1);
+//                        Temp_tempList l = munchArgs(false, 0, args);
+//                        Temp_tempList calldefs = NULL; // TODO
+//                        //TODO，此处未写，call(e1,args)节点含义不明
                     }
                 } else {
                     /* MOVE(TEMP(i),e1) */
@@ -718,6 +718,7 @@ static void munchStm(T_stm s, F_frame f) {
 
                     Temp_tempList useArgList = NULL;
 
+#ifndef USE_R0_RETURN
                     // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
                     special_tag = Sys_lib_fuc_test(lab);
 
@@ -726,30 +727,46 @@ static void munchStm(T_stm s, F_frame f) {
                             args_count++;
                         }
 
+
                         doCallerReg(args_count, CALL_SAVE);
                         Temp_temp* callerArray = F_getCallerArray();
                         for(int k = 0; k < args_count; k ++) {
                             useArgList = L(callerArray[k], useArgList);
                         }
                     }
+#else
+                    special_tag = true;
+#endif
 
-                    munchArgs(special_tag, 0, args);
+                    Temp_tempList new_args_temp = NULL;
+                    for(T_expList arg_list = args; arg_list; arg_list = arg_list->tail) {
+                        Temp_temp r = munchExp(arg_list->head);
+                        new_args_temp = L(r, new_args_temp);
+                    }
+
+                    munchArgs(special_tag, 0, new_args_temp);
 
                     // 函数调用
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
                     emit(AS_Oper(inst, NULL, useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
-                    if (special_tag)
+#ifndef USE_R0_RETURN
+                    if (special_tag) {
                         doCallerReg(args_count, CALL_LOAD);
+                    }
+#endif
 
                 } else {
                     /* EXP(CALL(e,args)) */
-                    T_exp e1 = call->u.CALL.fun;
-                    T_expList args = call->u.CALL.args;
-                    Temp_temp r1 = munchExp(e1);
-                    Temp_tempList l = munchArgs(false, 0, args);
-                    Temp_tempList calldefs = NULL; // TODO
-                    // TODO 此处未写，call(e1,args)语义不明
+                    EM_error(0, "call(e1,args) illegal");
+                    assert(0);
+
+//                    T_exp e1 = call->u.CALL.fun;
+//                    T_expList args = call->u.CALL.args;
+//                    Temp_temp r1 = munchExp(e1);
+//                    Temp_tempList l = munchArgs(false, 0, args);
+//                    Temp_tempList calldefs = NULL; // TODO
+//                    // TODO 此处未写，call(e1,args)语义不明
                 }
             } else {
                 /* EXP(e) */
@@ -850,7 +867,7 @@ static void munchStm(T_stm s, F_frame f) {
     }
 }
 
-static Temp_tempList munchArgs(bool tag, int i, T_expList args)
+static Temp_tempList munchArgs(bool tag, int i, Temp_tempList args)
 /**
  * 调用过程中传参。
  * \注意 这种传参方法没有使用压栈操作。而是在程序入口处提前分配传参空间。
@@ -870,7 +887,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
             return nullptr;
         }
         char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        Temp_temp r = munchExp(args->head);
+        Temp_temp r = args->head;
         if (i)
             sprintf(inst, "\tstr     's0, ['s1, #%d]\n", i * get_word_size());
         else
@@ -886,8 +903,7 @@ static Temp_tempList munchArgs(bool tag, int i, T_expList args)
             return nullptr;
         }
         char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        char *str = (char *) checked_malloc(sizeof(char) * INST_LEN);
-        Temp_temp r = munchExp(args->head);
+        Temp_temp r = args->head;
         if (count_func_param > 4) {
             if (i - 4)
                 sprintf(inst, "\tstr     's0, ['s1, #%d]\n", (i - 4) * get_word_size());
@@ -952,7 +968,11 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 
 //    Temp_temp* callerReg = F_getCallerArray();
 //    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
+
+#ifndef USE_R0_RETURN
     doCallerReg(4, CALL_SAVE);
+    return_val = F_R9();
+#endif
 
     char *inst2 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst2, "\tmov     'd0, 's0\n");//传递操作数reg1->r0
@@ -965,6 +985,8 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     char *inst4 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst4, "\tbl      %s\n", fun);
     emit(AS_Oper(inst4, NULL, NULL, NULL));
+
+#ifndef USE_R0_RETURN
     if (strcmp(fun, "__aeabi_idiv") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值
@@ -982,5 +1004,6 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     char *inst6 = (char *) checked_malloc(sizeof(char) * INST_LEN);
     sprintf(inst6, "\tmov     'd0, 's0\n");
     emit(AS_Oper(inst6, L(rsreg, NULL), L(F_R9(), NULL), NULL, true));
+#endif
 }
 

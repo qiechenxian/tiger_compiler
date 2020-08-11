@@ -235,14 +235,12 @@ Temp_tempList F_registers(void) {
     }
 
 #ifdef USE_R0_RETURN
-    return Temp_TempList(r1,
-                         Temp_TempList(r2,
-                                       Temp_TempList(r3,
-                                                     Temp_TempList(r4,
-                                                                   Temp_TempList(r5,
-                                                                                 Temp_TempList(r6,
-                                                                                               Temp_TempList(r7,
-                                                                                                             NULL)))))));
+    return Temp_TempList(r4,
+                         Temp_TempList(r5,
+                                       Temp_TempList(r6,
+                                                     Temp_TempList(r7,
+                                                                   NULL))));
+
 #else
     return Temp_TempList(r0,
                          Temp_TempList(r1,
@@ -440,7 +438,7 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
 #define STACK_PROTECT_REG_NUM_MAX 8
 #define STACK_PROTECT_REG_NUM_MAX_MAIN 4
 #ifdef USE_R0_RETURN
-#define CALL_LIB_PROTECED_REG_NUM 3
+#define CALL_LIB_PROTECED_REG_NUM 0
 #else
 #define CALL_LIB_PROTECED_REG_NUM 4
 #endif
