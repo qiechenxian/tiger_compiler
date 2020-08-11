@@ -295,11 +295,27 @@ static Temp_temp munchExp(T_exp e) {
             else if (e->u.BINOP.op == T_add) {
                 /* BINOP(PLUS,e1,e2) 已检查*/
                 T_exp e1 = e->u.BINOP.left, e2 = e->u.BINOP.right;
-                Temp_temp r1 = munchExp(e1);
-                Temp_temp r2 = munchExp(e2);
                 Temp_temp r = Temp_newTemp();
-                sprintf(inst, "\tadd     'd0, 's0, 's1\n");
-                emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
+                Temp_temp r1 = munchExp(e1);
+                // 如果e2是乘法
+                if(e2->kind == T_exp_::T_BINOP && e2->u.BINOP.op == T_mul) {
+                    T_exp e2_left = e2->u.BINOP.left;
+                    T_exp e2_right = e2->u.BINOP.right;
+                    int shift = 0;
+
+                    if(e2_right->kind == T_exp_::T_CONST && (shift = getShiftTime(e2_right->u.CONST))) {
+                        sprintf(inst, "\tadd     'd0, 's0, 's1, lsl #%d\n", shift);
+                        emit(AS_Oper(inst, L(r, NULL), L(r1, L(munchExp(e2_left), NULL)), NULL));
+                    } else {
+                        sprintf(inst, "\tmla     'd0, 's0, 's1, 's2\n");
+                        emit(AS_Oper(inst, L(r, NULL), L(munchExp(e2_left), L(munchExp(e2_right), L(r1, NULL))), NULL));
+                    }
+                } else {
+                    Temp_temp r2 = munchExp(e2);
+                    sprintf(inst, "\tadd     'd0, 's0, 's1\n");
+                    emit(AS_Oper(inst, L(r, NULL), L(r1, L(r2, NULL)), NULL));
+                }
+
                 return r;
             } else if (e->u.BINOP.op == T_sub) {
                 /* BINOP(MINUS,e1,e2) 已检查*/
