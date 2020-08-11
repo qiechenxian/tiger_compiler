@@ -630,7 +630,7 @@ static void munchStm(T_stm s, F_frame f) {
                             new_args_temp = L(r, new_args_temp);
                         }
 
-                        munchArgs(special_tag, 0, new_args_temp);
+                        munchArgs(special_tag, 0, Temp_reverseList(new_args_temp));
 
                         // 函数调用
                         sprintf(inst, "\tbl      %s\n", Temp_labelString(lab));
@@ -744,7 +744,8 @@ static void munchStm(T_stm s, F_frame f) {
                         new_args_temp = L(r, new_args_temp);
                     }
 
-                    munchArgs(special_tag, 0, new_args_temp);
+
+                    munchArgs(special_tag, 0, Temp_reverseList(new_args_temp));
 
                     // 函数调用
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
