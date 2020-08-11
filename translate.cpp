@@ -724,9 +724,11 @@ void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals)//todo
 }
 Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame)
 {
-    Temp_temp ret_temp = F_R9();
+    Temp_temp ret_temp;
 #ifdef FUNC_FORMAL_ARG_REG
     ret_temp = F_R0();
+#else
+    ret_temp = F_R9();
 #endif
     T_exp tmp = T_Temp(ret_temp);
 

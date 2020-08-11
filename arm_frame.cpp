@@ -722,9 +722,9 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
     if (strcmp(name, "main")) {
 #ifdef FUNC_FORMAL_ARG_REG
-        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R0-R7, FP, LR}\n");
-#else
         snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R7, FP, LR}\n");
+#else
+        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R0-R7, FP, LR}\n");
 #endif
     } else {
         snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R7, FP, LR}\n");
