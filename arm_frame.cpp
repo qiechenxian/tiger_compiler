@@ -234,7 +234,7 @@ Temp_tempList F_registers(void) {
         F_initRegisters();
     }
 
-#ifdef USE_R0_RETURN
+#ifdef FUNC_FORMAL_ARG_REG
     return Temp_TempList(r4,
                          Temp_TempList(r5,
                                        Temp_TempList(r6,
@@ -326,6 +326,7 @@ struct F_frame_ {
 
 
 
+
 /** function prototype */
 static F_access InFrame(int offset);
 
@@ -404,7 +405,7 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     int args_inFrame_cnt = 1;
     for (U_boolList iter = formals; iter; iter = iter->tail) {
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K && (iter->head == false) && false) {
+        if (args_inReg_cnt <= F_K && (iter->head == true)) {
             //暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
             access = InReg(Temp_newTemp(), F_WORD_SIZE * (-frame->local_count));
             args_inReg_cnt++;
@@ -437,7 +438,7 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
 // R4~R7
 #define STACK_PROTECT_REG_NUM_MAX 8
 #define STACK_PROTECT_REG_NUM_MAX_MAIN 4
-#ifdef USE_R0_RETURN
+#ifdef FUNC_FORMAL_ARG_REG
 #define CALL_LIB_PROTECED_REG_NUM 0
 #else
 #define CALL_LIB_PROTECED_REG_NUM 4
@@ -446,8 +447,8 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
 F_frame F_newFrame(Temp_label name, U_boolList formals) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
-    f->formals = makeFormalAccessList(f, formals);
     f->local_count = STACK_PROTECT_REG_NUM_MAX + 1 + CALL_LIB_PROTECED_REG_NUM;
+    f->formals = makeFormalAccessList(f, formals);
     f->locals = nullptr;
     f->isLeaf = true;
     f->temp_space = 0;
@@ -696,7 +697,7 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     head_inst_list = AS_splice(head_inst_list, body->tail);
 
     /** 函数出口指令 */
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
     if (0 == strcmp(name, "main")) {
         tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
         snprintf(tempinst_buf, INST_SIZE, (char *)"\tmov     R0, R9\n");

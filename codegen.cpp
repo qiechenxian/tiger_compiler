@@ -55,6 +55,17 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 AS_instrList F_codegen(F_frame f, T_stmList stmList) {
     AS_instrList list;
     T_stmList stmList1;
+
+    // 形参的前四个参数要把寄存器的值保存在栈中
+    Temp_temp* callerArray = F_getCallerArray();
+    F_accessList formalAccessList = F_getFormals(f);
+    for(int argCnt = 0;formalAccessList && (argCnt < 4); formalAccessList = formalAccessList->tail, argCnt ++) {
+        char *inst = (char *) checked_malloc(sizeof(char) * INST_LEN);
+
+        sprintf(inst, "\tstr     's0, ['d0, #%d]\n", F_accessOffset(formalAccessList->head));
+        emit(AS_Oper(inst, L(F_FP(), NULL), L(callerArray[argCnt], NULL), NULL));
+    }
+
     for (stmList1 = stmList; stmList1; stmList1 = stmList1->tail) {
         munchStm(stmList1->head, f);
     }
@@ -599,7 +610,7 @@ static void munchStm(T_stm s, F_frame f) {
                         Temp_tempList useArgList = NULL;
                         Temp_temp returnVar = NULL;
 
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
                         // 检查是否是外部函数
                         special_tag = Sys_lib_fuc_test(lab);
                         if (true == special_tag) {
@@ -637,7 +648,7 @@ static void munchStm(T_stm s, F_frame f) {
 
                         emit(AS_Oper(inst, L(returnVar, NULL), useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
                         if (special_tag) {
                             sprintf(inst2, "\tmov     'd0, 's0\n");
                             emit(AS_Oper(inst2, L(F_R9(), NULL), L(F_R0(), F_callersaves()), NULL, true));
@@ -718,7 +729,7 @@ static void munchStm(T_stm s, F_frame f) {
 
                     Temp_tempList useArgList = NULL;
 
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
                     // 检查是否是外部函数，并返回需要保存入栈的寄存器个数
                     special_tag = Sys_lib_fuc_test(lab);
 
@@ -751,7 +762,7 @@ static void munchStm(T_stm s, F_frame f) {
                     sprintf(inst, "\tbl      %s\n", funcName(Temp_labelString(lab)));
                     emit(AS_Oper(inst, NULL, useArgList, AS_Targets(Temp_LabelList(lab, NULL))));
 
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
                     if (special_tag) {
                         doCallerReg(args_count, CALL_LOAD);
                     }
@@ -970,7 +981,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
 //    Temp_temp* callerReg = F_getCallerArray();
 //    Temp_tempList caller2List = L(callerReg[0], L(callerReg[1], NULL));
 
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
     doCallerReg(4, CALL_SAVE);
     return_val = F_R9();
 #endif
@@ -987,7 +998,7 @@ static void call_lib(c_string fun, Temp_temp rsreg, Temp_temp reg1, Temp_temp re
     sprintf(inst4, "\tbl      %s\n", fun);
     emit(AS_Oper(inst4, NULL, NULL, NULL));
 
-#ifndef USE_R0_RETURN
+#ifndef FUNC_FORMAL_ARG_REG
     if (strcmp(fun, "__aeabi_idiv") == 0) {
         char *inst5 = (char *) checked_malloc(sizeof(char) * INST_LEN);
         sprintf(inst5, "\tmov     'd0, 's0\n");//取回返回值

@@ -531,6 +531,8 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             TY_tyList typeIter = funEntry->u.fun.formals;
             A_fieldList formalIter = d->u.function.params;
             Tr_accessList argsCL = Tr_getFormals(fun_frame);
+            Tr_accessList save_argsCL = argsCL;
+
             for ( ; typeIter; typeIter = typeIter->tail, formalIter = formalIter->tail){
                 // 语义支持const形参，虽然语法没支持
 
@@ -557,8 +559,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                                                                                             nullptr)))));
             /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body, l_break, l_continue);
+
             F_setFrameCalleeArgs(fun_frame, returnValue.callee_args);
+
             returnValue.exp = Tr_add_fuc_head_label(returnValue.exp, fun_label);
+
             /// 检查返回值
             if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)) {
                 EM_error(d->u.function.body->pos,
@@ -574,7 +579,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 if (!is_equal_ty(returnValue.ty, TY_Int()))
                     EM_warning(d->pos, "main function should return a integer");
             }
-            Tr_procEntryExit(fun_frame, returnValue.exp, argsCL);//将函数栈帧与函数体记录，构建中间代码阶段反回的片段列表
+
+            //将函数栈帧与函数体记录，构建中间代码阶段反回的片段列表
+            Tr_procEntryExit(fun_frame, returnValue.exp, save_argsCL);
             S_endScope(venv);
             S_endScope(tenv);
             return Tr_nopExp();
@@ -735,7 +742,6 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     }
     assert(0);
 }
-
 
 static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,Tr_exp l_continue){
     if (not a){

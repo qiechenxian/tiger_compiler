@@ -215,7 +215,11 @@ A_field A_Field(A_pos pos, S_symbol id, S_symbol type, A_expList size){
     a-> id = id;
     a-> type = type;
     a->size = size;
+#ifdef FUNC_FORMAL_ARG_REG
+    a->escape = false; /// 默认所有的形参都存储在栈中
+#else
     a->escape = true; /// 默认逃逸变量，即所有变量均可放在寄存器中
+#endif
     return a;
 }
 A_fieldList A_FieldList(A_field head, A_fieldList tail){
