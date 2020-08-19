@@ -560,13 +560,13 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             F_setFrameCalleeArgs(fun_frame, returnValue.callee_args);
             returnValue.exp = Tr_add_fuc_head_label(returnValue.exp, fun_label);
             /// 检查返回值
-            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)) {
-                EM_error(d->u.function.body->pos,
-                         "incorrect return type %s, expected %s",
-                         TY_toString(returnValue.ty),
-                         TY_toString(funEntry->u.fun.result)
-                );
-            }
+//            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)) {
+//                EM_error(d->u.function.body->pos,
+//                         "incorrect return type %s, expected %s",
+//                         TY_toString(returnValue.ty),
+//                         TY_toString(funEntry->u.fun.result)
+//                );
+//            }
             /// 检查main函数是否有参数，返回值是否为int
             if (d->u.function.id == S_Symbol((char *) "main")) {
                 if (d->u.function.params != nullptr)
