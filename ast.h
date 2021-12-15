@@ -75,6 +75,8 @@ struct A_dec_{
              */
             A_exp init; /// init is optional
 
+            int *suffixSize; /// 指针类型的suffixSize
+
             bool isConst;
             bool escape;
         }var;

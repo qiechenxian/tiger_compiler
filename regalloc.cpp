@@ -2,6 +2,11 @@
 // Created by zcjsh on 2020/7/28.
 //
 #include "regalloc.h"
+#include "temp.h"
+
+#include <vector>
+
+using namespace std;
 
 static void printTemp(void *t) {
     Temp_map m = Temp_name();
@@ -10,8 +15,18 @@ static void printTemp(void *t) {
 
 //打印指令
 static void printInst(void *info) {
+
     AS_instr inst = (AS_instr) info;
-    AS_print(stdout, inst, Temp_name());
+
+    char result[200] = {0};
+
+    if(!inst->isDead) {
+        AS_string(inst, Temp_name(), result);
+
+        if(result[0] != '\0') {
+            fprintf(stdout, "%s", result);
+        }
+    }
 }
 
 //翻转instr list
@@ -116,10 +131,14 @@ static Temp_tempList aliased(Temp_tempList tl, G_graph ig,
     for (; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
         G_node n = temp2Node(t, ig);
-        G_node alias = getAlias(n, aliases, cn);
-        t = node2Temp(n);
+        if(n != nullptr) {
+            G_node alias = getAlias(n, aliases, cn);
+            Temp_temp alias_temp = node2Temp(alias);
+            al = L(alias_temp, al);
+        }
         al = L(t, al);
     }
+
     return tempUnion(al, NULL);
 }
 
@@ -128,57 +147,114 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
     struct RA_result ret;
     bool ra_finished = false;
 
-    G_graph flow;
-    struct Live_graph live;
-    Temp_map initial;
-    struct COL_result col;// = (COL_result*)checked_malloc(sizeof(COL_result));
+    Temp_map precored_map = F_initialRegisters(f);
+    struct COL_result col;
     AS_instrList rewriteList;
     int tryNum = 0;
-    const int maxTryNum = 2;
-    while (tryNum ++ < maxTryNum) {
-        flow = FG_AssemFlowGraph(il, f);
+    const int maxTryNum = 10;//遍历一遍
 
-#if 0
+    // 可着色的寄存器一览
+    Temp_tempList canColoredRegs = F_registers();
+    Temp_tempList initial = nullptr;
+    bool spilled_exist = false;
+    COL_init_spilled_temp_num(-1);
+
+    while (tryNum ++ < maxTryNum) {
+
+#ifdef DEBUG_PRINT_COLOR
+        printf("Color:%s:%d start\n", Temp_labelString(F_getName(f)), tryNum);
+#endif
+
+        // 因每次都会构建控制流图，因此initial每次都需要设置空
+        initial = nullptr;
+
+        // 构建控制流图
+        G_graph flow = FG_AssemFlowGraph(il, f);
+
+#ifdef DEBUG_PRINT_IR
         G_show(stderr, G_nodes(flow), printInst);
 #endif
 
-        live = Live_liveness(flow);
+        // 进行变量活跃性分析
+        struct Live_graph live = Live_liveness(flow);
 
-#if 0
+        // 控制流图不再使用，清除空间
+        G_Graph_free(flow);
+
+#ifdef DEBUG_PRINT_GRAPH
         G_show(stderr, G_nodes(live.graph), printTemp);
 #endif
 
-        initial = F_initialRegisters(f);
-
-        col = COL_color(live.graph, initial, F_registers(),
+        col = COL_color(live.graph, precored_map, canColoredRegs, initial,
                         live.worklistMoves, live.moveList, live.spillCost);
 
         if (col.spills == NULL) {
+#ifdef DEBUG_PRINT_COLOR
+            printf("Color:%s:%d OK\n", Temp_labelString(F_getName(f)), tryNum);
+#endif
             break;
         }
 
+        // 下面进行未着色结点的溢出处理，然后重写程序
         Temp_tempList spilled = col.spills;
+
         rewriteList = NULL;
 
         // Assign locals in memory
-        Temp_tempList tl;
+        Temp_tempList tl, new_spilled = NULL;
+        AS_instrList inst_move;
+
+#ifdef DEBUG_PRINT
+        // 查看合并的Move指令是否包含有溢出的临时变量
+        for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+
+            Temp_tempList src = inst_move->head->u.MOVE.src;
+            Temp_tempList dst = inst_move->head->u.MOVE.dst;
+
+            printf("Move %d:%d\n", dst->head->num, src->head->num);
+        }
+#endif
+
         TAB_table spilledLocal = TAB_empty();
         for (tl = spilled; tl; tl = tl->tail) {
-            //TODO local的大小
-            F_access local = F_allocLocal(f, true, get_word_size());
+
+            if(NULL != TAB_look(spilledLocal, tl->head)) {
+                continue;
+            }
+
+            new_spilled = Temp_TempList(tl->head, new_spilled);
+
+            F_access local = NULL;
+            local = F_allocLocal(f, true, 1);
             TAB_enter(spilledLocal, tl->head, local);
         }
+
+        Temp_tempList new_spilled_temps = nullptr;
 
         // Rewrite instructions
         for (; il; il = il->tail) {
             AS_instr inst = il->head;
 
+            // 查看合并的Move指令是否包含有溢出的临时变量
+            bool moveExist = false;
+            for(inst_move = col.coalescedMoves; inst_move; inst_move = inst_move->tail) {
+                if(inst == inst_move->head) {
+                    moveExist = true;
+                    break;
+                }
+            }
+
+            if(moveExist) {
+                rewriteList = AS_InstrList(inst, rewriteList);
+                continue;
+            }
+
             Temp_tempList useSpilled = tempIntersect(
                     aliased(inst_use(inst), live.graph, col.alias, col.coalescedNodes),
-                    spilled);
+                    new_spilled);
             Temp_tempList defSpilled = tempIntersect(
                     aliased(inst_def(inst), live.graph, col.alias, col.coalescedNodes),
-                    spilled);
+                    new_spilled);
 
             // Skip unspilled instructions
             // 跳过未溢出的指令
@@ -187,65 +263,130 @@ struct RA_result RA_regAlloc(F_frame f, AS_instrList il) {
                 continue;
             }
 
+            Temp_tempList replace_list;
             for (tl = useSpilled; tl; tl = tl->tail) {
-                char buf[128];
 
-                Temp_temp temp = tl->head;
-                F_access local = (F_access) TAB_look(spilledLocal, temp);
+                // 溢出变量所在栈中的位置
+                F_access local = (F_access) TAB_look(spilledLocal, tl->head);
 
-                sprintf(buf, "\tldr     'd0, ['s0, #%d] \n#spilled\n", F_accessOffset(local));
+                // 新建一个临时变量
+                Temp_temp new_temp = Temp_newTemp();
+                if(!spilled_exist) {
+                    COL_init_spilled_temp_num(new_temp->num);
+                    spilled_exist = true;
+                }
+
+                // 记录一下
+                new_spilled_temps = Temp_TempList(new_temp, new_spilled_temps);
+
+                char *buf = (char *) checked_malloc(sizeof(char) * INST_GENERAL_LEN);
+                sprintf(buf, "\tldr     'd0, [FP, #%d] \n#spilled\n", F_accessOffset(local));
 
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), L(temp, NULL), L(F_FP(), NULL), NULL), rewriteList);
+                        AS_Oper(String(buf), L(new_temp, NULL), NULL, NULL), rewriteList);
+
+                //ldr是放在inst use前面,替换inst src列表
+                replace_list = nullptr;
+
+                if (inst->kind == AS_instr_::I_MOVE) {
+                    replace_list = inst->u.MOVE.src;
+                } else if (inst->kind == AS_instr_::I_OPER) {
+                    replace_list = inst->u.OPER.src;
+                }
+
+                for (; replace_list; replace_list = replace_list->tail) {
+                    if (replace_list->head == tl->head) {
+                        replace_list->head = new_temp;
+                    }
+                }
             }
 
             rewriteList = AS_InstrList(inst, rewriteList);
 
             for (tl = defSpilled; tl; tl = tl->tail) {
-                char buf[128];
 
-                Temp_temp temp = tl->head;
-                F_access local = (F_access) TAB_look(spilledLocal, temp);
+                // 溢出变量所在栈中的位置
+                F_access local = (F_access) TAB_look(spilledLocal, tl->head);
 
-                sprintf(buf, "\tstr     's0, ['s1, #%d] \n#spilled\n", F_accessOffset(local));
+                // 新建一个临时变量
+                Temp_temp new_temp = Temp_newTemp();
+                if(!spilled_exist) {
+                    COL_init_spilled_temp_num(new_temp->num);
+                    spilled_exist = true;
+                }
+
+                new_spilled_temps = Temp_TempList(new_temp, new_spilled_temps);
+
+                char *buf = (char *) checked_malloc(sizeof(char) * INST_GENERAL_LEN);
+                sprintf(buf, "\tstr     's0, [FP, #%d] \n#spilled\n", F_accessOffset(local));
 
                 rewriteList = AS_InstrList(
-                        AS_Oper(String(buf), NULL, L(temp, L(F_FP(), NULL)), NULL), rewriteList);
+                        AS_Oper(String(buf), NULL, L(new_temp, NULL), NULL), rewriteList);
+
+                //str是放在inst dfe后面,替换dst列表
+                replace_list = nullptr;
+
+                if (inst->kind == AS_instr_::I_MOVE) {
+                    replace_list = inst->u.MOVE.dst;
+                } else if (inst->kind == AS_instr_::I_OPER) {
+                    replace_list = inst->u.OPER.dst;
+                }
+
+                for (; replace_list; replace_list = replace_list->tail) {
+                    if (replace_list->head == tl->head) {
+                        replace_list->head = new_temp;
+                    }
+                }
             }
         }
 
+#if 0
+        if (col.coalescedMoves != NULL) {
+            for (il = rewriteList; il; il = il->tail) {
+                AS_instr inst = il->head;
+
+                // Remove coalesced moves
+                if (instIn(inst, col.coalescedMoves)) {
+                    inst->isDead = true;
+                }
+            }
+        }
+#endif
+
         il = reverseInstrList(rewriteList);
+
+        G_Graph_free(live.graph);
+
+#ifdef DEBUG_PRINT_COLOR
+        printf("Color:%s:%d NG\n", Temp_labelString(F_getName(f)), tryNum);
+#endif
     }
 
     if (col.spills != NULL) {
-//        EM_error(0, "fail to allocate registers");
+        EM_errorWithExitCode(-2, 0, "fail to allocate registers");
+#ifdef DEBUG_PRINT_COLOR
+        printf("Color:%s failed to allocate registers\n", Temp_labelString(F_getName(f)));
+#endif
     }
 
     if (col.coalescedMoves != NULL) {
-        rewriteList = NULL;
-        for (; il; il = il->tail) {
-            AS_instr inst = il->head;
+        for (rewriteList = il; rewriteList; rewriteList = rewriteList->tail) {
+            AS_instr inst = rewriteList->head;
 
-// Remove coalesced moves
-//溢出已经合并的指令
+            // Remove coalesced moves
             if (instIn(inst, col.coalescedMoves)) {
-                char buf[1024];
-                sprintf(buf, "# ");
-                strcat(buf, inst->u.OPER.assem);
-                inst->u.OPER.assem = String(buf);
-//continue;
+                inst->isDead = true;
             }
-
-            rewriteList = AS_InstrList(inst, rewriteList);
         }
-
-        il = reverseInstrList(rewriteList);
     }
 
     ret.coloring = col.coloring;
+
+    ret.il = il;
+
     //free(col);
     //delete col;
-    ret.il = il;
+
 
 // Temp_tempList precolored = NULL;
 // Temp_tempList initial = NULL;

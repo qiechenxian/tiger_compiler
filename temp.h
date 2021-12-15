@@ -9,6 +9,12 @@
 #include "stdio.h"
 
 typedef struct Temp_temp_* Temp_temp;
+
+struct Temp_temp_ {
+    int num;
+    bool imm_tag;
+};
+
 Temp_temp Temp_newTemp();
 
 typedef struct Temp_tempList_ *Temp_tempList;
@@ -44,5 +50,9 @@ void Temp_enterPtr(Temp_map m, Temp_temp t, void *ptr);
 void* Temp_lookPtr(Temp_map m, Temp_temp t);
 
 Temp_map Temp_name(void);
+Temp_map Temp_imm_name(void);
+Temp_temp Temp_new_imm_Temp(int number);
 Temp_temp Temp_new_special(c_string s, int num);
+int Temp_number(Temp_temp test);
+bool Temp_tag(Temp_temp test);
 #endif //COMPILER_LOYX_TEMP_H

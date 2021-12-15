@@ -3,6 +3,8 @@
 //
 
 #include "tree.h"
+#include "errormsg.h"
+
 T_expList T_ExpList(T_exp head, T_expList tail)
 {
     T_expList p = (T_expList)checked_malloc(sizeof *p);
@@ -157,6 +159,7 @@ T_relOp T_not_op(T_relOp op)//T_lt, T_le, T_gt, T_ge, T_eq, T_ne,T_not,T_and, T_
         case T_eq:return T_ne;
         case T_ne:return T_eq;
         default: //永远不应该被执行
+            EM_ASSERT_CODE=-97;
             assert(0);
             return T_eq;
     }

@@ -4,10 +4,7 @@
 #include <stdio.h>
 #include "temp.h"
 #include "table.h"
-
-struct Temp_temp_ {
-    int num;
-};
+#include "errormsg.h"
 
 static int temps = 100;
 
@@ -19,9 +16,24 @@ Temp_temp Temp_newTemp() {
         sprintf(temp_inform, "%d", p->num);
         Temp_enter(Temp_name(), p, String(temp_inform));
     }
+    p->imm_tag= false;
     return p;
 }
-
+int Temp_number(Temp_temp test)
+{
+    return test->num;
+}
+Temp_temp Temp_new_imm_Temp(int number) {
+    Temp_temp p = (Temp_temp) checked_malloc(sizeof(*p));
+    p->num = number;
+    {
+        char temp_inform[16];
+        sprintf(temp_inform, "%d", p->num);
+        Temp_enter(Temp_imm_name(), p, String(temp_inform));
+    }
+    p->imm_tag= true;
+    return p;
+}
 Temp_temp Temp_new_special(c_string s, int num) {
     Temp_temp p = (Temp_temp) checked_malloc(sizeof(*p));
     p->num = num;
@@ -82,7 +94,11 @@ Temp_map Temp_name(void) {
     if (!m) m = Temp_empty();
     return m;
 }
-
+Temp_map Temp_imm_name(void) {
+    static Temp_map m = nullptr;
+    if (!m) m = Temp_empty();
+    return m;
+}
 Temp_map newMap(TAB_table tab, Temp_map under) {
     Temp_map m = (Temp_map) checked_malloc(sizeof(*m));
     m->tab = tab;
@@ -102,12 +118,14 @@ Temp_map Temp_layerMap(Temp_map over, Temp_map under) {
 }
 
 void Temp_enter(Temp_map m, Temp_temp t, c_string s) {
+    EM_ASSERT_CODE=-90;
     assert(m && m->tab);
     TAB_enter(m->tab, t, s);
 }
 
 c_string Temp_look(Temp_map m, Temp_temp t) {
     c_string s;
+    EM_ASSERT_CODE=-91;
     assert(m && m->tab);
     s = (c_string) (TAB_look(m->tab, t));
     if (s) return s;
@@ -163,8 +181,16 @@ bool Temp_equal(Temp_tempList ta, Temp_tempList tb) {
     free(m);
     return (ca == cb);
 }
-
+bool Temp_tag(Temp_temp test)
+{
+    return test->imm_tag;
+}
 Temp_tempList Temp_union(Temp_tempList ta, Temp_tempList tb) {
+
+    if(NULL == ta) return tb;
+
+    if(NULL == tb) return ta;
+
     Temp_temp t;
     Temp_tempList tl = NULL;
     Temp_map m = Temp_empty();
@@ -211,8 +237,13 @@ Temp_tempList Temp_intersect(Temp_tempList ta, Temp_tempList tb) {
 
 Temp_tempList Temp_minus(Temp_tempList ta, Temp_tempList tb) {
     Temp_temp t;
-    Temp_tempList tl = NULL;
+    Temp_tempList last = NULL;
+    Temp_tempList head = NULL;
     Temp_map m = Temp_empty();
+
+    if(ta == NULL) {
+        return head;
+    }
 
     for (; tb; tb = tb->tail) {
         t = tb->head;
@@ -222,11 +253,24 @@ Temp_tempList Temp_minus(Temp_tempList ta, Temp_tempList tb) {
     for (; ta; ta = ta->tail) {
         t = ta->head;
         if (Temp_look(m, t) == NULL) {
-            tl = Temp_TempList(t, tl);
+
+            Temp_tempList p = (Temp_tempList) checked_malloc(sizeof(*p));
+            p->head = t;
+            p->tail = NULL;
+
+            if(head == NULL) {
+                last = p;
+                head = p;
+            } else {
+                last->tail = p;
+                last = p;
+            }
         }
     }
+
     free(m);
-    return tl;
+
+    return head;
 }
 
 bool Temp_inList(Temp_temp t, Temp_tempList tl) {
@@ -238,11 +282,13 @@ bool Temp_inList(Temp_temp t, Temp_tempList tl) {
     return false;
 }
 void Temp_enterPtr(Temp_map m, Temp_temp t, void *ptr) {
+    EM_ASSERT_CODE=-92;
     assert(m && m->tab);
     TAB_enter(m->tab, t, ptr);
 }
 
 void* Temp_lookPtr(Temp_map m, Temp_temp t) {
+    EM_ASSERT_CODE=-93;
     assert(m && m->tab);
     void *s = TAB_look(m->tab, t);
     if (s) return s;

@@ -58,6 +58,7 @@ A_dec A_VariableDec(A_pos pos, S_symbol type, S_symbol id, A_exp init, bool isCo
     a->u.var.id = id;
     a->u.var.init = init;
     a->u.var.isConst = isConst;
+    a->u.var.suffixSize = nullptr; /// 指针类型使用
     a->u.var.escape = true; /// 默认逃逸变量
     return a;
 }
@@ -215,7 +216,7 @@ A_field A_Field(A_pos pos, S_symbol id, S_symbol type, A_expList size){
     a-> id = id;
     a-> type = type;
     a->size = size;
-    a->escape = true; /// 默认逃逸变量，即所有变量均可放在寄存器中
+    a->escape = true; /// 默认逃逸变量，即所有变量均可放在寄存器中,但对于形参的前四个除外
     return a;
 }
 A_fieldList A_FieldList(A_field head, A_fieldList tail){

@@ -47,9 +47,21 @@ struct COL_result {
 
 // 冲突图 ; 预着色 ; 寄存器列表;
 // 有可能合并的传送指令集和;节点映射;临时变量的定值次数
-struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
+struct COL_result COL_color(G_graph ig, Temp_map precolored_map, Temp_tempList regs, Temp_tempList initial,
                             AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost);
 
+G_node temp2Node(Temp_temp t);
+
+bool precolred(Temp_temp u);
+bool precolred(G_node nu);
+
+long degree(Temp_temp t);
+long degree(G_node n);
+
+long degreeAdd(G_node nu, long num);
+long degreeAdd(Temp_temp u, long num);
+
+void COL_init_spilled_temp_num(int num);
 
 ////color和regalloc重复函数
 //static Temp_tempList instDef(AS_instr inst);

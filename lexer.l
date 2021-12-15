@@ -103,12 +103,14 @@ c_string striped(char* st){
 char* stripZero(char* st){
     /** 去除8进制和16进制的前导0 */
     for(; *st == '0' && *(st+1); st++);
+    EM_ASSERT_CODE=-73;
     assert(st);
     return st;
 }
 
 int otoi(char* text){
     /** 8进制转10进制*/
+    EM_ASSERT_CODE=-74;
     assert(text[0] == '0');
     char *ptr;
     int res=(int)strtol(text,&ptr,8);

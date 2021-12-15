@@ -21,7 +21,8 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-
+#include <stdio.h>
+#include <io.h>
 /* end standard C headers. */
 
 /* flex integer type definitions */
@@ -598,7 +599,7 @@ int yycolumn = 1;
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
-#include <unistd.h>
+
 #endif
 
 #ifndef YY_EXTRA_TYPE
@@ -1723,7 +1724,7 @@ extern int isatty (int );
         b->yy_bs_column = 0;
     }
 
-        b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
+        b->yy_is_interactive = file ? (_isatty( fileno(file) ) > 0) : 0;
     
 	errno = oerrno;
 }

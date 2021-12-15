@@ -44,6 +44,9 @@ S_table E_base_typeEntry(){
 
     /// 这是为了内置函数的形参(int[])提供类型
     S_enter(t, S_Symbol((char*)"$int"), TY_Array(TY_Int()));
+
+    /// 数组提升时所需要的int指针类型
+    S_enter(t, S_Symbol((char*)"int*"), TY_Array(TY_Int()));
     return t;
 }
 
