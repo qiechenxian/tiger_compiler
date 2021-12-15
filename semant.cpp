@@ -1,10 +1,9 @@
-//
+﻿//
 // Created by loyx on 2020/5/1.
 //
 
 #include "semant.h"
 #include "env.h"
-#include <cstdio>
 #include <cstring>
 
 /**
@@ -57,6 +56,7 @@ static int* makeSuffixSize(A_expList list)
     suffix_size[suffix_index++] = 1;
     for (A_expList iter = list->tail; iter; iter = iter->tail, suffix_index++)
     {
+        EM_ASSERT_CODE=-81;
         assert(iter->head->kind == A_exp_::A_intExp);
         suffix_size[suffix_index] = 1;
         for (int i = 0; i < suffix_index; i++){
@@ -102,6 +102,7 @@ static int calculate(A_binOp op, int left, int right) {
         case A_mod:
             return left % right;
     }
+    EM_ASSERT_CODE=-82;
     assert(0);
 }
 
@@ -117,6 +118,7 @@ static int getConstValue(S_table venv, A_exp a){
     int index_len = 0;
     while (const_var->kind == A_var_::A_arrayVar){
         A_exp exp_index = const_var->u.arrayVar.index;
+        EM_ASSERT_CODE=-83;
         assert(exp_index->kind == A_exp_::A_intExp);
         access_index[index_len++] = exp_index->u.intExp;
         const_var = const_var->u.arrayVar.id;
@@ -175,12 +177,15 @@ static TY_tyList makeFormalTys(S_table tenv, A_fieldList params){
          } else{
              int lens = 0;
              for (A_expList sIter = iter->head->size; sIter; sIter = sIter->tail, lens++);
+             EM_ASSERT_CODE=-84;
              assert(lens);
              t = anonymousArrayTyDec(iter->head->type, lens, tenv);
          }
          if (!t){
-             EM_error(iter->head->pos, "unknown type name \'%s\'",
-                     S_getName(iter->head->type));
+//             EM_error(iter->head->pos, "unknown type name \'%s\'",
+//                     S_getName(iter->head->type));
+             EM_errorWithExitCode(-11, iter->head->pos, "unknown type name \'%s\'",
+                      S_getName(iter->head->type));
          } else{
             if (paramTys){
                 tail_p->tail = TY_TyList(t, nullptr);
@@ -212,6 +217,7 @@ static TY_ty actual_ty(TY_ty ty){
      * */
     if (ty->kind == TY_ty_::TY_typedef) {
         return actual_ty(ty->u.ty_typedef.ty);
+        EM_ASSERT_CODE=-85;
         assert(0); // 我们没有typedef关键词， 不应该运行到此处。 --loyx 2020/6/25
     }
     else
@@ -235,7 +241,8 @@ F_fragList SEM_transProgram(S_table venv, S_table tenv, A_decList program){
 
     auto mainEntry = (E_envEntry)S_look(venv, S_Symbol((char *)"main"));
     if (!mainEntry || mainEntry->kind != E_envEntry_::E_funEntry)
-        EM_error(A_Pos(0,0,0,0), "not find main function");
+//        EM_error(A_Pos(0,0,0,0), "not find main function");
+        EM_errorWithExitCode(-12, A_Pos(0,0,0,0), "not find main function");
 
     return Tr_getResult();
 }
@@ -245,16 +252,20 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
         case A_dec_::A_arrayDec:{
 
             /** 检查数组基础类型 */
+            EM_ASSERT_CODE=-86;
             assert(d->u.array.base);
             auto type = (TY_ty)look_ty(tenv, d->u.array.base);
             if (!type){
-                EM_error(d->pos, "unknown type \'%s\'",
+//                EM_error(d->pos, "unknown type \'%s\'",
+//                         S_getName(d->u.array.base));
+                EM_errorWithExitCode(-13, d->pos, "unknown type \'%s\'",
                          S_getName(d->u.array.base));
             }
 
             /** 根据数组纬度生成对应的类型， 相当于一个匿名typedef variableDec */
             int lens = 0;
             for (A_expList sIter = d->u.array.size; sIter; sIter = sIter->tail, lens++);
+            EM_ASSERT_CODE=-87;
             assert(lens);
             TY_ty array_ty = anonymousArrayTyDec(d->u.array.base, lens, tenv);
 
@@ -267,14 +278,22 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                  */
                 A_exp subscript = iter->head;
                 transExp(venv, tenv, subscript,l_break,l_continue); /// 转化constExp表达式
-                if (subscript->kind != A_exp_::A_intExp) /// 如果下标合法，transExp保证AST被就地修改为intExp
-                    EM_error(subscript->pos,
-                            "size of array \'%s\' has non-integer type",
-                            S_getName(d->u.array.id));
-                if (subscript->u.intExp < 0)
-                    EM_error(subscript->pos,
-                            "size of array \'%s\' is negative",
-                            S_getName(d->u.array.id));
+                if (subscript->kind != A_exp_::A_intExp) { /// 如果下标合法，transExp保证AST被就地修改为intExp
+//                    EM_error(subscript->pos,
+//                            "size of array \'%s\' has non-integer type",
+//                            S_getName(d->u.array.id));
+                    EM_errorWithExitCode(-14, subscript->pos,
+                                         "size of array \'%s\' has non-integer type",
+                                         S_getName(d->u.array.id));
+                }
+                if (subscript->u.intExp < 0) {
+//                    EM_error(subscript->pos,
+//                            "size of array \'%s\' is negative",
+//                            S_getName(d->u.array.id));
+                    EM_errorWithExitCode(-15, subscript->pos,
+                                         "size of array \'%s\' is negative",
+                                         S_getName(d->u.array.id));
+                }
 
                 array_total_size *= subscript->u.intExp;
             }
@@ -302,20 +321,20 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
                 //将init_list中的A_EXP转换为中间代码形式并保存
                 auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-                init_list_tr->array_length=init_list->array.size()-1;
+                init_list_tr->array_length=(int)init_list->array.size()-1;
                 init_list_tr->array=(Tr_exp*)checked_malloc(init_list_tr->array_length*sizeof(Tr_exp));
                 init_list_tr->init_offset=(int*)checked_malloc(init_list_tr->array_length*sizeof(int));
                 int cnt = 0;
-//                for (auto & iter : init_list->array){
                 for (auto iter = init_list->array.begin(); iter+1!=init_list->array.end(); iter++){
                     struct expty temp = transExp(venv, tenv, iter->second, l_break, l_continue);
                     init_list_tr->array[cnt] = temp.exp;
                     init_list_tr->init_offset[cnt] = iter->first;
                     cnt++;
                 }
+                EM_ASSERT_CODE=-88;
                 assert(cnt == init_list_tr->array_length);
 
-                if (not frame){
+                if (!frame){
                     /// 全局数组的frag处理
 
                     /**
@@ -349,7 +368,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
                     Tr_expList_append(call_memset_param,Tr_intExp(0));
                     Tr_expList_append(call_memset_param,Tr_intExp(init_list->total_size*4));
-                    return Tr_seq(Tr_func_call(Temp_namedLabel((char *)"memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));// todo 优化项：当常数数组只有常量访问时，无需初始化
+                    return Tr_seq(Tr_func_call(Temp_namedLabel((char *)"memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
                 } else{
                     /**
                      * 非常量数组初值处理
@@ -365,7 +384,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
             /** 无初值情况*/
 
-            if (not frame){
+            if (!frame){
                 /// 全局数组无初始化，默认全0
 
                 Tr_newArrayFrag(
@@ -389,21 +408,11 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 INIT_initList null_init = INIT_InitList(d->u.array.size, nullptr);
                 arrayEntry->u.var.cValues = E_ArrayValue(null_init);
 
-//                auto init_list_tr=(Tr_INIT_initList)checked_malloc(sizeof(Tr_INIT_initList_));
-//                init_list_tr->array_length=null_init->total_size;
-//                init_list_tr->array=(Tr_exp*)checked_malloc((null_init->total_size+5)*sizeof(Tr_exp));
-//                for(int i=0;i < null_init->total_size;i++)
-//                {
-//                    struct expty temp=transExp(venv,tenv,null_init->array[i],l_break,l_continue);;
-//                    init_list_tr->array[i]=temp.exp;
-//                }
-
                 S_enter(venv, d->u.array.id, arrayEntry);
                 Tr_expList call_memset_param=Tr_ExpList();
                 Tr_expList_append(call_memset_param,Tr_Ex_cover(var_access));
                 Tr_expList_append(call_memset_param,Tr_intExp(0));
                 Tr_expList_append(call_memset_param,Tr_intExp(null_init->total_size*4));
-//                return Tr_seq(Tr_func_call(Temp_namedLabel("memset"),call_memset_param),Tr_init_array(var_access, init_list_tr));
                 return Tr_func_call(Temp_namedLabel((char *)"memset"),call_memset_param);
             }
 
@@ -413,15 +422,18 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
         case A_dec_::A_variableDec:{
 
             /** 检查变量类型 */
+            EM_ASSERT_CODE=-89;
             assert(d->u.var.type);
             TY_ty type = look_ty(tenv, d->u.var.type);
             if (!type){
-                EM_error(d->pos, "unknown type name \'%s\'",
-                        S_getName(d->u.var.type));
+//                EM_error(d->pos, "unknown type name \'%s\'",
+//                        S_getName(d->u.var.type));
+                EM_errorWithExitCode(-16, d->pos, "unknown type name \'%s\'",
+                         S_getName(d->u.var.type));
             }
             Tr_access var_access;
             if (frame){
-                var_access = Tr_allocLocal(frame, true, 1);
+                var_access = Tr_allocLocal(frame, false, 1);
             }
             else{
                 var_access = Tr_allocGlobal(d->u.var.id);
@@ -429,6 +441,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
             /// 该变量声明的在符号表中的基本条目
             E_envEntry varEntry = E_VarEntry(d->u.var.isConst, var_access, type);
+            varEntry->u.var.suffix_size = d->u.var.suffixSize;
 
             /** 处理初始值 */
             if (d->u.var.init != nullptr) {
@@ -436,8 +449,10 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 /// 检查初值与声明类型是否相符
                 struct expty e = transExp(venv, tenv, d->u.var.init,l_break,l_continue);
                 if (!is_equal_ty(type, e.ty)) {
-                    EM_error(d->pos, "type error: %s given, expected %s for expression",
-                            TY_toString(e.ty),S_getName(d->u.var.type));
+//                    EM_error(d->pos, "type error: %s given, expected %s for expression",
+//                            TY_toString(e.ty),S_getName(d->u.var.type));
+                    EM_errorWithExitCode(-17, d->pos, "type error: %s given, expected %s for expression",
+                             TY_toString(e.ty),S_getName(d->u.var.type));
                 }
                 if (frame){
                     int callee_args = -1;
@@ -452,7 +467,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                      * 并且修改AST结构(此处为d->u.var.init)
                      */
                     if (d->u.var.init->kind != A_exp_::A_intExp){
-                        EM_error(d->u.var.init->pos,
+//                        EM_error(d->u.var.init->pos,
+//                                 "The initial value of the constant should be ConstExp");
+                        EM_errorWithExitCode(-18, d->u.var.init->pos,
                                  "The initial value of the constant should be ConstExp");
                     }
                     /// 在符号表中创建该const变量的条目，特别保存const的初始值，供之后使用。
@@ -460,7 +477,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                     S_enter(venv, d->u.var.id, varEntry);
                     return Tr_nopExp(); // 对于const int，可直接看为一个宏定义不需要翻译，
                                         // semant会保证每个对其的访问都会优化为一个int值
-                } else if (not frame){
+                } else if (!frame){
                     /// 无frame表示此变量为全局变量
 
                     // 全局变量的初值必须为常数表达式，此处前端保证优化为常数
@@ -490,7 +507,7 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             }
 
             /// 无初值的全局变量
-            if (not frame){
+            if (!frame){
                 Tr_newIntFrag(Tr_getGlobalLabel(var_access), 0, true);
                 S_enter(venv, d->u.var.id, varEntry);
                 return Tr_nopExp();
@@ -501,22 +518,29 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
         }
         case A_dec_::A_functionDec:{
 
+            bool needReturn = true;
             /** 处理函数头 */
             TY_ty resultTy = nullptr;
             if (d->u.function.result){
                 resultTy = (TY_ty)S_look(tenv, d->u.function.result);
-                if (!resultTy)
-                    EM_error(d->pos, "unknown type name \'%s\' for return type",
-                            S_getName(d->u.function.result));
+                if (!resultTy) {
+//                    EM_error(d->pos, "unknown type name \'%s\' for return type",
+//                             S_getName(d->u.function.result));
+                    EM_errorWithExitCode(-19, d->pos, "unknown type name \'%s\' for return type",
+                             S_getName(d->u.function.result));
+                }
             }
-            if (!resultTy) resultTy = TY_Void();
+            if (!resultTy) {
+                needReturn = false;
+                resultTy = TY_Void();
+            }
 
 
-                /// 登记函数id，提取形参类型
+            /// 登记函数id，提取形参类型
             TY_tyList formalTys = makeFormalTys(tenv, d->u.function.params);
             Temp_label fun_label = Temp_namedLabel(S_getName(d->u.function.id)); /// 用函数名作函数label
             U_boolList formal_escape_list = makeFormalEscapeList(d->u.function.params);
-            Tr_frame fun_frame = Tr_newFrame(fun_label, formal_escape_list);
+            Tr_frame fun_frame = Tr_newFrame(fun_label, formal_escape_list, needReturn);
             S_enter(venv, d->u.function.id, E_FunEntry(fun_label, formalTys, resultTy));
 
             /** 处理函数体 */
@@ -527,6 +551,8 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
             TY_tyList typeIter = funEntry->u.fun.formals;
             A_fieldList formalIter = d->u.function.params;
             Tr_accessList argsCL = Tr_getFormals(fun_frame);
+            Tr_accessList save_argsCL = argsCL;
+
             for ( ; typeIter; typeIter = typeIter->tail, formalIter = formalIter->tail){
                 // 语义支持const形参，虽然语法没支持
 
@@ -553,16 +579,24 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                                                                                             nullptr)))));
             /// trans body
             struct expty returnValue = transStm(fun_frame, venv, tenv, d->u.function.body, l_break, l_continue);
+
             F_setFrameCalleeArgs(fun_frame, returnValue.callee_args);
+
             returnValue.exp = Tr_add_fuc_head_label(returnValue.exp, fun_label);
-            /// 检查返回值
-            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)) {
-                EM_error(d->u.function.body->pos,
-                         "incorrect return type %s, expected %s",
-                         TY_toString(returnValue.ty),
-                         TY_toString(funEntry->u.fun.result)
-                );
-            }
+
+//            /// 检查返回值
+//            if (returnValue.ty && !is_equal_ty(funEntry->u.fun.result, returnValue.ty)) {
+////                EM_error(d->u.function.body->pos,
+////                         "incorrect return type %s, expected %s",
+////                         TY_toString(returnValue.ty),
+////                         TY_toString(funEntry->u.fun.result)
+////                );
+//                EM_errorWithExitCode(-20, d->u.function.body->pos,
+//                         "incorrect return type %s, expected %s",
+//                         TY_toString(returnValue.ty),
+//                         TY_toString(funEntry->u.fun.result)
+//                );
+//            }
             /// 检查main函数是否有参数，返回值是否为int
             if (d->u.function.id == S_Symbol((char *) "main")) {
                 if (d->u.function.params != nullptr)
@@ -570,7 +604,9 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
                 if (!is_equal_ty(returnValue.ty, TY_Int()))
                     EM_warning(d->pos, "main function should return a integer");
             }
-            Tr_procEntryExit(fun_frame, returnValue.exp, argsCL);//将函数栈帧与函数体记录，构建中间代码阶段反回的片段列表
+
+            //将函数栈帧与函数体记录，构建中间代码阶段反回的片段列表
+            Tr_procEntryExit(fun_frame, returnValue.exp, save_argsCL);
             S_endScope(venv);
             S_endScope(tenv);
             return Tr_nopExp();
@@ -584,6 +620,15 @@ static Tr_exp transDec(Tr_frame frame, S_table venv, S_table tenv, A_dec d,Tr_ex
 
 
 static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s,Tr_exp l_break,Tr_exp l_continue){
+
+    if (OptionalLeveL2){
+        LOOP_hoistArrayAccess(s, venv);
+    }
+
+    if (OptionalLeveL2){
+        LOOP_unrollWhile(s);
+    }
+
     switch (s->kind) {
         case A_stm_::A_expStm:{
             expty expty_msg = transExp(venv, tenv, s->u.expStm,l_break,l_continue);
@@ -595,7 +640,8 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             test = transExp(venv, tenv, s->u.ifStm.test,l_break,l_continue);
             int callee_args = test.callee_args;
             if (test.ty->kind != TY_ty_::TY_int){
-                EM_error(s->u.ifStm.test->pos, "integer required");
+//                EM_error(s->u.ifStm.test->pos, "integer required");
+                EM_errorWithExitCode(-32, s->u.ifStm.test->pos, "integer required");
             }
             body = transStm(frame, venv, tenv, s->u.ifStm.body,l_break,l_continue);
             if (callee_args < body.callee_args){
@@ -619,8 +665,10 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
             struct expty test = transExp(venv, tenv, s->u.whileStm.test,l_break,l_continue);
             int callee_args = test.callee_args;
             if (test.ty->kind != TY_ty_::TY_int){
-                EM_error(s->u.whileStm.test->pos, "integer required");
+//                EM_error(s->u.whileStm.test->pos, "integer required");
+                EM_errorWithExitCode(-33, s->u.whileStm.test->pos, "integer required");
             }
+
             Tr_exp w_done=Tr_doneExp();
             Tr_exp w_init=Tr_initialExp();
             struct expty body = transStm(frame, venv, tenv, s->u.whileStm.body,w_done,w_init);//trans之前应生成while的break与continue  label
@@ -682,20 +730,27 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
 
             /// 检查左值是否为const
             if (var.isConst){
-                EM_error(s->pos,
-                        "assignment of read-only variable \'%s\'",
-                        S_getName(s->u.assignStm.var->u.simple));
+//                EM_error(s->pos,
+//                        "assignment of read-only variable \'%s\'",
+//                        S_getName(s->u.assignStm.var->u.simple));
+                EM_errorWithExitCode(-34, s->pos,
+                         "assignment of read-only variable \'%s\'",
+                         S_getName(s->u.assignStm.var->u.simple));
             }
             /// 检查数组是否定位到了元素
             if (var.ty->kind == TY_ty_::TY_array){
-                EM_error(s->pos,"assignment to expression with array type");
+//                EM_error(s->pos,"assignment to expression with array type");
+                EM_errorWithExitCode(-35, s->pos,"assignment to expression with array type");
             }
 
             struct expty exp = transExp(venv, tenv, s->u.assignStm.exp,l_break,l_continue);
             if (!is_equal_ty(var.ty, exp.ty)){
-                EM_error(s->u.assignStm.exp->pos,
-                        "expression not of expected type %s",
-                        TY_toString(var.ty));
+//                EM_error(s->u.assignStm.exp->pos,
+//                        "expression not of expected type %s",
+//                        TY_toString(var.ty));
+                EM_errorWithExitCode(-36, s->u.assignStm.exp->pos,
+                         "expression not of expected type %s",
+                         TY_toString(var.ty));
             }
             expty expty_msg = Expty(Tr_assign(var.exp,exp.exp), TY_Void());
             expty_msg.callee_args = exp.callee_args;
@@ -703,7 +758,7 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         }
         case A_stm_::A_returnStm:{//todo translate  now translate it as put result in rv reg
             if (!s->u.returnStm){
-                return Expty(Tr_nopExp(), TY_Void());
+                return Expty(Tr_return_no_param(frame), TY_Void());
             }
             struct expty returnTy = transExp(venv, tenv, s->u.returnStm,l_break,l_continue);
             expty expty_msg = Expty(Tr_return(returnTy.exp,frame), returnTy.ty);
@@ -713,7 +768,8 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
         case A_stm_::A_switchStm:{//not required in grammer
             struct expty key = transExp(venv, tenv, s->u.switchStm.exp,l_break,l_continue);
             if (key.ty->kind != TY_ty_::TY_int){
-                EM_error(s->u.switchStm.exp->pos, "integer required");
+//                EM_error(s->u.switchStm.exp->pos, "integer required");
+                EM_errorWithExitCode(-37, s->u.switchStm.exp->pos, "integer required");
             }
             A_caseList caseIter;
             for (caseIter = s->u.switchStm.body; caseIter; caseIter = caseIter->tail){
@@ -732,9 +788,8 @@ static struct expty transStm(Tr_frame frame, S_table venv, S_table tenv, A_stm s
     assert(0);
 }
 
-
 static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,Tr_exp l_continue){
-    if (not a){
+    if (!a){
         return Expty(Tr_nopExp(), TY_Int());
     }
     switch (a->kind) {
@@ -764,7 +819,9 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             auto funEntry = (E_envEntry)S_look(venv, a->u.callExp.id);
             /// 检查是否定义函数
             if (funEntry == nullptr || funEntry->kind != E_envEntry_::E_funEntry){
-                EM_error(a->pos, "undefined function %s",
+//                EM_error(a->pos, "undefined function %s",
+//                         S_getName(a->u.callExp.id));
+                EM_errorWithExitCode(-21, a->pos, "undefined function %s",
                          S_getName(a->u.callExp.id));
                 return Expty(nullptr, TY_Void());
             }
@@ -776,7 +833,8 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             int param_count=0;
             if (strcmp(S_getName(a->u.callExp.id), "putf") == 0){
                 if (a->u.callExp.args->head->kind != A_exp_::A_stringExp){
-                    EM_error(a->pos, "The first argument of putf must be a String");
+//                    EM_error(a->pos, "The first argument of putf must be a String");
+                    EM_errorWithExitCode(-22, a->pos, "The first argument of putf must be a String");
                 }
                 Tr_expList params = Tr_ExpList();
                 A_expList argIter = a->u.callExp.args;
@@ -813,9 +871,11 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
             }
             /// 检查参数个数
             if (argIter == nullptr && formals != nullptr){
-                EM_error(a->pos, "not enough arguments!");
+//                EM_error(a->pos, "not enough arguments!");
+                EM_errorWithExitCode(-23, a->pos, "not enough arguments!");
             }else if (argIter != nullptr){
-                EM_error(a->pos, "too many arguments!");
+//                EM_error(a->pos, "too many arguments!");
+                EM_errorWithExitCode(-24, a->pos, "too many arguments!");
             }
             expty expty_msg = Expty(Tr_func_call(funEntry->u.fun.label,params), actual_ty(funEntry->u.fun.result));//因为要考虑调用gcc函数的情况，在这里进行参数压栈
             expty_msg.callee_args = param_count;
@@ -867,12 +927,18 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 case A_mul:
                 case A_div:{
                     if (left.ty->kind != TY_ty_::TY_int && left.ty->kind != TY_ty_::TY_char) {
-                        EM_error(a->u.opExp.left->pos,
-                                "%s expression given for LHS, expected int",
-                                TY_toString(left.ty));
+//                        EM_error(a->u.opExp.left->pos,
+//                                "%s expression given for LHS, expected int",
+//                                TY_toString(left.ty));
+                        EM_errorWithExitCode(-25, a->u.opExp.left->pos,
+                                 "%s expression given for LHS, expected int",
+                                 TY_toString(left.ty));
                     }
                     if (right.ty->kind != TY_ty_::TY_int && right.ty->kind != TY_ty_::TY_char) {
-                        EM_error(a->u.opExp.right->pos,
+//                        EM_error(a->u.opExp.right->pos,
+//                                 "%s expression given for RHS, expected int",
+//                                 TY_toString(right.ty));
+                        EM_errorWithExitCode(-26, a->u.opExp.right->pos,
                                  "%s expression given for RHS, expected int",
                                  TY_toString(right.ty));
                     }
@@ -896,20 +962,31 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                             return expty_msg;
                     }
                     else if (left.ty->kind == TY_ty_::TY_array){
-                        if (right.ty->kind!=TY_ty_::TY_array  )
-                            EM_error(a->u.opExp.right->pos,
-                                    "%s expression given for RHS, expected %s",
-                                    TY_toString(right.ty), TY_toString(left.ty));
+                        if (right.ty->kind!=TY_ty_::TY_array  ) {
+//                            EM_error(a->u.opExp.right->pos,
+//                                     "%s expression given for RHS, expected %s",
+//                                     TY_toString(right.ty), TY_toString(left.ty));
+                            EM_errorWithExitCode(-27, a->u.opExp.right->pos,
+                                     "%s expression given for RHS, expected %s",
+                                     TY_toString(right.ty), TY_toString(left.ty));
+                        }
                     }
                     else if(left.ty->kind == TY_ty_::TY_struct){
-                        if (right.ty->kind!=TY_ty_::TY_struct )
-                            EM_error(a->u.opExp.right->pos,
-                                    "%S expression given for RHS, expected struct tyepe",
-                                    TY_toString(right.ty));
+                        if (right.ty->kind!=TY_ty_::TY_struct ) {
+//                            EM_error(a->u.opExp.right->pos,
+//                                     "%S expression given for RHS, expected struct tyepe",
+//                                     TY_toString(right.ty));
+                            EM_errorWithExitCode(-28, a->u.opExp.right->pos,
+                                     "%S expression given for RHS, expected struct tyepe",
+                                     TY_toString(right.ty));
+                        }
                     } else{
-                        EM_error(a->u.opExp.right->pos,
-                                "unexpected %s expression in comparison",
-                                TY_toString(right.ty));
+//                        EM_error(a->u.opExp.right->pos,
+//                                "unexpected %s expression in comparison",
+//                                TY_toString(right.ty));
+                        EM_errorWithExitCode(-29, a->u.opExp.right->pos,
+                                 "unexpected %s expression in comparison",
+                                 TY_toString(right.ty));
                     }
                     assert(0);
                 }
@@ -918,14 +995,20 @@ static struct expty transExp(S_table venv, S_table tenv, A_exp a,Tr_exp l_break,
                 case A_gt:
                 case A_ge:{
                     if (left.ty->kind != right.ty->kind){
-                        EM_error(a->u.opExp.right->pos,
+//                        EM_error(a->u.opExp.right->pos,
+//                                 "%s expression given for RHS, expected %s",
+//                                 TY_toString(right.ty), TY_toString(left.ty));
+                        EM_errorWithExitCode(-30, a->u.opExp.right->pos,
                                  "%s expression given for RHS, expected %s",
                                  TY_toString(right.ty), TY_toString(left.ty));
                     }
 
-                    if (left.ty->kind != TY_ty_::TY_int and left.ty->kind != TY_ty_::TY_char)
+                    if (left.ty->kind != TY_ty_::TY_int && left.ty->kind != TY_ty_::TY_char)
                     {
-                        EM_error(a->u.opExp.right->pos,
+//                        EM_error(a->u.opExp.right->pos,
+//                                 "unexpected %s expression in comparison",
+//                                 TY_toString(right.ty));
+                        EM_errorWithExitCode(-31, a->u.opExp.right->pos,
                                  "unexpected %s expression in comparison",
                                  TY_toString(right.ty));
                     }
@@ -960,14 +1043,16 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
         case A_var_::A_simpleVar:{
             auto varEntry = (E_envEntry)S_look(venv, v->u.simple);
             if (varEntry == nullptr || varEntry->kind != E_envEntry_::E_varEntry){
-                EM_error(v->pos, "undefined variable %s",
-                        S_getName(v->u.simple));
+//                EM_error(v->pos, "undefined variable %s",
+//                        S_getName(v->u.simple));
+                EM_errorWithExitCode(-38, v->pos, "undefined variable %s",
+                         S_getName(v->u.simple));
                 struct expty expty_msg = Expty(nullptr, TY_Int());
                 return expty_msg;
             } else{
 
                 /// 如果访问的变量是数组，则额外返回后缀和信息，供访问数组翻译时使用
-                if (varEntry->u.var.suffix_size and not varEntry->u.var.isFormal)
+                if (varEntry->u.var.suffix_size && !varEntry->u.var.isFormal)
                 /**
                  * 此处通过符号表中的varEntry的suffix_size域是否为空，来判断该varEntry是否为数组
                  * 该做法十分危险且使suffix_size职责混乱，由于时间精力限制暂且这样实现
@@ -996,14 +1081,17 @@ static struct expty transVar(S_table venv, S_table tenv, A_var v,Tr_exp l_break,
         case A_var_::A_arrayVar:{
             struct expty id = transVar(venv, tenv, v->u.arrayVar.id,l_break,l_continue);
             if (id.ty->kind != TY_ty_::TY_array){
-                EM_error(v->u.arrayVar.id->pos,
-                        "subscripted value is neither array nor pointer nor vector");
+//                EM_error(v->u.arrayVar.id->pos,
+//                        "subscripted value is neither array nor pointer nor vector");
+                EM_errorWithExitCode(-39, v->u.arrayVar.id->pos,
+                         "subscripted value is neither array nor pointer nor vector");
                 struct expty expty_msg = Expty(nullptr, TY_Int());
                 return expty_msg;
             } else{
                 struct expty index = transExp(venv, tenv, v->u.arrayVar.index,l_break,l_continue);
                 if (index.ty->kind != TY_ty_::TY_int){
-                    EM_error(v->u.arrayVar.index->pos, "index must be a int");
+//                    EM_error(v->u.arrayVar.index->pos, "index must be a int");
+                    EM_errorWithExitCode(-40, v->u.arrayVar.index->pos, "index must be a int");
                 }
                 expty expty_msg{};
                 assert(id.suffix_size);

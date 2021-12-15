@@ -23,14 +23,19 @@ static F_accessList F_AccessList(F_access head, F_accessList tail);
 int F_accessOffset(F_access a);
 void F_setMemArgs(F_frame frame);
 Temp_temp F_accessReg(F_access a);
+bool F_accessIsReg(F_access a);
 
 void F_setFrameCalleeArgs(F_frame frame, int callee_args);
-F_frame F_newFrame(Temp_label name, U_boolList formals);
+F_frame F_newFrame(Temp_label name, U_boolList formals, bool needReturn);
 Temp_label F_getName(F_frame frame);
+bool F_needReturn(F_frame frame);
 F_accessList F_getFormals(F_frame frame);
+int F_getFormalsCount(F_frame frame);
 F_access F_allocLocal(F_frame frame, bool escape, int size);
 F_access F_allocGlobal(S_symbol global);
 Temp_label F_getGlobalLabel(F_access fa);
+Temp_temp* F_getCallerArray();
+Temp_temp F_getCallerArrayByIndex(int index);
 
 //F_frag片段信息相关
 typedef  struct F_frag_* F_frag;
@@ -66,12 +71,16 @@ Temp_temp F_R0();
 Temp_temp F_R1();
 Temp_temp F_R2();
 Temp_temp F_R3();
-Temp_temp F_R(c_string save);
-
+Temp_temp F_R4();
+Temp_temp F_R5();
+Temp_temp F_R6();
+Temp_temp F_R7();
+Temp_temp F_R8();
+Temp_temp F_R9();
+Temp_temp F_R10();
 void F_initRegisters(void);
 Temp_map F_initialRegisters(F_frame f);
-Temp_tempList F_callersaves(void);
-Temp_tempList F_calleesaves(void);
+Temp_tempList F_callersaves(int real_arg_cnt);
 
 
 int get_word_size();
@@ -85,4 +94,10 @@ AS_proc F_procEntryExit3(F_frame frame, AS_instrList body);
 Temp_label get_done_label(F_frame f_frame);
 int get_offset(F_access g_access);
 T_exp F_fp_address(F_access acc,int index);
+F_access look_for_f_offset(Temp_temp temp,F_frame f);
+
+Temp_map get_frame_precored_map(F_frame frame);
+
+bool constExpr(int num);
+
 #endif //COMPILER_LOYX_FRAME_H

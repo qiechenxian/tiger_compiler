@@ -3,21 +3,7 @@
 //
 
 #include "prast.h"
-
-static void pr_var(FILE *out, A_var v, int d);
-static void pr_dec(FILE *out, A_dec v, int d);
-static void pr_stm(FILE *out, A_stm v, int d);
-static void pr_exp(FILE *out, A_exp v, int d);
-static void pr_ty(FILE *out, A_ty v, int d);
-static void pr_field(FILE *out, A_field v, int d);
-static void pr_fieldList(FILE *out, A_fieldList v, int d);
-static void pr_expList(FILE *out, A_expList v, int d);
-static void pr_comStm(FILE *out, A_comStm v, int d);
-static void pr_comStmList(FILE *out, A_comStmList v, int d);
-static void pr_case(FILE *out, A_case v, int d);
-static void pr_caseList(FILE *out, A_caseList v, int d);
-static void pr_initNode(FILE *out, A_initNode v, int d);
-static void pr_arrayInitList(FILE *out, A_arrayInitList v, int d);
+#include "errormsg.h"
 
 
 static void indent(FILE *out,int d){
@@ -25,7 +11,7 @@ static void indent(FILE *out,int d){
     for(i=0;i<=d;i++) fprintf(out," ");
 }
 
-static void pr_var(FILE *out,A_var v,int d)
+void pr_var(FILE *out,A_var v,int d)
 {
     indent(out,d);
     switch (v->kind) {
@@ -47,17 +33,18 @@ static void pr_var(FILE *out,A_var v,int d)
             break;
         default:
             fprintf(out,"pr_var failed\n");
+            EM_ASSERT_CODE=-75;
             assert(0);
     }
 }
 
 static char str_oper[][12]={
-        "or","and","not","lt","le","gt","ge","eq","ne","add","sub","mul","dev","mod"};
-static void pr_oper(FILE *out,A_binOp d){
+        "or","and","not","lt","le","gt","ge","eq","ne","add","sub","mul","div","mod"};
+void pr_oper(FILE *out,A_binOp d){
     fprintf(out,"%s",str_oper[d]);
 }
 
-static void pr_dec(FILE *out,A_dec v,int d)
+void pr_dec(FILE *out,A_dec v,int d)
 {
     indent(out,d);
     switch (v->kind) {
@@ -104,11 +91,12 @@ static void pr_dec(FILE *out,A_dec v,int d)
             break;
         default:
             fprintf(out,"pr_dec failed\n");
+            EM_ASSERT_CODE=-76;
             assert(0);
     }
 }
 
-static void pr_stm(FILE *out, A_stm v, int d){
+void pr_stm(FILE *out, A_stm v, int d){
     indent(out,d);
     switch (v->kind) {
         case A_stm_::A_ifStm:
@@ -168,10 +156,11 @@ static void pr_stm(FILE *out, A_stm v, int d){
             break;
         default:
             fprintf(out,"pr_stm failed\n");
+            EM_ASSERT_CODE=-77;
             assert(0);
     }
 }
-static void pr_exp(FILE *out ,A_exp v,int d){
+void pr_exp(FILE *out ,A_exp v,int d){
     indent(out,d);
     switch (v->kind) {
         case A_exp_::A_varExp:
@@ -205,11 +194,12 @@ static void pr_exp(FILE *out ,A_exp v,int d){
             break;
         default:
             fprintf(out,"pr_exp failed\n");
+            EM_ASSERT_CODE=-78;
             assert(0);
     }
 }
 
-static void pr_ty(FILE *out, A_ty v, int d)
+void pr_ty(FILE *out, A_ty v, int d)
 {
     indent(out,d);
     switch (v->kind) {
@@ -226,11 +216,12 @@ static void pr_ty(FILE *out, A_ty v, int d)
             break;
         default:
             fprintf(out,"pr_ty failed\n");
+            EM_ASSERT_CODE=-79;
             assert(0);
     }
 }
 
-static void pr_field(FILE *out, A_field v, int d){
+void pr_field(FILE *out, A_field v, int d){
     indent(out,d);
     fprintf(out,"field(%s,\n",S_getName(v->id));
     indent(out,d+1);
@@ -241,7 +232,7 @@ static void pr_field(FILE *out, A_field v, int d){
     fprintf(out,"%s",v->escape?"TRUE)":"FALSE");
 }
 
-static void pr_fieldList(FILE *out, A_fieldList v, int d){
+void pr_fieldList(FILE *out, A_fieldList v, int d){
     indent(out,d);
     if(v){
         fprintf(out,"fieldList(\n");
@@ -254,7 +245,7 @@ static void pr_fieldList(FILE *out, A_fieldList v, int d){
     }
 }
 
-static void pr_expList(FILE *out, A_expList v, int d){
+void pr_expList(FILE *out, A_expList v, int d){
     indent(out,d);
     if(v){
         fprintf(out,"expList(\n");
@@ -279,7 +270,7 @@ void pr_decList(FILE *out, A_decList v, int d){
         fprintf(out,"decList()");
     }
 }
-static void pr_comStm(FILE *out, A_comStm v, int d){
+void pr_comStm(FILE *out, A_comStm v, int d){
     indent(out,d);
     fprintf(out,"comStm(");
     if(v->const_var_decStm){
@@ -296,7 +287,7 @@ static void pr_comStm(FILE *out, A_comStm v, int d){
     }
 }
 
-static void pr_comStmList(FILE *out, A_comStmList v, int d){
+void pr_comStmList(FILE *out, A_comStmList v, int d){
     indent(out,d);
     if(v){
         fprintf(out,"comStmList(\n");
@@ -309,7 +300,7 @@ static void pr_comStmList(FILE *out, A_comStmList v, int d){
     }
 }
 
-static void pr_case(FILE *out, A_case v, int d){
+void pr_case(FILE *out, A_case v, int d){
     indent(out,d);
     fprintf(out,"case(\n");
     fprintf(out,"%d,\n",v->const_value);
@@ -317,7 +308,7 @@ static void pr_case(FILE *out, A_case v, int d){
     fprintf(out,")");
 }
 
-static void pr_caseList(FILE *out, A_caseList v, int d){
+void pr_caseList(FILE *out, A_caseList v, int d){
     indent(out,d);
     if(v){
         fprintf(out,"comStmList(\n");
@@ -330,7 +321,7 @@ static void pr_caseList(FILE *out, A_caseList v, int d){
     }
 }
 
-static void pr_initNode(FILE *out, A_initNode v, int d){
+void pr_initNode(FILE *out, A_initNode v, int d){
     indent(out,d);
     switch (v->kind) {
         case A_initNode_::A_singleInit:
@@ -345,11 +336,12 @@ static void pr_initNode(FILE *out, A_initNode v, int d){
             break;
         default:
             fprintf(out,"pr_initNode failed\n");
+            EM_ASSERT_CODE=-80;
             assert(0);
     }
 }
 
-static void pr_arrayInitList(FILE *out, A_arrayInitList v, int d) {
+void pr_arrayInitList(FILE *out, A_arrayInitList v, int d) {
     indent(out, d);
     fprintf(out, "arrayInitList(\n");
     pr_initNode(out, v->head, d + 1);

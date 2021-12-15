@@ -1,3 +1,15 @@
+# 项目来历
+
+## 根据虎书实现的 c子集 -> arm汇编 编译器
++ 2020年华为编译系统设计赛，NWPU
++ 因为最终生成为arm汇编，工作后手头没有arm机器，打算做一版jit的运行时
++ 直接用visual studio2022 打开 .sln 文件，运行即可， test.c 为c子集程序， test.s 为生成的arm汇编
+
+## ToDo list
+
++ asm_jit运行时支持
++ llvm_jit运行时支持
+
 # 文件说明
 
 ## 通用模块

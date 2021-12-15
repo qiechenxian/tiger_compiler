@@ -30,11 +30,19 @@ struct AS_instr_ {
     enum {
         I_OPER, I_LABEL, I_MOVE
     } kind;
+    enum {
+        O_mov,  O_add,O_sub,O_div,O_str,O_ldr,O_mod,O_others,O_lsl
+    } kindl;
+    enum {
+        OP_NG = -1, OP_STR, OP_LTR
+    };
     union {
         struct {
             c_string assem;
             Temp_tempList dst, src;
             AS_targets jumps;
+            bool info_tag;
+            Temp_tempList div_dst,div_src;
         } OPER;
         struct {
             c_string assem;
@@ -45,17 +53,19 @@ struct AS_instr_ {
             Temp_tempList dst, src;
         } MOVE;
     } u;
+    int op_kind;
+    bool isDead;
 };
 
-AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j);
+AS_instr AS_Oper(c_string a, Temp_tempList d, Temp_tempList s, AS_targets j, bool tag = false,int op_kind = AS_instr_::OP_NG);
 
 AS_instr AS_Label(c_string a, Temp_label label);
 
-AS_instr AS_Move(c_string a, Temp_tempList d, Temp_tempList s);
+AS_instr AS_Move(c_string a, Temp_tempList d, Temp_tempList s, bool tag = false);
 
 // 调用AS_print可以将一条汇编指令表示为字符串的形式并输出
 // 需要在temp.h中描述对临时变量映射操作的函数
-void AS_print(FILE *out, AS_instr i, Temp_map m);
+void AS_string(AS_instr i, Temp_map m, char * result);
 
 typedef struct AS_instrList_ *AS_instrList;
 struct AS_instrList_ {

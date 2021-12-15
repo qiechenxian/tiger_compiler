@@ -9,6 +9,7 @@
 #include "types.h"
 #include "errormsg.h"
 #include "translate.h"
+#include "loop_trans.h"
 
 
 struct expty {

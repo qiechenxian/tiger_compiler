@@ -3,9 +3,11 @@
 //
 #include <cstring>
 #include "util.h"
+#include "errormsg.h"
 
 void* checked_malloc(unsigned len){
     void* p = malloc(len);
+    EM_ASSERT_CODE=-98;
     assert(p);
     return p;
 }

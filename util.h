@@ -7,6 +7,9 @@
 
 #include <cassert>
 #include <cstdlib>
+extern bool OptionalLeveL2;
+
+extern bool OptionalLeveL2;
 
 typedef char *c_string;
 c_string String(char *);

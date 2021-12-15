@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <unistd.h>
 #include "util.h"
 #include "ast.h"
 #include "semant.h"
@@ -8,6 +7,7 @@
 #include "cannon.h"
 #include "print_ir_tree.h"
 #include "codegen.h"
+#include "data_flow.h"
 #include "regalloc.h"
 using namespace std;
 
@@ -17,6 +17,7 @@ using namespace std;
 extern A_decList absyn_root;
 c_string INPUT_FILE;
 c_string OUTPUT_FILE;
+bool OptionalLeveL2 = false; /// -O2选项的全局flag
 
 static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
@@ -32,11 +33,15 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
     stmList = C_linearize(body);
     stmList = C_traceSchedule(C_basicBlocks(stmList,frame));
 //    printcannoList(stderr, stmList);
+    TAB_table div_table= TAB_empty();
+    iList = F_codegen(frame, stmList,div_table);
 
-    iList = F_codegen(frame, stmList);
+    if(OptionalLeveL2) {
+        iList = dataflow(frame, iList,div_table);
+    }
 
     iList = F_procEntryExit2(iList);
-    //fprintf(outfile,"%s",iList->tail->head->u.LABEL.assem);
+    fprintf(outfile,"%s",iList->tail->head->u.LABEL.assem);
     struct RA_result ra=RA_regAlloc(frame,iList);
     iList=ra.il;
 
@@ -50,9 +55,9 @@ static void doProc(FILE *outfile,F_frame frame, T_stm body) {
 
 static void doGlobal(FILE *outfile, F_fragList fragList){
     int word_size = get_word_size();
-    fprintf(outfile, "\t.arch   armv7-a\n");
-    fprintf(outfile, "\t.file   \"%s\"\n", INPUT_FILE);
-    fprintf(outfile, "\t.data\n");
+    fprintf(outfile, ".arch   armv7-a\n");
+    fprintf(outfile, ".file   \"%s\"\n", INPUT_FILE);
+    fprintf(outfile, ".data\n");
     for (F_fragList iter = fragList; iter; iter = iter->tail){
         F_frag frag = iter->head;
         if (frag->kind == F_frag_::F_globalFrag){
@@ -93,9 +98,6 @@ extern FILE *yyout;
 extern char *yytext;
 
 extern int yyparse();
-bool OptionalLeveL2 = false; /// -O2选项的全局flag
-
-
 
 int main(int argc, char **argv) {
 
@@ -103,31 +105,45 @@ int main(int argc, char **argv) {
     /**
      * 参数处理 --loyx 2020/6/15
      */
+#ifdef define(LINUX)
     int option;
     while ((option = getopt(argc, argv, "So:O::")) != -1) {
         switch (option) {
-            case 'o':
-                OUTPUT_FILE = String(optarg);
-                break;
-            case 'O':
-                if (*optarg == '2') {
-                    OptionalLeveL2 = true;
-                } else {
-                    OptionalLeveL2 = false;
-                }
-                break;
-            default:
-                // 此处匹配-S选项
-                break;
+        case 'o':
+            OUTPUT_FILE = String(optarg);
+            break;
+        case 'O':
+            if (*optarg == '2') {
+                //                    OptionalLeveL2 = true;
+                OptionalLeveL2 = false;
+            }
+            else {
+                OptionalLeveL2 = false;
+            }
+            break;
+        default:
+            // 此处匹配-S选项
+            break;
         }
     }
     INPUT_FILE = argv[optind];
+#else
+    INPUT_FILE = "./test.c";
+    OUTPUT_FILE = "./test.s";
+#endif 
+
+
 
 
     /**
      * open the input file
      */
     yyin = fopen(INPUT_FILE, "r");
+    if(yyin == NULL) {
+        printf("Open file(%s) failed\n", INPUT_FILE);
+        return -1;
+    }
+
     yyout = stdout;
     FILE_NAME = INPUT_FILE; // todo refactor?
 
@@ -136,9 +152,10 @@ int main(int argc, char **argv) {
     S_table venv = E_base_valueEntry(tenv);
     yyparse();
 
+    FILE* ast_log = fopen("ast.txt", "w");
 //    fprintf(stderr, "\nbefore semantic ast:\n");
-//    pr_decList(stderr, absyn_root, 0);
-//    fprintf(stderr, "\n");
+    pr_decList(ast_log, absyn_root, 0);
+    fprintf(ast_log, "\n");
 
     frags = SEM_transProgram(venv, tenv, absyn_root);
 //    printStmList(stderr, frags);
@@ -150,14 +167,20 @@ int main(int argc, char **argv) {
 
     //输出汇编指令的路径,应更改为文件名
     FILE *outfile=fopen(OUTPUT_FILE, "w");
+    if(outfile == NULL) {
+        printf("open file(%s) failed", OUTPUT_FILE);
+        return -1;
+    }
+
 //    FILE *outfile = stdout;
     doGlobal(outfile, frags);
-    fprintf(outfile, "\t.text\n");
+    fprintf(outfile, ".text\n");
     for (; frags; frags = frags->tail) {
         if (frags->head->kind == F_frag_::F_procFrag) {
             doProc(outfile, frags->head->u.proc.frame, frags->head->u.proc.body);
         }
     }
+
     return 0;
 }
 

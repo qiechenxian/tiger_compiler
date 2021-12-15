@@ -42,6 +42,17 @@ void TAB_enter(TAB_table t, void* key, void* value){
     t->table[index] = Binder(key, value, t->table[index], t->top);
     t->top = key;
 }
+void TAB_free(TAB_table t){
+
+    for(long long index = 0; index < TAB_SIZE; index ++) {
+        for(binder b = t->table[index]; b;){
+            binder temp = b;
+            b = b->next;
+            free(temp);
+        }
+    }
+}
+
 void* TAB_look(TAB_table t, void* key){
     assert(t && key);
     long long index = ((long long)key) % TAB_SIZE;

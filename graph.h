@@ -7,18 +7,36 @@
 
 #include <stdio.h>
 #include "table.h"
+#include "temp.h"
+#include "frame.h"
+struct G_node_;
+struct G_nodeList_;
+struct G_graph_;
+typedef struct G_node_ {
+    G_graph_* mygraph;
+    int mykey;
+    G_nodeList_* succs;
+    G_nodeList_* preds;
+    void* info;
+}*G_node;
 
-typedef struct G_graph_ *G_graph;  /* 图类型 */
-typedef struct G_node_ *G_node;    /* 节点类型 */
+typedef struct G_nodeList_ {
+    G_node_* head;
+    G_nodeList_* tail;
+}*G_nodeList;
 
-typedef struct G_nodeList_ *G_nodeList; /* 节点表*/
-struct G_nodeList_ {
-    G_node head;
-    G_nodeList tail;
-};
 
+typedef struct G_graph_ {
+    F_frame frame;
+    int nodecount;
+    G_nodeList mynodes, mylast;
+}*G_graph;
 /* 创建新的图 */
-G_graph G_Graph(void);
+G_graph G_Graph(F_frame frame);
+
+void G_Graph_free(G_graph graph);
+
+F_frame G_frame(G_graph graph);
 
 /* 创建新的图节点 */
 G_node G_Node(G_graph g, void *info);
@@ -56,6 +74,8 @@ G_nodeList G_adj(G_node n);
 /* 是否有从from到n的边*/
 bool G_goesTo(G_node from, G_node n);
 
+bool G_goesTo(Temp_temp from, Temp_temp n);
+
 /* 节点n的度（入和出） */
 int G_degree(G_node n);
 
@@ -74,4 +94,9 @@ void G_enter(G_table t, G_node node, void *value);
 /* 在表t中查找node->value */
 void *G_look(G_table t, G_node node);
 
+void G_free(G_table table);
+G_nodeList G_NodeList_minus(G_nodeList table, G_nodeList rmove);
+G_nodeList G_NodeList_union(G_nodeList na, G_nodeList nb);
+bool G_NodeList_equal(G_nodeList na, G_nodeList nb);
+G_nodeList G_nodeList_intersect(G_nodeList ta, G_nodeList tb);
 #endif //COMPILER_GRAPH_H

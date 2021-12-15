@@ -217,8 +217,12 @@ static void trace(T_stmList list)
     if (s->kind == T_stm_::T_JUMP) {
         auto target = (T_stmList) S_look(block_env, s->u.JUMP.jumps->head);
         if (!s->u.JUMP.jumps->tail && target) {
+#ifdef IR_SEQ
             last->tail = target;
             trace(target);
+#else
+            last->tail->tail = getNext();
+#endif
         }
         else {last->tail->tail = getNext();}
     }
@@ -226,8 +230,12 @@ static void trace(T_stmList list)
         auto trues =  (T_stmList) S_look(block_env, s->u.CJUMP.trues);
         auto falses =  (T_stmList) S_look(block_env, s->u.CJUMP.falses);
         if (falses) {
+#ifdef IR_SEQ
             last->tail->tail = falses;
             trace(falses);
+#else
+            last->tail->tail = getNext();
+#endif
         }
         else if (trues) {
             last->tail->head = T_Cjump(T_not_op(s->u.CJUMP.op), s->u.CJUMP.left,
@@ -240,7 +248,9 @@ static void trace(T_stmList list)
             last->tail->tail = getNext();
         }
     }
-    else {printf("error from trace ");assert(0);}
+    else {printf("error from trace ");
+        EM_ASSERT_CODE=-58;
+        assert(0);}
 }
 static T_stmList getNext()//使所有基本快都被添加到轨迹中
 {

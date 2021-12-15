@@ -5,10 +5,9 @@
 typedef struct ctx COL_ctx;
 
 #include "color.h"
-
 //机器的所有数据结构，
 struct ctx {
-    G_graph nodes;//图
+    G_graph nodes;//冲突图
     Temp_map precolored;//机器寄存器集合，每个都事先分配颜色
     Temp_tempList initial;//临时寄存器集合，既没有预着色也没有处理
     Temp_tempList spillWorklist;//高度数的节点表
@@ -18,6 +17,7 @@ struct ctx {
     Temp_tempList coalescedNodes;//已合并的寄存器集合
     Temp_tempList coloredNodes;//已成功着色的节点集合
     Temp_tempList selectStack;//一个包含从图中删除的临时变量的栈
+    Temp_tempList lastStack; // selectStack的最后一个
 
     AS_instrList coalescedMoves;//已经合并的传递指令集合
     AS_instrList constrainedMoves;//源操作数和目标操作数冲突的传送指令集合
@@ -31,10 +31,15 @@ struct ctx {
     G_table degree;//每个节点当前度数的数组
 
     int K;//颜色数目，可用的寄存器个数
+
+    int spilled_min_temp_num;
 };
 
 static COL_ctx c;
 
+void COL_init_spilled_temp_num(int num) {
+    c.spilled_min_temp_num = num;
+}
 
 /*
  * FG_def  指令的dst
@@ -68,11 +73,24 @@ static Temp_tempList instUse(AS_instr inst) {
 
 //复制寄存器表
 static Temp_tempList cloneRegs(Temp_tempList regs) {
-    Temp_tempList tl = NULL;
+    Temp_tempList tl, head = NULL, last = NULL;
+
     for (; regs; regs = regs->tail) {
-        tl = Temp_TempList(regs->head, tl);
+
+        Temp_tempList p = (Temp_tempList) checked_malloc(sizeof(*p));
+        p->head = regs->head;
+        p->tail = NULL;
+
+        if(head == NULL) {
+            head = p;
+            last = p;
+        } else {
+            last->tail = p;
+            last = p;
+        }
     }
-    return tl;
+
+    return head;
 }
 
 //temp列表头
@@ -82,12 +100,12 @@ static Temp_temp tempHead(Temp_tempList temps) {
 }
 
 //temp to node
-static G_node temp2Node(Temp_temp t) {
+G_node temp2Node(Temp_temp t) {
     if (t == NULL) return NULL;
     G_nodeList nodes = G_nodes(c.nodes);
     G_nodeList p;
     for (p = nodes; p != NULL; p = p->tail)//遍历冲突图节点
-        if (Live_gtemp(p->head) == t) return p->head;
+        if (Live_gtemp(p->head) == t) return p->head;//返回冲突图中的temp节点
     return NULL;
 }
 
@@ -207,45 +225,48 @@ static bool instIn(AS_instr i, AS_instrList il) {
     return AS_instrInList(i, il);
 }
 
+static Temp_tempList adjacent(G_node n) {
+    G_nodeList adjn = G_adj(n);
+
+    Temp_tempList adjs = NULL;
+    for (; adjn; adjn = adjn->tail) {
+        adjs = L(node2Temp(adjn->head), adjs);
+    }
+
+    //adj - （从图中删除的+已经合并的）
+    adjs = tempMinus(adjs, tempUnion(c.selectStack, c.coalescedNodes));
+
+    return adjs;
+}
+
 //冲突的temp list
 static Temp_tempList adjacent(Temp_temp t) {
     G_node n = temp2Node(t);
-    G_nodeList adjn = G_adj(n);
-    Temp_tempList adjs = NULL;
-    for (; adjn; adjn = adjn->tail) {
-        adjs = L(node2Temp(n), adjs);
-    }
-    //adj - （从图中删除的+已经合并的）
-    adjs = tempMinus(adjs, tempUnion(c.selectStack, c.coalescedNodes));
-    return adjs;
+    return adjacent(n);
 }
 
 //添加一条边
 static void addEdge(G_node nu, G_node nv) {
+
     if (nu == nv) return;
-    if (G_goesTo(nu, nv) || G_goesTo(nv, nu)) return;
+    if (G_goesTo(nu, nv) && G_goesTo(nv, nu)) return;
     G_addEdge(nu, nv);
 
-    Temp_temp u = node2Temp(nu);
-    Temp_temp v = node2Temp(nv);
-
-    if (Temp_look(c.precolored, u) == NULL) {
-        long d = (long long) G_look(c.degree, nu);
-        d += 1;
-        G_enter(c.degree, nu, (void *) d);
+    if (!precolred(nu)) {
+        degreeAdd(nu, 1);
     }
 
-    if (Temp_look(c.precolored, v) == NULL) {
-        long d = (long long) G_look(c.degree, nv);
-        d += 1;
-        G_enter(c.degree, nv, (void *) d);
+    if (!precolred(nv)) {
+        degreeAdd(nv, 1);
     }
 }
 
 static AS_instrList nodeMoves(Temp_temp t) {
+
     AS_instrList ml = (AS_instrList) Temp_lookPtr(c.moveList, t);
+
     //ml 相交（还未做好合并准备的指令+有可能合并的传送指令集合）
-    return instIntersect(ml, instUnion(c.activeMoves, c.worklistMoves));//返回交集结果
+    return instIntersect(ml, instUnion(c.activeMoves, c.worklistMoves));
 }
 
 //是否还有与temp相关的move指令？
@@ -254,21 +275,40 @@ static bool moveRelated(Temp_temp t) {
 }
 
 //有可能合并的传送指令集合准备
-static void makeWorkList() {//低度数的传送无关表，一般来说当一个变量的冲突便小于K，K为当前使用的寄存器个个数
+static void makeWorkList() {
+
+    //低度数的传送无关表，一般来说当一个变量的冲突边小于K时其放入低度数的冲突无关表，K为当前使用的寄存器个个数
     Temp_tempList tl;
+
+    // 遍历预着色节点
     for (tl = c.initial; tl; tl = tl->tail) {
         Temp_temp t = tl->head;
         G_node n = temp2Node(t);
-        c.initial = tempMinus(c.initial, L(t, NULL));
+
+        //在冲突图中查找预着色节点
 
         if (G_degree(n) >= c.K) {
-            c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));//高读数的节点表
+#ifdef DEBUG_PRINT
+            printf("Init2Spill:%d\n", t->num);
+#endif
+            c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));
         } else if (moveRelated(t)) {
-            c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));//低度数的传送有关节点
+#ifdef DEBUG_PRINT
+            printf("Init2Freeze:%d\n", t->num);
+#endif
+            c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));
         } else {
-            c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));//低度数的传送无关节点
+#ifdef DEBUG_PRINT
+            printf("Init2Simplify:%d\n", t->num);
+#endif
+            c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
         }
+//        Temp_tempList spillWorklist;//高度数的节点表
+//        Temp_tempList freezeWorklist;//低度数的传送有关的节点表
+//        Temp_tempList simplifyWorklist;//低度数的传送无关的节点表
     }
+
+    c.initial = NULL;
 }
 
 //移除冲突
@@ -286,10 +326,14 @@ static void removeAdj(G_node n) {
 }
 
 static void enableMoves(Temp_tempList tl) {
+
+    if(c.activeMoves == nullptr) return;
+
     for (; tl; tl = tl->tail) {
         AS_instrList il = nodeMoves(tl->head);
         for (; il; il = il->tail) {
             AS_instr m = il->head;
+            if(m->isDead) continue;
             if (instIn(m, c.activeMoves)) {
                 c.activeMoves = instMinus(c.activeMoves, IL(m, NULL));
                 c.worklistMoves = instUnion(c.worklistMoves, IL(m, NULL));
@@ -300,12 +344,12 @@ static void enableMoves(Temp_tempList tl) {
 
 //
 static void decrementDegree(G_node n) {
-    Temp_temp t = node2Temp(n);
-    long d = (long long) G_look(c.degree, n);
-    d -= 1;
-    G_enter(c.degree, n, (void *) d);
 
-    if (d == c.K) {
+    long d = degreeAdd(n, -1);
+
+    if (d == (c.K - 1)) {
+
+        Temp_temp t = node2Temp(n);
         enableMoves(L(t, adjacent(t)));
         c.spillWorklist = tempMinus(c.spillWorklist, L(t, NULL));
         if (moveRelated(t)) {
@@ -316,40 +360,40 @@ static void decrementDegree(G_node n) {
     }
 }
 
-static void addWorkList(Temp_temp t) {
-    long degree = (long long) G_look(c.degree, temp2Node(t));
-    if (Temp_look(c.precolored, t) == NULL &&
-        (!moveRelated(t)) &&
-        (degree < c.K)) {
-        c.freezeWorklist = tempMinus(c.freezeWorklist, L(t, NULL));
-        c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));
+static void deleteEdge(G_node nu, G_node nv) {
+    if (nu == nv) return;
+
+    if (!G_goesTo(nu, nv) || !G_goesTo(nv, nu)) {
+        printf("delete edge error");
+        return;
+    }
+
+    G_rmEdge(nu, nv);
+    G_rmEdge(nv, nu);
+
+    decrementDegree(nu);
+    decrementDegree(nv);
+}
+
+static void addWorkList(Temp_temp u) {
+    if (precolred(u) &&
+        (!moveRelated(u)) &&
+        (degree(u) < c.K)) {
+        c.freezeWorklist = tempMinus(c.freezeWorklist, L(u, NULL));
+        c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(u, NULL));
     }
 }
 
 // temp t ok？
 static bool OK(Temp_temp t, Temp_temp r) {
-    G_node nt = temp2Node(t);
-    G_node nr = temp2Node(r);
-    long degree = (long long) G_look(c.degree, nt);
-    if (degree < c.K) {
-        return true;
-    }
-    if (Temp_look(c.precolored, t)) {
-        return true;
-    }
-    if (G_goesTo(nt, nr) || G_goesTo(nr, nt)) {
-        return true;
-    }
-    return false;
+    return (degree(t) < c.K) || precolred(t) || G_goesTo(t, r) || G_goesTo(r, t);
 }
 
 //保守的，briggs合并策略
 static bool conservative(Temp_tempList tl) {
-    G_nodeList nl = tempL2NodeL(tl);
     int k = 0;
-    for (; nl; nl = nl->tail) {
-        long degree = (long long) G_look(c.degree, nl->head);
-        if (degree >= c.K) {
+    for (; tl; tl = tl->tail) {
+        if (degree(tl->head) >= c.K) {
             ++k;
         }
     }
@@ -367,21 +411,63 @@ static G_node getAlias(G_node n) {
     }
 }
 
+//得到别名
+static G_node getAlias(Temp_temp n) {
+    if (tempIn(n, c.coalescedNodes)) {
+        G_node n_node = temp2Node(n);
+        G_node alias = (G_node) G_look(c.alias, n_node);
+        return getAlias(alias);
+    } else {
+        return temp2Node(n);
+    }
+}
+
+
 //简化（第二步）第一步的冲突图构建由solve_liveness解决
 static void simplify() {
-    if (c.simplifyWorklist == NULL) {//c.simplifyWorklist低度数的传送无关的节点表
+
+    if (c.simplifyWorklist == NULL) {
+        //c.simplifyWorklist低度数的传送无关的节点表
         return;
     }
-//每次一个的从途中删除低度数的传送无关节点
-    Temp_temp t = c.simplifyWorklist->head;
+
+    Temp_temp t = nullptr;
+    if(c.spilled_min_temp_num != -1) {
+        // 优先着色首先溢出的寄存器，因此这里优先取小于新建临时变量的变量
+        Temp_tempList currentWorkList = c.simplifyWorklist;
+        Temp_tempList prevWorkList = nullptr;
+        for(;currentWorkList; currentWorkList = currentWorkList->tail) {
+            if(currentWorkList->head->num < c.spilled_min_temp_num) {
+                // 找到了
+                t = currentWorkList->head;
+                if(prevWorkList != nullptr) {
+                    prevWorkList->tail = currentWorkList->tail;
+                } else {
+                    c.simplifyWorklist = c.simplifyWorklist->tail;
+                }
+                break;
+            }
+            prevWorkList = currentWorkList;
+        }
+    }
+
+    if(nullptr == t) {
+        t = c.simplifyWorklist->head;
+        c.simplifyWorklist = c.simplifyWorklist->tail;
+    }
+
     G_node n = temp2Node(t);
-    c.simplifyWorklist = c.simplifyWorklist->tail;
+
+#ifdef DEBUG_PRINT
+    printf("Simplify:%d\n", t->num);
+#endif
 
     c.selectStack = L(t, c.selectStack);  // push
 
-    G_nodeList adjs = G_adj(n);
+    // 降低邻居节点的度数
+    Temp_tempList adjs = adjacent(n);
     for (; adjs; adjs = adjs->tail) {
-        G_node m = adjs->head;
+        G_node m = temp2Node(adjs->head);
         decrementDegree(m);
     }
 }
@@ -390,13 +476,14 @@ static void simplify() {
 static void combine(Temp_temp u, Temp_temp v) {
     G_node nu = temp2Node(u);
     G_node nv = temp2Node(v);
+
     if (tempIn(v, c.freezeWorklist)) {
         c.freezeWorklist = tempMinus(c.freezeWorklist, L(v, NULL));
     } else {
         c.spillWorklist = tempMinus(c.spillWorklist, L(v, NULL));
     }
-
     c.coalescedNodes = tempUnion(c.coalescedNodes, L(v, NULL));
+
     G_enter(c.alias, nv, (void *) nu);
 
     AS_instrList au = (AS_instrList) Temp_lookPtr(c.moveList, u);
@@ -406,23 +493,41 @@ static void combine(Temp_temp u, Temp_temp v) {
 
     enableMoves(L(v, NULL));
 
-    //Temp_tempList tadjs = adjacent(v);
-    //G_nodeList adjs = tempL2NodeL(tadjs);
-    G_nodeList adjs = G_adj(nv);
-    Temp_tempList tadjs = nodeL2TempL(adjs);
+    Temp_tempList adjs = adjacent(nv);
     for (; adjs; adjs = adjs->tail) {
-        G_node nt = adjs->head;
-        nt = getAlias(nt);
+        G_node nt = temp2Node(adjs->head);
         addEdge(nt, nu);
         decrementDegree(nt);
     }
-    tadjs = NULL;
 
-    long degree = (long long) G_look(c.degree, nu);
-    if (degree >= c.K && tempIn(u, c.freezeWorklist)) {
+    if (degree(u) >= c.K && tempIn(u, c.freezeWorklist)) {
         c.freezeWorklist = tempMinus(c.freezeWorklist, L(u, NULL));
         c.spillWorklist = tempUnion(c.spillWorklist, L(u, NULL));
     }
+}
+
+bool precolred(Temp_temp u)
+{
+    return (u != NULL) && (Temp_look(c.precolored, u) != NULL);
+}
+
+bool precolred(G_node nu)
+{
+    Temp_temp u = node2Temp(nu);
+
+    return precolred(u);
+}
+
+bool adjacentOK(Temp_temp v, Temp_temp u)
+{
+    Temp_tempList adj = adjacent(v);
+    for (; adj; adj = adj->tail) {
+        if (!OK(adj->head, u)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 //合并，进行保守的合并，（第三步）
@@ -432,6 +537,7 @@ static void coalesce() {//错误注释语句信息的定位
     }
 
     AS_instr m = c.worklistMoves->head;
+
     Temp_temp x = tempHead(instUse(m));
     Temp_temp y = tempHead(instDef(m));
     Temp_temp u, v;
@@ -439,50 +545,31 @@ static void coalesce() {//错误注释语句信息的定位
     x = node2Temp(getAlias(temp2Node(x)));
     y = node2Temp(getAlias(temp2Node(y)));
 
-    if (Temp_look(c.precolored, x) != NULL) {
+    if (precolred(x)) {
         u = y;
         v = x;
     } else {
         u = x;
         v = y;
     }
-    G_node nu = temp2Node(u);
-    G_node nv = temp2Node(v);
 
     c.worklistMoves = instMinus(c.worklistMoves, IL(m, NULL));
 
     if (u == v) {
         c.coalescedMoves = instUnion(c.coalescedMoves, IL(m, NULL));
         addWorkList(u);
-    } else if (Temp_look(c.precolored, v) || G_goesTo(nu, nv) || G_goesTo(nv, nu)) {
+    } else if (precolred(v) || G_goesTo(u, v) || G_goesTo(v, u)) {
         c.constrainedMoves = instUnion(c.constrainedMoves, IL(m, NULL));
         addWorkList(u);
         addWorkList(v);
-    } else {
-        bool flag = false;
-        if (Temp_look(c.precolored, u)) {
-            flag = true;
-            Temp_tempList adj = adjacent(v);
-            for (; adj; adj = adj->tail) {
-                if (!OK(adj->head, u)) {
-                    flag = false;
-                    break;
-                }
-            }
-        } else {
-            Temp_tempList adju = adjacent(u);
-            Temp_tempList adjv = adjacent(v);
-            Temp_tempList adj = tempUnion(adju, adjv);
-            flag = conservative(adj);
-        }
+    } else if((precolred(u) && adjacentOK(u, v)) ||
+              ((!precolred(u)) && conservative(tempUnion(adjacent(u), adjacent(v))))){
 
-        if (flag) {
-            c.coalescedMoves = instUnion(c.coalescedMoves, IL(m, NULL));
-            combine(u, v);
-            addWorkList(u);
-        } else {
-            c.activeMoves = instUnion(c.activeMoves, IL(m, NULL));
-        }
+        c.coalescedMoves = instUnion(c.coalescedMoves, IL(m, NULL));
+        combine(u, v);
+        addWorkList(u);
+    } else {
+        c.activeMoves = instUnion(c.activeMoves, IL(m, NULL));
     }
 }
 
@@ -493,22 +580,18 @@ static void freezeMoves(Temp_temp u) {
         AS_instr m = il->head;
         Temp_temp x = tempHead(instUse(m));
         Temp_temp y = tempHead(instDef(m));
-        G_node nx = temp2Node(x);
-        G_node ny = temp2Node(y);
-        G_node nv;
+        Temp_temp v;
 
-        if (getAlias(nx) == getAlias(ny)) {
-            nv = getAlias(nx);
+        if (getAlias(y) == getAlias(u)) {
+            v = node2Temp(getAlias(x));
         } else {
-            nv = getAlias(ny);
+            v = node2Temp(getAlias(y));
         }
-        Temp_temp v = node2Temp(nv);
 
         c.activeMoves = instMinus(c.activeMoves, IL(m, NULL));
         c.frozenMoves = instUnion(c.frozenMoves, IL(m, NULL));
 
-        long degree = (long long) G_look(c.degree, nv);
-        if (nodeMoves(v) == NULL && degree < c.K) {
+        if (nodeMoves(v) == NULL && degree(v) < c.K) {
             c.freezeWorklist = tempMinus(c.freezeWorklist, L(v, NULL));
             c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(v, NULL));
         }
@@ -535,31 +618,66 @@ static void selectSpill() {
     if (c.spillWorklist == NULL) {
         return;
     }
-    Temp_tempList tl = c.spillWorklist;
+    Temp_tempList tl;
     float minSpillPriority = 9999.0f;
     Temp_temp m = NULL;
-    for (; tl; tl = tl->tail) {
-        Temp_temp t = tl->head;
-        long cost = (long long) Temp_lookPtr(c.spillCost, t);
-        long degree = (long long) G_look(c.degree, temp2Node(t));
-        degree = (degree > 0) ? degree : 1;
-        float priority = ((float) cost) / degree;
-        if (priority < minSpillPriority) {
-            minSpillPriority = priority;
-            m = t;
+
+    // 曾经溢出，优先选择这些溢出的优先着色
+    if(c.spilled_min_temp_num != -1) {
+        tl = c.spillWorklist;
+        for (; tl; tl = tl->tail) {
+            Temp_temp t = tl->head;
+            if((t->num >= c.spilled_min_temp_num)) {
+                // 小于的先不选择
+                continue;
+            }
+            long cost = (long long) Temp_lookPtr(c.spillCost, t);
+            long degree = (long long) G_look(c.degree, temp2Node(t));
+            degree = (degree > 0) ? degree : 1;
+            float priority = ((float) cost) / degree;
+            if ((priority < minSpillPriority)) {
+                minSpillPriority = priority;
+                m = t;
+            }
         }
     }
-    c.spillWorklist = tempMinus(c.spillWorklist, L(m, NULL));
-    c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(m, NULL));
-    freezeMoves(m);
+
+    // 没有选择到，则重新选择
+    if(m == NULL) {
+        tl = c.spillWorklist;
+        for (; tl; tl = tl->tail) {
+            Temp_temp t = tl->head;
+            long cost = (long long) Temp_lookPtr(c.spillCost, t);
+            long degree = (long long) G_look(c.degree, temp2Node(t));
+            degree = (degree > 0) ? degree : 1;
+            float priority = ((float) cost) / degree;
+            if ((priority < minSpillPriority)) {
+                minSpillPriority = priority;
+                m = t;
+            }
+        }
+    }
+
+    if(m != NULL) {
+        // 从溢出队列中移动到simpify队列中
+#ifdef DEBUG_PRINT
+        printf("Spill2Simplify:%d\n", m->num);
+#endif
+        c.spillWorklist = tempMinus(c.spillWorklist, L(m, NULL));
+        c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(m, NULL));
+        freezeMoves(m);
+    }
 }
 
 static void colorMain() {
+
+    // 把initial中的未着色的寄存器变量按照冲突图的度数进行分类
+    // 大于可用寄存器最大值的作为溢出的结点
+    // 针对Move指令进行特定的处理
+    // 小于度数最大阈值的课加入到simplify中
     makeWorkList();
-//    c.spillWorklist = tempUnion(c.spillWorklist, L(t, NULL));//高读数的节点表
-//c.freezeWorklist = tempUnion(c.freezeWorklist, L(t, NULL));//低度数的传送有关节点
-//c.simplifyWorklist = tempUnion(c.simplifyWorklist, L(t, NULL));//低度数的传送无关节点
-do {
+
+    do {
         if (c.simplifyWorklist != NULL) {
             simplify();//简化过程
         } else if (c.worklistMoves != NULL) {
@@ -573,111 +691,183 @@ do {
              c.freezeWorklist != NULL || c.spillWorklist != NULL);
 }
 
-struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
+struct COL_result COL_color(G_graph ig, Temp_map precolored_map, Temp_tempList regs, Temp_tempList initial,
                             AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
     struct COL_result ret;
 
-    c.precolored = initial;//预着色节点map
-    c.initial = NULL;
-    c.simplifyWorklist = NULL;
-    c.freezeWorklist = NULL;
-    c.spillWorklist = NULL;
-    c.spilledNodes = NULL;
-    c.coalescedNodes = NULL;
-    c.coloredNodes = NULL;
-    c.selectStack = NULL;
+    //预着色节点map
+    c.precolored = precolored_map;
 
+    // 临时寄存器集合，其中的元素既没有预着色，也没有被处理
+    c.initial = initial;
+
+    // 低度数的传送无关的结点表
+    c.simplifyWorklist = NULL;
+
+    // 低度数的传送有关的结点表
+    c.freezeWorklist = NULL;
+
+    // 高度数的结点表
+    c.spillWorklist = NULL;
+
+    // 本轮重要溢出的结点集合，初始为空
+    c.spilledNodes = NULL;
+
+    // 已合并的寄存器集合。当合并u <- v时，将v加入到这个结合总，u被放回到某个工作表中（或反之）
+    c.coalescedNodes = NULL;
+
+    // 已成功着色的结点集合
+    c.coloredNodes = NULL;
+
+    // 一个包含从图中删除的临时变量的栈
+    c.selectStack = NULL;
+    c.lastStack = NULL;
+
+    // 已经合并的传送指令集合
     c.coalescedMoves = NULL;
+
+    // 源操作数和目标操作数冲突的传送指令集合
     c.constrainedMoves = NULL;
+
+    // 不再考虑合并的传送指令集合
     c.frozenMoves = NULL;
+
+    // 有可能合并的传送指令集合
     c.worklistMoves = worklistMoves;//所有的mov命令表
+
+    // 还未做好合并准备得传送指令集合
     c.activeMoves = NULL;
 
-    c.spillCost = spillCost;//temp------所有命令中defuse中含有temp的总和
-    c.moveList = moveList;//所有move命令构成的列表
+    //temp------所有命令中defuse中含有temp的总和
+    c.spillCost = spillCost;
+
+    //所有move命令构成的列表
+    c.moveList = moveList;
     c.degree = G_empty();
+
+    // 当一条传送指令(u,v)已被合并，并且v已放入到合并结点集合coalesedNodes时，有alias(v) = u
     c.alias = G_empty();
-    c.nodes = ig;//冲突图
 
-    c.K = tempCount(regs);//可用的寄存器个数
+    // 冲突图
+    c.nodes = ig;
 
+    //可用的寄存器个数
+    c.K = tempCount(regs);
 
-    Temp_map precolored = initial;//预着色表
-    Temp_map colors = Temp_layerMap(Temp_empty(), initial);//将一个空表与与着色表连接
-    Temp_tempList spilledNodes = NULL, coloredNodes = NULL;
-    G_nodeList nodes = G_nodes(ig);//冲突图首结点，冲突图中对应节点信息为temp的指针
-    G_nodeList temps = NULL;
+    // c.color 算法为结点选择的颜色，对于预着色结点，其初值为给定的颜色
 
+    Temp_map colors = Temp_layerMap(Temp_empty(), precolored_map);//将一个空表与与着色表连接
+
+    // 冲突图首结点，冲突图中对应节点信息为temp的指针
+    G_nodeList nodes = G_nodes(ig);
+
+    // 遍历冲突图，构建寄存器变量与度数的映射表，
+    // 同时把冲突图的所有结点对应的临时寄存器变量都作为未着色的变量加入到initial中
     G_nodeList nl;
-    for (nl = nodes; nl; nl = nl->tail) {//遍历冲突图
+    for (nl = nodes; nl; nl = nl->tail) {
 
-        long degree = G_degree(nl->head);//degree为冲突边个数
+        // degree为冲突边个数
+        long degree = G_degree(nl->head);
 
-        G_enter(c.degree, nl->head, (void *) degree);//c.degree为每个节点当前度数的数组
-
-        if (Temp_look(precolored, node2Temp(nl->head))) {//node2Temp返回temp指针，指向命令中的temp位置
-            G_enter(c.degree, nl->head, (void *) 999);//预着色节点的度数设置为999
+        // node2Temp返回temp指针，指向命令中的temp位置
+        if (Temp_look(precolored_map, node2Temp(nl->head))) {
+            //冲突图中的预着色节点的度数设置为999
+            G_enter(c.degree, nl->head, (void *) 999);
             continue;
         }
-        c.initial = L(node2Temp(nl->head), c.initial);////c.initial临时寄存器集合，既没有预着色也没有处理
+
+        //c.degree为每个节点当前度数的数组
+        G_enter(c.degree, nl->head, (void *) degree);
+
+        //// c.initial临时寄存器集合，既没有预着色也没有处理
+        Temp_temp tn = node2Temp(nl->head);
+
+#ifdef DEBUG_PRINT
+        printf("NODE:%d\n", tn->num);
+#endif
+
+        c.initial = L(tn, c.initial);
     }
-    colorMain();//开始着色
 
-    // for (nl = nodes; nl; nl = nl->tail) {
-    //   if (Temp_look(precolored, node2Temp(nl->head))) {
-    //     continue;
-    //   }
-    //   c.selectStack = L(node2Temp(nl->head), c.selectStack);
-    // }
+    colorMain();
 
+    // COL_init_spilled_temp_num(-1);
+
+#if 0
+    for (nl = nodes; nl; nl = nl->tail) {
+        if (Temp_look(precolored_map, node2Temp(nl->head))) {
+            continue;
+        }
+        c.selectStack = L(node2Temp(nl->head), c.selectStack);
+    }
+#endif
+
+    Temp_tempList okColors = nullptr;
+
+    // 下面开始着色
     while (c.selectStack != NULL) {
         Temp_temp t = c.selectStack->head; // pop
         G_node n = temp2Node(t);
         c.selectStack = c.selectStack->tail;
 
-        Temp_tempList okColors = cloneRegs(regs);
-        G_nodeList adjs = G_adj(n);
-        G_node nw;
-        Temp_temp w;
+        G_node w;
         c_string color;
 
+        okColors = cloneRegs(regs);
+
+        G_nodeList adjs = G_adj(n);
         for (; adjs; adjs = adjs->tail) {
 
-            nw = adjs->head;
-            w = node2Temp(nw);
-            G_node nw_alias = getAlias(nw);
+            G_node w = adjs->head;
+            G_node nw_alias = getAlias(w);
             Temp_temp w_alias = node2Temp(nw_alias);
-            if ((color = Temp_look(colors, w_alias)) != NULL) {
-                Temp_temp colorTemp = str2Color(color, precolored, regs);
-                if (colorTemp) {
-                    okColors = tempMinus(okColors, L(colorTemp, NULL));
+            if(Temp_inList(w_alias, c.coloredNodes) || Temp_look(precolored_map, w_alias)) {
+                if ((color = Temp_look(colors, w_alias)) != NULL) {
+                    Temp_temp colorTemp = str2Color(color, precolored_map, regs);
+                    if (colorTemp) {
+                        okColors = tempMinus(okColors, L(colorTemp, NULL));
+                    }
                 }
             }
         }
+
         if (okColors == NULL) {
             c.spilledNodes = L(t, c.spilledNodes);
         } else {
-            coloredNodes = L(t, coloredNodes);
-            Temp_enter(colors, t, color2Str(okColors->head, precolored));
+            c.coloredNodes = L(t, c.coloredNodes);
+            Temp_enter(colors, t, color2Str(okColors->head, precolored_map));
+#ifdef DEBUG_PRINT
+            printf("Color: %d -- %d\n", t->num, okColors->head->num);
+#endif
         }
     }
+
     Temp_tempList tl;
     for (tl = c.coalescedNodes; tl; tl = tl->tail) {
-        G_node alias = getAlias(temp2Node(tl->head));
-        c_string color = Temp_look(colors, node2Temp(alias));
-        Temp_enter(colors, tl->head, color);
+        Temp_temp n = tl->head;
+
+        G_node alias = getAlias(n);
+        Temp_temp alias_temp = node2Temp(alias);
+        c_string aliasColor = Temp_look(colors, alias_temp);
+
+        if(aliasColor) {
+            Temp_enter(colors, n, aliasColor);
+        }
     }
 
     ret.coloring = colors;
 
     ret.colored = NULL;
+    Temp_tempList coloredNodes = c.coloredNodes;
     for (; coloredNodes; coloredNodes = coloredNodes->tail) {
         ret.colored = L(coloredNodes->head, ret.colored);
     }
 
     ret.spills = NULL;
     for (; c.spilledNodes; c.spilledNodes = c.spilledNodes->tail) {
-//        printf("spilled: %s\n", tempName(c.spilledNodes->head));
+#ifdef DEBUG_PRINT
+        printf("spilled: %s\n", tempName(c.spilledNodes->head));
+#endif
         ret.spills = L(c.spilledNodes->head, ret.spills);
     }
 
@@ -688,73 +878,24 @@ struct COL_result COL_color(G_graph ig, Temp_map initial, Temp_tempList regs,
     return ret;
 }
 
-static struct COL_result COL_color2(G_graph ig, Temp_map initial, Temp_tempList regs,
-                                    AS_instrList worklistMoves, Temp_map moveList, Temp_map spillCost) {
-    //your code here.
-    struct COL_result ret;
-
-    Temp_map precolored = initial;
-    Temp_map colors = Temp_layerMap(Temp_empty(), initial);
-    G_nodeList spilledNodes = NULL, coloredNodes = NULL;
-    G_nodeList nodes = G_nodes(ig);
-    G_nodeList temps = NULL;
-
-    G_nodeList nl;
-    for (nl = nodes; nl; nl = nl->tail) {
-        if (Temp_look(precolored, node2Temp(nl->head))) {
-            continue;
-        }
-        temps = G_NodeList(nl->head, temps);
-    }
-
-    while (temps != NULL) {
-        G_node n = temps->head;
-        Temp_tempList okColors = cloneRegs(regs);
-        G_nodeList adjs = G_adj(n);
-        G_node adj;
-        c_string color;
-
-        for (; adjs; adjs = adjs->tail) {
-            adj = adjs->head;
-            if ((color = Temp_look(colors, node2Temp(adj))) != NULL) {
-                Temp_temp colorTemp = str2Color(color, precolored, regs);
-                if (colorTemp) {
-                    okColors = tempMinus(okColors,
-                                         Temp_TempList(colorTemp, NULL));
-                }
-            }
-        }
-
-        if (okColors == NULL) {
-            spilledNodes = G_NodeList(n, spilledNodes);
-        } else {
-            coloredNodes = G_NodeList(n, coloredNodes);
-            Temp_enter(colors, node2Temp(n), color2Str(okColors->head, precolored));
-        }
-
-        // Next
-        temps = temps->tail;
-    }
-
-    ret.coloring = colors;
-
-    ret.colored = NULL;
-    for (; coloredNodes; coloredNodes = coloredNodes->tail) {
-        ret.colored = Temp_TempList(node2Temp(coloredNodes->head), ret.colored);
-    }
-
-    ret.spills = NULL;
-    for (; spilledNodes; spilledNodes = spilledNodes->tail) {
-//        printf("spilled: %s\n", tempName(node2Temp(spilledNodes->head)));
-        ret.spills = Temp_TempList(node2Temp(spilledNodes->head), ret.spills);
-    }
-
-    ret.alias = G_empty();
-    ret.coalescedMoves = NULL;
-    ret.coalescedNodes = NULL;
-
-    return ret;
+long degree(Temp_temp t) {
+    return (long long) G_look(c.degree, temp2Node(t));
 }
 
+long degree(G_node n) {
+    return (long long) G_look(c.degree, n);
+}
 
+long degreeAdd(G_node nu, long num) {
+    long d = (long long) G_look(c.degree, nu);
+    long old = d;
+    d += num;
+    G_enter(c.degree, nu, (void *) d);
+    return old;
+}
+
+long degreeAdd(Temp_temp u, long num) {
+    G_node nu = temp2Node(u);
+    return degreeAdd(nu, num);
+}
 

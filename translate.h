@@ -21,7 +21,7 @@ typedef F_accessList Tr_accessList;
 typedef F_frame Tr_frame;
 
 
-Tr_frame Tr_newFrame(Temp_label name, U_boolList formals);
+Tr_frame Tr_newFrame(Temp_label name, U_boolList formals, bool needReturn);
 Tr_access Tr_allocLocal(Tr_frame frame, bool escape, int size);
 Tr_access Tr_allocGlobal(S_symbol global);
 Tr_accessList Tr_getFormals(Tr_frame frame);
@@ -73,6 +73,7 @@ Tr_exp Tr_func_call(Temp_label name,Tr_expList params);
 Tr_exp Tr_assign(Tr_exp left,Tr_exp right);
 Tr_exp Tr_seq(Tr_exp left,Tr_exp right);
 Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame);
+Tr_exp Tr_return_no_param(F_frame f_frame);
 Tr_exp Tr_newlabel();
 Tr_frame Tr_root_frame();
 F_fragList Tr_getResult();

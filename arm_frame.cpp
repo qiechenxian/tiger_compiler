@@ -3,6 +3,7 @@
 //
 #include "frame.h"
 #include "assem.h"
+#include "temp.h"
 
 const int F_WORD_SIZE = 4; /// 32位机器
 static const int F_K = 4; /// 保存在Reg中参数的数量(待定)
@@ -62,7 +63,7 @@ void F_initRegisters(void) {
                                               Temp_TempList(lr, NULL)));
 }
 Temp_map F_initialRegisters(F_frame f){
-    Temp_map m=Temp_empty();
+    Temp_map m = get_frame_precored_map(f);
 
     Temp_enter(m, fp, (char*)"FP");
     Temp_enter(m, sp, (char*)"SP");
@@ -81,6 +82,7 @@ Temp_map F_initialRegisters(F_frame f){
     Temp_enter(m, r8, (char*)"R8");
     Temp_enter(m, r9, (char*)"R9");
     Temp_enter(m, r10, (char*)"R10");
+
     return m;
 }
 Temp_temp F_FP()//取帧指针
@@ -92,7 +94,7 @@ Temp_temp F_FP()//取帧指针
 }
 //TODO 取栈指针，为什么两个？
 Temp_temp F_RV(void){
-    if (fp == NULL) {
+    if (r0 == NULL) {
         F_initRegisters();
     }
     return r0;
@@ -144,6 +146,31 @@ Temp_temp F_R0()
     return r0;
 }
 
+Temp_temp F_R8()
+{
+    if (r8 == nullptr) {
+        F_initRegisters();
+    }
+    return r8;
+}
+
+Temp_temp F_R9()
+{
+    if (r9 == nullptr) {
+        F_initRegisters();
+    }
+    return r9;
+}
+
+Temp_temp F_R10()
+{
+    if (r10 == nullptr) {
+        F_initRegisters();
+    }
+    return r10;
+}
+
+
 Temp_temp F_R1()
 {
     if (r1 == nullptr){
@@ -169,30 +196,93 @@ Temp_temp F_R3()
     return r3;
 }
 
+Temp_temp F_R4()
+{
+    if (r4 == nullptr) {
+        F_initRegisters();
+    }
+    return r4;
+}
+
+Temp_temp F_R5()
+{
+    if (r5 == nullptr) {
+        F_initRegisters();
+    }
+    return r5;
+}
+
+Temp_temp F_R6()
+{
+    if (r6 == nullptr) {
+        F_initRegisters();
+    }
+    return r6;
+}
+
+Temp_temp F_R7()
+{
+    if (r7 == nullptr) {
+        F_initRegisters();
+    }
+    return r7;
+}
+
+ Temp_tempList L(Temp_temp h, Temp_tempList t) {
+    return Temp_TempList(h, t);
+}
+
 //TODO 需添加剩余寄存器,是否需要fp，sp
 Temp_tempList F_registers(void) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return /*Temp_TempList(r0,
-            Temp_TempList(r1,
-                    Temp_TempList(r2,
-                            Temp_TempList(r3,*/
-                                    Temp_TempList(r4,
-                                            Temp_TempList(r5,
-                                                    Temp_TempList(r6,
-                                                            Temp_TempList(r7,
-                                                                    Temp_TempList(r8,
-                                                                            Temp_TempList(r9,NULL))))));//))));
+
+    return L(r0, L(r1, L(r2, L(r3, L(r4, L(r5, L(r6, L(r7, L(r8, L(r9, NULL))))))))));
 }
 
 //TODO 调用者保护寄存器
-Temp_tempList F_callersaves(void) {
+Temp_tempList F_callersaves(int real_arg_cnt) {
     if (fp == NULL) {
         F_initRegisters();
     }
-    return Temp_TempList(NULL, NULL);
+
+    Temp_tempList callersave = NULL;
+    Temp_temp * callerRegs = F_getCallerArray();
+    for(int k = 0; k < real_arg_cnt && k < 4; k ++) {
+        callersave = L(callerRegs[k], callersave);
+    }
+
+    return callersave;
 }
+
+Temp_temp* callerArray = nullptr;
+
+Temp_temp* F_getCallerArray()
+{
+    if (!callerArray){
+        callerArray = (Temp_temp*)checked_malloc(10*sizeof(Temp_temp));
+        callerArray[0] = F_R0();
+        callerArray[1] = F_R1();
+        callerArray[2] = F_R2();
+        callerArray[3] = F_R3();
+        callerArray[4] = F_R4();
+        callerArray[5] = F_R5();
+        callerArray[6] = F_R6();
+        callerArray[7] = F_R7();
+        callerArray[8] = F_R8();
+        callerArray[9] = F_R9();
+    }
+
+    return callerArray;
+}
+
+Temp_temp F_getCallerArrayByIndex(int index)
+{
+    Temp_temp* array = F_getCallerArray();
+    return array[index];
+}
+
 
 //TODO
 Temp_tempList F_calleesaves(void) {
@@ -219,20 +309,24 @@ struct F_frame_ {
     Temp_label func_done_label;
     F_accessList formals;
     F_accessList locals;
+    int formals_count; // 参数个数
     int local_count;
     int callee_max_args;
     int temp_space;  /// todo 为寄存器分配后，保存临时变量空间预留的接口
     bool isLeaf;
+    bool needReturn; // 需要有返回值
+    Temp_map precoredMap;
 
     /** instructions required view shift*/
 };//添加局部变量域
 
 
 
+
 /** function prototype */
 static F_access InFrame(int offset);
 
-static F_access InReg(Temp_temp reg);
+static F_access InReg(Temp_temp reg, int num);
 
 static F_accessList F_AccessList(F_access head, F_accessList tail);
 
@@ -273,12 +367,13 @@ Temp_label F_getGlobalLabel(F_access fa) {
     /**
      * 为translate中的Tr_getGlobalLabel提供底层实现
      */
+    EM_ASSERT_CODE=-57;
     assert(fa->kind == F_access_::inGlobal);
     return fa->u.global;
 }
 
 /** 辅助函数 */
-static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
+static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals, int & arg_cnt)
 /**
  * 根据escape分配形参access，目前escape全为true，即所有参数都不是必须要放到栈中
  *
@@ -305,10 +400,14 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
     F_accessList access_list = nullptr, list_tail = nullptr;
     int args_inReg_cnt = 0;
     int args_inFrame_cnt = 1;
+    arg_cnt = 0;
     for (U_boolList iter = formals; iter; iter = iter->tail) {
+        arg_cnt ++;
+
         F_access access = nullptr;
-        if (args_inReg_cnt <= F_K && (iter->head == false) && false) {//暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
-            access = InReg(Temp_newTemp());
+        if (args_inReg_cnt < F_K && (iter->head == true)) {
+            //暂时采取全部放在堆栈的存储方式,之后进行寄存器分配优化时修改
+            access = InReg(Temp_newTemp(), F_WORD_SIZE * (-frame->local_count));
             args_inReg_cnt++;
         } else {
             access = InFrame(args_inFrame_cnt++ * F_WORD_SIZE);
@@ -321,6 +420,7 @@ static F_accessList makeFormalAccessList(F_frame frame, U_boolList formals)
             list_tail = access_list;
         }
     }
+
     return access_list;
 }
 
@@ -336,16 +436,23 @@ void F_setFrameCalleeArgs(F_frame frame, int callee_args) {
         frame->callee_max_args = callee_args;
 }
 
-F_frame F_newFrame(Temp_label name, U_boolList formals) {
+// R4~R7
+#define STACK_PROTECT_REG_NUM_MAX 6
+#define STACK_PROTECT_REG_NUM_MAX_MAIN 6
+#define CALL_LIB_PROTECED_REG_NUM 0
+
+F_frame F_newFrame(Temp_label name, U_boolList formals, bool needReturn) {
     F_frame f = (F_frame) checked_malloc(sizeof(*f));
     f->name = name;
-    f->formals = makeFormalAccessList(f, formals);
-    f->local_count = 6+1; ///为保存旧FP预留空间 todo 当该函数为子叶函数时，可优化掉栈帧 --loyx 2020/7/25
+    f->local_count = STACK_PROTECT_REG_NUM_MAX + 1 + CALL_LIB_PROTECED_REG_NUM;
+    f->formals = makeFormalAccessList(f, formals, f->formals_count);
     f->locals = nullptr;
     f->isLeaf = true;
+    f->needReturn = needReturn;
     f->temp_space = 0;
     f->callee_max_args = -1;
     f->func_done_label=Temp_newLabel();
+    f->precoredMap = Temp_empty();;
     return f;
 }
 
@@ -353,21 +460,40 @@ Temp_label F_getName(F_frame frame) {
     return frame->name;
 }
 
+bool F_needReturn(F_frame frame) {
+    return frame->needReturn;
+}
+
+Temp_map get_frame_precored_map(F_frame frame)
+{
+    return frame->precoredMap;
+}
+
 F_accessList F_getFormals(F_frame frame) {
     return frame->formals;
 }
 
+int F_getFormalsCount(F_frame frame) {
+    return frame->formals_count;
+}
+
 int F_accessOffset(F_access a) {
-//    if (a->kind != F_access_::inFrame) {
+
+    if (a->kind != F_access_::inFrame) {
 //        EM_error(0, "Offset of a reg access is invalid");
-//    }
+    }
 
     return a->u.offset;
 }
 
+bool F_accessIsReg(F_access a) {
+    return a->kind == F_access_::inReg;
+}
+
 Temp_temp F_accessReg(F_access a) {
     if (a->kind != F_access_::inReg) {
-        EM_error(0, "Reg of a frame access is invalid");
+//        EM_error(0, "Reg of a frame access is invalid");
+        EM_errorWithExitCode(-3, 0, "Reg of a frame access is invalid");
     }
 
     return a->u.reg;
@@ -375,15 +501,16 @@ Temp_temp F_accessReg(F_access a) {
 
 F_access F_allocLocal(F_frame frame, bool escape, int size) {
     frame->local_count += size;
-    if (0) {
-        F_access access = InFrame(F_WORD_SIZE * (-frame->local_count));
+    F_access access;
+    if(escape) {
+        access = InFrame(F_WORD_SIZE * (-frame->local_count));
         frame->locals = F_AccessList(access, frame->locals);
-        return access;
     } else {
-        F_access access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
+        access =InReg(Temp_newTemp(),F_WORD_SIZE * (-frame->local_count));
         frame->locals = F_AccessList(access, frame->locals);
-        return access;
     }
+
+    return access;
 }
 
 F_access F_allocGlobal(S_symbol global) {
@@ -478,15 +605,9 @@ static Temp_tempList returnSink = nullptr;
 AS_instrList F_procEntryExit2(AS_instrList body) {
     Temp_tempList calleeSaves = nullptr;
     if (!returnSink)
-#if 1
         returnSink = Temp_TempList(F_LR(),
-                                  Temp_TempList(F_SP(), calleeSaves));
-#else
-    returnSink = Temp_TempList(F_ZERO(),
-                                   Temp_TempList(F_LR(),
-                                                 Temp_TempList(F_SP(), calleeSaves)));
-#endif
-
+                        Temp_TempList(F_FP(),
+                           Temp_TempList(F_SP(), calleeSaves)));
     return AS_splice(body, AS_InstrList(
             AS_Oper((char*)"", nullptr, returnSink, nullptr), nullptr));
 }
@@ -514,105 +635,94 @@ static int getSpace(F_frame frame)
  */
 AS_proc F_procEntryExit3(F_frame frame, AS_instrList body) {
     const int INST_SIZE = 40;
-    AS_instrList head_inst_list, tail_inst_list;
-    AS_instrList head_inst_ptr, tail_inst_ptr;
+    AS_instrList head_inst_list = NULL, tail_inst_list = NULL;
+    AS_instrList temp_inst_list;
+    char * tempinst_buf;
     int word_size = get_word_size();
     char *name = Temp_labelString(frame->name);
 
-    /** 函数入口label*/
-    char *fun_label = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(fun_label, "%s:\n", name);
-    head_inst_list = AS_InstrList(AS_Label(fun_label, frame->name), NULL);
-    head_inst_ptr = head_inst_list;
-
-    /** 函数入口处的汇编指令 */
-
     int recover_offset;
-    if (frame->isLeaf) {
-        char *inst = (char *) "\tstr     fp, [sp, #-4]!\n";
-        head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        head_inst_ptr = head_inst_ptr->tail;
-
-//        recover_offset = 0;
-        recover_offset = (0 + 6) * word_size;
+    if (0 == strcmp(name, "main")) {
+        recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX_MAIN) * word_size;
     } else {
-        char *inst = (char *) "\tstmfd   sp!, {fp, lr}\n";
-        head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        head_inst_ptr = head_inst_ptr->tail;
-
-        recover_offset = (1 + 6) * word_size;
+        recover_offset = (1 + STACK_PROTECT_REG_NUM_MAX) * word_size;
     }
 
-    // todo 优化
-    head_inst_ptr->tail = AS_InstrList(AS_Oper((char*)"\tstmfd   sp!, {r4-r9}\n", NULL, NULL, NULL),NULL);
-    head_inst_ptr = head_inst_ptr->tail;
+    /** 函数入口label*/
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    snprintf(tempinst_buf, INST_SIZE, "%s:\n", name);
+    temp_inst_list = AS_InstrList(AS_Label(tempinst_buf, frame->name), NULL);
+    head_inst_list = AS_splice(head_inst_list, temp_inst_list);
 
-    char *inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(inst, "\tadd     'd0, 's0, #%d\n", recover_offset);
-    head_inst_ptr->tail = AS_InstrList(AS_Oper(inst, Temp_TempList(F_FP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-    head_inst_ptr = head_inst_ptr->tail;
+    /** 函数入口处的汇编指令 */
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    if (strcmp(name, "main")) {
+        snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R4-R9, FP, LR}\n");
+    } else {
+        snprintf(tempinst_buf, INST_SIZE, "\tstmfd   SP!, {R4-R9, FP, LR}\n");
+    }
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL),NULL);
+    head_inst_list = AS_splice(head_inst_list, temp_inst_list);
 
+    // TODO recover_offset可能超过立即数的限制，需要先读都寄存器，然后再加法
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    sprintf(tempinst_buf, "\tadd     FP, SP, #%d\n", recover_offset);
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    head_inst_list = AS_splice(head_inst_list, temp_inst_list);
 
     int space = getSpace(frame);
-    if (space>0){
-        if (space < 200){
-            char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-            sprintf(frame_space, "\tsub     'd0, 's0, #%d\n", space * word_size);
-            head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-            head_inst_ptr = head_inst_ptr->tail;
-        } else{
-            char *temp = (char*)checked_malloc(sizeof(char ) * INST_SIZE);
-            sprintf(temp, "\tldr     r4, =%d\n", space * word_size);
-            head_inst_ptr->tail = AS_InstrList(AS_Oper(temp, NULL, NULL, NULL), NULL);
-            head_inst_ptr = head_inst_ptr->tail;
+    if (space > 0){
 
-            char *frame_space = (char*)checked_malloc(sizeof(char) * INST_SIZE);
-            int tmp_wsize = space * word_size;
-            sprintf(frame_space, "\tsub     'd0, 's0, r4\n");
-            head_inst_ptr->tail = AS_InstrList(AS_Oper(frame_space, Temp_TempList(F_SP(), NULL), Temp_TempList(F_SP(), NULL), NULL), NULL);
-            head_inst_ptr = head_inst_ptr->tail;
+        int tmp_wsize = space * word_size;
+
+        if (constExpr(tmp_wsize)){
+            tempinst_buf = (char*)checked_malloc(sizeof(char) * INST_SIZE);
+            snprintf(tempinst_buf, INST_SIZE, "\tsub     SP, SP, #%d\n", tmp_wsize);
+            temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+            head_inst_list = AS_splice(head_inst_list, temp_inst_list);
+        } else{
+            tempinst_buf = (char*)checked_malloc(sizeof(char ) * INST_SIZE);
+            snprintf(tempinst_buf, INST_SIZE, "\tldr     R4, =%d\n", tmp_wsize);
+            temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+            head_inst_list = AS_splice(head_inst_list, temp_inst_list);
+
+            tempinst_buf = (char*)checked_malloc(sizeof(char) * INST_SIZE);
+            sprintf(tempinst_buf, "\tsub     SP, SP, R4\n");
+            temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+            head_inst_list = AS_splice(head_inst_list, temp_inst_list);
         }
     }
 
     /** 将函数入口指令和body指令连接 */
-    head_inst_ptr->tail = body->tail;
+    head_inst_list = AS_splice(head_inst_list, body->tail);
 
-    /** 函数出口指令 */
-//    tail_inst_list = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
-//    tail_inst_ptr = tail_inst_list;
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    snprintf(tempinst_buf, INST_SIZE, "\tsub     SP, FP, #%d\n", recover_offset);
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
 
-    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(inst, "\tsub     sp, fp, #%d\n", recover_offset);
-//    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-//    tail_inst_ptr = tail_inst_ptr->tail;
-    tail_inst_list = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-    tail_inst_ptr = tail_inst_list;
-
-    tail_inst_ptr->tail = AS_InstrList(AS_Oper((char *)"\tldmfd   sp!, {r4-r9}\n", NULL, NULL, NULL), NULL);
-    tail_inst_ptr = tail_inst_ptr->tail;
-
-
-    if (frame->isLeaf) {
-        inst = (char *) "\tldr     fp, [sp], #4\n";
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_ptr->tail;
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    if (strcmp(name, "main")) {
+        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R9, FP, LR}\n");
     } else {
-        inst = (char *) "\tldmfd   sp!, {fp, lr}\n";
-        tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
-        tail_inst_ptr = tail_inst_ptr->tail;
+        snprintf(tempinst_buf, INST_SIZE, "\tldmfd   SP!, {R4-R9, FP, LR}\n");
     }
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
 
-    inst = (char *) checked_malloc(sizeof(char) * INST_SIZE);
-    sprintf(inst, "\tbx      lr\n");
-    tail_inst_ptr->tail = AS_InstrList(AS_Oper(inst, NULL, NULL, NULL), NULL);
+    tempinst_buf = (char *) checked_malloc(sizeof(char) * INST_SIZE);
+    snprintf(tempinst_buf, INST_SIZE, "\tbx      LR\n");
+    temp_inst_list = AS_InstrList(AS_Oper(tempinst_buf, NULL, NULL, NULL), NULL);
+    tail_inst_list = AS_splice(tail_inst_list, temp_inst_list);
 
     /** 连接上出口指令 */
     AS_instrList total_inst = AS_splice(head_inst_list, tail_inst_list);
 
     char *entry_meta = (char *) checked_malloc(sizeof(char) * INST_SIZE*3);
-    sprintf(entry_meta, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
+    snprintf(entry_meta, INST_SIZE*3, "\t.align  2\n\t.global %s\n\t.type   %s, %%function\n", name, name);
+
     char *exit_meta = (char *) checked_malloc(sizeof(char) * INST_SIZE*3);
-    sprintf(exit_meta, "\t.size   %s, .-%s", name, name);
+    snprintf(exit_meta, INST_SIZE*3, "\t.size   %s, .-%s", name, name);
 
     return AS_Proc(entry_meta, total_inst, exit_meta);
 }
@@ -631,5 +741,20 @@ void F_setMemArgs(F_frame frame)
 {
     if (3 > frame->callee_max_args){
         frame->callee_max_args = 3;
+        frame->isLeaf = false;
     }
+}
+
+F_access look_for_f_offset(Temp_temp temp,F_frame f)
+{
+    F_accessList temp_access=f->locals;
+
+    for(;temp_access;temp_access=temp_access->tail) {
+        if((temp_access->head->kind == F_access_::inReg) &&
+            temp_access->head->u.reg->num == temp->num) {
+            return temp_access->head;
+        }
+    }
+
+    return NULL;
 }

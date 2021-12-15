@@ -4,8 +4,6 @@
 
 #include "translate.h"
 
-extern bool OptionalLeveL2; /// -O2选项的全局flag
-
 /**
  * typedefs
  * */
@@ -81,6 +79,18 @@ static Tr_exp Tr_Ex(T_exp exp){
     ex->u.ex = exp;
     return ex;
 }
+
+static Tr_exp Tr_Temp(Temp_temp temp){
+    T_exp p = (T_exp)checked_malloc(sizeof *p);
+    p->kind = T_exp_::T_TEMP;
+    p->u.TEMP = temp;
+
+    Tr_exp ex = (Tr_exp)checked_malloc(sizeof(*ex));
+    ex->kind = Tr_exp_::Tr_ex;
+    ex->u.ex = p;
+    return ex;
+}
+
 Tr_exp Tr_Nx(T_stm stm){
     Tr_exp nx = (Tr_exp)checked_malloc(sizeof(*nx));
     nx->kind = Tr_exp_::Tr_nx;
@@ -151,6 +161,7 @@ static struct Cx Tr_unCx(Tr_exp e)
         case Tr_exp_::Tr_nx:
         {
             printf("error:transform nx to cx");
+            EM_ASSERT_CODE=-94;
             assert(0);
         }
     }
@@ -200,8 +211,8 @@ Tr_access Tr_allocGlobal(S_symbol global){
 Tr_accessList Tr_getFormals(Tr_frame frame){
     return F_getFormals(frame);
 }
-Tr_frame Tr_newFrame(Temp_label name, U_boolList formals){
-    return F_newFrame(name, formals);
+Tr_frame Tr_newFrame(Temp_label name, U_boolList formals, bool needReturn){
+    return F_newFrame(name, formals, needReturn);
 }
 Temp_label Tr_getGlobalLabel(Tr_access access){
     /**
@@ -293,37 +304,83 @@ Tr_exp Tr_simpleVarNoMem(Tr_access acc)
  * @return 不为T_MEM的翻译
  */
 {
-    T_exp acc_with_mem = F_Exp(acc, T_Temp(F_FP()));
-    assert(acc_with_mem->kind == T_exp_::T_MEM);
-    return Tr_Ex(acc_with_mem->u.MEM);
+    T_exp acc_temp;
+
+    if(F_accessIsReg(acc)) {
+        acc_temp = F_Exp(acc, NULL);
+    } else {
+        acc_temp = F_Exp(acc, T_Temp(F_FP()));
+    }
+
+    if(acc_temp->kind == T_exp_::T_TEMP) {
+        return Tr_Temp(acc_temp->u.TEMP);
+    }
+    EM_ASSERT_CODE=-95;
+    assert(acc_temp->kind == T_exp_::T_MEM);
+    return Tr_Ex(acc_temp->u.MEM);
 }
 
 Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 {
+//    bool flag = false;
+//    T_exp offset_exp = Tr_unEx(offset);
+//    if (offset_exp->kind == T_exp_::T_CONST){
+//        T_exp base_exp = Tr_unEx(base);
+//
+//        if (base_exp->kind == T_exp_::T_BINOP or
+//        (base_exp->kind == T_exp_::T_MEM and
+//        base_exp->u.MEM->kind == T_exp_::T_BINOP)){
+//            if (base_exp->kind == T_exp_::T_MEM){
+//                flag = true;
+//                base_exp = base_exp->u.MEM;
+//            }
+//            assert(base_exp->kind == T_exp_::T_BINOP);
+//            assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+//            if (base_exp->u.BINOP.right->u.CONST < 0){
+//                return Tr_Ex(T_Mem(
+//                        T_Binop(
+//                                T_add, base_exp->u.BINOP.left,
+//                                T_Const(base_exp->u.BINOP.right->u.CONST+offset_exp->u.CONST * dimension * get_word_size())
+//                        )
+//                ));
+//            } else{
+//                if (flag)
+//                    base_exp = T_Mem(base_exp);
+//                return Tr_Ex(T_Mem(T_Binop(
+//                        T_add, base_exp,
+//                        T_Const(offset_exp->u.CONST * dimension * get_word_size())
+//                )));
+//            }
+//
+//        } else{
+//            return Tr_Ex(T_Mem(T_Binop(
+//                    T_add, base_exp,
+//                    T_Const(offset_exp->u.CONST * dimension * get_word_size())
+//                    )));
+//        }
+//    }
+    T_exp base_exp = Tr_unEx(base);
     T_exp offset_exp = Tr_unEx(offset);
     if (offset_exp->kind == T_exp_::T_CONST){
-        T_exp base_exp = Tr_unEx(base);
-
-        if (base_exp->kind == T_exp_::T_BINOP or
-        (base_exp->kind == T_exp_::T_MEM and base_exp->u.MEM->kind == T_exp_::T_BINOP)){
-            if (base_exp->kind == T_exp_::T_MEM){
-                base_exp = base_exp->u.MEM;
-            }
-            assert(base_exp->kind == T_exp_::T_BINOP);
+        int offset_int = offset_exp->u.CONST;
+        if (base_exp->kind == T_exp_::T_BINOP){
+            EM_ASSERT_CODE=-96;
             assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
-            return Tr_Ex(T_Mem(
-                    T_Binop(
-                            T_add, base_exp->u.BINOP.left,
-                            T_Const(base_exp->u.BINOP.right->u.CONST+offset_exp->u.CONST * dimension * get_word_size())
-                    )
-            ));
-
-        } else{
+            int base_int = base_exp->u.BINOP.right->u.CONST;
             return Tr_Ex(T_Mem(T_Binop(
-                    T_add, base_exp,
-                    T_Const(offset_exp->u.CONST * dimension * get_word_size())
-                    )));
+                    T_add, base_exp->u.BINOP.left,
+                    T_Const(base_int + offset_int * dimension * get_word_size())
+            )));
         }
+
+        if (offset_int == 0){
+            return Tr_Ex(T_Mem(base_exp));
+        }
+
+        return Tr_Ex(T_Mem(T_Binop(
+                T_add, base_exp,
+                T_Const(offset_int * dimension * get_word_size())
+        )));
     }
     return Tr_Ex(T_Mem(
             T_Binop(T_add,Tr_unEx(base),
@@ -333,27 +390,61 @@ Tr_exp Tr_subscriptVar(Tr_exp base, Tr_exp offset, int dimension)
 
 Tr_exp Tr_subscriptVarNoMem(Tr_exp base, Tr_exp offset, int dimension)
 {
+//    bool flag = false;
+//    T_exp offset_exp = Tr_unEx(offset);
+//    if (offset_exp->kind == T_exp_::T_CONST){
+//        T_exp base_exp = Tr_unEx(base);
+//
+//        if (base_exp->kind == T_exp_::T_BINOP or
+//            (base_exp->kind == T_exp_::T_MEM and base_exp->u.MEM->kind == T_exp_::T_BINOP)){
+//            if (base_exp->kind == T_exp_::T_MEM){
+//                flag = true;
+//                base_exp = base_exp->u.MEM;
+//            }
+//            assert(base_exp->kind == T_exp_::T_BINOP);
+//            assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+//            if (base_exp->u.BINOP.right->u.CONST < 0){
+//                return Tr_Ex(T_Binop(
+//                        T_add, base_exp->u.BINOP.left,
+//                        T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
+//                ));
+//            } else{
+//                if (flag)
+//                    base_exp = T_Mem(base_exp);
+//                return Tr_Ex(T_Binop(
+//                        T_add, base_exp,
+//                        T_Const(offset_exp->u.CONST*dimension*get_word_size())
+//                ));
+//            }
+//        } else{
+//            return Tr_Ex(T_Binop(
+//                    T_add, base_exp,
+//                    T_Const(offset_exp->u.CONST*dimension*get_word_size())
+//                    ));
+//        }
+//    }
+    T_exp base_exp = Tr_unEx(base);
     T_exp offset_exp = Tr_unEx(offset);
     if (offset_exp->kind == T_exp_::T_CONST){
-        T_exp base_exp = Tr_unEx(base);
-
-        if (base_exp->kind == T_exp_::T_BINOP or
-            (base_exp->kind == T_exp_::T_MEM and base_exp->u.MEM->kind == T_exp_::T_BINOP)){
-            if (base_exp->kind == T_exp_::T_MEM){
-                base_exp = base_exp->u.MEM;
-            }
-            assert(base_exp->kind == T_exp_::T_BINOP);
+        int offset_int = offset_exp->u.CONST;
+        if (base_exp->kind == T_exp_::T_BINOP){
+            EM_ASSERT_CODE=-97;
             assert(base_exp->u.BINOP.right->kind == T_exp_::T_CONST);
+            int base_int = base_exp->u.BINOP.right->u.CONST;
             return Tr_Ex(T_Binop(
                     T_add, base_exp->u.BINOP.left,
-                    T_Const(base_exp->u.BINOP.right->u.CONST + offset_exp->u.CONST * dimension * get_word_size())
+                    T_Const(base_int + offset_int * dimension * get_word_size())
             ));
-        } else{
-            return Tr_Ex(T_Binop(
-                    T_add, base_exp,
-                    T_Const(offset_exp->u.CONST*dimension*get_word_size())
-                    ));
         }
+
+        if (offset_int == 0){
+            return Tr_Ex(base_exp);
+        }
+
+        return Tr_Ex(T_Binop(
+                T_add, base_exp,
+                T_Const(offset_int * dimension * get_word_size())
+                ));
     }
     return Tr_Ex(T_Binop(
             T_add,
@@ -373,6 +464,7 @@ Tr_exp Tr_binop(A_binOp aop,Tr_exp left,Tr_exp right)//算术运算
         case A_mod: op=T_mod;break;
         default: {
             printf("error from Tr_binop translate.c maybe something wrong wirh binop");
+            EM_ASSERT_CODE=-98;
             assert(0);
         }
     }
@@ -498,6 +590,7 @@ Tr_exp Tr_relop(A_binOp aop,Tr_exp left,Tr_exp right)//逻辑运算
                 break;}
         default:
             printf("error from Tr_binop translate.c maybe something wrong wirh relop");
+            EM_ASSERT_CODE=-99;
             assert(0);
     }
     T_exp left_exp=Tr_unEx(left);
@@ -566,16 +659,26 @@ Tr_exp Tr_init_array(Tr_access base, Tr_INIT_initList init_info)
 {
     T_exp frame_ptr = T_Temp(F_FP());
     int array_length=init_info->array_length;
-    T_stm init_var = T_Move(F_expWithIndex(base, frame_ptr, init_info->init_offset[0]),
-                            Tr_unEx(init_info->array[0]));
+    T_stm init_var = nullptr;
 
-    for(int i=1;i<array_length;i++)
+    for(int i=0;i<array_length;i++)
     {
-        init_var = T_Seq(
-                init_var,
-                T_Move(F_expWithIndex(base, frame_ptr, init_info->init_offset[i]), Tr_unEx(init_info->array[i]))
-                );
+        T_exp index_exp = Tr_unEx(init_info->array[i]);
+        if (index_exp->kind == T_exp_::T_CONST && index_exp->u.CONST == 0)
+            continue;
+
+        if (init_var == nullptr){
+            init_var = T_Move(F_expWithIndex(base, frame_ptr, init_info->init_offset[i]),
+                              index_exp);
+        } else{
+            init_var = T_Seq(
+                    init_var,
+                    T_Move(F_expWithIndex(base, frame_ptr, init_info->init_offset[i]),
+                           index_exp));
+        }
     }
+    if (!init_var)
+        return Tr_nopExp();
     return Tr_Nx(init_var);
 }
 Tr_exp Tr_doneExp() {
@@ -678,12 +781,23 @@ void Tr_procEntryExit(Tr_frame frame, Tr_exp body, Tr_accessList formals)//todo
 }
 Tr_exp Tr_return(Tr_exp ret_num,F_frame f_frame)
 {
-    Temp_temp get_rv=F_RV();
-    T_exp tmp=T_Temp(get_rv);
-    Temp_label f_temp_label=get_done_label(f_frame);
-    T_stm jump=T_Jump(T_Name(f_temp_label),Temp_LabelList(f_temp_label,NULL));
-    return Tr_Nx(T_Seq(T_Move(tmp,Tr_unEx(ret_num)),jump));
+    Temp_temp ret_temp;
+    ret_temp = F_R0();
+    T_exp tmp = T_Temp(ret_temp);
+
+    Temp_label f_temp_label = get_done_label(f_frame);
+    T_stm jump = T_Jump(T_Name(f_temp_label), Temp_LabelList(f_temp_label, NULL));
+
+    return Tr_Nx(T_Seq(T_Move(tmp, Tr_unEx(ret_num)), jump));
 }
+
+Tr_exp Tr_return_no_param(F_frame f_frame)
+{
+    Temp_label f_temp_label = get_done_label(f_frame);
+    T_stm jump = T_Jump(T_Name(f_temp_label), Temp_LabelList(f_temp_label, NULL));
+    return Tr_Nx(jump);
+}
+
 //todo return jump label in chapter 12
 Tr_exp Tr_newlabel()
 {

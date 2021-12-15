@@ -18,5 +18,6 @@ struct RA_result {
 
 struct RA_result RA_regAlloc(F_frame f, AS_instrList il);
 
+#define INST_GENERAL_LEN 40
 
 #endif //COMPILER_BUG_CONSTEXP_REGALLOC_H

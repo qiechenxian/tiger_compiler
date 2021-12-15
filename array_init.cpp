@@ -47,12 +47,13 @@ static void paddingInit(vector<intExpPair>& exp_array, int pos, int len, const i
                     break;
                 }
             }
+            EM_ASSERT_CODE=-54;
             assert(stride);
             if (stride == 1){
 //                exp_array[index] = getOneValue(init_list->head->u.nested);
                 exp_array.emplace_back(pos, getOneValue(init_list->head->u.nested));
             } else{
-                paddingInit(exp_array/*+index*/, pos+index, stride,
+                paddingInit(exp_array/*+index*/, pos, stride,
                             suffix_size+sub_point, init_list->head->u.nested);
             }
             index += stride;
@@ -76,11 +77,14 @@ bool pairCmp(intExpPair a, intExpPair b){
 
 INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_list){
     auto init_list = (INIT_initList)checked_malloc(sizeof(INIT_initList_));
-    vector<intExpPair> exp_vector;
+
+    init_list->array.clear();
+    vector<intExpPair> & exp_vector = init_list->array;
 
     int len = 0, total_len=1;
     int temp[256];
     for (A_expList iter = array_size; iter; iter = iter->tail){
+        EM_ASSERT_CODE=-55;
         assert(iter->head->kind == A_exp_::A_intExp);
         temp[len++] = iter->head->u.intExp;
         total_len *= iter->head->u.intExp;
@@ -106,7 +110,7 @@ INIT_initList INIT_InitList(A_expList array_size, A_arrayInitList array_init_lis
     if (exp_vector.end()->first != total_len){
         exp_vector.emplace_back(total_len, A_IntExp(nullptr, 0));
     }
-    init_list->array = exp_vector;
+//    init_list->array.swap(exp_vector);
     init_list->suffix_size = suffix_size;
     init_list->total_size = suffix_size[0] * temp[0];
     return init_list;
@@ -135,6 +139,7 @@ A_exp INIT_get(INIT_initList init_list, const int* index){
 
 int INIT_getInt(INIT_initList init_list, int* index){
     A_exp el = INIT_get(init_list, index);
+    EM_ASSERT_CODE=-56;
     assert(el->kind == A_exp_::A_intExp);
     return el->u.intExp;
 }
@@ -145,22 +150,36 @@ U_pairList INIT_shrinkInitList(INIT_initList init_list){
     U_pairList shrink_array = nullptr;
     U_pairList tail_ptr = shrink_array;
     int pre = 0;
+    int cnt = 1;
     for (auto & iter : init_list->array){
         int zeros = iter.first - pre - 1;
         pre = iter.first;
         U_intPair pair;
         if (zeros > 0){
             pair = U_IntPair(zeros, 0);
+            if (!shrink_array){
+                shrink_array = U_PairList(pair, nullptr);
+                tail_ptr = shrink_array;
+            } else{
+                tail_ptr->tail = U_PairList(pair, nullptr);
+                tail_ptr = tail_ptr->tail;
+            }
+            if (cnt == init_list->array.size())
+                break;
+            pair = U_IntPair(1, iter.second->u.intExp);
         } else{
+            if (cnt == init_list->array.size())
+                break;
             pair = U_IntPair(1, iter.second->u.intExp);
         }
-        if (not shrink_array){
+        if (!shrink_array){
             shrink_array = U_PairList(pair, nullptr);
             tail_ptr = shrink_array;
         } else{
             tail_ptr->tail = U_PairList(pair, nullptr);
             tail_ptr = tail_ptr->tail;
         }
+        cnt++;
     }
     return shrink_array;
 }

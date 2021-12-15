@@ -7,6 +7,7 @@
 
 #define EM_MSG_NUM 2
 
+int EM_ASSERT_CODE = 71;
 unsigned EM_token_pos = 0;
 char EM_code_str[EM_LINE_CODE_BUF];
 char *msg[EM_MSG_NUM];
@@ -42,8 +43,22 @@ void EM_warning(A_pos pos, const char* message, ...){
     fprintf(stderr, "\n");
 }
 
+void EM_errorWithExitCode(int code, A_pos pos, const char* message, ...){
+    exit(code);
+    if (!pos){
+        pos = A_Pos(0,0,0,0);
+    }
+    fprintf(stderr, "%s:%d:%d: error: ", FILE_NAME, pos->first_line, pos->first_column);
+    va_list ap;
+    va_start(ap, message);
+    vfprintf(stderr, message, ap);
+    va_end(ap);
+    fprintf(stderr, "\n");
+}
+
+#if 0
 void EM_error(A_pos pos, const char* message, ...){
-    if (not pos){
+    if (!pos){
         pos = A_Pos(0,0,0,0);
     }
     fprintf(stderr, "%s:%d:%d: error: ", FILE_NAME, pos->first_line, pos->first_column);
@@ -54,4 +69,5 @@ void EM_error(A_pos pos, const char* message, ...){
     fprintf(stderr, "\n");
     exit(-1);
 }
+#endif
 
